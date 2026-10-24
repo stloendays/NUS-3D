@@ -7,9 +7,12 @@ Date checked: 2026-10-24. Links are research references, **not** statements that
 | Resource | Link | Intended role | Access / caveat |
 |---|---|---|---|
 | NUS interactive campus map | https://map.nus.edu.sg/ | Find buildings, entrances, transport and place names | Official map; use as visual reference, not automatically a survey |
+| NUS UTown map (2025 map) | https://map.nus.edu.sg/download/University-Town-Map.pdf | Main map comparison and building orientation | Uses a scale bar; still not a measured source for heights, ramps, stairs or detailed facades |
 | NUS University Town PDF | https://map.nus.edu.sg/download/9Jan2024/University-Town-Map.pdf | Historical names, layout, road and facility reference | Dated path; **map says NOT TO SCALE**, do not extract exact lengths by pixel |
 | NUS official 360° tour | https://www.nus.edu.sg/oam/nus-experience/virtual-tour | Eye-height exterior reference, entrances, facade views | Reference/observation; redistribution of screenshots not presumed licensed |
 | NUS UCI UTown facilities | https://uci.nus.edu.sg/campus-life/campus-services/utown/ | ERC, SRC and Town Plaza contextual descriptions | Official descriptive source, confirm updated access and names |
+| City-Syntax public building points | https://github.com/City-Syntax/nus-digital-twin/blob/main/src/content/buildings/buildings.json | Cross-check approximate P0/P1 building centres, Oct 2026 | Publicly readable does not prove permission to redistribute source code or meshes; no 3D mesh copied |
+| City-Syntax public green-spaces layer | https://github.com/City-Syntax/nus-digital-twin/blob/main/public/shapefiles/green-spaces/natural.json | Cross-check and simplify Town Green OSM-derived park outline | Attribution includes OSM/ODbL; full upstream GIS licensing review pending |
 | NUS Digital Twin | https://www.nus-digital-twin.com/ | Building names, footprints, potential geometry references | Some models/layers are listed; **download and reuse permission not verified** |
 | OpenStreetMap | https://www.openstreetmap.org/ | Approximate building footprints, roads, lawns, paths | ODbL; attribution and database share-alike rules may apply |
 | Overpass Turbo | https://overpass-turbo.eu/ | Extract a UTown OSM area as geospatial input | Query and export results with date/attribution |
@@ -18,7 +21,14 @@ Date checked: 2026-10-24. Links are research references, **not** statements that
 | Campus3D description | https://3d.nus.app/des/ | Check regional downloadable coverage | Explicitly says **UTown and Faculty of Science datasets to be released later**; verify before relying |
 | OSM copyright / licensing | https://www.openstreetmap.org/copyright | Attribution/license review | Keep attribution in published application |
 
-## B. Evidence gathering shot list
+## B. M1 facts and what is **not** measured
+
+- `godot/data/utown_core.json` contains coordinate-centred proxies, a simplified Town Green polygon and a conceptual 4-stop walking loop; the Godot smoke test checks only generation, not survey accuracy.
+- M1 anchor: WGS84 (103.77316 E, 1.305075 N); provisional for visual testing, not an officially surveyed control point.
+- All model heights, planar extents, flat elevations, tree placements and paths are estimates or procedural. Use real observations and permitted reference images before replacing them with precise assets.
+- Upstream geospatial data may be based on OSM and third-party modifications; evaluate rights before scaling up to bulk derivatives or commercial reuse.
+
+## C. Evidence gathering shot list
 
 For each P0 building, collect **links + photographer/source + date + viewpoint**, not uncontrolled image copies.
 
@@ -45,7 +55,7 @@ usage_permission: verified | needs-review | reference-only
 local_file: none unless authorized
 ```
 
-## C. Data provenance / measurement workflow
+## D. Data provenance / measurement workflow
 
 1. Capture the source page URL, access date and source attribution.
 2. For OSM, export a bounded UTown dataset, preserve `source_date` and original GeoJSON separately from transformed data.
@@ -55,7 +65,7 @@ local_file: none unless authorized
 6. Before including a downloaded 3D model, texture or image, confirm the exact asset license; an accessible URL is not a reuse license.
 7. Provide NUS non-affiliation notice and OSM attribution in released demo and project website.
 
-## D. Key open questions
+## E. Key open questions
 
 - Where exactly should the Town Green local origin and bounding box be defined using verified GIS points?
 - Are there current publicly redistributable exterior photographs of ERC and SRC under suitable Creative Commons terms?

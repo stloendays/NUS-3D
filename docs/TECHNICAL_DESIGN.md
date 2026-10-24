@@ -1,6 +1,6 @@
 # Technical design — reusable UTown model pipeline
 
-Date: 2026-10-24 · Proposed specification (not yet implemented)
+Date: 2026-10-24 · Godot M1 greybox implemented; data-survey/GLB pipeline remains proposed.
 
 ## 1. Architecture and responsibilities
 
@@ -14,8 +14,8 @@ Date: 2026-10-24 · Proposed specification (not yet implemented)
 ## 2. Coordinate reference contract
 
 1. Original geographic data: WGS84 lat/lon (EPSG:4326), with source and timestamp.
-2. For local area metric geometry, transform geographic positions to Singapore SVY21 projected coordinates (EPSG:3414) when supported by GIS tools.
-3. Set a **verified Town Green anchor**, stored as E0/N0 and an elevation reference H0. **Do not invent coordinates or heights now.**
+2. **Current M1 prototype** uses a documented local equirectangular approximation, with origin `(lon 103.77316, lat 1.305075)` near Town Green. It is not survey-grade, and elevations remain entirely provisional.
+3. **Future validated model** should convert WGS84 to Singapore SVY21 (EPSG:3414), establish a verified anchor E0/N0 and measure an elevation datum H0. Replace the approximation only after reprojecting all related assets together.
 4. 3D world axes (metres): `X = Easting - E0`, `Z = -(Northing - N0)`, `Y = Height - H0`. Thus positive X points east, negative Z points north, positive Y points upward.
 5. Blender uses a Z-up authoring viewport, but export to glTF/Godot Y-up. Compare an exported test cube/arrow before producing real building assets.
 6. All footprints and building IDs use this single shared origin; never center each file arbitrarily when producing site-level placement data.
@@ -32,56 +32,49 @@ Record a confidence per measurement: `verified`, `derived_from_OSM`, `estimated_
 | Blender source | BLEND | Non-destructive editable masters |
 | Texture | PNG/JPEG/WebP (as appropriate) | Prefer legal, self-made and tiling materials |
 | Preview | PNG | Screenshot with a clear stage/viewpoint ID |
-| Runtime scene | Godot `.tscn` | References reusable GLB assets, not duplicated geometry |
+| Runtime scene | Godot `.tscn` | **M1** procedurally creates proxy geometry from `godot/data/utown_core.json`; future stages will reference GLB assets |
 
 **Do not commit** personal account details, unofficial private building plans, unlicensed third-party models, or photos without re-distribution rights.
 
-## 4. Proposed structure (future)
+## 4. Repository structure (current and planned)
 
 ```text
-data/
-  utown_landmarks.csv
-  gis/                 # future cleaned footprint/route geometries + source metadata
-assets/
-  buildings/           # erc.glb, src.glb, ...
-  terrain/
-  props/
-  vegetation/
-  materials/
-blender/
-  utown_blockout.blend
-  buildings/
+README.md
+data/utown_landmarks.csv
 godot/
   project.godot
-  scenes/
-    utown_world.tscn
-    first_person_controller.tscn
-  scripts/
-web/
-  src/                 # optional Three.js viewer
-tools/
-  gis/
-  validators/
-docs/
+  data/utown_core.json          # v0 approximate data, P0 and P1
+  scenes/main.tscn              # player + HUD + world scene
+  scripts/utown_world.gd        # procedural geometry
+  scripts/player_controller.gd  # first-person controller
+  scripts/hud.gd
+  scripts/minimap.gd
+  tests/smoke_test.gd
+.github/workflows/godot.yml      # Godot 4.4.1 headless test
+docs/M1_GREYBOX.md               # launch and limitations
+assets/                           # planned editable or licensed GLBs
+blender/                          # planned Blender master scenes
+web/                              # future Three.js viewer
+tools/                            # future GIS conversion and validators
 ```
 
-These paths are a proposal; only existing files are represented as implemented.
+Only the paths with actual files above are implemented. Asset, Blender, web and tooling directories are future plans.
 
-### Suggested Godot hierarchy
+### Current Godot scene hierarchy
 
 ```text
-UTownWorld (Node3D)
-  Terrain (StaticBody3D)
-  RoadsAndStairs (Node3D)
-  Buildings (Node3D)
-    ERC (Node3D)
-    SRC (Node3D)
-    SurroundingProxies (Node3D)
-  Vegetation (Node3D / MultiMeshInstance3D)
-  StaticProps (Node3D)
-  Lighting (WorldEnvironment + DirectionalLight3D)
-  Player (CharacterBody3D)
-  LandmarkLabels (Node3D)
+UTown (Node3D)
+  World (UTownWorld script)
+    Terrain (box mesh + static collision)
+    TownGreen_approximate (triangulated mesh)
+    TownPlaza_approximate (plaza slab/canopy)
+    ConceptualFootpaths_NotSurveyed (wide overlay strips)
+    BuildingMassing_Estimated (9 named building groups)
+    Vegetation_Procedural (64 trees)
+    RouteBeacons_Conceptual (4 markers)
+    WorldEnvironment / DirectionalLight3D
+  Player (CharacterBody3D + capsule + Head/Camera3D)
+  HUD (CanvasLayer / status / minimap)
 ```
 
 Player should have a capsule collider, slope support and a simple unstuck/reset function. Keep collision meshes distinct from high-detail rendering geometry.
@@ -110,14 +103,13 @@ Player should have a capsule collider, slope support and a simple unstuck/reset 
 
 1. **Top-down**: compare placement of at least ERC/SRC/Plaza/Green with GIS and official orientation diagram.
 2. **Eye-level**: three known standing viewpoints with screenshots and reference links.
-3. **Walking path**: player completes Green → Plaza → ERC → SRC → Green without collision issues.
+3. **Walking path**: player completes Green → ERC → SRC → Plaza → Green without collision issues.
 4. **Scale**: doors, person height, path widths and facade rhythm plausibly aligned; unknown real dimensions marked estimated.
 5. **Performance**: repeatable graphics preset and recorded PC specifications.
 6. **Rights**: review redistribution license before public packaging.
 
-## 8. Suggested first implementation
+## 8. Initial implementation and next pass
 
-- Export a **single GLB** with ground plane, first rough terrain, four core blockout masses, footpaths and 5–10 placeholder trees.
-- Import into Godot 4, add CharacterBody3D player controller and static collision.
-- Make two comparison screenshots before investing in any detailed material.
-- After the M1 walk-through passes, break apart buildings into independently editable GLBs.
+- **Implemented**: source-driven Godot scene with approximate flat ground, nine compound/proxy buildings, Town Green and Plaza, pedestrian hints, 64 generated trees and capsule collision. CI instantiates and tests the scene.
+- **Next**: verify elevation and pedestrian routes, record two reference-vs-engine viewpoints, check player scale, and compare real Windows FPS.
+- **After M1 walk-through acceptance**: build editable Blender GLBs with shared placement coordinates and replace individual proxy masses, preserving stable IDs.

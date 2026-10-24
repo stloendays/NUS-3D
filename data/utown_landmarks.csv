@@ -1,12 +1,12 @@
 id,name,priority,phase,geometry_status,visual_reference_status,license_status,notes
-UT_TOWN_GREEN,Town Green,P0,M1,not-collected,reference-links-listed,needs-review,Start of walking loop; lawn outline slopes and trees
-UT_TOWN_PLAZA,Town Plaza,P0,M1,not-collected,reference-links-listed,needs-review,Pedestrian hub and linking canopy
-UT_ERC,Education Resource Centre,P0,M1-M2,not-collected,reference-links-listed,needs-review,Facade entrance and relative massing
-UT_SRC,Stephen Riady Centre,P0,M1-M2,not-collected,reference-links-listed,needs-review,Facade entrance and plaza relationship
-UT_TEMBUSU,Tembusu College,P1,M2,not-collected,not-collected,needs-review,Surrounding building proxy initially
-UT_CAPT,College of Alice & Peter Tan,P1,M2,not-collected,not-collected,needs-review,Surrounding building proxy initially
-UT_RC4,Residential College 4,P1,M2,not-collected,not-collected,needs-review,Surrounding building proxy initially
-UT_CINNAMON,Cinnamon College,P1,M2,not-collected,not-collected,needs-review,Check current institution names
-UT_UTR,UTown Residence,P1,M2,not-collected,not-collected,needs-review,North and south towers where relevant
-UT_CREATE,CREATE,P1,M2,not-collected,not-collected,needs-review,Context building proxy
-UT_COLLEGE_LINK,College Link,P2,M5,not-collected,not-collected,needs-review,Future connectivity to Kent Ridge
+UT_TOWN_GREEN,Town Green,P0,M1,simplified-outline-unsurveyed,reference-links-listed,needs-review,OSM-derived schematic polygon flat ground no elevation
+UT_TOWN_PLAZA,Town Plaza,P0,M1,approximate-surface-proxy,reference-links-listed,needs-review,Create Tower lower floors not yet recreated
+UT_ERC,Education Resource Centre,P0,M1-M2,approximate-centre-and-massing,reference-links-listed,needs-review,Parts dimensions and entrance unverified
+UT_SRC,Stephen Riady Centre,P0,M1-M2,approximate-centre-and-massing,reference-links-listed,needs-review,Compound split into separate wings to avoid wrong parcel extrusion
+UT_TEMBUSU,Tembusu College,P1,M2,approximate-centre-and-proxy,not-collected,needs-review,Height and facade estimated
+UT_CAPT,College of Alice & Peter Tan,P1,M2,approximate-centre-and-proxy,not-collected,needs-review,Height and facade estimated
+UT_RC4,Residential College 4,P1,M2,approximate-centre-and-proxy,not-collected,needs-review,Height and facade estimated
+UT_CINNAMON,Cinnamon College,P1,M2,approximate-centre-and-proxy,not-collected,needs-review,Institution naming requires periodic review
+UT_UTR,UTown Residence,P1,M2,north-south-proxies-estimated,not-collected,needs-review,Two schematic towers
+UT_CREATE,CREATE,P1,M2,create-tower-proxy-estimated,not-collected,needs-review,Other CREATE facilities not yet reconstructed
+UT_COLLEGE_LINK,College Link,P2,M5,not-collected,not-collected,needs-review,Not part of M1 playable area
