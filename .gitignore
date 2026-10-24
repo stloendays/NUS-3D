@@ -1,0 +1,30 @@
+# Godot 4 generated files
+.godot/
+.import/
+.mono/
+
+# JavaScript / Three.js
+node_modules/
+dist/
+build/
+.vite/
+
+# Blender backups and autosaves
+*.blend1
+*.blend2
+*.blend@
+*.blend.gz
+*.blend_autosave
+*.blend_backup
+
+# Temporary source downloads (keep provenance and licensed final assets only)
+tmp/
+temp/
+downloads/
+*.part
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
