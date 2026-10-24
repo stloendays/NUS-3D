@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-10-24 · Status: proposal, not yet implemented
+Date: 2026-10-24 · Status: **first procedural Godot M1 source committed; verification and survey pending**
 
 ## 1. 产品定位
 
@@ -52,6 +52,8 @@ Date: 2026-10-24 · Status: proposal, not yet implemented
 **验收**：一个带来源的平面总图；P0 建筑轮廓与关键路径有可复现坐标；从 360° 能辨识关键视角。
 
 ### M1 — Greybox / 空间占位模型
+
+**2026-10-24 progress:** [第一版 Godot 灰盒](M1_GREYBOX.md)已经加入 `godot/`：简化 Green/Plaza、ERC/SRC 大体量与周边建筑、基础碰撞、第一人称控制、路径指示、简图和数据来源说明。**还未达到本阶段验收**：路线、坡道与建筑尺度未现场验证，Blender GLB 资产尚未制作，Windows 真机性能未实测。
 
 - [ ] Blender 按米建立 Green/Plaza/ERC/SRC 占位几何；确定高度、入口朝向和地形高差的可信来源。
 - [ ] 导出 GLB；模型原点、命名、比例一致。

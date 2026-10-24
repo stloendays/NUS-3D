@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "label": "NUS University Town — M1 approximate greybox",
+  "spatial_reference": {
+    "crs": "EPSG:4326 (WGS84)",
+    "origin_lon": 103.77316,
+    "origin_lat": 1.305075,
+    "conversion": "local tangent equirectangular, metres; X east, -Z north, Y up",
+    "precision": "approximate, NOT survey grade",
+    "status": "P0 points cross-checked with 2025 NUS map and City-Syntax/NUS Digital Twin public POI listing; massing and elevation still estimated"
+  },
+  "ground_size_m": [
+    550,
+    720
+  ],
+  "green": {
+    "id": "TOWN_GREEN",
+    "name": "Town Green",
+    "provenance": "simplified shape traced from OSM-derived public GIS outline; not precise landscaping or terrain",
+    "polygon_lonlat": [
+      [
+        103.7730082,
+        1.3053186
+      ],
+      [
+        103.7727563,
+        1.3053009
+      ],
+      [
+        103.7726204,
+        1.3051475
+      ],
+      [
+        103.7726019,
+        1.3050633
+      ],
+      [
+        103.7727117,
+        1.304917
+      ],
+      [
+        103.77289,
+        1.3048068
+      ],
+      [
+        103.7730799,
+        1.3046338
+      ],
+      [
+        103.7732897,
+        1.3044397
+      ],
+      [
+        103.7733268,
+        1.3043957
+      ],
+      [
+        103.773408,
+        1.3045058
+      ],
+      [
+        103.7735442,
+        1.304576
+      ],
+      [
+        103.7735881,
+        1.3046648
+      ],
+      [
+        103.7735295,
+        1.3048504
+      ],
+      [
+        103.7734544,
+        1.3050933
+      ],
+      [
+        103.7734102,
+        1.3052612
+      ],
+      [
+        103.7733837,
+        1.3054069
+      ],
+      [
+        103.7733483,
+        1.3054202
+      ],
+      [
+        103.7732781,
+        1.3053396
+      ],
+      [
+        103.7731742,
+        1.3053002
+      ],
+      [
+        103.7730903,
+        1.3053122
+      ]
+    ]
+  },
+  "buildings": [
+    {
+      "id": "ERC",
+      "name": "Education Resource Centre",
+      "priority": "P0",
+      "lat": 1.30598,
+      "lon": 103.77291,
+      "role": "academic",
+      "rotation_deg": -10,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": -9,
+          "dn": 7,
+          "w": 45,
+          "d": 30,
+          "h": 12.5
+        },
+        {
+          "dx": 18,
+          "dn": -10,
+          "w": 26,
+          "d": 28,
+          "h": 11.5
+        }
+      ]
+    },
+    {
+      "id": "SRC",
+      "name": "Stephen Riady Centre",
+      "priority": "P0",
+      "lat": 1.30462,
+      "lon": 103.77252,
+      "role": "civic",
+      "rotation_deg": -18,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": -14,
+          "dn": 22,
+          "w": 43,
+          "d": 28,
+          "h": 12.5
+        },
+        {
+          "dx": 2,
+          "dn": -22,
+          "w": 60,
+          "d": 24,
+          "h": 12
+        },
+        {
+          "dx": 28,
+          "dn": 10,
+          "w": 22,
+          "d": 34,
+          "h": 13
+        }
+      ]
+    },
+    {
+      "id": "CREATE_TOWER",
+      "name": "CREATE Tower",
+      "priority": "P1",
+      "lat": 1.30385,
+      "lon": 103.77358,
+      "role": "research",
+      "rotation_deg": -23,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": 0,
+          "dn": 0,
+          "w": 48,
+          "d": 29,
+          "h": 27
+        }
+      ]
+    },
+    {
+      "id": "UTR_N",
+      "name": "UTown Residence North",
+      "priority": "P1",
+      "lat": 1.30538,
+      "lon": 103.77379,
+      "role": "residence",
+      "rotation_deg": 17,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": 0,
+          "dn": 0,
+          "w": 30,
+          "d": 48,
+          "h": 42
+        }
+      ]
+    },
+    {
+      "id": "UTR_S",
+      "name": "UTown Residence South",
+      "priority": "P1",
+      "lat": 1.30488,
+      "lon": 103.77395,
+      "role": "residence",
+      "rotation_deg": 17,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": 0,
+          "dn": 0,
+          "w": 30,
+          "d": 48,
+          "h": 42
+        }
+      ]
+    },
+    {
+      "id": "TEMBUSU",
+      "name": "Tembusu College",
+      "priority": "P1",
+      "lat": 1.30621,
+      "lon": 103.7737,
+      "role": "residence",
+      "rotation_deg": 21,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": 0,
+          "dn": 0,
+          "w": 37,
+          "d": 40,
+          "h": 48
+        }
+      ]
+    },
+    {
+      "id": "CAPT",
+      "name": "College of Alice & Peter Tan",
+      "priority": "P1",
+      "lat": 1.3076,
+      "lon": 103.77315,
+      "role": "residence",
+      "rotation_deg": 17,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": 0,
+          "dn": 0,
+          "w": 40,
+          "d": 31,
+          "h": 46
+        }
+      ]
+    },
+    {
+      "id": "CINNAMON",
+      "name": "Cinnamon College",
+      "priority": "P1",
+      "lat": 1.30669,
+      "lon": 103.77347,
+      "role": "residence",
+      "rotation_deg": 24,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": 0,
+          "dn": 0,
+          "w": 28,
+          "d": 36,
+          "h": 45
+        }
+      ]
+    },
+    {
+      "id": "RC4",
+      "name": "Residential College 4",
+      "priority": "P1",
+      "lat": 1.30822,
+      "lon": 103.7733,
+      "role": "residence",
+      "rotation_deg": 17,
+      "dimensions_status": "estimated",
+      "parts": [
+        {
+          "dx": 0,
+          "dn": 0,
+          "w": 35,
+          "d": 40,
+          "h": 46
+        }
+      ]
+    }
+  ],
+  "plaza": {
+    "id": "TOWN_PLAZA",
+    "name": "Town Plaza",
+    "lat": 1.3041,
+    "lon": 103.77355,
+    "width_m": 44,
+    "depth_m": 31,
+    "rotation_deg": 15,
+    "confidence": "approximate; the official facility occupies lower CREATE Tower levels"
+  },
+  "loop": [
+    {
+      "id": "GREEN",
+      "name": "Town Green",
+      "lat": 1.305035,
+      "lon": 103.77314
+    },
+    {
+      "id": "ERC",
+      "name": "ERC (south approach)",
+      "lat": 1.305615,
+      "lon": 103.773
+    },
+    {
+      "id": "SRC",
+      "name": "SRC (east forecourt)",
+      "lat": 1.30458,
+      "lon": 103.77296
+    },
+    {
+      "id": "PLAZA",
+      "name": "Town Plaza",
+      "lat": 1.30419,
+      "lon": 103.77358
+    }
+  ],
+  "walkway_note": "Conceptual, flat and unsurveyed pedestrian guidance; do not use for real navigation",
+  "walkways": [
+    {
+      "width_m": 4,
+      "lonlat": [
+        [
+          103.77314,
+          1.305035
+        ],
+        [
+          103.7731,
+          1.30534
+        ],
+        [
+          103.773,
+          1.305615
+        ]
+      ]
+    },
+    {
+      "width_m": 3.5,
+      "lonlat": [
+        [
+          103.773,
+          1.305615
+        ],
+        [
+          103.77283,
+          1.30535
+        ],
+        [
+          103.77276,
+          1.30502
+        ],
+        [
+          103.77296,
+          1.30458
+        ]
+      ]
+    },
+    {
+      "width_m": 4.2,
+      "lonlat": [
+        [
+          103.77296,
+          1.30458
+        ],
+        [
+          103.77324,
+          1.30433
+        ],
+        [
+          103.77358,
+          1.30419
+        ]
+      ]
+    },
+    {
+      "width_m": 4.2,
+      "lonlat": [
+        [
+          103.77358,
+          1.30419
+        ],
+        [
+          103.7735,
+          1.30458
+        ],
+        [
+          103.77314,
+          1.305035
+        ]
+      ]
+    }
+  ],
+  "no_official_affiliation": true,
+  "data_credit": "OpenStreetMap contributors (ODbL); positional cross-check: City-Syntax/nus-digital-twin public buildings data; official NUS 2025 map for broad spatial arrangement. No source meshes or images bundled."
+}

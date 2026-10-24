@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **Planning / source collection (2026-10-24)**. No 3D model, terrain survey, or playable build has been completed yet.
+> Status: **M1 initial Godot greybox implementation (2026-10-24)**. Source is committed; Windows export and real-device playtesting have not been verified.
 
-[中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -14,6 +14,12 @@
 - **周边占位模型**：Tembusu College、College of Alice & Peter Tan (CAPT)、Residential College 4 (RC4)、Cinnamon College、UTown Residence、CREATE；待核实后按批次完善。
 - **暂不做**：整个 Kent Ridge 校区、所有室内、精细 BIM、联网多人、自动真实校车仿真。
 - **原则**：不是 NUS 官方项目；不要将尚未验证的点云、建筑高度或模型授权表述为已取得。
+
+## Play the first prototype / 运行第一版
+
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+
+The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1 milestone, or a Windows installer.**
 
 ## Preferred workflow / 建议技术路线
 
@@ -82,7 +88,7 @@ NUS-3D/
 └── tools/               # future GIS/asset verification scripts
 ```
 
-Only documented directories/files are created now; the others are **planned**, not implemented.
+The `godot/` prototype is now implemented. Blender asset masters, bundled GLBs, Windows exports and the Three.js viewer are still **planned**, not yet implemented.
 
 ## Attribution & use / 使用和授权
 
@@ -94,4 +100,4 @@ Only documented directories/files are created now; the others are **planned**, n
 
 ## Immediate next action
 
-打开 [Issues](https://github.com/stloendays/NUS-3D/issues)，从 **M0: UTown geospatial baseline** 开始：确定 Town Green 原点、研究 OSM building footprint、测量核心区尺度，录入地标清单。**不要在地理基准确认前批量精细建模。**
+Open [M1 greybox instructions](docs/M1_GREYBOX.md), run the source in Godot, and verify P0 route/size/elevation against onsite or permitted visual evidence before refining buildings. [Issue #1](https://github.com/stloendays/NUS-3D/issues/1) still tracks geometry provenance and survey work.
