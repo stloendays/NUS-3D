@@ -45,6 +45,7 @@ func _smoke() -> void:
         push_error("generated tree position registry is incomplete")
         quit(1)
         return
+    # Headless CI validates source positions and batch counts; visual transform/culling checks require a GUI run.
     for i in range(world.generated_tree_positions.size()):
         var expected: Vector3 = world.generated_tree_positions[i]
         if not world.is_tree_position_clear(Vector2(expected.x, expected.z)):
