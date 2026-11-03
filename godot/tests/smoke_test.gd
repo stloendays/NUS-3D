@@ -31,14 +31,19 @@ func _smoke() -> void:
         push_error("the conceptual walkway loop was not constructed")
         quit(1)
         return
-    var vegetation: Node3D = world.get_node_or_null("Vegetation_Procedural") as Node3D
-    if vegetation == null:
-        push_error("procedural vegetation node is missing")
+    var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
+    var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
+    if trunks == null or canopies == null or trunks.multimesh == null or canopies.multimesh == null:
+        push_error("the two vegetation MultiMesh batches are missing")
         quit(1)
         return
-    for item in vegetation.get_children():
-        var tree: Node3D = item as Node3D
-        if tree != null and not world.is_tree_position_clear(Vector2(tree.position.x, tree.position.z)):
+    if trunks.multimesh.instance_count != world.generated_tree_count or canopies.multimesh.instance_count != world.generated_tree_count:
+        push_error("vegetation batch instance counts do not match the generated tree count")
+        quit(1)
+        return
+    for i in range(trunks.multimesh.instance_count):
+        var tree_position: Vector3 = trunks.multimesh.get_instance_transform(i).origin
+        if not world.is_tree_position_clear(Vector2(tree_position.x, tree_position.z)):
             push_error("a generated tree overlaps a building buffer or conceptual walkway")
             quit(1)
             return
@@ -53,6 +58,6 @@ func _smoke() -> void:
         push_error("the provisional geography must remain clearly labelled")
         quit(1)
         return
-    print("PASS: scene, %d building groups, %d trees, %d paths, four waypoints, axes and provenance." % [world.generated_building_count, world.generated_tree_count, world.generated_path_count])
+    print("PASS: scene, %d building groups, %d trees in 2 MultiMesh batches, %d paths, four waypoints, axes and provenance." % [world.generated_building_count, world.generated_tree_count, world.generated_path_count])
     instance.queue_free()
     quit(0)
