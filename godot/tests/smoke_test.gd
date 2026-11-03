@@ -13,6 +13,7 @@ func _smoke() -> void:
     var instance: Node3D = scene.instantiate() as Node3D
     root.add_child(instance)
     await process_frame
+    await RenderingServer.frame_post_draw
     var world: UTownWorld = instance.get_node_or_null("World") as UTownWorld
     var player: CharacterBody3D = instance.get_node_or_null("Player") as CharacterBody3D
     if world == null or player == null:
