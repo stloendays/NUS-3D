@@ -14,6 +14,7 @@ var route_points: Array[Vector3] = []
 var route_names: PackedStringArray = []
 var generated_building_count: int = 0
 var generated_tree_count: int = 0
+var generated_tree_positions: Array[Vector3] = []
 var generated_path_count: int = 0
 
 func _ready() -> void:
@@ -279,10 +280,7 @@ func _build_trees() -> void:
     canopy_batch.transform_format = MultiMesh.TRANSFORM_3D
     canopy_batch.mesh = leaves
     canopy_batch.instance_count = tree_positions.size()
-    for i in range(tree_positions.size()):
-        var base: Vector3 = tree_positions[i]
-        trunk_batch.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 2.2, 0.0)))
-        canopy_batch.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 6.2, 0.0)))
+    generated_tree_positions = tree_positions.duplicate()
 
     var trunk_instances: MultiMeshInstance3D = MultiMeshInstance3D.new()
     trunk_instances.name = "TreeTrunks_MultiMesh"
@@ -294,6 +292,12 @@ func _build_trees() -> void:
     canopy_instances.multimesh = canopy_batch
     canopy_instances.material_override = canopy
     root.add_child(canopy_instances)
+
+    # Populate after the MultiMeshInstance3D nodes are attached to the scene tree.
+    for i in range(tree_positions.size()):
+        var base: Vector3 = tree_positions[i]
+        trunk_instances.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 2.2, 0.0)))
+        canopy_instances.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 6.2, 0.0)))
     generated_tree_count = tree_positions.size()
 
 func _build_waypoints() -> void:
