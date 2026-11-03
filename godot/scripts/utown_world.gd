@@ -260,27 +260,41 @@ func _build_trees() -> void:
     leaves.height = 4.5
     var rng: RandomNumberGenerator = RandomNumberGenerator.new()
     rng.seed = 20261024
+    var tree_positions: Array[Vector3] = []
     for _attempt in range(280):
-        if generated_tree_count >= 64:
+        if tree_positions.size() >= 64:
             break
         var x: float = rng.randf_range(-190.0, 190.0)
         var z: float = rng.randf_range(-230.0, 230.0)
         if x * x + z * z < 900.0 or not is_tree_position_clear(Vector2(x, z)):
             continue
-        var tree: Node3D = Node3D.new()
-        tree.position = Vector3(x, 0.0, z)
-        root.add_child(tree)
-        var bark: MeshInstance3D = MeshInstance3D.new()
-        bark.mesh = trunk
-        bark.material_override = woody
-        bark.position.y = 2.2
-        tree.add_child(bark)
-        var crown: MeshInstance3D = MeshInstance3D.new()
-        crown.mesh = leaves
-        crown.material_override = canopy
-        crown.position.y = 6.2
-        tree.add_child(crown)
-        generated_tree_count += 1
+        tree_positions.append(Vector3(x, 0.0, z))
+
+    # Two MultiMesh batches replace 128 individual MeshInstance3D nodes.
+    var trunk_batch: MultiMesh = MultiMesh.new()
+    trunk_batch.transform_format = MultiMesh.TRANSFORM_3D
+    trunk_batch.mesh = trunk
+    trunk_batch.instance_count = tree_positions.size()
+    var canopy_batch: MultiMesh = MultiMesh.new()
+    canopy_batch.transform_format = MultiMesh.TRANSFORM_3D
+    canopy_batch.mesh = leaves
+    canopy_batch.instance_count = tree_positions.size()
+    for i in range(tree_positions.size()):
+        var base: Vector3 = tree_positions[i]
+        trunk_batch.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 2.2, 0.0)))
+        canopy_batch.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 6.2, 0.0)))
+
+    var trunk_instances: MultiMeshInstance3D = MultiMeshInstance3D.new()
+    trunk_instances.name = "TreeTrunks_MultiMesh"
+    trunk_instances.multimesh = trunk_batch
+    trunk_instances.material_override = woody
+    root.add_child(trunk_instances)
+    var canopy_instances: MultiMeshInstance3D = MultiMeshInstance3D.new()
+    canopy_instances.name = "TreeCanopies_MultiMesh"
+    canopy_instances.multimesh = canopy_batch
+    canopy_instances.material_override = canopy
+    root.add_child(canopy_instances)
+    generated_tree_count = tree_positions.size()
 
 func _build_waypoints() -> void:
     var root: Node3D = Node3D.new()
