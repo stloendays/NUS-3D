@@ -28,3 +28,8 @@ downloads/
 Thumbs.db
 .vscode/
 .idea/
+
+# Python validation tools
+__pycache__/
+*.py[cod]
+.pytest_cache/
