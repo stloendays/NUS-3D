@@ -41,10 +41,24 @@ func _smoke() -> void:
         push_error("vegetation batch instance counts do not match the generated tree count")
         quit(1)
         return
+    if world.generated_tree_positions.size() != world.generated_tree_count:
+        push_error("generated tree position registry is incomplete")
+        quit(1)
+        return
     for i in range(trunks.multimesh.instance_count):
-        var tree_position: Vector3 = trunks.multimesh.get_instance_transform(i).origin
-        if not world.is_tree_position_clear(Vector2(tree_position.x, tree_position.z)):
-            push_error("generated tree %d failed clearance at x=%.2f z=%.2f" % [i, tree_position.x, tree_position.z])
+        var expected: Vector3 = world.generated_tree_positions[i]
+        var actual_trunk: Vector3 = trunks.multimesh.get_instance_transform(i).origin
+        var actual_canopy: Vector3 = canopies.multimesh.get_instance_transform(i).origin
+        if not actual_trunk.is_equal_approx(expected + Vector3(0.0, 2.2, 0.0)):
+            push_error("trunk MultiMesh transform mismatch at %d: expected %s, got %s" % [i, str(expected), str(actual_trunk)])
+            quit(1)
+            return
+        if not actual_canopy.is_equal_approx(expected + Vector3(0.0, 6.2, 0.0)):
+            push_error("canopy MultiMesh transform mismatch at %d: expected %s, got %s" % [i, str(expected), str(actual_canopy)])
+            quit(1)
+            return
+        if not world.is_tree_position_clear(Vector2(expected.x, expected.z)):
+            push_error("generated tree %d failed clearance at x=%.2f z=%.2f" % [i, expected.x, expected.z])
             quit(1)
             return
     var erc: Vector3 = world.lonlat_to_world(103.77291, 1.30598)
