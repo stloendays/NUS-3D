@@ -29,7 +29,7 @@
 - Runtime generated flat ground (a **placeholder**, not an elevation model), an irregular green zone, and a plaza proxy.
 - Approximately positioned **ERC** and **Stephen Riady Centre** compound volumes, plus **CREATE Tower, Tembusu, UTown Residences, CAPT, Cinnamon College and RC4** as simple neighboring landmarks.
 - Free first-person camera with gravity, capsule collision, jump, sprint, and a reset if the avatar falls out of the site.
-- Conceptual (not surveyed) paved loop, glowing markers and labels, ambient daylight, reproducible low-poly trees.
+- Conceptual (not surveyed) paved loop, glowing markers and labels, ambient daylight, reproducible low-poly trees rendered in two MultiMesh batches.
 - Basic HUD: nearest building, distance to next stop, FPS, elapsed loop count, schematic mini map.
 - **All graphics are original procedural placeholders**, not copied NUS photos or proprietary models. No external assets to install.
 
