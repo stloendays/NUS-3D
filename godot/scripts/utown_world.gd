@@ -296,8 +296,12 @@ func _build_trees() -> void:
     # Populate after the MultiMeshInstance3D nodes are attached to the scene tree.
     for i in range(tree_positions.size()):
         var base: Vector3 = tree_positions[i]
-        trunk_instances.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 2.2, 0.0)))
-        canopy_instances.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY, base + Vector3(0.0, 6.2, 0.0)))
+        var trunk_transform: Transform3D = Transform3D(Basis(), base + Vector3(0.0, 2.2, 0.0))
+        var canopy_transform: Transform3D = Transform3D(Basis(), base + Vector3(0.0, 6.2, 0.0))
+        trunk_batch.set_instance_transform(i, trunk_transform)
+        canopy_batch.set_instance_transform(i, canopy_transform)
+        if i == 0:
+            print("MultiMesh debug format=%d count=%d first=%s" % [trunk_batch.transform_format, trunk_batch.instance_count, str(trunk_batch.get_instance_transform(0).origin)])
     generated_tree_count = tree_positions.size()
 
 func _build_waypoints() -> void:
