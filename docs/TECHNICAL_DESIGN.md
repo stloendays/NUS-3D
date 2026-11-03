@@ -1,6 +1,6 @@
 # Technical design — reusable UTown model pipeline
 
-Date: 2026-10-24 · Godot M1 greybox implemented; data-survey/GLB pipeline remains proposed.
+Date: 2026-11-03 · Godot M1 greybox and M1.5 data validator implemented; field survey and GLB pipeline remain pending.
 
 ## 1. Architecture and responsibilities
 
@@ -36,6 +36,10 @@ Record a confidence per measurement: `verified`, `derived_from_OSM`, `estimated_
 
 **Do not commit** personal account details, unofficial private building plans, unlicensed third-party models, or photos without re-distribution rights.
 
+### Automated source-data checks
+
+`tools/validate_utown_data.py` uses only the Python standard library. It validates WGS84 coordinate ranges, unique landmark IDs, Town Green polygon area and self-intersection, positive massing dimensions, rotated building bounds inside the ground plane (5 m safety margin), route-stop/walkway endpoint alignment (2 m tolerance), and public attribution fields. Warnings remain for unmeasured or approximate geometry. The validator is a consistency gate, not a survey-accuracy or licensing certificate.
+
 ## 4. Repository structure (current and planned)
 
 ```text
@@ -55,7 +59,8 @@ docs/M1_GREYBOX.md               # launch and limitations
 assets/                           # planned editable or licensed GLBs
 blender/                          # planned Blender master scenes
 web/                              # future Three.js viewer
-tools/                            # future GIS conversion and validators
+tools/validate_utown_data.py       # implemented source-data validator
+  tools/test_validate_utown_data.py # Python regression tests
 ```
 
 Only the paths with actual files above are implemented. Asset, Blender, web and tooling directories are future plans.
@@ -101,6 +106,7 @@ Player should have a capsule collider, slope support and a simple unstuck/reset 
 
 ## 7. Validation protocol
 
+0. **Machine data check**: run `python tools/validate_utown_data.py` and `python -m unittest discover -s tools -t . -v`.
 1. **Top-down**: compare placement of at least ERC/SRC/Plaza/Green with GIS and official orientation diagram.
 2. **Eye-level**: three known standing viewpoints with screenshots and reference links.
 3. **Walking path**: player completes Green → ERC → SRC → Plaza → Green without collision issues.
@@ -110,6 +116,6 @@ Player should have a capsule collider, slope support and a simple unstuck/reset 
 
 ## 8. Initial implementation and next pass
 
-- **Implemented**: source-driven Godot scene with approximate flat ground, nine compound/proxy buildings, Town Green and Plaza, pedestrian hints, 64 generated trees and capsule collision. CI instantiates and tests the scene.
-- **Next**: verify elevation and pedestrian routes, record two reference-vs-engine viewpoints, check player scale, and compare real Windows FPS.
+- **Implemented**: source-driven Godot scene with approximate flat ground, nine compound/proxy buildings, Town Green and Plaza, pedestrian hints, 64 generated trees and capsule collision. CI instantiates and tests the scene. M1.5 adds Python data validation, regression tests and footprint/path-aware tree placement.
+- **Next**: verify elevation and pedestrian routes in the real campus, record two reference-vs-engine viewpoints, check player scale, and compare real Windows FPS.
 - **After M1 walk-through acceptance**: build editable Blender GLBs with shared placement coordinates and replace individual proxy masses, preserving stable IDs.
