@@ -11,6 +11,13 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate UTown source data
+        run: python tools/validate_utown_data.py
+      - name: Run Python validator tests
+        run: python -m unittest discover -s tools -t . -v
       - name: Install Godot 4.4.1
         run: |
           curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
