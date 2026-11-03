@@ -209,6 +209,42 @@ func _add_sign(parent: Node3D, title: String, at: Vector3, color_hex: String) ->
     sign.position = at
     parent.add_child(sign)
 
+func _distance_to_segment(point: Vector2, start: Vector2, finish: Vector2) -> float:
+    var segment: Vector2 = finish - start
+    var length_squared: float = segment.length_squared()
+    if length_squared < 0.0001:
+        return point.distance_to(start)
+    var t: float = clampf((point - start).dot(segment) / length_squared, 0.0, 1.0)
+    return point.distance_to(start + segment * t)
+
+func is_tree_position_clear(position: Vector2, building_clearance_m: float = 8.0) -> bool:
+    # Transform candidate into each building's local frame and test actual massing parts.
+    for record in layout.get("buildings", []):
+        var centre: Vector3 = lonlat_to_world(float(record["lon"]), float(record["lat"]))
+        var relative: Vector2 = position - Vector2(centre.x, centre.z)
+        var angle: float = deg_to_rad(float(record.get("rotation_deg", 0.0)))
+        var c: float = cos(angle)
+        var s: float = sin(angle)
+        var local_position: Vector2 = Vector2(c * relative.x - s * relative.y, s * relative.x + c * relative.y)
+        for piece in record.get("parts", []):
+            var half_width: float = float(piece.get("w", 24.0)) * 0.5 + building_clearance_m
+            var half_depth: float = float(piece.get("d", 24.0)) * 0.5 + building_clearance_m
+            var part_x: float = float(piece.get("dx", 0.0))
+            var part_z: float = -float(piece.get("dn", 0.0))
+            if absf(local_position.x - part_x) <= half_width and absf(local_position.y - part_z) <= half_depth:
+                return false
+
+    # Keep generated trees outside the conceptual pedestrian corridor.
+    for way in layout.get("walkways", []):
+        var points: Array = way.get("lonlat", [])
+        var path_clearance: float = float(way.get("width_m", 3.5)) * 0.5 + 2.0
+        for i in range(points.size() - 1):
+            var a: Vector3 = lonlat_to_world(float(points[i][0]), float(points[i][1]))
+            var b: Vector3 = lonlat_to_world(float(points[i + 1][0]), float(points[i + 1][1]))
+            if _distance_to_segment(position, Vector2(a.x, a.z), Vector2(b.x, b.z)) < path_clearance:
+                return false
+    return true
+
 func _build_trees() -> void:
     var root: Node3D = Node3D.new()
     root.name = "Vegetation_Procedural"
@@ -229,13 +265,7 @@ func _build_trees() -> void:
             break
         var x: float = rng.randf_range(-190.0, 190.0)
         var z: float = rng.randf_range(-230.0, 230.0)
-        var excluded: bool = x * x + z * z < 900.0
-        for record in layout.get("buildings", []):
-            var p: Vector3 = lonlat_to_world(float(record["lon"]), float(record["lat"]))
-            if Vector2(x, z).distance_to(Vector2(p.x, p.z)) < 35.0:
-                excluded = true
-                break
-        if excluded:
+        if x * x + z * z < 900.0 or not is_tree_position_clear(Vector2(x, z)):
             continue
         var tree: Node3D = Node3D.new()
         tree.position = Vector3(x, 0.0, z)
