@@ -300,8 +300,7 @@ func _build_trees() -> void:
         var canopy_transform: Transform3D = Transform3D(Basis(), base + Vector3(0.0, 6.2, 0.0))
         trunk_batch.set_instance_transform(i, trunk_transform)
         canopy_batch.set_instance_transform(i, canopy_transform)
-        if i == 0:
-            print("MultiMesh debug format=%d count=%d first=%s" % [trunk_batch.transform_format, trunk_batch.instance_count, str(trunk_batch.get_instance_transform(0).origin)])
+
     generated_tree_count = tree_positions.size()
 
 func _build_waypoints() -> void:
