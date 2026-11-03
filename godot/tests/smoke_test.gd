@@ -44,7 +44,7 @@ func _smoke() -> void:
     for i in range(trunks.multimesh.instance_count):
         var tree_position: Vector3 = trunks.multimesh.get_instance_transform(i).origin
         if not world.is_tree_position_clear(Vector2(tree_position.x, tree_position.z)):
-            push_error("a generated tree overlaps a building buffer or conceptual walkway")
+            push_error("generated tree %d failed clearance at x=%.2f z=%.2f" % [i, tree_position.x, tree_position.z])
             quit(1)
             return
     var erc: Vector3 = world.lonlat_to_world(103.77291, 1.30598)
