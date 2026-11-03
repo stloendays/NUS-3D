@@ -75,7 +75,7 @@ UTown (Node3D)
     TownPlaza_approximate (plaza slab/canopy)
     ConceptualFootpaths_NotSurveyed (wide overlay strips)
     BuildingMassing_Estimated (9 named building groups)
-    Vegetation_Procedural (64 trees)
+    Vegetation_Procedural (64 trees in 2 MultiMeshInstance3D batches)
     RouteBeacons_Conceptual (4 markers)
     WorldEnvironment / DirectionalLight3D
   Player (CharacterBody3D + capsule + Head/Camera3D)
@@ -116,6 +116,6 @@ Player should have a capsule collider, slope support and a simple unstuck/reset 
 
 ## 8. Initial implementation and next pass
 
-- **Implemented**: source-driven Godot scene with approximate flat ground, nine compound/proxy buildings, Town Green and Plaza, pedestrian hints, 64 generated trees and capsule collision. CI instantiates and tests the scene. M1.5 adds Python data validation, regression tests and footprint/path-aware tree placement.
+- **Implemented**: source-driven Godot scene with approximate flat ground, nine compound/proxy buildings, Town Green and Plaza, pedestrian hints, 64 generated trees rendered in two MultiMesh batches, and capsule collision. CI instantiates and tests the scene. M1.5 adds Python data validation, regression tests and footprint/path-aware tree placement.
 - **Next**: verify elevation and pedestrian routes in the real campus, record two reference-vs-engine viewpoints, check player scale, and compare real Windows FPS.
 - **After M1 walk-through acceptance**: build editable Blender GLBs with shared placement coordinates and replace individual proxy masses, preserving stable IDs.
