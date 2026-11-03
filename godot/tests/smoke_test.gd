@@ -31,6 +31,17 @@ func _smoke() -> void:
         push_error("the conceptual walkway loop was not constructed")
         quit(1)
         return
+    var vegetation: Node3D = world.get_node_or_null("Vegetation_Procedural") as Node3D
+    if vegetation == null:
+        push_error("procedural vegetation node is missing")
+        quit(1)
+        return
+    for item in vegetation.get_children():
+        var tree: Node3D = item as Node3D
+        if tree != null and not world.is_tree_position_clear(Vector2(tree.position.x, tree.position.z)):
+            push_error("a generated tree overlaps a building buffer or conceptual walkway")
+            quit(1)
+            return
     var erc: Vector3 = world.lonlat_to_world(103.77291, 1.30598)
     var src: Vector3 = world.lonlat_to_world(103.77252, 1.30462)
     if not (erc.x < 0.0 and erc.z < 0.0 and src.x < 0.0 and src.z > 0.0):
