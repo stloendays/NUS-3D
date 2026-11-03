@@ -65,11 +65,12 @@ Date: 2026-11-03 · Status: **M1.5 automated data validation and geometry-aware 
 
 ### M1.5 — Data integrity and scene consistency / 数据校验与场景一致性
 
-**2026-11-03 progress:** a standard-library Python validator and regression tests now check the source JSON before Godot imports it. Checks cover WGS84 coordinate ranges, duplicate IDs, Town Green polygon area/self-intersection, positive building dimensions, rotated massing bounds, walkway-to-route endpoint alignment and attribution fields. Godot vegetation placement now tests each rotated building part and conceptual paths instead of relying on a circular distance from building centres.
+**2026-11-03 progress:** a standard-library Python validator and regression tests now check the source JSON before Godot imports it. Checks cover WGS84 coordinate ranges, duplicate IDs, Town Green polygon area/self-intersection, positive building dimensions, rotated massing bounds, walkway-to-route endpoint alignment and attribution fields. Godot vegetation placement now tests each rotated building part and conceptual paths instead of relying on a circular distance from building centres. The 64 accepted tree positions are rendered through two MultiMesh batches (trunks and canopies).
 
 - [x] Add `tools/validate_utown_data.py` and regression tests under `tools/`.
 - [x] Run data validation and Python unit tests in GitHub Actions alongside the Godot smoke test.
 - [x] Expand the provisional ground depth from 720 m to 800 m: the RC4 proxy reaches about 372 m north of the local origin, beyond the old 360 m half-depth.
+- [x] Render 64 procedural trees through two MultiMesh batches, reducing the tree scene from 128 individual mesh nodes to two draw batches.
 - [ ] Keep all estimated geometry visibly labelled as provisional; automated checks do not replace a field survey.
 
 **验收**：source JSON has zero structural/extent errors, Python tests pass, Godot smoke test passes, and all remaining uncertainty is clearly documented.
