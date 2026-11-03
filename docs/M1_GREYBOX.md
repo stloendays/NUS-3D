@@ -1,6 +1,6 @@
 # UTown M1 — playable greybox (first implementation)
 
-**Status:** initial Godot 4 source has been added. CI smoke checks the scene graph and generated geometry. No tested Windows binary or photo-verified facades have been delivered. The project is *not* an accurate navigational map.
+**Status:** initial Godot 4 source and M1.5 data checks have been added. CI checks the scene graph, generated geometry and source-data consistency. No tested Windows binary or photo-verified facades have been delivered. The project is *not* an accurate navigational map.
 
 ## Open and run (Windows)
 
@@ -59,6 +59,9 @@
 
 - Install Godot 4.4+ then run `godot --headless --path godot --import --quit`.
 - Run `godot --headless --path godot --script res://tests/smoke_test.gd`.
-- GitHub Actions is configured to run these checks on each main/feature branch update.
+- Run `python tools/validate_utown_data.py` to check coordinate ranges, polygon integrity, building bounds, route continuity and attribution fields.
+- Run `python -m unittest discover -s tools -t . -v` for validator regression tests.
+- GitHub Actions runs the Python checks and Godot checks on each main/feature branch update.
+- See [M1.5 data validation](M1_5_DATA_VALIDATION.md) for scope and limitations.
 
 Next task: install on a Windows laptop, capture two eye-level screenshots, and revise building models against officially permitted reference views.
