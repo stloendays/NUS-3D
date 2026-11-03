@@ -25,7 +25,7 @@ The RC4 proxy reaches approximately 372 m north of the local origin, while the p
 
 ## Vegetation placement
 
-Procedural trees now use rotated building-part footprints with an 8 m buffer, instead of excluding only a 35 m circle around building centres. Trees are also kept outside conceptual pedestrian corridors (half the path width plus 2 m). The 64 accepted tree positions are rendered in two MultiMesh batches (trunks and canopies), replacing 128 individual MeshInstance3D nodes. The Godot smoke test checks both batch counts and every generated tree position.
+Procedural trees now use rotated building-part footprints with an 8 m buffer, instead of excluding only a 35 m circle around building centres. Trees are also kept outside conceptual pedestrian corridors (half the path width plus 2 m). The 64 accepted tree positions are rendered in two MultiMesh batches (trunks and canopies), replacing 128 individual MeshInstance3D nodes. The Godot smoke test checks batch counts and the source placement registry. Headless CI does not assert RenderingServer transform readback or replace a GUI visual check; confirm tree rendering and culling in the target Windows build.
 
 ## What these checks do not prove
 
