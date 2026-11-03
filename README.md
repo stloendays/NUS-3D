@@ -21,7 +21,7 @@ Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`,
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1 milestone, or a Windows installer.**
 
-The source-data validator checks coordinate ranges, polygon integrity, rotated building bounds, route continuity and attribution fields. It also prevents procedural trees from being placed inside building footprints or across conceptual walking paths. These checks improve data and scene consistency; they do not establish real-world accuracy.
+The source-data validator checks coordinate ranges, polygon integrity, rotated building bounds, route continuity and attribution fields. Procedural trees avoid building footprints and conceptual walking paths, and 64 trees are rendered in two MultiMesh batches rather than 128 separate mesh nodes. These checks improve data and rendering efficiency; they do not establish real-world accuracy.
 
 ## Preferred workflow / 建议技术路线
 
