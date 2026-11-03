@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-10-24 · Status: **first procedural Godot M1 source committed; verification and survey pending**
+Date: 2026-11-03 · Status: **M1.5 automated data validation and geometry-aware vegetation checks implemented; M1 real-world verification pending**
 
 ## 1. 产品定位
 
@@ -62,6 +62,17 @@ Date: 2026-10-24 · Status: **first procedural Godot M1 source committed; verifi
 - [ ] 提供一张固定视角对比图（实景参考 vs 引擎截图）。
 
 **验收**：能连贯绕行，不穿模，不会因上下台阶而卡死；人物大小和建筑比例看起来合理。
+
+### M1.5 — Data integrity and scene consistency / 数据校验与场景一致性
+
+**2026-11-03 progress:** a standard-library Python validator and regression tests now check the source JSON before Godot imports it. Checks cover WGS84 coordinate ranges, duplicate IDs, Town Green polygon area/self-intersection, positive building dimensions, rotated massing bounds, walkway-to-route endpoint alignment and attribution fields. Godot vegetation placement now tests each rotated building part and conceptual paths instead of relying on a circular distance from building centres.
+
+- [x] Add `tools/validate_utown_data.py` and regression tests under `tools/`.
+- [x] Run data validation and Python unit tests in GitHub Actions alongside the Godot smoke test.
+- [x] Expand the provisional ground depth from 720 m to 800 m: the RC4 proxy reaches about 372 m north of the local origin, beyond the old 360 m half-depth.
+- [ ] Keep all estimated geometry visibly labelled as provisional; automated checks do not replace a field survey.
+
+**验收**：source JSON has zero structural/extent errors, Python tests pass, Godot smoke test passes, and all remaining uncertainty is clearly documented.
 
 ### M2 — Recognizable architecture / 建筑辨识度
 
@@ -126,7 +137,7 @@ Date: 2026-10-24 · Status: **first procedural Godot M1 source committed; verifi
 
 ## 7. 下一步执行顺序
 
-1. 确认并记录 Town Green 的坐标原点，以及 P0 四个地标的 GIS 轮廓和连接路径。
-2. 生成一个按比例的 UTown top-down greybox（Blender，可导出 GLB）。
-3. 建立 Godot 4 第一人称测试场景，跑通完整步行闭环。
-4. 对照 360° 与照片，从 ERC/SRC 开始迭代立面，逐项记录误差。
+1. 运行 `python tools/validate_utown_data.py`，确认源数据与 CI 检查通过。
+2. 现场核验 Town Green、Town Plaza、ERC、SRC 的步行路线、入口、坡道、楼梯和标高；记录测量来源与置信度。
+3. 根据核验结果更新 P0 地标坐标、轮廓和步行路径，再重新运行验证器。
+4. 完成固定视角实景/引擎截图对比后，再制作 ERC/SRC 的 Blender 可编辑模型并导出 GLB。
