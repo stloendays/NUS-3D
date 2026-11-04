@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-04 · Status: **M2 ERC/SRC architecture alpha implemented, with M1 survey and on-device acceptance still pending**
+Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux screenshot pipeline implemented; real-world survey and Windows checks pending**
 
 ## 1. 产品定位
 
@@ -105,6 +105,18 @@ Date: 2026-11-04 · Status: **M2 ERC/SRC architecture alpha implemented, with M1
 - [ ] 给重要场所增加简短建筑标签（可关闭）。
 
 **验收**：没有建筑标签也能从正确路线辨识至少 ERC/SRC/Town Green；资源列表完整。
+
+### M2.1 — Geotagged photo-reference visual review
+
+**2026-11-04:** four source-attributed or explicitly synthetic camera presets (ERC 2014, UTown 2020, ERC 2026, SRC proxy), F3 to cycle, F4 original screenshot+JSON provenance, Python validation of photo metadata and camera clearance, and a Linux virtual-display M1-vs-M2 preview artifact.
+
+- [x] Track photo date, creator, CC license, camera geotag, heading datum and uncertainty.
+- [x] Restore cameras reproducibly and capture own-model comparison images.
+- [x] Validate camera positions and evidence status; publish CI software-rendered M1/M2 pairs.
+- [ ] Compare photo and in-engine snapshots visually at validated eye elevations and camera FoV.
+- [ ] Extract and review actual OSM building outlines/entrances, SRC levels and accessibility with appropriate licensing.
+
+See [M2.1 documentation](M2_1_VIEWPOINT_CALIBRATION.md). Passing software render is not an accurate-survey or Windows-performance claim.
 
 ### M3 — Atmosphere / 环境与交互
 

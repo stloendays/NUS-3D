@@ -67,3 +67,7 @@ The Blender generator's Python syntax is covered by the Godot CI workflow. A **s
 4. Run Blender to produce .blend and GLB, check coordinate orientation, mesh topology and scale, then explicitly choose and implement the GLB asset swap.
 5. Test the Green → ERC → SRC → Plaza → Green walk in a real windowed environment. Verify no collisions, clipping or wrong elevations.
 6. Measure frame-time distributions on a Windows PC and confirm redistribution rights before public packaging.
+
+## Evidence-based camera review (M2.1)
+
+A repeatable photo-reference camera workflow and Linux Xvfb software-rendered screenshot artifacts are tracked separately in [M2.1 viewpoint documentation](M2_1_VIEWPOINT_CALIBRATION.md). Camera EXIF and creative-commons photo references do not validate real measured geometry.
