@@ -1,9 +1,11 @@
 extends Node3D
 class_name UTownWorld
-## Procedural M1 greybox. Distances are metres; source lon/lat coordinates are approximate.
+## Source-driven UTown M1 massing + provisional M2 architecture study. All GIS is approximate.
 ## All geometry is created by us: no third-party screenshots, 3D meshes or textures.
 
 const DATA_PATH: String = "res://data/utown_core.json"
+const M2_DATA_PATH: String = "res://data/m2_profiles.json"
+const FACADE_KIT = preload("res://scripts/utown_facades.gd")
 const METRES_PER_DEG_LAT: float = 110574.0
 const METRES_PER_DEG_LON: float = 111320.0
 
@@ -16,6 +18,10 @@ var generated_building_count: int = 0
 var generated_tree_count: int = 0
 var generated_tree_positions: Array[Vector3] = []
 var generated_path_count: int = 0
+var m2_profiles: Dictionary = {}
+var m2_detail_nodes: Array[Node3D] = []
+var generated_facade_count: int = 0
+var m2_details_visible: bool = true
 
 func _ready() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -29,6 +35,13 @@ func _ready() -> void:
     var ref: Dictionary = layout.get("spatial_reference", {})
     origin_lat = float(ref.get("origin_lat", origin_lat))
     origin_lon = float(ref.get("origin_lon", origin_lon))
+    if FileAccess.file_exists(M2_DATA_PATH):
+        var profile_json: Variant = JSON.parse_string(FileAccess.get_file_as_string(M2_DATA_PATH))
+        if typeof(profile_json) == TYPE_DICTIONARY:
+            var profile_document: Dictionary = profile_json
+            m2_profiles = profile_document.get("profiles", {})
+        else:
+            push_warning("M2 architecture profiles are invalid; plain massing will remain.")
     _build_sky()
     _build_ground()
     _build_green()
@@ -195,8 +208,22 @@ func _build_buildings() -> void:
                 _add_box(group, Vector3(dx, yf, z + d * 0.5 + 0.053), Vector3(w * 0.88, 0.68, 0.11), glass)
             if priority == "P0":
                 _add_box(group, Vector3(dx, 1.55, z + d * 0.5 + 0.095), Vector3(3.5, 3.1, 0.18), entrance)
+        if priority == "P0" and m2_profiles.has(str(record.get("id", ""))):
+            var profile: Dictionary = m2_profiles[str(record.get("id"))]
+            var detail: Node3D = FACADE_KIT.build(group, record, profile)
+            m2_detail_nodes.append(detail)
+            generated_facade_count += 1
         generated_building_count += 1
         _add_sign(group, str(record.get("name", group.name)), Vector3(0.0, max_height + 6.0, 0.0), "#fbfbf8")
+
+func set_m2_details_visible(enabled: bool) -> void:
+    m2_details_visible = enabled
+    for detail in m2_detail_nodes:
+        detail.visible = enabled
+
+func _unhandled_input(event: InputEvent) -> void:
+    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
+        set_m2_details_visible(not m2_details_visible)
 
 func _add_sign(parent: Node3D, title: String, at: Vector3, color_hex: String) -> void:
     var sign: Label3D = Label3D.new()

@@ -35,6 +35,7 @@ func _ready() -> void:
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
 
 func _process(_delta: float) -> void:
+    hint_label.text = "M2 architecture %s [F2] | schematic / not surveyed" % ("ON" if world.m2_details_visible else "OFF")
     if world.route_points.is_empty():
         return
     var destination: Vector3 = world.route_points[target_index]

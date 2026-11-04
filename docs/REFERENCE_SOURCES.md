@@ -1,11 +1,15 @@
 # UTown research sources & license register / 素材来源
 
-Date checked: 2026-10-24. Links are research references, **not** statements that media are free to redistribute.
+Date checked: 2026-11-04 (M2 architecture sources); original GIS/georeferencing sources checked 2026-10-24. Links are research references, **not** statements that media are free to redistribute.
 
 ## A. Primary spatial and visual sources
 
 | Resource | Link | Intended role | Access / caveat |
 |---|---|---|---|
+| W Architects/Meinhardt ERC facade | https://www.mfacade.com/projects/education-resource-centre-nus/ | ERC faceted curved glazed exterior, canopies and sunshades | Descriptive reference only; no images/materials/meshes copied |
+| NUS Residential Life UTown architecture | https://blog.nus.edu.sg/reslife/2022/07/19/3-lesser-known-facts-about-utowns-design/ | Independent NUS explanation of ERC's curved glass panels | Descriptive reference only; visual media rights not granted |
+| DP Architects Stephen Riady Centre | https://www.dpa.com.sg/projects/stephen-riady-centre/ | SRC Forum metal disc, stacked walkways, three storeys | Design description reference only; not source mesh/dimension licence |
+| DP Design SRC spaces | https://www.dpa.com.sg/projects/dpd-stephen-riady-centre/ | SRC public program and covered links | Contextual reference only; not survey geometry |
 | NUS interactive campus map | https://map.nus.edu.sg/ | Find buildings, entrances, transport and place names | Official map; use as visual reference, not automatically a survey |
 | NUS UTown map (2025 map) | https://map.nus.edu.sg/download/University-Town-Map.pdf | Main map comparison and building orientation | Uses a scale bar; still not a measured source for heights, ramps, stairs or detailed facades |
 | NUS University Town PDF | https://map.nus.edu.sg/download/9Jan2024/University-Town-Map.pdf | Historical names, layout, road and facility reference | Dated path; **map says NOT TO SCALE**, do not extract exact lengths by pixel |

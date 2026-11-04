@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M1.5 data-validation and geometry-aware vegetation checks added (2026-11-03)**. M1 route, elevation and Windows-device verification remain pending.
+> Status: **M2 alpha architectural study for ERC/SRC (2026-11-04)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[启动 Godot 原型](docs/M1_GREYBOX.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -17,7 +17,7 @@
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1 milestone, or a Windows installer.**
 
@@ -57,7 +57,7 @@ NUS official map + OpenStreetMap outlines + reference photographs/360 views
 
 ## First development slice / 最小可交付场景
 
-**入口：Town Green 草坪边 → Town Plaza → ERC → SRC → 返回 Town Green。**
+**当前概念步行顺序：Town Green → ERC → SRC → Town Plaza → 返回 Town Green。** 地图路线和高差尚未经现场核验。
 
 第一版仅需要：地形/草地、4 个大体量建筑/区域、主路与台阶、基础植被、碰撞、WASD 移动+鼠标视角、白天固定光照。完成后再制作更细的外立面。
 
@@ -90,7 +90,7 @@ NUS-3D/
 └── tools/               # implemented source-data validator and tests
 ```
 
-The `godot/` prototype and Python source-data validator are implemented. Blender asset masters, bundled GLBs, Windows exports and the Three.js viewer remain **planned**, not yet implemented.
+The `godot/` prototype, M2 ERC/SRC procedural detail layers, Python validators and Blender authoring script are implemented. **Blender 4.0.2 CI has generated the separate ERC/SRC .blend and GLB files**, available as a downloadable workflow artifact; GUI import, visual fidelity, Windows binaries and the Three.js viewer remain pending.
 
 ## Attribution & use / 使用和授权
 
@@ -103,3 +103,7 @@ The `godot/` prototype and Python source-data validator are implemented. Blender
 ## Immediate next action
 
 Run `python tools/validate_utown_data.py` and the Godot smoke test, then verify P0 route/size/elevation against onsite or permitted visual evidence before refining buildings. [Issue #1](https://github.com/stloendays/NUS-3D/issues/1) still tracks geometry provenance and survey work.
+
+## M2 architectural study / 建筑细节开发
+
+ERC now has schematic glazing, mullions, sunshades and a faceted curved bay; SRC has schematic glass, balcony overhangs, an elevated forum disc and a linkway. All are a **visual-only study using estimated geometry**, not real as-built plans or official NUS assets. Toggle the detail layer using **F2**. A reproducible Blender authoring script lives at `blender/build_m2_blockouts.py`, and [Blender M2 CI](https://github.com/stloendays/NUS-3D/actions/workflows/blender_m2.yml) builds **editable .blend plus GLB preview artifacts**. See [M2 architecture documentation](docs/M2_ARCHITECTURE.md) for the export command and acceptance checklist. The generated models remain provisional and have not passed a local GUI visual review.

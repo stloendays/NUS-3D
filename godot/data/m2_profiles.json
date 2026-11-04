@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "status": "schematic-architecture-not-surveyed",
+  "source_policy": "No third-party imagery, textures, meshes or branding embedded. All numeric sizes below are artistic estimates.",
+  "profiles": {
+    "ERC": {
+      "style": "erc",
+      "building_id": "ERC",
+      "verified_observations": [
+        "Curved/faceted glazed facades",
+        "Horizontal sunshades and aluminium-clad canopies",
+        "Four-storey clusters oriented around a courtyard"
+      ],
+      "estimates_m": {
+        "storey_pitch": 3.45,
+        "mullion_spacing": 3.2,
+        "arc_radius": 4.8,
+        "canopy_projection": 2.0
+      },
+      "evidence_links": [
+        "https://www.mfacade.com/projects/education-resource-centre-nus/",
+        "https://blog.nus.edu.sg/reslife/2022/07/19/3-lesser-known-facts-about-utowns-design/",
+        "https://uci.nus.edu.sg/campus-life/campus-services/utown/education-resource-centre/"
+      ],
+      "geometry_confidence": "estimated",
+      "license_status": "reference-only"
+    },
+    "SRC": {
+      "style": "src",
+      "building_id": "SRC",
+      "verified_observations": [
+        "Three-storey mixed-use complex",
+        "Stacked pedestrian circulation",
+        "Open central forum with an elevated metallic disc"
+      ],
+      "estimates_m": {
+        "storey_pitch": 3.65,
+        "mullion_spacing": 3.8,
+        "disc_radius": 10.5,
+        "disc_elevation": 14.5,
+        "linkway_width": 3.5
+      },
+      "evidence_links": [
+        "https://www.dpa.com.sg/projects/stephen-riady-centre/",
+        "https://www.dpa.com.sg/projects/dpd-stephen-riady-centre/"
+      ],
+      "geometry_confidence": "estimated",
+      "license_status": "reference-only"
+    }
+  }
+}

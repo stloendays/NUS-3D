@@ -1,8 +1,8 @@
 id,name,priority,phase,geometry_status,visual_reference_status,license_status,notes
 UT_TOWN_GREEN,Town Green,P0,M1,simplified-outline-unsurveyed,reference-links-listed,needs-review,OSM-derived schematic polygon flat ground no elevation
 UT_TOWN_PLAZA,Town Plaza,P0,M1,approximate-surface-proxy,reference-links-listed,needs-review,Create Tower lower floors not yet recreated
-UT_ERC,Education Resource Centre,P0,M1-M2,approximate-centre-and-massing,reference-links-listed,needs-review,Parts dimensions and entrance unverified
-UT_SRC,Stephen Riady Centre,P0,M1-M2,approximate-centre-and-massing,reference-links-listed,needs-review,Compound split into separate wings to avoid wrong parcel extrusion
+UT_ERC,Education Resource Centre,P0,M1-M2,schematic-M2-facade-and-estimated-massing,architecture-features-reviewed,needs-review,Curved glazing and sunshades drawn from text references - exact dimensions and entrances unverified
+UT_SRC,Stephen Riady Centre,P0,M1-M2,schematic-M2-forum-disc-and-estimated-massing,architecture-features-reviewed,needs-review,Stacked walkways and forum disc based on DP Architects description - all geometry estimated
 UT_TEMBUSU,Tembusu College,P1,M2,approximate-centre-and-proxy,not-collected,needs-review,Height and facade estimated
 UT_CAPT,College of Alice & Peter Tan,P1,M2,approximate-centre-and-proxy,not-collected,needs-review,Height and facade estimated
 UT_RC4,Residential College 4,P1,M2,approximate-centre-and-proxy,not-collected,needs-review,Height and facade estimated

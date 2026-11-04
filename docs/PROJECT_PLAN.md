@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-03 · Status: **M1.5 automated data validation and geometry-aware vegetation checks implemented; M1 real-world verification pending**
+Date: 2026-11-04 · Status: **M2 ERC/SRC architecture alpha implemented, with M1 survey and on-device acceptance still pending**
 
 ## 1. 产品定位
 
@@ -58,7 +58,7 @@ Date: 2026-11-03 · Status: **M1.5 automated data validation and geometry-aware 
 - [ ] Blender 按米建立 Green/Plaza/ERC/SRC 占位几何；确定高度、入口朝向和地形高差的可信来源。
 - [ ] 导出 GLB；模型原点、命名、比例一致。
 - [ ] Godot 加入第一人称控制、地面碰撞、建筑碰撞、简易路径和起点。
-- [ ] 做闭环路线：Green → Plaza → ERC → SRC → Green。
+- [ ] 实地核验概念闭环：Green → ERC → SRC → Plaza → Green（现有 JSON 顺序；不可作为实际校园导航）。
 - [ ] 提供一张固定视角对比图（实景参考 vs 引擎截图）。
 
 **验收**：能连贯绕行，不穿模，不会因上下台阶而卡死；人物大小和建筑比例看起来合理。
@@ -76,6 +76,15 @@ Date: 2026-11-03 · Status: **M1.5 automated data validation and geometry-aware 
 **验收**：source JSON has zero structural/extent errors, Python tests pass, Godot smoke test passes, and all remaining uncertainty is clearly documented.
 
 ### M2 — Recognizable architecture / 建筑辨识度
+
+**2026-11-04 progress:** Godot now creates non-colliding, independently toggleable architectural details for ERC (faceted glazing, sunshades, canopy) and SRC (forum disc, layered bridges and glass). Parameters and evidence are recorded in `godot/data/m2_profiles.json` and validated in CI. `blender/build_m2_blockouts.py` generated actual .blend and GLB assets in a Blender 4.0.2 GitHub Actions run; exported model visuals and imported Godot scenes remain uninspected. See [M2 architecture study](M2_ARCHITECTURE.md).
+
+- [x] Research real architectural motifs and keep numeric dimensions marked estimated.
+- [x] Implement independent M2 visual layers and F2 greybox comparison.
+- [x] Add reproducible Blender 4.x authoring script plus profile validator.
+- [ ] Verify building heights, facade geometry, courtyard/Forum placement and true entrances on-site.
+- [ ] Generate and visually inspect Blender and GLB assets, then explicitly replace selected in-engine proxies.
+- [ ] Validate Windows GUI rendering, sightlines and pedestrian routes.
 
 - [ ] 给四个 P0 地标建外立面：柱子、玻璃幕墙、屋檐/遮雨棚、主要入口。
 - [ ] 增加常见道路材料：混凝土、地砖、草坪、玻璃、深浅灰金属。

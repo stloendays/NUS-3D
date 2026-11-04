@@ -1,0 +1,51 @@
+name: Blender M2 schematic asset build
+
+on:
+  push:
+    branches: ["main", "feature/**"]
+    paths:
+      - "blender/build_m2_blockouts.py"
+      - "godot/data/utown_core.json"
+      - "godot/data/m2_profiles.json"
+      - ".github/workflows/blender_m2.yml"
+  workflow_dispatch:
+
+jobs:
+  build-provisional-architecture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender 4.x from Ubuntu packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender python3-numpy
+          blender --version | head -n 2
+      - name: Build editable ERC/SRC and GLB previews
+        run: |
+          blender --background --python-exit-code 1 --python blender/build_m2_blockouts.py -- --out build/m2_assets
+      - name: Validate generated Blender and glTF file headers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import struct
+          root = Path("build/m2_assets")
+          for name in ("erc_study", "src_study"):
+              blend = root / f"{name}.blend"
+              glb = root / f"{name}.glb"
+              assert blend.exists() and blend.stat().st_size > 1000, blend
+              assert blend.open("rb").read(7) == b"BLENDER", blend
+              assert glb.exists() and glb.stat().st_size > 4096, glb
+              magic, version, byte_length = struct.unpack("<4sII", glb.open("rb").read(12))
+              assert magic == b"glTF" and version == 2 and byte_length == glb.stat().st_size, glb
+              print(f"PASS {name}: BLEND={blend.stat().st_size} bytes, GLB={glb.stat().st_size} bytes")
+          PY
+      - name: Attach schematic assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: nus3d-m2-erc-src-schematic-assets
+          path: |
+            build/m2_assets/*.blend
+            build/m2_assets/*.glb
+          if-no-files-found: error
+          retention-days: 30
