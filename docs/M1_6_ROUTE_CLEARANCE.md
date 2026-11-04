@@ -14,6 +14,7 @@ Run from repository root:
 
     python tools/validate_utown_data.py
     python tools/audit_route_clearance.py --strict --report build/route-clearance.json
+    python tools/render_utown_plan.py --out build/utown-audit-plan.svg
     python -m unittest discover -s tools -t . -v
 
 The audit transforms WGS84 to **the identical provisional local-metre basis used by the Godot scene**: X east, negative Z north. It reconstructs each building part as a rotated 2-D rectangle, including per-part offsets. For each conceptual walkway centreline segment, it calculates the shortest distance to each rectangle using segment intersection, endpoint inclusion and edge distances. A route segment is a conflict when its gap is below **half the walkway width + 0.75 m**. Because walkway parts are guide overlays without navigation meshes, this is an intentionally conservative envelope, not a slope/accessibility test.
@@ -21,7 +22,7 @@ The audit transforms WGS84 to **the identical provisional local-metre basis used
 - Current checked shape: **11 polyline segments, 9 building groups, zero proxy-envelope conflicts**.
 - Previous ERC-to-SRC shortcut: regression fixture requires the old conflict with SRC to be detected.
 - JSON report includes nearest building/part, gap, required clearance and conflict per segment.
-- CI stores an artifact named **utown-route-clearance-audit** containing the JSON report. This is a machine-checkable engineering result.
+- CI stores an artifact named **utown-route-clearance-audit** containing the JSON report **and a matching top-down SVG plan**. The self-generated SVG marks the two schematic detour points, all P0/P1 proxy shapes, the Green and all four route stops; no third-party maps or photos are copied. This is a machine-checkable engineering result.
 - Geometry remains estimated; a result of zero does not validate actual campus widths or obstacles, precise building coordinates, height differences, terrain or wheelchair access.
 
 ## Field survey inputs still needed

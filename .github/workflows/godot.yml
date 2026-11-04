@@ -18,11 +18,15 @@ jobs:
         run: python tools/validate_utown_data.py
       - name: Audit conceptual pedestrian route clearance
         run: python tools/audit_route_clearance.py --strict --report build/route-clearance.json
+      - name: Render original schematic top-down plan
+        run: python tools/render_utown_plan.py --out build/utown-audit-plan.svg
       - name: Upload route audit report
         uses: actions/upload-artifact@v4
         with:
           name: utown-route-clearance-audit
-          path: build/route-clearance.json
+          path: |
+            build/route-clearance.json
+            build/utown-audit-plan.svg
           if-no-files-found: error
       - name: Validate M2 architecture profile assumptions
         run: python tools/validate_m2_profiles.py

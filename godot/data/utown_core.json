@@ -378,7 +378,11 @@
         ]
       ],
       "geometry_status": "schematic_proxy_clearance_only",
-      "geometry_note": "Two provisional east-side offsets avoid the estimated SRC collision. Not surveyed or accessible-route verified."
+      "geometry_note": "Two provisional east-side offsets avoid the estimated SRC collision. Not surveyed or accessible-route verified.",
+      "schematic_detour_indices": [
+        3,
+        4
+      ]
     },
     {
       "width_m": 4.2,
