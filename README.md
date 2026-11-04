@@ -57,7 +57,7 @@ NUS official map + OpenStreetMap outlines + reference photographs/360 views
 
 ## First development slice / 最小可交付场景
 
-**入口：Town Green 草坪边 → Town Plaza → ERC → SRC → 返回 Town Green。**
+**当前概念步行顺序：Town Green → ERC → SRC → Town Plaza → 返回 Town Green。** 地图路线和高差尚未经现场核验。
 
 第一版仅需要：地形/草地、4 个大体量建筑/区域、主路与台阶、基础植被、碰撞、WASD 移动+鼠标视角、白天固定光照。完成后再制作更细的外立面。
 
