@@ -58,7 +58,7 @@ Date: 2026-11-04 · Status: **M2 ERC/SRC architecture alpha implemented, with M1
 - [ ] Blender 按米建立 Green/Plaza/ERC/SRC 占位几何；确定高度、入口朝向和地形高差的可信来源。
 - [ ] 导出 GLB；模型原点、命名、比例一致。
 - [ ] Godot 加入第一人称控制、地面碰撞、建筑碰撞、简易路径和起点。
-- [ ] 做闭环路线：Green → Plaza → ERC → SRC → Green。
+- [ ] 实地核验概念闭环：Green → ERC → SRC → Plaza → Green（现有 JSON 顺序；不可作为实际校园导航）。
 - [ ] 提供一张固定视角对比图（实景参考 vs 引擎截图）。
 
 **验收**：能连贯绕行，不穿模，不会因上下台阶而卡死；人物大小和建筑比例看起来合理。
