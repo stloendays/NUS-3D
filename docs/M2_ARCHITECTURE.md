@@ -55,9 +55,9 @@ build/m2_assets/src_study.blend
 build/m2_assets/src_study.glb
 ```
 
-The generator was authored to use Blender X=east, Y=north, Z=up, then glTF Y-up export; imported Godot scene axes are intended to be X=east, -Z=north, Y=up. This coordinate handoff **must be tested visually on a cube/arrow reference before replacing assets**. The generated files contain source-building-local geometry, not a fully georeferenced combined campus scene. Position in Godot with each building's shared geographic transform.
+The generator uses Blender X=east, Y=north, Z=up, then glTF Y-up export; imported Godot scene axes are intended to be X=east, -Z=north, Y=up. This coordinate handoff **must be tested visually on a cube/arrow reference before replacing assets**. The generated files contain source-building-local geometry, not a fully georeferenced combined campus scene. Position in Godot with each building's shared geographic transform.
 
-The Blender generator's **Python syntax** is covered by CI. There is no claim that Blender ran, that valid exported GLBs were produced in this environment, or that the generated assets match the campus. The procedural Godot layers are currently the playable implementation.
+The Blender generator's Python syntax is covered by the Godot CI workflow. A **separate GitHub Actions Blender 4.0.2 workflow successfully executed the script on 2026-11-04** and uploaded a ZIP artifact containing both .blend files and both .glb files. The GLB 2.0 headers and binary length were checked; the downloadable ZIP was independently inspected and contained **50 ERC mesh nodes and 61 SRC mesh nodes**. [Download the temporary GitHub Actions artifact](https://github.com/stloendays/NUS-3D/actions/workflows/blender_m2.yml) (30-day workflow retention). This is asset-generation validation, **not** a visual review or a claim of geographical accuracy. The procedural Godot detail layers remain the playable implementation until the GLB import, axis and scene checks pass.
 
 ## Remaining gates before M2 acceptance
 
