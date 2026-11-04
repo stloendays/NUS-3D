@@ -9,10 +9,13 @@ import math
 from pathlib import Path
 import re
 from typing import Any
-
-from tools.audit_route_clearance import _project, footprint_vertices, segment_footprint_gap
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.audit_route_clearance import _project, footprint_vertices, segment_footprint_gap
 IDENTIFIER = re.compile(r"^[A-Z][A-Z0-9_]{2,47}$")
 
 
