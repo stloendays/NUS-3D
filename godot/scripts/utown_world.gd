@@ -1,6 +1,6 @@
 extends Node3D
 class_name UTownWorld
-## Procedural M1 greybox. Distances are metres; source lon/lat coordinates are approximate.
+## Source-driven UTown M1 massing + provisional M2 architecture study. All GIS is approximate.
 ## All geometry is created by us: no third-party screenshots, 3D meshes or textures.
 
 const DATA_PATH: String = "res://data/utown_core.json"
