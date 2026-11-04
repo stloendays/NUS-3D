@@ -1,6 +1,6 @@
 # Technical design — reusable UTown model pipeline
 
-Date: 2026-11-03 · Godot M1 greybox and M1.5 data validator implemented; field survey and GLB pipeline remain pending.
+Date: 2026-11-04 · Godot M2 alpha architectural layers and Blender authoring script implemented; field survey, exported GLB and Windows checks remain pending.
 
 ## 1. Architecture and responsibilities
 
@@ -49,7 +49,9 @@ godot/
   project.godot
   data/utown_core.json          # v0 approximate data, P0 and P1
   scenes/main.tscn              # player + HUD + world scene
-  scripts/utown_world.gd        # procedural geometry
+  scripts/utown_world.gd        # procedural world
+  scripts/utown_facades.gd      # M2 non-colliding ERC/SRC visual detail
+  data/m2_profiles.json        # M2 estimated parameters and architectural sources
   scripts/player_controller.gd  # first-person controller
   scripts/hud.gd
   scripts/minimap.gd
@@ -59,6 +61,8 @@ docs/M1_GREYBOX.md               # launch and limitations
 assets/                           # planned editable or licensed GLBs
 blender/                          # planned Blender master scenes
 web/                              # future Three.js viewer
+blender/build_m2_blockouts.py      # M2 Blender source and GLB generator (not run in CI)
+tools/validate_m2_profiles.py       # M2 profile/provenance validator
 tools/validate_utown_data.py       # implemented source-data validator
   tools/test_validate_utown_data.py # Python regression tests
 ```
@@ -107,7 +111,8 @@ Player should have a capsule collider, slope support and a simple unstuck/reset 
 ## 7. Validation protocol
 
 0. **Machine data check**: run `python tools/validate_utown_data.py` and `python -m unittest discover -s tools -t . -v`.
-1. **Top-down**: compare placement of at least ERC/SRC/Plaza/Green with GIS and official orientation diagram.
+1. **M2 source check**: validate `m2_profiles.json` and review [M2 architectural-study limitations](M2_ARCHITECTURE.md).
+2. **Top-down**: compare placement of at least ERC/SRC/Plaza/Green with GIS and official orientation diagram.
 2. **Eye-level**: three known standing viewpoints with screenshots and reference links.
 3. **Walking path**: player completes Green → ERC → SRC → Plaza → Green without collision issues.
 4. **Scale**: doors, person height, path widths and facade rhythm plausibly aligned; unknown real dimensions marked estimated.
