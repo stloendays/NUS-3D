@@ -19,11 +19,11 @@ jobs:
       - name: Install Blender 4.x from Ubuntu packages
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
           blender --version | head -n 2
       - name: Build editable ERC/SRC and GLB previews
         run: |
-          blender --background --python blender/build_m2_blockouts.py -- --out build/m2_assets
+          blender --background --python-exit-code 1 --python blender/build_m2_blockouts.py -- --out build/m2_assets
       - name: Validate generated Blender and glTF file headers
         run: |
           python - <<'PY'
