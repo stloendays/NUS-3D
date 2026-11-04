@@ -90,7 +90,7 @@ NUS-3D/
 └── tools/               # implemented source-data validator and tests
 ```
 
-The `godot/` prototype, M2 ERC/SRC procedural detail layers, Python validators and Blender source generator are implemented. **GLB exports have not been built or tested**, and Windows binaries and the Three.js viewer remain planned.
+The `godot/` prototype, M2 ERC/SRC procedural detail layers, Python validators and Blender authoring script are implemented. **Blender 4.0.2 CI has generated the separate ERC/SRC .blend and GLB files**, available as a downloadable workflow artifact; GUI import, visual fidelity, Windows binaries and the Three.js viewer remain pending.
 
 ## Attribution & use / 使用和授权
 
@@ -106,4 +106,4 @@ Run `python tools/validate_utown_data.py` and the Godot smoke test, then verify 
 
 ## M2 architectural study / 建筑细节开发
 
-ERC now has schematic glazing, mullions, sunshades and a faceted curved bay; SRC has schematic glass, balcony overhangs, an elevated forum disc and a linkway. All are a **visual-only study using estimated geometry**, not real as-built plans or official NUS assets. Toggle the detail layer using **F2**. A reproducible, unverified Blender authoring script lives at `blender/build_m2_blockouts.py`; see [M2 architecture documentation](docs/M2_ARCHITECTURE.md) for the export command and acceptance checklist.
+ERC now has schematic glazing, mullions, sunshades and a faceted curved bay; SRC has schematic glass, balcony overhangs, an elevated forum disc and a linkway. All are a **visual-only study using estimated geometry**, not real as-built plans or official NUS assets. Toggle the detail layer using **F2**. A reproducible Blender authoring script lives at `blender/build_m2_blockouts.py`, and [Blender M2 CI](https://github.com/stloendays/NUS-3D/actions/workflows/blender_m2.yml) builds **editable .blend plus GLB preview artifacts**. See [M2 architecture documentation](docs/M2_ARCHITECTURE.md) for the export command and acceptance checklist. The generated models remain provisional and have not passed a local GUI visual review.
