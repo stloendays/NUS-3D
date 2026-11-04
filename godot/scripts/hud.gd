@@ -3,6 +3,7 @@ extends CanvasLayer
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: CharacterBody3D = $"../Player"
+@onready var review: UTownViewReview = $"../ViewReview"
 @onready var title_label: Label = $Info/VBox/Title
 @onready var hint_label: Label = $Info/VBox/Hint
 @onready var target_label: Label = $Info/VBox/Target
@@ -35,7 +36,7 @@ func _ready() -> void:
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
 
 func _process(_delta: float) -> void:
-    hint_label.text = "M2 architecture %s [F2] | schematic / not surveyed" % ("ON" if world.m2_details_visible else "OFF")
+    hint_label.text = "M2 %s [F2] | F3: %s | F4 capture | NOT SURVEYED" % ["ON" if world.m2_details_visible else "OFF", review.current_name()]
     if world.route_points.is_empty():
         return
     var destination: Vector3 = world.route_points[target_index]

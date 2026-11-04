@@ -59,6 +59,31 @@ func _smoke() -> void:
         push_error("F2 architectural comparison toggle does not restore detail layers")
         quit(1)
         return
+    var review: UTownViewReview = instance.get_node_or_null("ViewReview") as UTownViewReview
+    if review == null or review.viewpoint_count() != 4:
+        push_error("Photo/synthetic camera registry failed to load")
+        quit(1)
+        return
+    if not review.select_view(0):
+        push_error("ERC review view could not be selected")
+        quit(1)
+        return
+    var observed: Dictionary = review.viewpoints[0]
+    var expected_eye: Vector3 = world.lonlat_to_world(float(observed["lon"]), float(observed["lat"])) + Vector3(0.0, 0.18, 0.0)
+    if player.global_position.distance_to(expected_eye) > 0.01:
+        push_error("Camera geographic to local conversion failed")
+        quit(1)
+        return
+    if absf(player.rotation.y + deg_to_rad(float(observed["heading_deg"]))) > 0.001:
+        push_error("Compass heading is not converted to Godot negative Y yaw")
+        quit(1)
+        return
+    review.current_index = review.viewpoint_count() - 1
+    review.cycle_view()
+    if review.current_index != -1 or player.global_position.distance_to(Vector3(0.0, 0.18, 0.0)) > 0.01:
+        push_error("Free-roam reset after reviewing viewpoints failed")
+        quit(1)
+        return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
         push_error("the conceptual walkway loop was not constructed")
         quit(1)

@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/hud.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/minimap.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/viewpoint_review.gd" id="5"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -30,6 +31,9 @@ current = true
 fov = 78.0
 near = 0.08
 far = 800.0
+
+[node name="ViewReview" type="Node" parent="."]
+script = ExtResource("5")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("3")
@@ -96,4 +100,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD walk   Shift run   Mouse look   Space jump   R reset   M map   F1 help   F2 M2 facade   Esc mouse"
+text = "WASD walk   Shift run   Mouse look   Space jump   R reset   M map   F1 help   F2 facade   F3 camera   F4 PNG   Esc mouse"

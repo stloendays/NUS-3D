@@ -33,3 +33,6 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Rendered evidence review screenshots
+godot/review_previews/
