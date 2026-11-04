@@ -365,10 +365,20 @@
           1.30502
         ],
         [
+          103.773052,
+          1.30494
+        ],
+        [
+          103.773052,
+          1.30458
+        ],
+        [
           103.77296,
           1.30458
         ]
-      ]
+      ],
+      "geometry_status": "schematic_proxy_clearance_only",
+      "geometry_note": "Two provisional east-side offsets avoid the estimated SRC collision. Not surveyed or accessible-route verified."
     },
     {
       "width_m": 4.2,

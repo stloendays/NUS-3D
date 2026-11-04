@@ -109,6 +109,10 @@ Player should have a capsule collider, slope support and a simple unstuck/reset 
 - Split larger eventual campus into spatial chunks (initial design range: 64–128 m, tune after profiling).
 - Log build version, hardware, camera path, median/low-percentile FPS and load times in test reports.
 
+### Route clearance (M1.6; provisional 2-D engineering gate)
+
+The Python tool at tools/audit_route_clearance.py reconstructs rotated massing parts from the same WGS84-to-local-metre approximation as Godot, then checks each conceptual walkway segment against the nearest building part. It reports measured *proxy gap*, required half-width + 0.75 m margin and conflicts. A JSON audit is published by GitHub Actions. One ERC-to-SRC route portion has been offset schematically to avoid the original SRC proxy collision. This is **not** a real-world map update or a validation of levels/ramps/stairs; see docs/M1_6_ROUTE_CLEARANCE.md.
+
 ## 7. Validation protocol
 
 0. **Machine data check**: run `python tools/validate_utown_data.py` and `python -m unittest discover -s tools -t . -v`.

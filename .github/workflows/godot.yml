@@ -16,6 +16,14 @@ jobs:
           python-version: "3.12"
       - name: Validate UTown source data
         run: python tools/validate_utown_data.py
+      - name: Audit conceptual pedestrian route clearance
+        run: python tools/audit_route_clearance.py --strict --report build/route-clearance.json
+      - name: Upload route audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: utown-route-clearance-audit
+          path: build/route-clearance.json
+          if-no-files-found: error
       - name: Validate M2 architecture profile assumptions
         run: python tools/validate_m2_profiles.py
       - name: Verify Blender authoring script syntax

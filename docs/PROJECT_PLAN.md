@@ -75,6 +75,19 @@ Date: 2026-11-04 · Status: **M2 ERC/SRC architecture alpha implemented, with M1
 
 **验收**：source JSON has zero structural/extent errors, Python tests pass, Godot smoke test passes, and all remaining uncertainty is clearly documented.
 
+
+### M1.6 — Proxy walkway clearance (not field-georeferenced)
+
+**2026-11-04 engineering progress:** the existing ERC-to-SRC conceptual guide crossed an SRC estimated massing. Two east-side schematic offsets now avoid the in-engine footprint, and a reproducible audit checks all route segments against rotated building parts using **walkway half-width + 0.75 m** clearance. Python regression tests and a CI JSON report cover the check.
+
+- [x] Record the original proxy collision and prevent re-introduction with tests.
+- [x] Clear the conceptual route against existing proxy buildings in 2-D.
+- [x] Produce CI machine-readable per-segment clearance evidence.
+- [ ] Validate actual walkways, ramps, entrances, ground elevations and accessibility in person or with appropriately licensed GIS/photo sources.
+- [ ] Check the route in a Godot/Windows graphical walkthrough; 2-D audit does not test vertical circulation.
+
+**No survey claim:** corrected guide points are schematic geometry. Refer to [M1.6 route audit](M1_6_ROUTE_CLEARANCE.md) before using any coordinates outside the prototype.
+
 ### M2 — Recognizable architecture / 建筑辨识度
 
 **2026-11-04 progress:** Godot now creates non-colliding, independently toggleable architectural details for ERC (faceted glazing, sunshades, canopy) and SRC (forum disc, layered bridges and glass). Parameters and evidence are recorded in `godot/data/m2_profiles.json` and validated in CI. `blender/build_m2_blockouts.py` generated actual .blend and GLB assets in a Blender 4.0.2 GitHub Actions run; exported model visuals and imported Godot scenes remain uninspected. See [M2 architecture study](M2_ARCHITECTURE.md).

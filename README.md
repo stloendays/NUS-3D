@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2 alpha architectural study for ERC/SRC (2026-11-04)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2 architecture alpha + M1.6 provisional path-clearance audit (2026-11-04)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -21,7 +21,7 @@ Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`,
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1 milestone, or a Windows installer.**
 
-The source-data validator checks coordinate ranges, polygon integrity, rotated building bounds, route continuity and attribution fields. Procedural trees avoid building footprints and conceptual walking paths, and 64 trees are rendered in two MultiMesh batches rather than 128 separate mesh nodes. These checks improve data and rendering efficiency; they do not establish real-world accuracy.
+The source-data validator checks coordinate ranges, polygon integrity, rotated building bounds, route continuity and attribution fields. Procedural trees avoid building footprints and conceptual walking paths, and 64 trees are rendered in two MultiMesh batches rather than 128 separate mesh nodes. These checks improve data and rendering efficiency; they do not establish real-world accuracy. M1.6 additionally audits conceptual route corridor widths against the estimated, rotated building footprints: one ERC-to-SRC leg was offset to avoid a proxy collision; the current 11-segment route passes the 2-D clearance check, **not a real-world accessible-path survey**.
 
 ## Preferred workflow / 建议技术路线
 
@@ -102,7 +102,7 @@ The `godot/` prototype, M2 ERC/SRC procedural detail layers, Python validators a
 
 ## Immediate next action
 
-Run `python tools/validate_utown_data.py` and the Godot smoke test, then verify P0 route/size/elevation against onsite or permitted visual evidence before refining buildings. [Issue #1](https://github.com/stloendays/NUS-3D/issues/1) still tracks geometry provenance and survey work.
+Run `python tools/validate_utown_data.py`, `python tools/audit_route_clearance.py --strict` and the Godot smoke test, then verify P0 route/size/elevation against onsite or permitted visual evidence before refining buildings. [Issue #1](https://github.com/stloendays/NUS-3D/issues/1) still tracks geometry provenance and survey work.
 
 ## M2 architectural study / 建筑细节开发
 
