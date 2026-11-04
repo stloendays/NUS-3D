@@ -1,6 +1,6 @@
 # Technical design — reusable UTown model pipeline
 
-Date: 2026-11-04 · Godot M2 alpha architectural layers and Blender authoring script implemented; field survey, exported GLB and Windows checks remain pending.
+Date: 2026-11-04 · Godot M2 alpha and Blender 4.0.2 CI-generated .blend/GLB assets implemented; field survey, GLB-in-Godot visual review and Windows checks remain pending.
 
 ## 1. Architecture and responsibilities
 
@@ -61,7 +61,8 @@ docs/M1_GREYBOX.md               # launch and limitations
 assets/                           # planned editable or licensed GLBs
 blender/                          # planned Blender master scenes
 web/                              # future Three.js viewer
-blender/build_m2_blockouts.py      # M2 Blender source and GLB generator (not run in CI)
+blender/build_m2_blockouts.py      # M2 Blender source and GLB generator (executed in separate CI job)
+.github/workflows/blender_m2.yml   # actual Blender 4.0.2 export and downloadable GLB artifacts
 tools/validate_m2_profiles.py       # M2 profile/provenance validator
 tools/validate_utown_data.py       # implemented source-data validator
   tools/test_validate_utown_data.py # Python regression tests
