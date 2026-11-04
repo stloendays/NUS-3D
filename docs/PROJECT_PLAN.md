@@ -77,7 +77,7 @@ Date: 2026-11-04 · Status: **M2 ERC/SRC architecture alpha implemented, with M1
 
 ### M2 — Recognizable architecture / 建筑辨识度
 
-**2026-11-04 progress:** Godot now creates non-colliding, independently toggleable architectural details for ERC (faceted glazing, sunshades, canopy) and SRC (forum disc, layered bridges and glass). Parameters and evidence are recorded in `godot/data/m2_profiles.json` and validated in CI. `blender/build_m2_blockouts.py` is an editable source/GLB generator, but has not yet been run and inspected in a Blender installation. See [M2 architecture study](M2_ARCHITECTURE.md).
+**2026-11-04 progress:** Godot now creates non-colliding, independently toggleable architectural details for ERC (faceted glazing, sunshades, canopy) and SRC (forum disc, layered bridges and glass). Parameters and evidence are recorded in `godot/data/m2_profiles.json` and validated in CI. `blender/build_m2_blockouts.py` generated actual .blend and GLB assets in a Blender 4.0.2 GitHub Actions run; exported model visuals and imported Godot scenes remain uninspected. See [M2 architecture study](M2_ARCHITECTURE.md).
 
 - [x] Research real architectural motifs and keep numeric dimensions marked estimated.
 - [x] Implement independent M2 visual layers and F2 greybox comparison.
