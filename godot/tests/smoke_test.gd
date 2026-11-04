@@ -27,6 +27,38 @@ func _smoke() -> void:
         push_error("missing procedural buildings or vegetation")
         quit(1)
         return
+    if world.generated_facade_count != 2 or world.m2_detail_nodes.size() != 2:
+        push_error("ERC and SRC both require a separate M2 architectural study layer")
+        quit(1)
+        return
+    var erc_details: Node3D = world.get_node_or_null("BuildingMassing_Estimated/ERC/ArchitecturalStudy_NotSurveyed") as Node3D
+    var src_details: Node3D = world.get_node_or_null("BuildingMassing_Estimated/SRC/ArchitecturalStudy_NotSurveyed") as Node3D
+    if erc_details == null or src_details == null:
+        push_error("missing ERC or SRC architectural layers")
+        quit(1)
+        return
+    if erc_details.get_node_or_null("StudyWing_00/ERC_CurvedGlazing_Study") == null:
+        push_error("ERC curved glass study was not created")
+        quit(1)
+        return
+    if src_details.get_node_or_null("SRC_ForumDisc_Study/ElevatedMetalDisc_Estimated") == null:
+        push_error("SRC forum disc study was not created")
+        quit(1)
+        return
+    if src_details.get_node_or_null("SRC_StackedLink_Study") == null:
+        push_error("SRC stacked circulation study was not created")
+        quit(1)
+        return
+    world.set_m2_details_visible(false)
+    if erc_details.visible or src_details.visible:
+        push_error("F2 architectural comparison toggle does not hide detail layers")
+        quit(1)
+        return
+    world.set_m2_details_visible(true)
+    if not erc_details.visible or not src_details.visible:
+        push_error("F2 architectural comparison toggle does not restore detail layers")
+        quit(1)
+        return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
         push_error("the conceptual walkway loop was not constructed")
         quit(1)
@@ -63,6 +95,6 @@ func _smoke() -> void:
         push_error("the provisional geography must remain clearly labelled")
         quit(1)
         return
-    print("PASS: scene, %d building groups, %d trees in 2 MultiMesh batches, %d paths, four waypoints, axes and provenance." % [world.generated_building_count, world.generated_tree_count, world.generated_path_count])
+    print("PASS: scene, %d buildings, %d M2 facades, %d trees in 2 MultiMesh batches, %d paths, axes and provenance." % [world.generated_building_count, world.generated_facade_count, world.generated_tree_count, world.generated_path_count])
     instance.queue_free()
     quit(0)
