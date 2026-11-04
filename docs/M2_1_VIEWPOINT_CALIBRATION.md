@@ -19,7 +19,7 @@ The complete versioned source/permission/precision record is in godot/data/viewp
 | ERC_2014_SOUTH | 1.305528 N, 103.772750 E; 6.97 degrees **magnetic** | [Wikimedia Commons, 20 Sep 2014](https://commons.wikimedia.org/wiki/File:Education_Resource_Centre,_University_Town,_National_University_of_Singapore_-_20140920-03.jpg) | Smuconlaw; **CC BY-SA 3.0**; EXIF heading, GPS and focal framing unverified |
 | UTOWN_2020_OVERVIEW | 1.305661 N, 103.772500 E; 131.60 degrees **true** | [Wikimedia Commons, 15 Feb 2020](https://commons.wikimedia.org/wiki/File:University_Town_at_sunrise,_National_University_of_Singapore,_February_2020.jpg) | Joshua Rommel Hayag Vargas; **CC BY-SA 4.0**; overview of ERC/UTR/CREATE/SRC, imperfect GPS/lens matching |
 | ERC_2026_GREEN | 1.305125 N, 103.772919 E; 14.83 degrees **unknown compass datum** | [Wikimedia Commons, 6 Jul 2026](https://commons.wikimedia.org/wiki/File:National_University_of_Singapore_-_Education_Research_Centre_6Jul2026.jpg) | RFNirmala; **CC BY 4.0**; source photo title spelling retained; not a surveyed standing point |
-| SRC_EAST_PROXY | 1.304580 N, 103.772960 E; 275 degrees **synthetic** | No matching source photo | Game inspection position near existing unsurveyed east forecourt waypoint; no real camera claim |
+| SRC_EAST_PROXY | 1.304580 N, 103.773180 E; 273.5 degrees **synthetic** | No matching source photo | Game inspection position on the **schematic Town Green side** of SRC, offset away from its proxy east facade for a legible perspective; no real camera claim |
 
 ### Keyboard workflow
 
@@ -51,3 +51,14 @@ Automated PNG capture proves that **the provisional scene renders** in Linux sof
 - ERC: real curved facade, courtyard, teaching levels, learning-cafe lower-ground connection, outdoor slope, primary approaches.
 - SRC: realistic stacked routes, entrances, Forum, transition between levels, ramps/stairs, differences between accessible and nonaccessible routes.
 - Real-time visual comparison and full collision walk on a Windows machine, 1080p performance log and error notes. **Do not treat current F3 presets as a real navigation guide.**
+
+## First visual QA of actual CI-produced frames (2026-11-04)
+
+The first software-rendered artifact was downloaded and individual PNGs inspected, not merely checked for file existence.
+
+- **ERC_2014_SOUTH M2**: geometry, sunlight and glazing render. Large procedurally placed trees block part of the multiwing facade; actual camera framing, courtyard and terrace heights are not reproduced. Treat these as model discrepancies, not source-camera errors.
+- **ERC_2026_GREEN M2**: simplified horizontal sunshades/greybox wings appear, but the real curved ERC silhouette and lower-ground cafe/terrace relationship remain poorly represented. Building scale and multiple levels are unverified.
+- **UTOWN_2020_OVERVIEW M2**: wide view currently dominated by rectilinear residential proxies; does not reproduce recognisable panoramic rooflines yet.
+- **SRC_EAST_PROXY M2**: initial view at the east forecourt path point was just metres from the proxy east wall and hid the Forum shape. Moved the **synthetic only** review camera farther east, toward the schematic Town Green side for whole-building comparison; real GPS/photo evidence is unaffected.
+- These are visual diagnosis notes, not validated photogrammetric error measurements. See Issue #5 for acceptance criteria.
+

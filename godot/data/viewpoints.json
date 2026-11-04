@@ -60,12 +60,12 @@
     },
     {
       "id": "SRC_EAST_PROXY",
-      "label": "SRC / east-side inspection",
+      "label": "SRC / Town Green-side inspection",
       "subject": "SRC",
       "kind": "synthetic_proxy",
-      "lon": 103.77296,
+      "lon": 103.77318,
       "lat": 1.30458,
-      "heading_deg": 275,
+      "heading_deg": 273.5,
       "heading_reference": "true",
       "fov_deg": 75,
       "pitch_deg": 0,
@@ -74,7 +74,7 @@
       "license": null,
       "source_url": null,
       "confidence": "synthetic-not-surveyed",
-      "notes": "Provisional east forecourt waypoint facing SRC proxy. No matching camera photograph or survey."
+      "notes": "Game-only schematic Town Green-side camera moved 27m+ from the estimated SRC east wall to show overall massing. Does not correspond to a verified real reference photo or accessible path."
     }
   ]
 }
