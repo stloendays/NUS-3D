@@ -15,7 +15,8 @@
     "service_data_last_edit": "2020-03-15T23:57:23Z",
     "item_metadata_updated": "2026-06-10",
     "contour_interval_m": 5,
-    "stated_spatial_resolution_m": 10
+    "stated_spatial_resolution_m": 10,
+    "license_status": "no explicit license URI found in the ArcGIS item metadata; reuse review required before external redistribution"
   },
   "extracted_at": "2026-11-05T08:01:20.964Z",
   "clip_bbox": {
