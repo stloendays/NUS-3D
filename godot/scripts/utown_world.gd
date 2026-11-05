@@ -350,17 +350,24 @@ func _build_waypoints() -> void:
         _add_sign(root, str(stop["name"]), p + Vector3(0.0, 3.1, 0.0), "#fff4c4")
 
 func nearest_landmark(position_m: Vector3) -> Dictionary:
-    var answer: Dictionary = {"name": "Town Green", "distance": 0.0}
+    var answer: Dictionary = {"id": "TOWN_GREEN", "name": "Town Green", "role": "open_space", "distance": INF}
     var best: float = INF
     for record in layout.get("buildings", []):
         var p: Vector3 = lonlat_to_world(float(record["lon"]), float(record["lat"]))
         var distance_m: float = Vector2(position_m.x, position_m.z).distance_to(Vector2(p.x, p.z))
         if distance_m < best:
             best = distance_m
-            answer = {"name": str(record["name"]), "distance": distance_m}
+            answer = {"id": str(record.get("id", "")), "name": str(record.get("name", record.get("id", "Building"))), "role": str(record.get("role", "campus")), "priority": str(record.get("priority", "P1")), "distance": distance_m}
     if layout.has("green"):
         var g: Vector3 = lonlat_to_world(103.77312, 1.30504)
         var gd: float = Vector2(position_m.x, position_m.z).distance_to(Vector2(g.x, g.z))
         if gd < best:
-            answer = {"name": "Town Green", "distance": gd}
+            best = gd
+            answer = {"id": "TOWN_GREEN", "name": "Town Green", "role": "open_space", "distance": gd}
+    if layout.has("plaza"):
+        var plaza: Dictionary = layout["plaza"]
+        var p: Vector3 = lonlat_to_world(float(plaza.get("lon", origin_lon)), float(plaza.get("lat", origin_lat)))
+        var pd: float = Vector2(position_m.x, position_m.z).distance_to(Vector2(p.x, p.z))
+        if pd < best:
+            answer = {"id": str(plaza.get("id", "TOWN_PLAZA")), "name": str(plaza.get("name", "Town Plaza")), "role": "public_space", "priority": "P0", "distance": pd}
     return answer
