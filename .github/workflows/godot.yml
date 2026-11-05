@@ -31,8 +31,8 @@ jobs:
       - name: Validate M2 architecture profile assumptions
         run: python tools/validate_m2_profiles.py
       - name: Verify Blender authoring script syntax
-        run: python -m py_compile blender/build_m2_blockouts.py
-      - name: Validate OSM and terrain contour reference snapshots
+        run: python -m py_compile blender/build_m2_blockouts.py blender/build_m2_4_osm_shells.py
+      - name: Validate OSM footprints, contours and estimated shell profiles
         run: python tools/validate_geospatial_sources.py
       - name: Run Python validator tests
         run: python -m unittest discover -s tools -t . -v
@@ -55,6 +55,8 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_viewpoints.gd
       - name: Render HUD minimap with OSM and contour overlays
         run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_minimap.gd
+      - name: Render ERC/SRC proxy versus OSM shell comparisons
+        run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_osm_shells.gd
       - name: Publish provisional M1/M2 viewport comparisons
         uses: actions/upload-artifact@v4
         with:
