@@ -86,6 +86,61 @@ func _smoke() -> void:
         push_error("ERC and SRC both require a separate M2 architectural study layer")
         quit(1)
         return
+
+    if world.osm_shell_count != 2 or world.osm_shell_way_ids.size() != 2:
+        push_error("ERC and SRC OSM footprint shells failed to generate")
+        quit(1)
+        return
+    var osm_root: Node3D = world.get_node_or_null("OSMBuildingShells_Estimated") as Node3D
+    var proxy_root: Node3D = world.get_node_or_null("BuildingMassing_Estimated") as Node3D
+    var erc_shell: MeshInstance3D = world.get_node_or_null("OSMBuildingShells_Estimated/ERC_OSMFootprintShell_NotSurveyed") as MeshInstance3D
+    var src_shell: MeshInstance3D = world.get_node_or_null("OSMBuildingShells_Estimated/SRC_OSMFootprintShell_NotSurveyed") as MeshInstance3D
+    if osm_root == null or proxy_root == null or erc_shell == null or src_shell == null:
+        push_error("OSM shell scene hierarchy is incomplete")
+        quit(1)
+        return
+    if erc_shell.mesh == null or src_shell.mesh == null or erc_shell.mesh.get_surface_count() != 2 or src_shell.mesh.get_surface_count() != 2:
+        push_error("OSM shells require separate wall and roof mesh surfaces")
+        quit(1)
+        return
+    if int(erc_shell.get_meta("osm_way_id", -1)) != 124549217 or int(src_shell.get_meta("osm_way_id", -1)) != 125774787:
+        push_error("OSM shell provenance IDs do not match ERC/SRC source ways")
+        quit(1)
+        return
+    var erc_shell_bounds: Vector3 = erc_shell.mesh.get_aabb().size
+    var src_shell_bounds: Vector3 = src_shell.mesh.get_aabb().size
+    if absf(erc_shell_bounds.x - 77.57) > 0.5 or absf(erc_shell_bounds.z - 122.69) > 0.5 or absf(erc_shell_bounds.y - 13.8) > 0.01:
+        push_error("ERC OSM shell bounds or estimated extrusion height changed unexpectedly")
+        quit(1)
+        return
+    if absf(src_shell_bounds.x - 173.29) > 0.5 or absf(src_shell_bounds.z - 167.75) > 0.5 or absf(src_shell_bounds.y - 14.6) > 0.01:
+        push_error("SRC OSM shell bounds or estimated extrusion height changed unexpectedly")
+        quit(1)
+        return
+    var erc_proxy: Node3D = proxy_root.get_node("ERC") as Node3D
+    var proxy_collision_found: bool = false
+    for proxy_part in erc_proxy.get_children():
+        for proxy_child in proxy_part.get_children():
+            if proxy_child is StaticBody3D:
+                proxy_collision_found = true
+    if not proxy_collision_found:
+        push_error("estimated proxy collision must remain available during OSM shell comparison")
+        quit(1)
+        return
+    world.set_osm_shells_visible(true)
+    var details_hidden: bool = true
+    for detail in world.m2_detail_nodes:
+        if detail.visible:
+            details_hidden = false
+    if not osm_root.visible or proxy_root.visible or not details_hidden:
+        push_error("OSM shell comparison did not hide old proxy and facade visuals")
+        quit(1)
+        return
+    world.set_osm_shells_visible(false)
+    if osm_root.visible or not proxy_root.visible:
+        push_error("OSM shell comparison did not restore the proxy model")
+        quit(1)
+        return
     var erc_details: Node3D = world.get_node_or_null("BuildingMassing_Estimated/ERC/ArchitecturalStudy_NotSurveyed") as Node3D
     var src_details: Node3D = world.get_node_or_null("BuildingMassing_Estimated/SRC/ArchitecturalStudy_NotSurveyed") as Node3D
     if erc_details == null or src_details == null:
