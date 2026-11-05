@@ -5,6 +5,8 @@ class_name UTownWorld
 
 const DATA_PATH: String = "res://data/utown_core.json"
 const M2_DATA_PATH: String = "res://data/m2_profiles.json"
+const OSM_DATA_PATH: String = "res://data/osm_utown_snapshot.json"
+const OSM_SHELL_PROFILE_PATH: String = "res://data/osm_shell_profiles.json"
 const FACADE_KIT = preload("res://scripts/utown_facades.gd")
 const METRES_PER_DEG_LAT: float = 110574.0
 const METRES_PER_DEG_LON: float = 111320.0
@@ -19,6 +21,12 @@ var generated_tree_count: int = 0
 var generated_tree_positions: Array[Vector3] = []
 var generated_path_count: int = 0
 var m2_profiles: Dictionary = {}
+var osm_shell_profiles: Dictionary = {}
+var building_massing_root: Node3D
+var osm_shell_root: Node3D
+var osm_shell_count: int = 0
+var osm_shell_way_ids: Array[int] = []
+var osm_shells_visible: bool = false
 var m2_detail_nodes: Array[Node3D] = []
 var generated_facade_count: int = 0
 var m2_details_visible: bool = true
@@ -42,12 +50,20 @@ func _ready() -> void:
             m2_profiles = profile_document.get("profiles", {})
         else:
             push_warning("M2 architecture profiles are invalid; plain massing will remain.")
+    if FileAccess.file_exists(OSM_SHELL_PROFILE_PATH):
+        var shell_profile_json: Variant = JSON.parse_string(FileAccess.get_file_as_string(OSM_SHELL_PROFILE_PATH))
+        if typeof(shell_profile_json) == TYPE_DICTIONARY:
+            var shell_profile_document: Dictionary = shell_profile_json
+            osm_shell_profiles = shell_profile_document.get("buildings", {})
+        else:
+            push_warning("OSM shell profiles are invalid; estimated massing remains active.")
     _build_sky()
     _build_ground()
     _build_green()
     _build_plaza()
     _build_walkways()
     _build_buildings()
+    _build_osm_shells()
     _build_trees()
     _build_waypoints()
 
@@ -175,9 +191,10 @@ func _building_color(role: String) -> StandardMaterial3D:
     return _mat("#c8c8c8")
 
 func _build_buildings() -> void:
-    var root: Node3D = Node3D.new()
-    root.name = "BuildingMassing_Estimated"
-    add_child(root)
+    building_massing_root = Node3D.new()
+    building_massing_root.name = "BuildingMassing_Estimated"
+    add_child(building_massing_root)
+    var root: Node3D = building_massing_root
     var glass: Material = _mat("#688a9c", 0.34)
     var roof: Material = _mat("#dde0dc")
     var entrance: Material = _mat("#426675", 0.32)
@@ -216,10 +233,157 @@ func _build_buildings() -> void:
         generated_building_count += 1
         _add_sign(group, str(record.get("name", group.name)), Vector3(0.0, max_height + 6.0, 0.0), "#fbfbf8")
 
+func _extrude_footprint(points: PackedVector2Array, height_m: float, side_material: Material, roof_material: Material) -> ArrayMesh:
+    if points.size() < 3 or height_m <= 0.0:
+        return null
+    var triangles: PackedInt32Array = Geometry2D.triangulate_polygon(points)
+    if triangles.size() < 3:
+        return null
+
+    var signed_area: float = 0.0
+    for index in range(points.size()):
+        var a: Vector2 = points[index]
+        var b: Vector2 = points[(index + 1) % points.size()]
+        signed_area += a.x * b.y - b.x * a.y
+    if absf(signed_area) < 0.01:
+        return null
+    var winding: float = 1.0 if signed_area > 0.0 else -1.0
+
+    var mesh: ArrayMesh = ArrayMesh.new()
+    var walls: SurfaceTool = SurfaceTool.new()
+    walls.begin(Mesh.PRIMITIVE_TRIANGLES)
+    walls.set_material(side_material)
+    for index in range(points.size()):
+        var a: Vector2 = points[index]
+        var b: Vector2 = points[(index + 1) % points.size()]
+        var edge: Vector2 = b - a
+        if edge.length_squared() < 0.000001:
+            continue
+        var normal: Vector3 = Vector3(edge.y * winding, 0.0, -edge.x * winding).normalized()
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(a.x, 0.0, a.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(b.x, 0.0, b.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(b.x, height_m, b.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(a.x, 0.0, a.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(b.x, height_m, b.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(a.x, height_m, a.y))
+    walls.commit(mesh)
+
+    var roof: SurfaceTool = SurfaceTool.new()
+    roof.begin(Mesh.PRIMITIVE_TRIANGLES)
+    roof.set_material(roof_material)
+    for index in range(0, triangles.size(), 3):
+        for vertex_index in [triangles[index], triangles[index + 1], triangles[index + 2]]:
+            var point: Vector2 = points[vertex_index]
+            roof.set_normal(Vector3.UP)
+            roof.add_vertex(Vector3(point.x, height_m, point.y))
+    roof.commit(mesh)
+    return mesh
+
+func _build_osm_shells() -> void:
+    if osm_shell_profiles.is_empty():
+        push_warning("No OSM shell profiles; estimated building massing remains active.")
+        return
+    if not FileAccess.file_exists(OSM_DATA_PATH):
+        push_warning("OSM footprint snapshot missing; estimated building massing remains active.")
+        return
+    var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(OSM_DATA_PATH))
+    if typeof(parsed) != TYPE_DICTIONARY:
+        push_warning("OSM footprint snapshot is invalid; estimated building massing remains active.")
+        return
+
+    var osm_document: Dictionary = parsed
+    var feature_by_id: Dictionary = {}
+    for feature in osm_document.get("features", []):
+        if typeof(feature) == TYPE_DICTIONARY:
+            feature_by_id[int(feature.get("osm_id", -1))] = feature
+
+    osm_shell_root = Node3D.new()
+    osm_shell_root.name = "OSMBuildingShells_Estimated"
+    osm_shell_root.visible = false
+    add_child(osm_shell_root)
+
+    for building_id in ["ERC", "SRC"]:
+        var profile: Dictionary = osm_shell_profiles.get(building_id, {})
+        if profile.is_empty():
+            push_warning("OSM shell profile missing for " + building_id)
+            continue
+        var way_id: int = int(profile.get("osm_way_id", -1))
+        var feature: Dictionary = feature_by_id.get(way_id, {})
+        if feature.is_empty() or str(feature.get("geometry_status", "")) != "complete":
+            push_warning("Complete OSM footprint missing for %s (way %d)" % [building_id, way_id])
+            continue
+        if str(feature.get("geometry_type", "")) != "Polygon":
+            push_warning("OSM shell source is not a Polygon for " + building_id)
+            continue
+
+        var coordinates: Array = feature.get("coordinates", [])
+        var point_count: int = coordinates.size()
+        if point_count >= 4:
+            var first_pair: Array = coordinates[0]
+            var last_pair: Array = coordinates[point_count - 1]
+            if absf(float(first_pair[0]) - float(last_pair[0])) < 0.0000001 and absf(float(first_pair[1]) - float(last_pair[1])) < 0.0000001:
+                point_count -= 1
+        if point_count < 3:
+            push_warning("OSM footprint has too few unique vertices for " + building_id)
+            continue
+
+        var site_points: PackedVector2Array = PackedVector2Array()
+        var centre: Vector2 = Vector2.ZERO
+        for index in range(point_count):
+            var pair: Array = coordinates[index]
+            var site: Vector3 = lonlat_to_world(float(pair[0]), float(pair[1]))
+            var point: Vector2 = Vector2(site.x, site.z)
+            site_points.append(point)
+            centre += point
+        centre /= float(site_points.size())
+
+        var local_points: PackedVector2Array = PackedVector2Array()
+        for point in site_points:
+            local_points.append(point - centre)
+
+        var height_m: float = float(profile.get("height_m", 0.0))
+        var side_material: StandardMaterial3D = _mat(str(profile.get("side_color", "#78949d")), 0.72)
+        side_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+        var roof_material: StandardMaterial3D = _mat(str(profile.get("roof_color", "#d7dfdc")), 0.86)
+        roof_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+        var mesh: ArrayMesh = _extrude_footprint(local_points, height_m, side_material, roof_material)
+        if mesh == null or mesh.get_surface_count() != 2:
+            push_warning("OSM footprint triangulation failed for " + building_id)
+            continue
+
+        var shell: MeshInstance3D = MeshInstance3D.new()
+        shell.name = building_id + "_OSMFootprintShell_NotSurveyed"
+        shell.mesh = mesh
+        shell.position = Vector3(centre.x, 0.0, centre.y)
+        shell.set_meta("osm_way_id", way_id)
+        shell.set_meta("osm_timestamp", str(feature.get("timestamp", "")))
+        shell.set_meta("osm_levels", int(profile.get("osm_levels", 0)))
+        shell.set_meta("estimated_height_m", height_m)
+        shell.set_meta("height_confidence", str(profile.get("height_confidence", "estimated")))
+        shell.set_meta("osm_layer_tag", str(profile.get("osm_layer_tag", "")))
+        osm_shell_root.add_child(shell)
+        osm_shell_way_ids.append(way_id)
+        osm_shell_count += 1
+
+func set_osm_shells_visible(enabled: bool) -> void:
+    osm_shells_visible = enabled
+    if osm_shell_root != null:
+        osm_shell_root.visible = enabled
+    if building_massing_root != null:
+        building_massing_root.visible = not enabled
+    for detail in m2_detail_nodes:
+        detail.visible = m2_details_visible and not enabled
+
 func set_m2_details_visible(enabled: bool) -> void:
     m2_details_visible = enabled
     for detail in m2_detail_nodes:
-        detail.visible = enabled
+        detail.visible = enabled and not osm_shells_visible
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
