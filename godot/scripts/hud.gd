@@ -10,7 +10,7 @@ extends CanvasLayer
 @onready var nearest_label: Label = $Info/VBox/Nearby
 @onready var detail_label: Label = $Info/VBox/Detail
 @onready var perf_label: Label = $Info/VBox/Perf
-@onready var map_control: Control = $Minimap
+@onready var map_control: UTownMinimap = $Minimap
 @onready var help_label: Label = $Help
 
 var target_index: int = 0
@@ -38,7 +38,7 @@ func _ready() -> void:
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
 
 func _process(_delta: float) -> void:
-    hint_label.text = "M2 %s [F2] | F3: %s | F4 capture | NOT SURVEYED" % ["ON" if world.m2_details_visible else "OFF", review.current_name()]
+    hint_label.text = "M2 %s [F2] | F3: %s | O OSM | T contours | F4 capture" % ["ON" if world.m2_details_visible else "OFF", review.current_name()]
     if world.route_points.is_empty():
         return
     var destination: Vector3 = world.route_points[target_index]
@@ -74,3 +74,7 @@ func _unhandled_input(event: InputEvent) -> void:
         elif event.keycode == KEY_F1:
             show_full_help = not show_full_help
             help_label.visible = show_full_help
+        elif event.keycode == KEY_O:
+            map_control.set_osm_reference_visible(not map_control.show_osm_reference)
+        elif event.keycode == KEY_T:
+            map_control.set_terrain_contours_visible(not map_control.show_terrain_contours)
