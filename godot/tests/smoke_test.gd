@@ -64,13 +64,19 @@ func _smoke() -> void:
             push_error("OSM campus boundary is clipped by the minimap")
             quit(1)
             return
+    if minimap.show_osm_paths:
+        push_error("OSM footpath network should default to a decluttered state")
+        quit(1)
+        return
     minimap.set_osm_reference_visible(false)
+    minimap.set_osm_paths_visible(true)
     minimap.set_terrain_contours_visible(false)
-    if minimap.show_osm_reference or minimap.show_terrain_contours:
-        push_error("OSM and contour overlay toggles failed")
+    if minimap.show_osm_reference or not minimap.show_osm_paths or minimap.show_terrain_contours:
+        push_error("OSM building, path and contour overlay toggles failed")
         quit(1)
         return
     minimap.set_osm_reference_visible(true)
+    minimap.set_osm_paths_visible(false)
     minimap.set_terrain_contours_visible(true)
     if world.generated_building_count < 8 or world.generated_tree_count < 20:
         push_error("missing procedural buildings or vegetation")
