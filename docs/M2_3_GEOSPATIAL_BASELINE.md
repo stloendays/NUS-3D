@@ -24,11 +24,12 @@ A public Singapore contour layer sourced from Singapore Land Authority (Land Sur
 
 The item description states a **5 m contour interval** and **10 m resolution**. Its acknowledgements identify SLA Land Survey data downloaded 1 May 2019; the service reports data last edited 15 March 2020. The vertical datum is not stated in the service metadata.
 
-This is therefore a planimetric contour reference, not a gridded DEM or a current site survey. The minimap draws these contour lines for slope context only. They are not used to assign player elevation, building-floor height, ramp grade or step riser height.
+This is therefore a planimetric contour reference, not a gridded DEM or a current site survey. The minimap draws these contour lines for slope context only. CI also captures both the decluttered default map and a path-network comparison image. They are not used to assign player elevation, building-floor height, ramp grade or step riser height.
 
 ## In-game controls
 
-- **O** toggles OSM building, landcover and pedestrian-way overlays.
+- **O** toggles OSM building footprints and landcover.
+- **P** toggles the denser OSM footway/steps/service network (off by default to keep the minimap legible).
 - **T** toggles the 5 m contour overlay.
 - The overlays are drawn separately from the existing schematic building collision envelopes and conceptual route.
 
