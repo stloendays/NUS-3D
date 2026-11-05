@@ -22,7 +22,7 @@ Snapshot: \`godot/data/terrain_contours.json\`
 
 A public Singapore contour layer sourced from Singapore Land Authority (Land Survey) was queried for the UTown bounding box. Line segments were retained when their midpoint falls inside the OSM boundary; they are not polygon-clipped to the exact boundary. It exposes a \`Height\` field in metres and five contours intersecting the study area: **5, 10, 15, 20 and 25 m**.
 
-The item description states a **5 m contour interval** and **10 m resolution**. Its acknowledgements identify SLA Land Survey data downloaded 1 May 2019; the service reports data last edited 15 March 2020. The vertical datum is not stated in the service metadata.
+The item description states a **5 m contour interval** and **10 m resolution**. Its acknowledgements identify SLA Land Survey data downloaded 1 May 2019; the service reports data last edited 15 March 2020. The vertical datum is not stated in the service metadata. The ArcGIS item has no explicit licence URI; although the service is publicly accessible and its description lists no special restrictions, reuse terms remain under review and must be confirmed before external redistribution.
 
 This is therefore a planimetric contour reference, not a gridded DEM or a current site survey. The minimap draws these contour lines for slope context only. CI also captures both the decluttered default map and a path-network comparison image. They are not used to assign player elevation, building-floor height, ramp grade or step riser height.
 
@@ -39,7 +39,7 @@ This is therefore a planimetric contour reference, not a gridded DEM or a curren
 - OSM contributor attribution and ODbL notice;
 - closed, complete building rings and valid WGS84 coordinates;
 - consistency between snapshot feature records and summary counts;
-- the five contour values, 5 m interval and explicit unknown vertical datum;
+- the five contour values, 5 m interval, explicit unknown vertical datum and reuse-review caveat;
 - the prohibition on presenting the contour reference as a surveyed DEM.
 
 CI validation proves data structure and provenance fields only. It does not prove the geometry is correct on the ground.
