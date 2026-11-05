@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux screenshot pipeline implemented; real-world survey and Windows checks pending**
+Date: 2026-11-05 · Status: **M2.3 OSM campus vectors and SLA-derived contour reference integrated; vertical datum, field survey and Windows checks pending**
 
 ## 1. 产品定位
 
@@ -43,7 +43,7 @@ Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux scree
 ### M0 — Geospatial baseline / 地理数据准备
 
 - [ ] 查 UTown 当期官方地图；2024 PDF 只做命名/拓扑参考（其页面标注 not to scale）。
-- [ ] 用 OSM 获取建筑轮廓、园路、台阶、树木/草坪等矢量数据；记录 OSM 抓取日期与 ODbL attribution。
+- [x] 获取首批 UTown OSM 建筑、屋顶、园路/台阶和绿地矢量快照；记录 way ID、版本、时间戳与 ODbL attribution。
 - [ ] 以 Town Green 的后续实测/核实中心点作为局部坐标原点；坐标转换遵循技术规范。
 - [ ] 创建四大 P0 地标的俯视标注图、立面参考清单、几何质量等级。
 - [ ] 查验航拍/街景/360° 图的许可，先保存链接和拍摄角度，不盲目上传照片。
@@ -114,9 +114,27 @@ Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux scree
 - [x] Restore cameras reproducibly and capture own-model comparison images.
 - [x] Validate camera positions and evidence status; publish CI software-rendered M1/M2 pairs.
 - [ ] Compare photo and in-engine snapshots visually at validated eye elevations and camera FoV.
-- [ ] Extract and review actual OSM building outlines/entrances, SRC levels and accessibility with appropriate licensing.
+- [x] Extract the first campus-clipped OSM building/path snapshot with way IDs and ODbL provenance.\n- [ ] Review real building outlines/entrances, SRC levels and accessibility against current evidence with appropriate licensing.
 
 See [M2.1 documentation](M2_1_VIEWPOINT_CALIBRATION.md). Passing software render is not an accurate-survey or Windows-performance claim.
+
+
+### M2.3 — OSM footprint and terrain contour baseline
+
+**2026-11-05:** a versioned OSM extract is now stored in `godot/data/osm_utown_snapshot.json`: 38 building footprints, 4 roof structures, 118 path/step/service ways and 17 landcover features, clipped to OSM University Town boundary way 92357946. Seven named OSM buildings are linked to existing schematic landmarks. The minimap overlays the OSM geometry and keeps it separate from proxy collision shapes.
+
+A public Singapore contour layer sourced from SLA Land Survey was clipped to the UTown boundary. Five contour levels (5–25 m at 5 m intervals) are shown as planimetric references. The service does not state a vertical datum; the contours are **not** used to create an absolute-height terrain mesh or ramp/step elevations.
+
+- [x] Store dated OSM way geometry, IDs, tags, versions and timestamps.
+- [x] Overlay OSM building footprints, landcover and pedestrian ways in the minimap; add O/T toggles.
+- [x] Store the five clipped contour levels with source and vertical-datum caveats.
+- [x] Add Python validation and CI checks for geometry closure, ODbL attribution and contour metadata.
+- [ ] Verify OSM outlines and entrances against current licensed photos or on-site observations.
+- [ ] Confirm contour vertical datum and accuracy, or obtain higher-resolution NUS/SLA survey data.
+- [ ] Measure ground elevations, SRC stacked paths, ramps and steps before generating the 3D terrain mesh.
+- [ ] Replace proxy collision geometry only after polygon collision and route-clearance tests pass.
+
+See [M2.3 geospatial baseline](M2_3_GEOSPATIAL_BASELINE.md). Passing validation confirms data integrity and provenance fields, not real-world survey accuracy.
 
 ### M3 — Atmosphere / 环境与交互
 
