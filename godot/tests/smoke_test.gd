@@ -29,6 +29,49 @@ func _smoke() -> void:
         push_error("full-extent schematic minimap failed to initialize")
         quit(1)
         return
+
+    if minimap.osm_features.size() < 170 or minimap.osm_boundary.size() < 30:
+        push_error("campus-clipped OSM reference geometry failed to load")
+        quit(1)
+        return
+    if minimap.terrain_contours.size() != 5:
+        push_error("five-metre terrain contour reference failed to load")
+        quit(1)
+        return
+    var osm_buildings: int = 0
+    var osm_paths: int = 0
+    for feature in minimap.osm_features:
+        if str(feature.get("feature_type", "")) == "building":
+            osm_buildings += 1
+        elif str(feature.get("feature_type", "")) == "path":
+            osm_paths += 1
+    if osm_buildings != 38 or osm_paths != 118:
+        push_error("OSM feature counts do not match the versioned campus extract")
+        quit(1)
+        return
+    var contour_heights: Array[int] = []
+    for contour in minimap.terrain_contours:
+        contour_heights.append(int(contour.get("height_m", 0)))
+    contour_heights.sort()
+    if contour_heights != [5, 10, 15, 20, 25]:
+        push_error("terrain contour elevations are missing or incorrectly ordered")
+        quit(1)
+        return
+    for coordinate in minimap.osm_boundary:
+        var boundary_world: Vector3 = world.lonlat_to_world(float(coordinate[0]), float(coordinate[1]))
+        var boundary_map: Vector2 = minimap.world_to_map(boundary_world)
+        if boundary_map.x < 17.0 or boundary_map.x > 205.0 or boundary_map.y < 17.0 or boundary_map.y > 205.0:
+            push_error("OSM campus boundary is clipped by the minimap")
+            quit(1)
+            return
+    minimap.set_osm_reference_visible(false)
+    minimap.set_terrain_contours_visible(false)
+    if minimap.show_osm_reference or minimap.show_terrain_contours:
+        push_error("OSM and contour overlay toggles failed")
+        quit(1)
+        return
+    minimap.set_osm_reference_visible(true)
+    minimap.set_terrain_contours_visible(true)
     if world.generated_building_count < 8 or world.generated_tree_count < 20:
         push_error("missing procedural buildings or vegetation")
         quit(1)
