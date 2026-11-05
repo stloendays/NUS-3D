@@ -61,18 +61,12 @@ def shell_mesh(bpy: Any, building_id: str, feature: dict[str, Any], profile: dic
     if not triangles:
         raise ValueError(f"{building_id}: Blender could not triangulate the OSM polygon")
 
-    coordinate_to_index = {
-        (round(x, 7), round(y, 7)): index for index, (x, y) in enumerate(points)
-    }
+    # Blender 4.0.2 returns source-vertex indices from tessellate_polygon.
     top_triangles: list[tuple[int, int, int]] = []
     for triangle in triangles:
-        try:
-            ids = tuple(
-                coordinate_to_index[(round(float(vertex.x), 7), round(float(vertex.y), 7))]
-                for vertex in triangle
-            )
-        except KeyError as exc:
-            raise ValueError(f"{building_id}: triangulator returned a non-source vertex") from exc
+        ids = tuple(int(vertex_index) for vertex_index in triangle)
+        if len(ids) != 3 or any(index < 0 or index >= len(points) for index in ids):
+            raise ValueError(f"{building_id}: triangulator returned an invalid source index")
         if len(set(ids)) == 3:
             top_triangles.append(ids)
     if not top_triangles:
