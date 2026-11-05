@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import unittest
 
-from tools.validate_geospatial_sources import validate_osm, validate_terrain
+from tools.validate_geospatial_sources import validate_osm, validate_terrain, validate_osm_shell_profiles
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,6 +13,7 @@ class GeospatialSourceTests(unittest.TestCase):
     def setUpClass(cls):
         cls.osm = json.loads((ROOT / "godot/data/osm_utown_snapshot.json").read_text(encoding="utf-8"))
         cls.terrain = json.loads((ROOT / "godot/data/terrain_contours.json").read_text(encoding="utf-8"))
+        cls.shell_profiles = json.loads((ROOT / "godot/data/osm_shell_profiles.json").read_text(encoding="utf-8"))
 
     def test_versioned_osm_snapshot_is_valid(self):
         self.assertEqual(validate_osm(self.osm), [])
@@ -49,6 +50,21 @@ class GeospatialSourceTests(unittest.TestCase):
         altered = copy.deepcopy(self.terrain)
         altered["source_metadata"]["license_status"] = "open data"
         self.assertTrue(any("reuse status must remain under review" in item for item in validate_terrain(altered)))
+
+    def test_erc_src_osm_shell_profiles_are_consistent(self):
+        self.assertEqual(validate_osm_shell_profiles(self.osm, self.shell_profiles), [])
+        self.assertEqual(self.shell_profiles["buildings"]["ERC"]["height_m"], 13.8)
+        self.assertEqual(self.shell_profiles["buildings"]["SRC"]["height_m"], 14.6)
+
+    def test_osm_shell_height_must_remain_estimated_and_derived(self):
+        altered = copy.deepcopy(self.shell_profiles)
+        altered["buildings"]["SRC"]["height_m"] = 25.0
+        self.assertTrue(any("levels × estimated storey pitch" in item for item in validate_osm_shell_profiles(self.osm, altered)))
+
+    def test_osm_layer_tag_is_not_a_vertical_offset(self):
+        altered = copy.deepcopy(self.shell_profiles)
+        altered["vertical_offset_policy"] = "layer=-1 means y=-1 metre"
+        self.assertTrue(any("must not be interpreted as vertical offsets" in item for item in validate_osm_shell_profiles(self.osm, altered)))
 
 
 if __name__ == "__main__":
