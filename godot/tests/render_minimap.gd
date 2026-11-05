@@ -33,6 +33,7 @@ func _render() -> void:
     hud.visible = true
     minimap.visible = true
     minimap.set_osm_reference_visible(true)
+    minimap.set_osm_paths_visible(false)
     minimap.set_terrain_contours_visible(true)
     for _frame in range(4):
         await process_frame
@@ -51,7 +52,17 @@ func _render() -> void:
         return
     var image_path: String = output.path_join("minimap_m2_3_osm_contours.png")
     if frame.save_png(image_path) != OK:
-        push_error("Could not save minimap review PNG")
+        push_error("Could not save decluttered minimap review PNG")
+        quit(1)
+        return
+
+    minimap.set_osm_paths_visible(true)
+    for _frame in range(3):
+        await process_frame
+    await RenderingServer.frame_post_draw
+    var path_frame: Image = root.get_texture().get_image()
+    if path_frame == null or path_frame.is_empty() or path_frame.save_png(output.path_join("minimap_m2_3_with_paths.png")) != OK:
+        push_error("Could not save OSM pedestrian path overlay comparison")
         quit(1)
         return
 
@@ -64,10 +75,12 @@ func _render() -> void:
         "campus_boundary_node_count": minimap.osm_boundary.size(),
         "contour_heights_m": [5, 10, 15, 20, 25],
         "osm_overlay_visible": minimap.show_osm_reference,
+        "path_overlay_visible_in_comparison": minimap.show_osm_paths,
         "contour_overlay_visible": minimap.show_terrain_contours,
         "map_scale_px_per_m": minimap.map_scale,
         "map_center_local_m": [minimap.map_center_world.x, minimap.map_center_world.y],
         "image": "minimap_m2_3_osm_contours.png",
+        "path_comparison_image": "minimap_m2_3_with_paths.png",
         "note": "This verifies the software-rendered HUD/minimap and overlay visibility only. It does not certify geographic accuracy or vertical datum."
     }
     var report: FileAccess = FileAccess.open(output.path_join("minimap_manifest.json"), FileAccess.WRITE)
