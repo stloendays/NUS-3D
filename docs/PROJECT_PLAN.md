@@ -121,13 +121,13 @@ See [M2.1 documentation](M2_1_VIEWPOINT_CALIBRATION.md). Passing software render
 
 ### M2.3 — OSM footprint and terrain contour baseline
 
-**2026-11-05:** a versioned OSM extract is now stored in `godot/data/osm_utown_snapshot.json`: 38 building footprints, 4 roof structures, 118 path/step/service ways and 17 landcover features, clipped to OSM University Town boundary way 92357946. Seven named OSM buildings are linked to existing schematic landmarks. The minimap overlays the OSM geometry and keeps it separate from proxy collision shapes.
+**2026-11-05:** a versioned OSM extract is now stored in `godot/data/osm_utown_snapshot.json`: 38 building footprints, 4 roof structures, 118 path/step/service ways and 17 landcover features, selected by way-vertex mean against OSM University Town boundary way 92357946. Original way geometries are retained uncut. Seven named OSM buildings are linked to existing schematic landmarks. The minimap overlays the OSM geometry and keeps it separate from proxy collision shapes.
 
-A public Singapore contour layer sourced from SLA Land Survey was clipped to the UTown boundary. Five contour levels (5–25 m at 5 m intervals) are shown as planimetric references. The service does not state a vertical datum; the contours are **not** used to create an absolute-height terrain mesh or ramp/step elevations.
+A public Singapore contour layer sourced from SLA Land Survey was queried for the UTown bbox; line segments were retained when their midpoint fell inside the OSM boundary. They are not polygon-clipped to the exact boundary. Five contour levels (5–25 m at 5 m intervals) are shown as planimetric references. The service does not state a vertical datum; the contours are **not** used to create an absolute-height terrain mesh or ramp/step elevations.
 
 - [x] Store dated OSM way geometry, IDs, tags, versions and timestamps.
 - [x] Overlay OSM building footprints, landcover and pedestrian ways in the minimap; add O/T toggles.
-- [x] Store the five clipped contour levels with source and vertical-datum caveats.
+- [x] Store the five boundary-filtered contour levels with source and vertical-datum caveats.
 - [x] Add Python validation and CI checks for geometry closure, ODbL attribution and contour metadata.
 - [ ] Verify OSM outlines and entrances against current licensed photos or on-site observations.
 - [ ] Confirm contour vertical datum and accuracy, or obtain higher-resolution NUS/SLA survey data.
