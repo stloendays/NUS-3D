@@ -42,7 +42,7 @@ script = ExtResource("3")
 offset_left = 18.0
 offset_top = 18.0
 offset_right = 414.0
-offset_bottom = 160.0
+offset_bottom = 192.0
 
 [node name="VBox" type="VBoxContainer" parent="HUD/Info"]
 layout_mode = 2
@@ -62,6 +62,10 @@ text = "Next: Education Resource Centre"
 [node name="Nearby" type="Label" parent="HUD/Info/VBox"]
 layout_mode = 2
 text = "Nearest landmark: Town Green"
+
+[node name="Detail" type="Label" parent="HUD/Info/VBox"]
+layout_mode = 2
+text = "Landmark context and source notes"
 
 [node name="Perf" type="Label" parent="HUD/Info/VBox"]
 layout_mode = 2
