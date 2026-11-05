@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Minimal status panel with a conceptual walking loop, labels and a toggleable map.
+## Status panel with source-aware landmark notes and a full-extent schematic map.
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: CharacterBody3D = $"../Player"
@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var hint_label: Label = $Info/VBox/Hint
 @onready var target_label: Label = $Info/VBox/Target
 @onready var nearest_label: Label = $Info/VBox/Nearby
+@onready var detail_label: Label = $Info/VBox/Detail
 @onready var perf_label: Label = $Info/VBox/Perf
 @onready var map_control: Control = $Minimap
 @onready var help_label: Label = $Help
@@ -26,12 +27,13 @@ func _ready() -> void:
     style.content_margin_top = 12.0
     style.content_margin_bottom = 12.0
     panel.add_theme_stylebox_override("panel", style)
-    for item in [title_label, hint_label, target_label, nearest_label, perf_label]:
+    for item in [title_label, hint_label, target_label, nearest_label, detail_label, perf_label]:
         item.add_theme_color_override("font_color", Color.html("#f0f2ed"))
     title_label.add_theme_font_size_override("font_size", 20)
     hint_label.add_theme_font_size_override("font_size", 12)
     target_label.add_theme_font_size_override("font_size", 17)
     nearest_label.add_theme_font_size_override("font_size", 14)
+    detail_label.add_theme_font_size_override("font_size", 11)
     perf_label.add_theme_font_size_override("font_size", 13)
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
 
@@ -50,7 +52,20 @@ func _process(_delta: float) -> void:
     target_label.text = "Next: %s  |  %.0f m" % [world.route_names[target_index], separation_m]
     var nearby: Dictionary = world.nearest_landmark(player.global_position)
     nearest_label.text = "Near: %s  (%.0f m)" % [nearby["name"], float(nearby["distance"])]
+    detail_label.text = _landmark_description(nearby)
     perf_label.text = "FPS %d  |  Loop %d  |  X %+.0f / N %+.0f m" % [Engine.get_frames_per_second(), walked_loops, player.global_position.x, -player.global_position.z]
+
+func _landmark_description(landmark: Dictionary) -> String:
+    var landmark_id: String = str(landmark.get("id", ""))
+    if landmark_id == "TOWN_GREEN":
+        return "Town Green outline and terrain are approximate."
+    if landmark_id == "TOWN_PLAZA":
+        return "Town Plaza footprint is approximate; not a surveyed boundary."
+    var profile: Dictionary = world.m2_profiles.get(landmark_id, {})
+    var summary: String = str(profile.get("hud_summary", ""))
+    if not summary.is_empty():
+        return summary
+    return "%s building proxy · footprint and height estimated." % str(landmark.get("role", "Campus")).capitalize()
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
