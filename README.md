@@ -2,7 +2,7 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.3 OSM footprint + SLA contour references integrated (2026-11-05)**. The minimap overlays campus-clipped OSM vectors and five contour levels; vertical datum, building heights, ramps and as-built accuracy remain unverified.
+> Status: **M2.3 OSM footprint + SLA contour references integrated (2026-11-05)**. The minimap overlays campus-filtered OSM vectors and five contour levels; vertical datum, building heights, ramps and as-built accuracy remain unverified.
 
 [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 地图与地标信息](docs/M2_2_MAP_NAVIGATION.md) · [M2.3 GIS 数据基线](docs/M2_3_GEOSPATIAL_BASELINE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
@@ -119,4 +119,4 @@ The feature branch upgrades the in-game minimap to a full-extent north-up schema
 
 ## M2.3 OSM and terrain reference baseline
 
-The dated OSM snapshot is clipped to the University Town boundary and retains way IDs, versions, timestamps, tags and node geometry. The minimap can display OSM buildings, pedestrian ways and landcover with **O**. A public SLA Land Survey-derived contour layer contributes 5 m, 10 m, 15 m, 20 m and 25 m lines; **T** toggles these planimetric references. The contour layer's vertical datum is not specified, so no absolute Y elevation or ramp grade is inferred. See [M2.3 GIS baseline](docs/M2_3_GEOSPATIAL_BASELINE.md).
+The dated OSM snapshot is campus-filtered by the OSM boundary and retains original, uncut way geometry plus IDs, versions, timestamps, tags and node geometry. The minimap can display OSM buildings, pedestrian ways and landcover with **O**. A public SLA Land Survey-derived contour layer contributes 5 m, 10 m, 15 m, 20 m and 25 m lines; **T** toggles these planimetric references. The contour layer's vertical datum is not specified, so no absolute Y elevation or ramp grade is inferred. See [M2.3 GIS baseline](docs/M2_3_GEOSPATIAL_BASELINE.md).
