@@ -32,6 +32,8 @@ jobs:
         run: python tools/validate_m2_profiles.py
       - name: Verify Blender authoring script syntax
         run: python -m py_compile blender/build_m2_blockouts.py
+      - name: Validate OSM and terrain contour reference snapshots
+        run: python tools/validate_geospatial_sources.py
       - name: Run Python validator tests
         run: python -m unittest discover -s tools -t . -v
       - name: Validate sourced camera viewpoints
