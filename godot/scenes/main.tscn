@@ -104,4 +104,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD walk   Shift run   Mouse look   Space jump   R reset   M map   F1 help   F2 facade   F3 camera   F4 PNG   Esc mouse"
+text = "WASD walk   Shift run   Mouse look   Space jump   R reset   M map   O OSM   T contours   F1 help   F2 facade   F3 camera   F4 PNG   Esc mouse"
