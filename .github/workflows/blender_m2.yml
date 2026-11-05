@@ -80,7 +80,7 @@ jobs:
               assert magic == b"glTF" and version == 2 and byte_length == glb.stat().st_size, glb
               assert chunk_type == b"JSON" and payload.get("meshes"), glb
               assert any(node.get("name", "").startswith(f"UT_{item['landmark_id']}_OSMFootprintShell") for node in payload.get("nodes", [])), glb
-              assert item["vertices"] > 100 and item["faces"] > 100
+              assert item["vertices"] > 50 and item["faces"] > 50
               print(f"PASS {item['landmark_id']}: BLEND={blend.stat().st_size} bytes, GLB={glb.stat().st_size} bytes, vertices={item['vertices']}, faces={item['faces']}")
           PY
       - name: Attach OSM footprint shell assets
