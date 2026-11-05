@@ -197,8 +197,10 @@ func _draw_osm_reference() -> void:
         elif feature_type == "path" and show_osm_paths:
             var tags: Dictionary = feature.get("tags", {})
             var highway: String = str(tags.get("highway", ""))
-            var path_color: Color = Color.html("#d48eb1") if highway == "steps" else Color.html("#68aebc")
-            draw_polyline(points, Color(path_color.r, path_color.g, path_color.b, 0.64), 0.75, true)
+            var path_color: Color = Color.html("#e18eae") if highway == "steps" else Color.html("#ba8bd2")
+            if highway == "service" or highway == "pedestrian":
+                path_color = Color.html("#89b7b4")
+            draw_polyline(points, Color(path_color.r, path_color.g, path_color.b, 0.84), 1.0, true)
 
 func _draw_terrain_contours(font: Font) -> void:
     if not show_terrain_contours:
@@ -320,11 +322,13 @@ func _draw() -> void:
     draw_rect(legend_rect, Color(0.035, 0.07, 0.08, 0.88), true)
     draw_rect(Rect2(13.0, MAP_SIZE - 22.0, 7.0, 7.0), Color.html("#d9ded8"), true)
     draw_string(font, Vector2(23.0, MAP_SIZE - 15.0), "Core", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
-    draw_line(Vector2(57.0, MAP_SIZE - 18.0), Vector2(68.0, MAP_SIZE - 18.0), Color.html("#65c3d4"), 1.4)
-    draw_string(font, Vector2(72.0, MAP_SIZE - 15.0), "OSM", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
-    draw_line(Vector2(112.0, MAP_SIZE - 18.0), Vector2(123.0, MAP_SIZE - 18.0), Color.html("#e5bd70"), 2.0)
-    draw_string(font, Vector2(127.0, MAP_SIZE - 15.0), "Route", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
-    draw_circle(Vector2(174.0, MAP_SIZE - 18.0), 3.0, Color.html("#4da6e6"))
-    draw_string(font, Vector2(181.0, MAP_SIZE - 15.0), "You", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
-    draw_line(Vector2(209.0, MAP_SIZE - 18.0), Vector2(219.0, MAP_SIZE - 18.0), Color.html("#e0c878"), 1.0)
-    draw_string(font, Vector2(223.0, MAP_SIZE - 15.0), "5m", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_line(Vector2(54.0, MAP_SIZE - 18.0), Vector2(63.0, MAP_SIZE - 18.0), Color.html("#65c3d4"), 1.4)
+    draw_string(font, Vector2(67.0, MAP_SIZE - 15.0), "OSM", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_line(Vector2(98.0, MAP_SIZE - 18.0), Vector2(107.0, MAP_SIZE - 18.0), Color.html("#ba8bd2"), 1.2)
+    draw_string(font, Vector2(111.0, MAP_SIZE - 15.0), "Path", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_line(Vector2(142.0, MAP_SIZE - 18.0), Vector2(151.0, MAP_SIZE - 18.0), Color.html("#e5bd70"), 2.0)
+    draw_string(font, Vector2(155.0, MAP_SIZE - 15.0), "Route", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_circle(Vector2(190.0, MAP_SIZE - 18.0), 3.0, Color.html("#4da6e6"))
+    draw_string(font, Vector2(197.0, MAP_SIZE - 15.0), "You", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_line(Vector2(218.0, MAP_SIZE - 18.0), Vector2(225.0, MAP_SIZE - 18.0), Color.html("#e0c878"), 1.0)
+    draw_string(font, Vector2(228.0, MAP_SIZE - 15.0), "5m", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
