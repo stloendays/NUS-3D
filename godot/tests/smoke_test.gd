@@ -31,7 +31,7 @@ func _smoke() -> void:
         return
 
     if minimap.osm_features.size() < 170 or minimap.osm_boundary.size() < 30:
-        push_error("campus-clipped OSM reference geometry failed to load")
+        push_error("campus-filtered OSM reference geometry failed to load")
         quit(1)
         return
     if minimap.terrain_contours.size() != 5:
