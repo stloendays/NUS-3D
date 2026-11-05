@@ -113,6 +113,8 @@ def validate_terrain(document: Any) -> list[str]:
         errors.append("terrain vertical unit must be metres")
     if "not specified" not in str(metadata.get("vertical_datum", "")).lower():
         errors.append("unknown vertical datum must remain explicitly disclosed")
+    if "review required" not in str(metadata.get("license_status", "")).lower():
+        errors.append("contour data reuse status must remain under review")
     if "Do not treat as a surveyed DEM" not in str(document.get("use_policy", "")):
         errors.append("terrain use policy must prohibit survey-grade DEM claims")
 
