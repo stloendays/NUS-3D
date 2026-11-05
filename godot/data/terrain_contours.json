@@ -606,5 +606,6 @@
       ],
       "source_url": "https://services5.arcgis.com/XqaKEQIgV03geG0E/arcgis/rest/services/Singapore_Contours_/FeatureServer/0/query"
     }
-  ]
+  ],
+  "selection_method": "Contour polylines were simplified in EPSG:4326, clipped to the study bounding box, then line segments were retained when their midpoint falls inside the OSM University Town boundary polygon. Segments are not polygon-clipped to the exact campus boundary."
 }
