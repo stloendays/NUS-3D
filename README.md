@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.2 map/navigation candidate + M2.1 evidence-based review cameras (2026-11-05)**. Full-extent minimap and source-aware landmark HUD are under CI validation; building scale, pedestrian routes, terrain and Windows performance remain unverified.
+> Status: **M2.3 OSM footprint + SLA contour references integrated (2026-11-05)**. The minimap overlays campus-clipped OSM vectors and five contour levels; vertical datum, building heights, ramps and as-built accuracy remain unverified.
 
-[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 地图与地标信息](docs/M2_2_MAP_NAVIGATION.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 地图与地标信息](docs/M2_2_MAP_NAVIGATION.md) · [M2.3 GIS 数据基线](docs/M2_3_GEOSPATIAL_BASELINE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -17,11 +17,11 @@
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **F3** to cycle public-geotag camera viewpoints, **O** to toggle OSM footprint/path overlays, **T** to toggle 5 m contour lines, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1 milestone, or a Windows installer.**
 
-The source-data validator checks coordinate ranges, polygon integrity, rotated building bounds, route continuity and attribution fields. Procedural trees avoid building footprints and conceptual walking paths, and 64 trees are rendered in two MultiMesh batches rather than 128 separate mesh nodes. These checks improve data and rendering efficiency; they do not establish real-world accuracy. M1.6 also generates an original top-down SVG spatial-audit plan (GitHub Actions artifact, not a true campus map) and audits conceptual route corridor widths against the estimated, rotated building footprints: one ERC-to-SRC leg was offset to avoid a proxy collision; the current 11-segment route passes the 2-D clearance check, **not a real-world accessible-path survey**.
+The source-data validators check coordinate ranges, polygon integrity, rotated building bounds, route continuity, OSM attribution, closed campus building rings and contour provenance. The minimap overlays 38 OSM building footprints, 4 roof structures, 118 path/step/service ways and 5 SLA-derived contour levels; these are reference layers, not replacement collision geometry or a surveyed terrain surface. Procedural trees avoid building footprints and conceptual walking paths, and 64 trees are rendered in two MultiMesh batches rather than 128 separate mesh nodes. These checks improve data and rendering efficiency; they do not establish real-world accuracy. M1.6 also generates an original top-down SVG spatial-audit plan (GitHub Actions artifact, not a true campus map) and audits conceptual route corridor widths against the estimated, rotated building footprints: one ERC-to-SRC leg was offset to avoid a proxy collision; the current 11-segment route passes the 2-D clearance check, **not a real-world accessible-path survey**.
 
 ## Preferred workflow / 建议技术路线
 
@@ -116,3 +116,7 @@ Godot now provides four photo-review positions through F3: ERC 2014, UTown 2020,
 ## M2.2 map and landmark context
 
 The feature branch upgrades the in-game minimap to a full-extent north-up schematic with rotated building-part footprints, route stop numbering, player heading, north arrow, scale bar and legend. The HUD adds source-backed ERC/SRC programme notes and Town Plaza as a nearby landmark. See [M2.2 documentation](docs/M2_2_MAP_NAVIGATION.md). All positions, dimensions and route geometry remain provisional; this is not a real navigation or accessibility map.
+
+## M2.3 OSM and terrain reference baseline
+
+The dated OSM snapshot is clipped to the University Town boundary and retains way IDs, versions, timestamps, tags and node geometry. The minimap can display OSM buildings, pedestrian ways and landcover with **O**. A public SLA Land Survey-derived contour layer contributes 5 m, 10 m, 15 m, 20 m and 25 m lines; **T** toggles these planimetric references. The contour layer's vertical datum is not specified, so no absolute Y elevation or ramp grade is inferred. See [M2.3 GIS baseline](docs/M2_3_GEOSPATIAL_BASELINE.md).
