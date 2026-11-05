@@ -114,7 +114,7 @@ Date: 2026-11-05 · Status: **M2.3 OSM campus vectors and SLA-derived contour re
 - [x] Restore cameras reproducibly and capture own-model comparison images.
 - [x] Validate camera positions and evidence status; publish CI software-rendered M1/M2 pairs.
 - [ ] Compare photo and in-engine snapshots visually at validated eye elevations and camera FoV.
-- [x] Extract the first campus-clipped OSM building/path snapshot with way IDs and ODbL provenance.\n- [ ] Review real building outlines/entrances, SRC levels and accessibility against current evidence with appropriate licensing.
+- [x] Extract the first campus-filtered OSM building/path snapshot with way IDs and ODbL provenance.\n- [ ] Review real building outlines/entrances, SRC levels and accessibility against current evidence with appropriate licensing.
 
 See [M2.1 documentation](M2_1_VIEWPOINT_CALIBRATION.md). Passing software render is not an accurate-survey or Windows-performance claim.
 
