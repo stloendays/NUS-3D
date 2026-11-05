@@ -176,6 +176,7 @@ def author_one(bpy: Any, building_id: str, feature: dict[str, Any], profile: dic
         export_format="GLB",
         export_yup=True,
         export_extras=True,
+        export_draco_mesh_compression_enable=False,
         use_selection=True,
     )
     return {
