@@ -49,6 +49,7 @@ blender --background --python blender/build_m2_4_osm_shells.py -- --out build/m2
 The generator reads \`osm_utown_snapshot.json\`, \`osm_shell_profiles.json\` and the shared WGS84 origin in \`utown_core.json\`. It creates site-local, editable \`.blend\` files and Y-up \`.glb\` previews for ERC and SRC, plus \`osm_shell_manifest.json\`. The output geometry is original procedural geometry; no third-party mesh or texture is bundled.
 
 GitHub Actions publishes the generated files as **\`nus3d-m2-4-osm-footprint-shells\`** for 30 days. GLB headers, mesh nodes and manifest counts are checked in CI.
+The successful Blender build is recorded in [GitHub Actions run 41996450043](https://github.com/stloendays/NUS-3D/actions/runs/41996450043); the generated asset bundle is available from [the workflow artifact](https://github.com/stloendays/NUS-3D/actions/runs/41996450043/artifacts/13399873569). Godot smoke tests and the comparison renderer passed in [run 41996450040](https://github.com/stloendays/NUS-3D/actions/runs/41996450040).
 
 ## Automated acceptance checks
 
