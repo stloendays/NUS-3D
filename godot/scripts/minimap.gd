@@ -16,6 +16,7 @@ var osm_features: Array = []
 var osm_boundary: Array = []
 var terrain_contours: Array = []
 var show_osm_reference: bool = true
+var show_osm_paths: bool = false
 var show_terrain_contours: bool = true
 
 func _ready() -> void:
@@ -153,6 +154,10 @@ func set_osm_reference_visible(enabled: bool) -> void:
     show_osm_reference = enabled
     queue_redraw()
 
+func set_osm_paths_visible(enabled: bool) -> void:
+    show_osm_paths = enabled
+    queue_redraw()
+
 func set_terrain_contours_visible(enabled: bool) -> void:
     show_terrain_contours = enabled
     queue_redraw()
@@ -189,7 +194,7 @@ func _draw_osm_reference() -> void:
                 if land_outline[0].distance_to(land_outline[land_outline.size() - 1]) > 0.1:
                     land_outline.append(land_outline[0])
                 draw_polyline(land_outline, Color(0.55, 0.76, 0.54, 0.48), 0.65, true)
-        elif feature_type == "path":
+        elif feature_type == "path" and show_osm_paths:
             var tags: Dictionary = feature.get("tags", {})
             var highway: String = str(tags.get("highway", ""))
             var path_color: Color = Color.html("#d48eb1") if highway == "steps" else Color.html("#68aebc")
@@ -287,7 +292,7 @@ func _draw() -> void:
         draw_colored_polygon(arrow, Color.WHITE)
 
     draw_string(font, Vector2(8.0, 15.0), "UTOWN", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.WHITE)
-    draw_string(font, Vector2(8.0, 27.0), "O OSM  T 5m contours", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.html("#c5d4d1"))
+    draw_string(font, Vector2(8.0, 27.0), "O OSM  P paths  T contours", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.html("#c5d4d1"))
     var north_base: Vector2 = Vector2(MAP_SIZE - 18.0, 27.0)
     draw_line(north_base + Vector2(0.0, 7.0), north_base + Vector2(0.0, -7.0), Color.WHITE, 1.4)
     draw_colored_polygon(PackedVector2Array([
