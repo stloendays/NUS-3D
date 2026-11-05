@@ -45,6 +45,11 @@ class GeospatialSourceTests(unittest.TestCase):
         altered["status"] = "surveyed_dem"
         self.assertTrue(any("planimetric contour reference only" in item for item in validate_terrain(altered)))
 
+    def test_contour_reuse_terms_must_remain_under_review(self):
+        altered = copy.deepcopy(self.terrain)
+        altered["source_metadata"]["license_status"] = "open data"
+        self.assertTrue(any("reuse status must remain under review" in item for item in validate_terrain(altered)))
+
 
 if __name__ == "__main__":
     unittest.main()
