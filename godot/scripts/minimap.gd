@@ -5,7 +5,7 @@ class_name UTownMinimap
 @onready var world: UTownWorld = get_parent().get_parent().get_node("World")
 @onready var player: CharacterBody3D = get_parent().get_parent().get_node("Player")
 
-const MAP_SIZE: float = 222.0
+const MAP_SIZE: float = 250.0
 const EDGE_PADDING: float = 18.0
 const OSM_DATA_PATH: String = "res://data/osm_utown_snapshot.json"
 const TERRAIN_DATA_PATH: String = "res://data/terrain_contours.json"
@@ -326,3 +326,5 @@ func _draw() -> void:
     draw_string(font, Vector2(127.0, MAP_SIZE - 15.0), "Route", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
     draw_circle(Vector2(174.0, MAP_SIZE - 18.0), 3.0, Color.html("#4da6e6"))
     draw_string(font, Vector2(181.0, MAP_SIZE - 15.0), "You", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_line(Vector2(209.0, MAP_SIZE - 18.0), Vector2(219.0, MAP_SIZE - 18.0), Color.html("#e0c878"), 1.0)
+    draw_string(font, Vector2(223.0, MAP_SIZE - 15.0), "5m", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
