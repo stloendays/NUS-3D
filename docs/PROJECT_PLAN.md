@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-05 · Status: **M2.3 OSM campus vectors and SLA-derived contour reference integrated; vertical datum, field survey and Windows checks pending**
+Date: 2026-11-05 · Status: **M2.4 ERC/SRC OSM footprint shells and Blender/GLB generation implemented; measured height, vertical datum, collision and field survey pending**
 
 ## 1. 产品定位
 
@@ -135,6 +135,26 @@ A public Singapore contour layer sourced from SLA Land Survey was queried for th
 - [ ] Replace proxy collision geometry only after polygon collision and route-clearance tests pass.
 
 See [M2.3 geospatial baseline](M2_3_GEOSPATIAL_BASELINE.md). Passing validation confirms data integrity and provenance fields, not real-world survey accuracy.
+
+
+### M2.4 — OSM footprint shells for ERC/SRC
+
+**2026-11-05:** the source OSM polygons for ERC (way 124549217) and SRC (way 125774787) now generate separate, non-colliding extruded shells in Godot. Press **G** to compare the OSM shells with the original proxy visuals. The proxy collision remains active while shells are shown. A Blender 4.x authoring script also generates editable site-local .blend and Y-up GLB previews.
+
+The OSM planimetric bounds are approximately 77.57 × 122.69 m for ERC and 173.29 × 167.75 m for SRC. Heights are **estimated**, not measured: 4 OSM levels × the existing estimated storey pitch = 13.8 m (ERC) and 14.6 m (SRC). SRC's `layer=-1` tag is preserved as relative stacking metadata and is not used as a vertical offset. Both shells start at the unverified flat proxy Y=0 plane.
+
+- [x] Preserve the source OSM way IDs, versions, timestamps and polygon geometry for both P0 buildings.
+- [x] Add explicit estimated height profiles and a validator that checks levels × storey pitch.
+- [x] Generate wall and triangulated roof surfaces from the OSM footprint polygons in Godot.
+- [x] Add **G** proxy-versus-shell visual switching while retaining proxy collision.
+- [x] Generate editable Blender masters and GLB previews in a separate CI artifact.
+- [x] Add Godot smoke checks for mesh bounds, provenance, height estimates and fallback collision.
+- [ ] Visually inspect the new shell comparison screenshots and compare the OSM polygons with current permitted photo/site evidence.
+- [ ] Verify actual entrances, storey counts, roof levels and SRC multi-level circulation.
+- [ ] Establish a vertical datum and measured ground elevations before applying absolute terrain heights.
+- [ ] Run polygon collision and 3D route-clearance checks before replacing any proxy collision.
+
+See [M2.4 OSM building shell documentation](M2_4_OSM_BUILDING_SHELLS.md). Passing CI proves reproducible geometry generation and software behaviour, not as-built accuracy.
 
 ### M3 — Atmosphere / 环境与交互
 
