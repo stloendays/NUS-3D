@@ -7,7 +7,7 @@
 Snapshot: \`godot/data/osm_utown_snapshot.json\`
 
 - Extracted from OpenStreetMap API v0.6 on 2026-11-05.
-- Clipped to the OSM University Town boundary way **92357946**.
+- Campus-filtered using the OSM University Town boundary way **92357946**: a way is selected when the arithmetic mean of its returned vertices falls inside the boundary. Original OSM geometry is retained uncut, so some feature edges may extend beyond the boundary.
 - 177 selected features: **38 building footprints, 4 roof structures, 118 path/step/service ways and 17 landcover areas/lines**.
 - Each way retains its OSM ID, version, changeset, timestamp, source URL, tags, node IDs and WGS84 geometry.
 - Explicit named matches are recorded for ERC (124549217), SRC (125774787), CREATE Tower (125842215), CAPT (124543527), Tembusu Tower (124230878), Acacia Tower/Cinnamon College (124542228), and RC4 Tower (124543999).
@@ -20,7 +20,7 @@ OSM \`building:levels\` tags are preserved as tags, not converted into measured 
 
 Snapshot: \`godot/data/terrain_contours.json\`
 
-A public Singapore contour layer sourced from Singapore Land Authority (Land Survey) was queried and clipped to the UTown boundary. It exposes a \`Height\` field in metres and five contours intersecting the study area: **5, 10, 15, 20 and 25 m**.
+A public Singapore contour layer sourced from Singapore Land Authority (Land Survey) was queried for the UTown bounding box. Line segments were retained when their midpoint falls inside the OSM boundary; they are not polygon-clipped to the exact boundary. It exposes a \`Height\` field in metres and five contours intersecting the study area: **5, 10, 15, 20 and 25 m**.
 
 The item description states a **5 m contour interval** and **10 m resolution**. Its acknowledgements identify SLA Land Survey data downloaded 1 May 2019; the service reports data last edited 15 March 2020. The vertical datum is not stated in the service metadata.
 
