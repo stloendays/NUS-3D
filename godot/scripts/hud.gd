@@ -38,7 +38,7 @@ func _ready() -> void:
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
 
 func _process(_delta: float) -> void:
-    hint_label.text = "M2 %s [F2] | F3: %s | O OSM | P paths | T contours | F4 capture" % ["ON" if world.m2_details_visible else "OFF", review.current_name()]
+    hint_label.text = "M2 %s [F2] | GIS shell %s [G] | F3: %s | O OSM | P paths | T contours" % ["ON" if world.m2_details_visible else "OFF", "ON" if world.osm_shells_visible else "OFF", review.current_name()]
     if world.route_points.is_empty():
         return
     var destination: Vector3 = world.route_points[target_index]
@@ -80,3 +80,5 @@ func _unhandled_input(event: InputEvent) -> void:
             map_control.set_osm_paths_visible(not map_control.show_osm_paths)
         elif event.keycode == KEY_T:
             map_control.set_terrain_contours_visible(not map_control.show_terrain_contours)
+        elif event.keycode == KEY_G:
+            world.set_osm_shells_visible(not world.osm_shells_visible)
