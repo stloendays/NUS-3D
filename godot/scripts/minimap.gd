@@ -1,23 +1,49 @@
 extends Control
 class_name UTownMinimap
-## North-up, full-extent schematic. Geometry is approximate and is not for real navigation.
+## North-up campus reference map. OSM geometry and contour lines are overlays, not surveyed navigation data.
 
 @onready var world: UTownWorld = get_parent().get_parent().get_node("World")
 @onready var player: CharacterBody3D = get_parent().get_parent().get_node("Player")
 
 const MAP_SIZE: float = 222.0
 const EDGE_PADDING: float = 18.0
+const OSM_DATA_PATH: String = "res://data/osm_utown_snapshot.json"
+const TERRAIN_DATA_PATH: String = "res://data/terrain_contours.json"
 
 var map_center_world: Vector2 = Vector2.ZERO
 var map_scale: float = 0.25
+var osm_features: Array = []
+var osm_boundary: Array = []
+var terrain_contours: Array = []
+var show_osm_reference: bool = true
+var show_terrain_contours: bool = true
 
 func _ready() -> void:
     clip_contents = true
     mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _load_reference_data()
     _rebuild_map_transform()
 
 func _process(_delta: float) -> void:
     queue_redraw()
+
+func _load_reference_data() -> void:
+    if FileAccess.file_exists(OSM_DATA_PATH):
+        var osm_value: Variant = JSON.parse_string(FileAccess.get_file_as_string(OSM_DATA_PATH))
+        if typeof(osm_value) == TYPE_DICTIONARY:
+            var osm_document: Dictionary = osm_value
+            osm_features = osm_document.get("features", [])
+            var boundary: Dictionary = osm_document.get("campus_boundary", {})
+            osm_boundary = boundary.get("coordinates", [])
+        else:
+            push_warning("OSM reference snapshot is invalid; estimated proxy map remains available.")
+    if FileAccess.file_exists(TERRAIN_DATA_PATH):
+        var terrain_value: Variant = JSON.parse_string(FileAccess.get_file_as_string(TERRAIN_DATA_PATH))
+        if typeof(terrain_value) == TYPE_DICTIONARY:
+            var terrain_document: Dictionary = terrain_value
+            terrain_contours = terrain_document.get("contours", [])
+        else:
+            push_warning("Terrain contour reference is invalid; contour overlay remains disabled.")
 
 func building_footprint_points(record: Dictionary, part: Dictionary) -> PackedVector2Array:
     var centre: Vector3 = world.lonlat_to_world(float(record.get("lon", world.origin_lon)),
@@ -55,6 +81,12 @@ func plaza_footprint_points(plaza: Dictionary) -> PackedVector2Array:
         result.append(Vector2(centre.x, centre.z) + offset)
     return result
 
+func _append_lonlat_extent(points: Array[Vector2], coordinates: Array) -> void:
+    for pair in coordinates:
+        if pair is Array and pair.size() >= 2:
+            var point: Vector3 = world.lonlat_to_world(float(pair[0]), float(pair[1]))
+            points.append(Vector2(point.x, point.z))
+
 func _rebuild_map_transform() -> void:
     var points: Array[Vector2] = []
     for record in world.layout.get("buildings", []):
@@ -72,9 +104,14 @@ func _rebuild_map_transform() -> void:
             points.append(point)
 
     for way in world.layout.get("walkways", []):
-        for coords in way.get("lonlat", []):
-            var path_point: Vector3 = world.lonlat_to_world(float(coords[0]), float(coords[1]))
-            points.append(Vector2(path_point.x, path_point.z))
+        _append_lonlat_extent(points, way.get("lonlat", []))
+
+    _append_lonlat_extent(points, osm_boundary)
+    for feature in osm_features:
+        _append_lonlat_extent(points, feature.get("coordinates", []))
+    for contour in terrain_contours:
+        for path in contour.get("paths", []):
+            _append_lonlat_extent(points, path)
 
     if points.is_empty():
         map_center_world = Vector2.ZERO
@@ -104,6 +141,76 @@ func _map_points(points_world: PackedVector2Array) -> PackedVector2Array:
         result.append(Vector2(MAP_SIZE * 0.5, MAP_SIZE * 0.5) + (point - map_center_world) * map_scale)
     return result
 
+func _map_lonlat_points(coordinates: Array) -> PackedVector2Array:
+    var result: PackedVector2Array = PackedVector2Array()
+    for pair in coordinates:
+        if pair is Array and pair.size() >= 2:
+            var point: Vector3 = world.lonlat_to_world(float(pair[0]), float(pair[1]))
+            result.append(world_to_map(point))
+    return result
+
+func set_osm_reference_visible(enabled: bool) -> void:
+    show_osm_reference = enabled
+    queue_redraw()
+
+func set_terrain_contours_visible(enabled: bool) -> void:
+    show_terrain_contours = enabled
+    queue_redraw()
+
+func _draw_osm_reference() -> void:
+    if not show_osm_reference:
+        return
+    var boundary_line: PackedVector2Array = _map_lonlat_points(osm_boundary)
+    if boundary_line.size() >= 2:
+        if boundary_line[0].distance_to(boundary_line[boundary_line.size() - 1]) > 0.1:
+            boundary_line.append(boundary_line[0])
+        draw_polyline(boundary_line, Color(0.49, 0.75, 0.78, 0.65), 0.8, true)
+
+    for feature in osm_features:
+        var feature_type: String = str(feature.get("feature_type", ""))
+        var coordinates: Array = feature.get("coordinates", [])
+        var points: PackedVector2Array = _map_lonlat_points(coordinates)
+        if points.size() < 2:
+            continue
+
+        if feature_type == "building" or feature_type == "roof":
+            var landmark_id: String = str(feature.get("landmark_id", ""))
+            var outline: Color = Color.html("#ffd28a") if landmark_id == "ERC" or landmark_id == "SRC" else Color.html("#65c3d4")
+            if points.size() >= 3:
+                draw_colored_polygon(points, Color(0.27, 0.69, 0.79, 0.10))
+            var closed: PackedVector2Array = PackedVector2Array(points)
+            if closed[0].distance_to(closed[closed.size() - 1]) > 0.1:
+                closed.append(closed[0])
+            draw_polyline(closed, outline, 1.35 if not landmark_id.is_empty() else 0.8, true)
+        elif feature_type == "landcover":
+            if str(feature.get("geometry_type", "")) == "Polygon" and points.size() >= 3:
+                draw_colored_polygon(points, Color(0.36, 0.62, 0.39, 0.12))
+                var land_outline: PackedVector2Array = PackedVector2Array(points)
+                if land_outline[0].distance_to(land_outline[land_outline.size() - 1]) > 0.1:
+                    land_outline.append(land_outline[0])
+                draw_polyline(land_outline, Color(0.55, 0.76, 0.54, 0.48), 0.65, true)
+        elif feature_type == "path":
+            var tags: Dictionary = feature.get("tags", {})
+            var highway: String = str(tags.get("highway", ""))
+            var path_color: Color = Color.html("#d48eb1") if highway == "steps" else Color.html("#68aebc")
+            draw_polyline(points, Color(path_color.r, path_color.g, path_color.b, 0.64), 0.75, true)
+
+func _draw_terrain_contours(font: Font) -> void:
+    if not show_terrain_contours:
+        return
+    for contour in terrain_contours:
+        var height_m: int = int(contour.get("height_m", 0))
+        var paths: Array = contour.get("paths", [])
+        for path_index in range(paths.size()):
+            var points: PackedVector2Array = _map_lonlat_points(paths[path_index])
+            if points.size() < 2:
+                continue
+            draw_polyline(points, Color(0.88, 0.78, 0.48, 0.74), 0.9, true)
+            if path_index == 0:
+                var label_point: Vector2 = points[int(points.size() / 2)]
+                draw_string(font, label_point + Vector2(2.0, -2.0), "%d m" % height_m,
+                    HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.html("#f3df9b"))
+
 func _draw() -> void:
     draw_rect(Rect2(Vector2.ZERO, Vector2(MAP_SIZE, MAP_SIZE)), Color(0.055, 0.10, 0.12, 0.93), true)
     draw_rect(Rect2(Vector2.ZERO, Vector2(MAP_SIZE, MAP_SIZE)), Color(0.58, 0.70, 0.68, 0.95), false, 1.2)
@@ -111,7 +218,6 @@ func _draw() -> void:
         return
 
     var font: Font = ThemeDB.fallback_font
-
     var green_polygon: PackedVector2Array = PackedVector2Array()
     for coords in world.layout.get("green", {}).get("polygon_lonlat", []):
         var point: Vector3 = world.lonlat_to_world(float(coords[0]), float(coords[1]))
@@ -146,6 +252,9 @@ func _draw() -> void:
             draw_string(font, world_to_map(centre) + Vector2(4.0, -4.0), str(record.get("id", "")),
                 HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, Color.WHITE)
 
+    _draw_osm_reference()
+    _draw_terrain_contours(font)
+
     for way in world.layout.get("walkways", []):
         var coords: Array = way.get("lonlat", [])
         var route_line: PackedVector2Array = PackedVector2Array()
@@ -178,6 +287,7 @@ func _draw() -> void:
         draw_colored_polygon(arrow, Color.WHITE)
 
     draw_string(font, Vector2(8.0, 15.0), "UTOWN", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.WHITE)
+    draw_string(font, Vector2(8.0, 27.0), "O OSM  T 5m contours", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.html("#c5d4d1"))
     var north_base: Vector2 = Vector2(MAP_SIZE - 18.0, 27.0)
     draw_line(north_base + Vector2(0.0, 7.0), north_base + Vector2(0.0, -7.0), Color.WHITE, 1.4)
     draw_colored_polygon(PackedVector2Array([
@@ -205,9 +315,9 @@ func _draw() -> void:
     draw_rect(legend_rect, Color(0.035, 0.07, 0.08, 0.88), true)
     draw_rect(Rect2(13.0, MAP_SIZE - 22.0, 7.0, 7.0), Color.html("#d9ded8"), true)
     draw_string(font, Vector2(23.0, MAP_SIZE - 15.0), "Core", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
-    draw_rect(Rect2(57.0, MAP_SIZE - 22.0, 7.0, 7.0), Color.html("#899b9b"), true)
-    draw_string(font, Vector2(67.0, MAP_SIZE - 15.0), "Proxy", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_line(Vector2(57.0, MAP_SIZE - 18.0), Vector2(68.0, MAP_SIZE - 18.0), Color.html("#65c3d4"), 1.4)
+    draw_string(font, Vector2(72.0, MAP_SIZE - 15.0), "OSM", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
     draw_line(Vector2(112.0, MAP_SIZE - 18.0), Vector2(123.0, MAP_SIZE - 18.0), Color.html("#e5bd70"), 2.0)
-    draw_string(font, Vector2(127.0, MAP_SIZE - 15.0), "Path", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
-    draw_circle(Vector2(165.0, MAP_SIZE - 18.0), 3.0, Color.html("#4da6e6"))
-    draw_string(font, Vector2(172.0, MAP_SIZE - 15.0), "You", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_string(font, Vector2(127.0, MAP_SIZE - 15.0), "Route", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
+    draw_circle(Vector2(174.0, MAP_SIZE - 18.0), 3.0, Color.html("#4da6e6"))
+    draw_string(font, Vector2(181.0, MAP_SIZE - 15.0), "You", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 8, Color.WHITE)
