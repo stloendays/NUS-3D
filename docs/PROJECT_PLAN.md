@@ -149,7 +149,7 @@ The OSM planimetric bounds are approximately 77.57 × 122.69 m for ERC and 173.2
 - [x] Add **G** proxy-versus-shell visual switching while retaining proxy collision.
 - [x] Generate editable Blender masters and GLB previews in a separate CI artifact.
 - [x] Add Godot smoke checks for mesh bounds, provenance, height estimates and fallback collision.
-- [ ] Visually inspect the new shell comparison screenshots and compare the OSM polygons with current permitted photo/site evidence.
+- [x] Generate and inspect software-rendered ERC/SRC proxy-versus-shell comparisons from an exterior approach and elevated isometric views. The OSM envelopes are materially larger than the current proxy bounds; this is a discrepancy to investigate, not an accuracy verdict.\n- [ ] Compare the OSM polygons with current permitted photo/site evidence.
 - [ ] Verify actual entrances, storey counts, roof levels and SRC multi-level circulation.
 - [ ] Establish a vertical datum and measured ground elevations before applying absolute terrain heights.
 - [ ] Run polygon collision and 3D route-clearance checks before replacing any proxy collision.
