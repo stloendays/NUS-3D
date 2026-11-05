@@ -11,6 +11,9 @@
 
 Bounds are local-coordinate axis-aligned extents; area is computed from the OSM polygon ring. Neither value is a surveyed measurement. The geometry remains community-mapped and is preserved with OSM IDs, version, timestamp, tags and ODbL attribution.
 
+The existing greybox proxy bounds are approximately 63.63 × 56.15 m for ERC and 82.57 × 87.43 m for SRC. The OSM envelopes are therefore materially larger, especially for SRC. These are AABB comparisons, not a measured error or proof that either representation is correct; they are a reason to keep the new shells visual-only until the outlines are checked against current permitted evidence.
+
+
 ## Height and vertical interpretation
 
 The source \`building:levels=4\` tags do not provide a measured building height. The current visual extrusion uses the existing M2 profile's estimated storey pitch:
@@ -64,7 +67,7 @@ Passing CI proves deterministic generation and software behaviour only. It does 
 
 ## Next acceptance gates
 
-1. Inspect the new Blender and Godot comparison screenshots at each ERC/SRC viewpoint; reject any obvious polygon, orientation or scale issue.
+1. [x] Generate and inspect software-rendered ERC/SRC proxy-versus-shell comparisons from the ERC 2026 approach and elevated isometric cameras; the screenshots show the larger OSM envelopes without establishing which footprint is correct.
 2. Compare each source footprint with current permitted site photographs or on-site observations.
 3. Verify the actual storey count, ground floor, roof level and entrance locations independently.
 4. Obtain a suitable vertical datum and measured ground elevations before assigning absolute heights.
