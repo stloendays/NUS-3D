@@ -32,6 +32,9 @@ The source and derivation are recorded in \`godot/data/osm_shell_profiles.json\`
 
 This is an A/B geometry review, not a replacement of the proxy collision model. Do not use the shell toggle as proof of pedestrian clearance.
 
+The first screenshot pass exposed a camera/footprint issue: the historic ERC 2014 geotag lies approximately 1.1 m inside the current OSM polygon, while the synthetic SRC east-proxy camera is only about 15.4 m from its OSM outline. Those positions are not reliable full-building exterior views. The comparison renderer therefore uses the ERC 2026 south-approach view plus generated elevated isometric views for both buildings; the excluded camera notes are recorded in the review manifest.
+
+
 ## Blender / GLB outputs
 
 Run with Blender 4.x:
