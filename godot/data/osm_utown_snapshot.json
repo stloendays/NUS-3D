@@ -207,12 +207,13 @@
   "attribution": "© OpenStreetMap contributors",
   "licence": "Open Database License (ODbL) 1.0",
   "licence_url": "https://www.openstreetmap.org/copyright",
-  "extraction_method": "OSM map bbox response; selected way centroids clipped to the University Town boundary polygon; way geometry reconstructed from referenced node coordinates.",
+  "extraction_method": "OSM map bbox response; features selected when the arithmetic mean of their returned way vertices falls inside the OSM University Town boundary polygon; original way geometry is retained without polygon clipping.",
   "warnings": [
     "Community-mapped geometry, not cadastral or as-built survey.",
     "building:levels is an OSM tag and is not a measured height.",
     "OSM layer tags describe relative stacking and must not be converted to vertical metres.",
-    "Only explicitly matched landmark IDs are linked to current schematic building groups."
+    "Only explicitly matched landmark IDs are linked to current schematic building groups.",
+    "Campus filtering is centroid-based, not a geometric clip; some retained feature edges may extend beyond the boundary polygon."
   ],
   "summary": {
     "source_element_count": 2998,
@@ -2372,7 +2373,7 @@
         "name": "Town Green",
         "name:zh": "城镇绿地"
       },
-      "landmark_id": null
+      "landmark_id": "TOWN_GREEN"
     },
     {
       "osm_type": "way",
