@@ -50,3 +50,7 @@ CI validation proves data structure and provenance fields only. It does not prov
 2. Establish the contour dataset's vertical datum and source accuracy, or obtain an appropriate higher-resolution SLA/NUS survey.
 3. Measure the Town Green–ERC–SRC ground levels, ramps, steps and stacked paths before building a height mesh.
 4. Replace only selected visual proxy geometry after polygon collision and route-clearance tests support it. Keep a fallback proxy until the new geometry passes GUI review.
+
+## Next geometry stage
+
+The OSM building polygons identified here are used by [M2.4 OSM footprint shells](M2_4_OSM_BUILDING_SHELLS.md) to generate visual-only ERC/SRC extrusions. They do not replace the estimated collision model.
