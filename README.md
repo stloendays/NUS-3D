@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.1 evidence-based review cameras + M1.6 path clearance (2026-11-04)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2.2 map/navigation candidate + M2.1 evidence-based review cameras (2026-11-05)**. Full-extent minimap and source-aware landmark HUD are under CI validation; building scale, pedestrian routes, terrain and Windows performance remain unverified.
 
-[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 地图与地标信息](docs/M2_2_MAP_NAVIGATION.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -111,3 +111,8 @@ ERC now has schematic glazing, mullions, sunshades and a faceted curved bay; SRC
 ## M2.1 evidence-linked camera review
 
 Godot now provides four photo-review positions through F3: ERC 2014, UTown 2020, ERC 2026, and one explicitly synthetic SRC position. F2 compares greybox against M2 detail at the same camera; F4 saves a generated PNG and evidence sidecar in user://review_captures. Source photograph images are not bundled. See docs/M2_1_VIEWPOINT_CALIBRATION.md for creator/license attribution, magnetic heading and ground-elevation uncertainty. Automated render previews are a **software-only comparison**, not proof of as-built fidelity or Windows performance.
+
+
+## M2.2 map and landmark context
+
+The feature branch upgrades the in-game minimap to a full-extent north-up schematic with rotated building-part footprints, route stop numbering, player heading, north arrow, scale bar and legend. The HUD adds source-backed ERC/SRC programme notes and Town Plaza as a nearby landmark. See [M2.2 documentation](docs/M2_2_MAP_NAVIGATION.md). All positions, dimensions and route geometry remain provisional; this is not a real navigation or accessibility map.
