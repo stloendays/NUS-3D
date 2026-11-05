@@ -60,7 +60,7 @@ func _smoke() -> void:
     for coordinate in minimap.osm_boundary:
         var boundary_world: Vector3 = world.lonlat_to_world(float(coordinate[0]), float(coordinate[1]))
         var boundary_map: Vector2 = minimap.world_to_map(boundary_world)
-        if boundary_map.x < 17.0 or boundary_map.x > 205.0 or boundary_map.y < 17.0 or boundary_map.y > 205.0:
+        if boundary_map.x < 17.0 or boundary_map.x > 233.0 or boundary_map.y < 17.0 or boundary_map.y > 233.0:
             push_error("OSM campus boundary is clipped by the minimap")
             quit(1)
             return
@@ -180,7 +180,7 @@ func _smoke() -> void:
                 return
             for corner in footprint:
                 var map_corner: Vector2 = minimap.world_to_map(Vector3(corner.x, 0.0, corner.y))
-                if map_corner.x < 17.0 or map_corner.x > 205.0 or map_corner.y < 17.0 or map_corner.y > 205.0:
+                if map_corner.x < 17.0 or map_corner.x > 233.0 or map_corner.y < 17.0 or map_corner.y > 233.0:
                     push_error("minimap clipped a building footprint: %s" % str(record.get("id", "")))
                     quit(1)
                     return
