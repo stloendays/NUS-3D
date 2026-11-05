@@ -72,7 +72,8 @@ func _render() -> void:
         push_error("Could not select the ERC 2026 review camera")
         quit(1)
         return
-    if not await _capture_pair(world, camera, output, "ERC_2026_GREEN", captures):
+    var erc_photo_pair_ok: bool = await _capture_pair(world, camera, output, "ERC_2026_GREEN", captures)
+    if not erc_photo_pair_ok:
         quit(1)
         return
 
@@ -89,7 +90,8 @@ func _render() -> void:
             quit(1)
             return
         _position_isometric_camera(camera, shell)
-        if not await _capture_pair(world, camera, output, building_id + "_OSM_ISOMETRIC", captures):
+        var isometric_pair_ok: bool = await _capture_pair(world, camera, output, building_id + "_OSM_ISOMETRIC", captures)
+        if not isometric_pair_ok:
             quit(1)
             return
 
