@@ -23,6 +23,12 @@ func _smoke() -> void:
         push_error("failed to parse site metadata")
         quit(1)
         return
+
+    var minimap: UTownMinimap = instance.get_node_or_null("HUD/Minimap") as UTownMinimap
+    if minimap == null or minimap.map_scale <= 0.0:
+        push_error("full-extent schematic minimap failed to initialize")
+        quit(1)
+        return
     if world.generated_building_count < 8 or world.generated_tree_count < 20:
         push_error("missing procedural buildings or vegetation")
         quit(1)
@@ -113,6 +119,34 @@ func _smoke() -> void:
     var src: Vector3 = world.lonlat_to_world(103.77252, 1.30462)
     if not (erc.x < 0.0 and erc.z < 0.0 and src.x < 0.0 and src.z > 0.0):
         push_error("east/north orientation is inconsistent")
+        quit(1)
+        return
+
+    for record in world.layout.get("buildings", []):
+        for part in record.get("parts", []):
+            var footprint: PackedVector2Array = minimap.building_footprint_points(record, part)
+            if footprint.size() != 4:
+                push_error("minimap footprint must contain four corners")
+                quit(1)
+                return
+            for corner in footprint:
+                var map_corner: Vector2 = minimap.world_to_map(Vector3(corner.x, 0.0, corner.y))
+                if map_corner.x < 17.0 or map_corner.x > 205.0 or map_corner.y < 17.0 or map_corner.y > 205.0:
+                    push_error("minimap clipped a building footprint: %s" % str(record.get("id", "")))
+                    quit(1)
+                    return
+    var plaza_record: Dictionary = world.layout.get("plaza", {})
+    var plaza_world: Vector3 = world.lonlat_to_world(float(plaza_record.get("lon", world.origin_lon)), float(plaza_record.get("lat", world.origin_lat)))
+    if str(world.nearest_landmark(plaza_world).get("id", "")) != "TOWN_PLAZA":
+        push_error("Town Plaza nearest-landmark identity failed")
+        quit(1)
+        return
+    if str(world.nearest_landmark(erc).get("id", "")) != "ERC":
+        push_error("ERC nearest-landmark identity failed")
+        quit(1)
+        return
+    if str(world.m2_profiles.get("ERC", {}).get("hud_summary", "")).is_empty() or str(world.m2_profiles.get("SRC", {}).get("hud_summary", "")).is_empty():
+        push_error("source-backed landmark summaries are missing")
         quit(1)
         return
     var data: Dictionary = world.layout.get("spatial_reference", {})
