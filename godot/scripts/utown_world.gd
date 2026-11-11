@@ -259,13 +259,13 @@ func _build_walkways() -> void:
 func _building_color(role: String) -> StandardMaterial3D:
     match role:
         "academic":
-            return _mat("#e3e5df")
+            return _mat("#c2cbc7")
         "civic":
-            return _mat("#b3c4cc")
+            return _mat("#91a8b1")
         "research":
-            return _mat("#b9b5ac")
+            return _mat("#a6a59b")
         "residence":
-            return _mat("#d7c8ad")
+            return _mat("#b9ab91")
     return _mat("#c8c8c8")
 
 func _build_buildings() -> void:
@@ -278,7 +278,7 @@ func _build_buildings() -> void:
     window_material.emission = Color.html("#78919a")
     window_material.emission_energy_multiplier = 0.035
     var glass: Material = window_material
-    var roof: Material = _mat("#dde0dc")
+    var roof: Material = _mat("#c5cbc7")
     var entrance: Material = _mat("#426675", 0.32)
     for record in layout.get("buildings", []):
         var group: Node3D = Node3D.new()
@@ -667,11 +667,11 @@ func _build_guide(parent: Node3D, at: Vector3, yaw_deg: float, title: String) ->
     dark_metal.metallic = 0.42
     var panel: Material = _mat("#e7e5d8", 0.82)
     _add_box(guide, Vector3(0.0, 1.0, 0.0), Vector3(0.12, 2.0, 0.12), dark_metal)
-    _add_box(guide, Vector3(0.0, 2.02, 0.0), Vector3(1.45, 1.12, 0.14), panel)
+    _add_box(guide, Vector3(0.0, 2.02, 0.0), Vector3(1.8, 1.28, 0.14), panel)
     var sign_lines: Array[Dictionary] = [
-        {"text": "UTOWN", "font_size": 30, "y": 2.31},
-        {"text": "CAMPUS GUIDE", "font_size": 20, "y": 2.02},
-        {"text": "ERC  ·  SRC  ·  GREEN", "font_size": 14, "y": 1.75}
+        {"text": "UTOWN", "font_size": 32, "y": 2.39},
+        {"text": "CAMPUS GUIDE", "font_size": 22, "y": 2.04},
+        {"text": "ERC  ·  SRC  ·  GREEN", "font_size": 14, "y": 1.72}
     ]
     for index in range(sign_lines.size()):
         var line: Dictionary = sign_lines[index]
@@ -679,12 +679,12 @@ func _build_guide(parent: Node3D, at: Vector3, yaw_deg: float, title: String) ->
         label.name = "CampusGuideText_%02d" % index
         label.text = str(line["text"])
         label.font_size = int(line["font_size"])
-        label.pixel_size = 0.007
+        label.pixel_size = 0.008
         label.billboard = BaseMaterial3D.BILLBOARD_DISABLED
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.modulate = Color.html("#263b40")
         label.outline_size = 3
-        label.rotation.y = PI
+        label.rotation.y = 0.0
         label.position = Vector3(0.0, float(line["y"]), 0.076)
         guide.add_child(label)
     generated_guide_count += 1
