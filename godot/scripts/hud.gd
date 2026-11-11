@@ -10,6 +10,8 @@ extends CanvasLayer
 @onready var nearest_label: Label = $Info/VBox/Nearby
 @onready var detail_label: Label = $Info/VBox/Detail
 @onready var perf_label: Label = $Info/VBox/Perf
+@onready var prompt_label: Label = $Info/VBox/Prompt
+@onready var progress_label: Label = $Info/VBox/Progress
 @onready var map_control: UTownMinimap = $Minimap
 @onready var help_label: Label = $Help
 
@@ -27,18 +29,29 @@ func _ready() -> void:
     style.content_margin_top = 12.0
     style.content_margin_bottom = 12.0
     panel.add_theme_stylebox_override("panel", style)
-    for item in [title_label, hint_label, target_label, nearest_label, detail_label, perf_label]:
+    for item in [title_label, hint_label, target_label, nearest_label, detail_label, prompt_label, progress_label, perf_label]:
         item.add_theme_color_override("font_color", Color.html("#f0f2ed"))
     title_label.add_theme_font_size_override("font_size", 20)
     hint_label.add_theme_font_size_override("font_size", 12)
     target_label.add_theme_font_size_override("font_size", 17)
     nearest_label.add_theme_font_size_override("font_size", 14)
     detail_label.add_theme_font_size_override("font_size", 11)
+    prompt_label.add_theme_font_size_override("font_size", 13)
+    progress_label.add_theme_font_size_override("font_size", 12)
     perf_label.add_theme_font_size_override("font_size", 13)
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
 
 func _process(_delta: float) -> void:
-    hint_label.text = "M2 %s [F2] | GIS shell %s [G] | F3: %s | O OSM | P paths | T contours" % ["ON" if world.m2_details_visible else "OFF", "ON" if world.osm_shells_visible else "OFF", review.current_name()]
+    hint_label.text = "F2 detail | G GIS shell | N day/night: %s | F3 views | O/P/T map layers" % ["NIGHT" if world.night_mode else "DAY"]
+    var discovery_total: int = world.campus_life_data.get("discoveries", []).size()
+    progress_label.text = "Campus passport: %d / %d places explored" % [world.discovered_landmarks.size(), discovery_total]
+    var nearby_discovery: Dictionary = world.nearby_discovery(player.global_position, 7.0)
+    if nearby_discovery.is_empty():
+        prompt_label.text = "Explore: walk to Town Green, ERC, SRC or Town Plaza"
+    elif bool(nearby_discovery.get("discovered", false)):
+        prompt_label.text = "E  ·  Revisit %s" % str(nearby_discovery.get("name", "landmark"))
+    else:
+        prompt_label.text = "E  ·  Discover %s" % str(nearby_discovery.get("name", "landmark"))
     if world.route_points.is_empty():
         return
     var destination: Vector3 = world.route_points[target_index]
@@ -52,7 +65,7 @@ func _process(_delta: float) -> void:
     target_label.text = "Next: %s  |  %.0f m" % [world.route_names[target_index], separation_m]
     var nearby: Dictionary = world.nearest_landmark(player.global_position)
     nearest_label.text = "Near: %s  (%.0f m)" % [nearby["name"], float(nearby["distance"])]
-    detail_label.text = _landmark_description(nearby)
+    detail_label.text = world.discovery_feedback if world.discovery_feedback_time > 0.0 else _landmark_description(nearby)
     perf_label.text = "FPS %d  |  Loop %d  |  X %+.0f / N %+.0f m" % [Engine.get_frames_per_second(), walked_loops, player.global_position.x, -player.global_position.z]
 
 func _landmark_description(landmark: Dictionary) -> String:
@@ -82,3 +95,7 @@ func _unhandled_input(event: InputEvent) -> void:
             map_control.set_terrain_contours_visible(not map_control.show_terrain_contours)
         elif event.keycode == KEY_G:
             world.set_osm_shells_visible(not world.osm_shells_visible)
+        elif event.keycode == KEY_N:
+            world.set_night_mode(not world.night_mode)
+        elif event.keycode == KEY_E:
+            world.discover_nearby_landmark(player.global_position)
