@@ -82,6 +82,59 @@ func _smoke() -> void:
         push_error("missing procedural buildings or vegetation")
         quit(1)
         return
+
+    if world.generated_bench_count != 4 or world.generated_lamp_count != 3 or world.generated_guide_count != 1:
+        push_error("campus furniture and wayfinding props did not all build")
+        quit(1)
+        return
+    if world.campus_furniture_positions.size() != 8:
+        push_error("campus furniture placement registry is incomplete")
+        quit(1)
+        return
+    for prop_position in world.campus_furniture_positions:
+        if not world._is_valid_campus_prop_position(prop_position):
+            push_error("a campus prop failed the Town Green / walkway clearance test")
+            quit(1)
+            return
+    if world.lamp_lights.size() != 3 or world.sun_light == null:
+        push_error("day/night lighting nodes are incomplete")
+        quit(1)
+        return
+    world.set_night_mode(true)
+    if not world.night_mode or world.sun_light.visible:
+        push_error("night mode did not disable the daylight source")
+        quit(1)
+        return
+    for lamp in world.lamp_lights:
+        if not lamp.visible:
+            push_error("night mode did not enable all warm campus lamps")
+            quit(1)
+            return
+    world.set_night_mode(false)
+    if world.night_mode or not world.sun_light.visible:
+        push_error("day mode did not restore daylight")
+        quit(1)
+        return
+    var green_discovery_point: Vector3 = world.lonlat_to_world(103.77314, 1.305035)
+    var green_discovery: Dictionary = world.nearby_discovery(green_discovery_point, 7.0)
+    if str(green_discovery.get("id", "")) != "GREEN":
+        push_error("Town Green discovery point is not aligned with the player route")
+        quit(1)
+        return
+    var first_discovery: Dictionary = world.discover_nearby_landmark(green_discovery_point)
+    if not bool(first_discovery.get("ok", false)) or world.discovered_landmarks.size() != 1:
+        push_error("campus passport failed to record the first discovery")
+        quit(1)
+        return
+    var repeat_discovery: Dictionary = world.discover_nearby_landmark(green_discovery_point)
+    if not bool(repeat_discovery.get("already_discovered", false)) or world.discovered_landmarks.size() != 1:
+        push_error("campus passport duplicate discovery handling failed")
+        quit(1)
+        return
+    if instance.get_node_or_null("HUD/Info/VBox/Prompt") == null or instance.get_node_or_null("HUD/Info/VBox/Progress") == null:
+        push_error("campus exploration HUD prompt and progress labels are missing")
+        quit(1)
+        return
     if world.generated_facade_count != 2 or world.m2_detail_nodes.size() != 2:
         push_error("ERC and SRC both require a separate M2 architectural study layer")
         quit(1)
@@ -258,6 +311,6 @@ func _smoke() -> void:
         push_error("the provisional geography must remain clearly labelled")
         quit(1)
         return
-    print("PASS: scene, %d buildings, %d M2 facades, %d trees in 2 MultiMesh batches, %d paths, axes and provenance." % [world.generated_building_count, world.generated_facade_count, world.generated_tree_count, world.generated_path_count])
+    print("PASS: scene, %d buildings, %d M2 facades, %d trees, %d benches, %d lamps, %d guide signs, %d discoveries, %d paths and provenance." % [world.generated_building_count, world.generated_facade_count, world.generated_tree_count, world.generated_bench_count, world.generated_lamp_count, world.generated_guide_count, world.discovered_landmarks.size(), world.generated_path_count])
     instance.queue_free()
     quit(0)
