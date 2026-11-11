@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux screenshot pipeline implemented; real-world survey and Windows checks pending**
+Date: 2026-11-11 · Status: **M2.5 atmosphere and discovery first pass implemented; field-verified props, audio, elevations and final collision pending**
 
 ## 1. 产品定位
 
@@ -43,7 +43,7 @@ Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux scree
 ### M0 — Geospatial baseline / 地理数据准备
 
 - [ ] 查 UTown 当期官方地图；2024 PDF 只做命名/拓扑参考（其页面标注 not to scale）。
-- [ ] 用 OSM 获取建筑轮廓、园路、台阶、树木/草坪等矢量数据；记录 OSM 抓取日期与 ODbL attribution。
+- [x] 获取首批 UTown OSM 建筑、屋顶、园路/台阶和绿地矢量快照；记录 way ID、版本、时间戳与 ODbL attribution。
 - [ ] 以 Town Green 的后续实测/核实中心点作为局部坐标原点；坐标转换遵循技术规范。
 - [ ] 创建四大 P0 地标的俯视标注图、立面参考清单、几何质量等级。
 - [ ] 查验航拍/街景/360° 图的许可，先保存链接和拍摄角度，不盲目上传照片。
@@ -114,9 +114,68 @@ Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux scree
 - [x] Restore cameras reproducibly and capture own-model comparison images.
 - [x] Validate camera positions and evidence status; publish CI software-rendered M1/M2 pairs.
 - [ ] Compare photo and in-engine snapshots visually at validated eye elevations and camera FoV.
-- [ ] Extract and review actual OSM building outlines/entrances, SRC levels and accessibility with appropriate licensing.
+- [x] Extract the first campus-filtered OSM building/path snapshot with way IDs and ODbL provenance.\n- [ ] Review real building outlines/entrances, SRC levels and accessibility against current evidence with appropriate licensing.
 
 See [M2.1 documentation](M2_1_VIEWPOINT_CALIBRATION.md). Passing software render is not an accurate-survey or Windows-performance claim.
+
+
+### M2.3 — OSM footprint and terrain contour baseline
+
+**2026-11-05:** a versioned OSM extract is now stored in `godot/data/osm_utown_snapshot.json`: 38 building footprints, 4 roof structures, 118 path/step/service ways and 17 landcover features, selected by way-vertex mean against OSM University Town boundary way 92357946. Original way geometries are retained uncut. Seven named OSM buildings are linked to existing schematic landmarks. The minimap overlays the OSM geometry and keeps it separate from proxy collision shapes.
+
+A public Singapore contour layer sourced from SLA Land Survey was queried for the UTown bbox; line segments were retained when their midpoint fell inside the OSM boundary. They are not polygon-clipped to the exact boundary. Five contour levels (5–25 m at 5 m intervals) are shown as planimetric references. The service does not state a vertical datum; the contours are **not** used to create an absolute-height terrain mesh or ramp/step elevations.
+
+- [x] Store dated OSM way geometry, IDs, tags, versions and timestamps.
+- [x] Overlay OSM building footprints, landcover and pedestrian ways in the minimap; add O/T toggles.
+- [x] Store the five boundary-filtered contour levels with source and vertical-datum caveats.
+- [x] Add Python validation and CI checks for geometry closure, ODbL attribution and contour metadata.
+- [ ] Verify OSM outlines and entrances against current licensed photos or on-site observations.
+- [ ] Confirm contour vertical datum and accuracy, or obtain higher-resolution NUS/SLA survey data.
+- [ ] Measure ground elevations, SRC stacked paths, ramps and steps before generating the 3D terrain mesh.
+- [ ] Replace proxy collision geometry only after polygon collision and route-clearance tests pass.
+
+See [M2.3 geospatial baseline](M2_3_GEOSPATIAL_BASELINE.md). Passing validation confirms data integrity and provenance fields, not real-world survey accuracy.
+
+
+### M2.4 — OSM footprint shells for ERC/SRC
+
+**2026-11-05:** the source OSM polygons for ERC (way 124549217) and SRC (way 125774787) now generate separate, non-colliding extruded shells in Godot. Press **G** to compare the OSM shells with the original proxy visuals. The proxy collision remains active while shells are shown. A Blender 4.x authoring script also generates editable site-local .blend and Y-up GLB previews.
+
+The OSM planimetric bounds are approximately 77.57 × 122.69 m for ERC and 173.29 × 167.75 m for SRC. Heights are **estimated**, not measured: 4 OSM levels × the existing estimated storey pitch = 13.8 m (ERC) and 14.6 m (SRC). SRC's `layer=-1` tag is preserved as relative stacking metadata and is not used as a vertical offset. Both shells start at the unverified flat proxy Y=0 plane.
+
+- [x] Preserve the source OSM way IDs, versions, timestamps and polygon geometry for both P0 buildings.
+- [x] Add explicit estimated height profiles and a validator that checks levels × storey pitch.
+- [x] Generate wall and triangulated roof surfaces from the OSM footprint polygons in Godot.
+- [x] Add **G** proxy-versus-shell visual switching while retaining proxy collision.
+- [x] Generate editable Blender masters and GLB previews in a separate CI artifact.
+- [x] Add Godot smoke checks for mesh bounds, provenance, height estimates and fallback collision.
+- [x] Generate and inspect software-rendered ERC/SRC proxy-versus-shell comparisons from an exterior approach and elevated isometric views. The OSM envelopes are materially larger than the current proxy bounds; this is a discrepancy to investigate, not an accuracy verdict.\n- [ ] Compare the OSM polygons with current permitted photo/site evidence.
+- [ ] Verify actual entrances, storey counts, roof levels and SRC multi-level circulation.
+- [ ] Establish a vertical datum and measured ground elevations before applying absolute terrain heights.
+- [ ] Run polygon collision and 3D route-clearance checks before replacing any proxy collision.
+
+See [M2.4 OSM building shell documentation](M2_4_OSM_BUILDING_SHELLS.md). Passing CI proves reproducible geometry generation and software behaviour, not as-built accuracy.
+
+
+### M2.5 — Campus atmosphere and exploration
+
+**2026-11-11:** the Town Green scene now has original procedural grass and paver textures, varied tree instance scales, four illustrative benches, three warm lamp poles and a generic wayfinding totem. The player has smoother acceleration and subtle speed-dependent head bob. Press **N** for a manual day/night preview and **E** to discover Town Green, ERC, SRC and Town Plaza using a four-stop campus passport.
+
+The feature choices follow public NUS/architect sources: Town Green supports daytime recreation and evening performances; ERC contains Computer Commons, study clusters and a lower-ground Learning Café; SRC is organised around a Forum and stacked pedestrian circulation. See [M2.5 documentation](M2_5_CAMPUS_ATMOSPHERE.md).
+
+- [x] Add original procedural grass and staggered paver textures.
+- [x] Add controlled scale/rotation variation to the existing two tree MultiMesh batches.
+- [x] Add four benches, three warm lamps and one generic wayfinding totem with safe-placement checks.
+- [x] Add manual day/night lighting and subtle proxy-window emission.
+- [x] Add four source-backed discovery points and a campus passport progress counter.
+- [x] Add player acceleration/deceleration and subtle walking head bob.
+- [x] Add Python placement/provenance validation, Godot smoke checks and day/night render captures.
+- [ ] Verify the exact furniture and lamp locations against current permitted photos or an on-site walk.
+- [ ] Replace approximate tree scatter with measured tree positions and verified species.
+- [ ] Add original/licensed ambient sound with a defined volume and provenance policy.
+- [ ] Replace flat surfaces only after vertical datum and measured ground elevations are available.
+
+Furniture coordinates are illustrative art placements, not surveyed or mapped existing amenities. Decorative props remain non-colliding. Night mode is a manual visual preview, not a real-time sun/weather simulation.
 
 ### M3 — Atmosphere / 环境与交互
 

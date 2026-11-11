@@ -61,7 +61,7 @@ docs/M1_GREYBOX.md               # launch and limitations
 assets/                           # planned editable or licensed GLBs
 blender/                          # planned Blender master scenes
 web/                              # future Three.js viewer
-blender/build_m2_blockouts.py      # M2 Blender source and GLB generator (executed in separate CI job)
+blender/build_m2_blockouts.py      # M2 architectural-study Blender/GLB generator\nblender/build_m2_4_osm_shells.py    # M2.4 OSM footprint shell Blender/GLB generator
 .github/workflows/blender_m2.yml   # actual Blender 4.0.2 export and downloadable GLB artifacts
 tools/validate_m2_profiles.py       # M2 profile/provenance validator
 tools/validate_utown_data.py       # implemented source-data validator
@@ -80,7 +80,7 @@ UTown (Node3D)
     TownPlaza_approximate (plaza slab/canopy)
     ConceptualFootpaths_NotSurveyed (wide overlay strips)
     BuildingMassing_Estimated (9 named building groups)
-    Vegetation_Procedural (64 trees in 2 MultiMeshInstance3D batches)
+    OSMBuildingShells_Estimated (non-colliding OSM ERC/SRC footprint extrusions; G toggle)\n    CampusFurniture_Illustrative (benches, warm lamps, generic guide sign; N day/night toggle)\n    Vegetation_Procedural (64 trees in 2 MultiMeshInstance3D batches)
     RouteBeacons_Conceptual (4 markers)
     WorldEnvironment / DirectionalLight3D
   Player (CharacterBody3D + capsule + Head/Camera3D)
@@ -127,5 +127,9 @@ The Python tool at tools/audit_route_clearance.py reconstructs rotated massing p
 ## 8. Initial implementation and next pass
 
 - **Implemented**: source-driven Godot scene with approximate flat ground, nine compound/proxy buildings, Town Green and Plaza, pedestrian hints, 64 generated trees rendered in two MultiMesh batches, and capsule collision. CI instantiates and tests the scene. M1.5 adds Python data validation, regression tests and footprint/path-aware tree placement.
-- **Next**: verify elevation and pedestrian routes in the real campus, record two reference-vs-engine viewpoints, check player scale, and compare real Windows FPS.
+- **M2.4 implemented**: OSM-derived ERC/SRC footprint shells are switchable against the original proxy visuals; proxy collision remains active and the new shells are non-colliding. Height estimates are sourced from OSM level tags × estimated storey pitch, not measured elevations.\n- **Next**: inspect the M2.4 shell renders, verify footprint and entrances against permitted current evidence, establish a vertical datum, and only then plan polygon collision replacement.
 - **After M1 walk-through acceptance**: build editable Blender GLBs with shared placement coordinates and replace individual proxy masses, preserving stable IDs.
+
+## M2.5 campus-life layer
+
+The Godot world reads godot/data/campus_life.json. It defines source-backed discovery descriptions for Town Green, ERC, SRC and Town Plaza, plus clearly labelled illustrative bench/lamp/guide placements. A runtime geometry check keeps those props inside the approximate Town Green polygon and away from current proxy-building margins and conceptual path corridors. Press **E** to record discoveries and **N** to toggle manual day/night lighting. Furniture remains non-colliding and the placements are not claims about surveyed existing amenities. See docs/M2_5_CAMPUS_ATMOSPHERE.md.

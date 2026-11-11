@@ -23,12 +23,175 @@ func _smoke() -> void:
         push_error("failed to parse site metadata")
         quit(1)
         return
+
+    var minimap: UTownMinimap = instance.get_node_or_null("HUD/Minimap") as UTownMinimap
+    if minimap == null or minimap.map_scale <= 0.0:
+        push_error("full-extent schematic minimap failed to initialize")
+        quit(1)
+        return
+
+    if minimap.osm_features.size() < 170 or minimap.osm_boundary.size() < 30:
+        push_error("campus-filtered OSM reference geometry failed to load")
+        quit(1)
+        return
+    if minimap.terrain_contours.size() != 5:
+        push_error("five-metre terrain contour reference failed to load")
+        quit(1)
+        return
+    var osm_buildings: int = 0
+    var osm_paths: int = 0
+    for feature in minimap.osm_features:
+        if str(feature.get("feature_type", "")) == "building":
+            osm_buildings += 1
+        elif str(feature.get("feature_type", "")) == "path":
+            osm_paths += 1
+    if osm_buildings != 38 or osm_paths != 118:
+        push_error("OSM feature counts do not match the versioned campus extract")
+        quit(1)
+        return
+    var contour_heights: Array[int] = []
+    for contour in minimap.terrain_contours:
+        contour_heights.append(int(contour.get("height_m", 0)))
+    contour_heights.sort()
+    if contour_heights != [5, 10, 15, 20, 25]:
+        push_error("terrain contour elevations are missing or incorrectly ordered")
+        quit(1)
+        return
+    for coordinate in minimap.osm_boundary:
+        var boundary_world: Vector3 = world.lonlat_to_world(float(coordinate[0]), float(coordinate[1]))
+        var boundary_map: Vector2 = minimap.world_to_map(boundary_world)
+        if boundary_map.x < 17.0 or boundary_map.x > 233.0 or boundary_map.y < 17.0 or boundary_map.y > 233.0:
+            push_error("OSM campus boundary is clipped by the minimap")
+            quit(1)
+            return
+    if minimap.show_osm_paths:
+        push_error("OSM footpath network should default to a decluttered state")
+        quit(1)
+        return
+    minimap.set_osm_reference_visible(false)
+    minimap.set_osm_paths_visible(true)
+    minimap.set_terrain_contours_visible(false)
+    if minimap.show_osm_reference or not minimap.show_osm_paths or minimap.show_terrain_contours:
+        push_error("OSM building, path and contour overlay toggles failed")
+        quit(1)
+        return
+    minimap.set_osm_reference_visible(true)
+    minimap.set_osm_paths_visible(false)
+    minimap.set_terrain_contours_visible(true)
     if world.generated_building_count < 8 or world.generated_tree_count < 20:
         push_error("missing procedural buildings or vegetation")
         quit(1)
         return
+
+    if world.generated_bench_count != 4 or world.generated_lamp_count != 3 or world.generated_guide_count != 1:
+        push_error("campus furniture and wayfinding props did not all build")
+        quit(1)
+        return
+    if world.campus_furniture_positions.size() != 8:
+        push_error("campus furniture placement registry is incomplete")
+        quit(1)
+        return
+    for prop_position in world.campus_furniture_positions:
+        if not world._is_valid_campus_prop_position(prop_position):
+            push_error("a campus prop failed the Town Green / walkway clearance test")
+            quit(1)
+            return
+    if world.lamp_lights.size() != 3 or world.sun_light == null:
+        push_error("day/night lighting nodes are incomplete")
+        quit(1)
+        return
+    world.set_night_mode(true)
+    if not world.night_mode or world.sun_light.visible:
+        push_error("night mode did not disable the daylight source")
+        quit(1)
+        return
+    for lamp in world.lamp_lights:
+        if not lamp.visible:
+            push_error("night mode did not enable all warm campus lamps")
+            quit(1)
+            return
+    world.set_night_mode(false)
+    if world.night_mode or not world.sun_light.visible:
+        push_error("day mode did not restore daylight")
+        quit(1)
+        return
+    var green_discovery_point: Vector3 = world.lonlat_to_world(103.77314, 1.305035)
+    var green_discovery: Dictionary = world.nearby_discovery(green_discovery_point, 7.0)
+    if str(green_discovery.get("id", "")) != "GREEN":
+        push_error("Town Green discovery point is not aligned with the player route")
+        quit(1)
+        return
+    var first_discovery: Dictionary = world.discover_nearby_landmark(green_discovery_point)
+    if not bool(first_discovery.get("ok", false)) or world.discovered_landmarks.size() != 1:
+        push_error("campus passport failed to record the first discovery")
+        quit(1)
+        return
+    var repeat_discovery: Dictionary = world.discover_nearby_landmark(green_discovery_point)
+    if not bool(repeat_discovery.get("already_discovered", false)) or world.discovered_landmarks.size() != 1:
+        push_error("campus passport duplicate discovery handling failed")
+        quit(1)
+        return
+    if instance.get_node_or_null("HUD/Info/VBox/Prompt") == null or instance.get_node_or_null("HUD/Info/VBox/Progress") == null:
+        push_error("campus exploration HUD prompt and progress labels are missing")
+        quit(1)
+        return
     if world.generated_facade_count != 2 or world.m2_detail_nodes.size() != 2:
         push_error("ERC and SRC both require a separate M2 architectural study layer")
+        quit(1)
+        return
+
+    if world.osm_shell_count != 2 or world.osm_shell_way_ids.size() != 2:
+        push_error("ERC and SRC OSM footprint shells failed to generate")
+        quit(1)
+        return
+    var osm_root: Node3D = world.get_node_or_null("OSMBuildingShells_Estimated") as Node3D
+    var proxy_root: Node3D = world.get_node_or_null("BuildingMassing_Estimated") as Node3D
+    var erc_shell: MeshInstance3D = world.get_node_or_null("OSMBuildingShells_Estimated/ERC_OSMFootprintShell_NotSurveyed") as MeshInstance3D
+    var src_shell: MeshInstance3D = world.get_node_or_null("OSMBuildingShells_Estimated/SRC_OSMFootprintShell_NotSurveyed") as MeshInstance3D
+    if osm_root == null or proxy_root == null or erc_shell == null or src_shell == null:
+        push_error("OSM shell scene hierarchy is incomplete")
+        quit(1)
+        return
+    if erc_shell.mesh == null or src_shell.mesh == null or erc_shell.mesh.get_surface_count() != 2 or src_shell.mesh.get_surface_count() != 2:
+        push_error("OSM shells require separate wall and roof mesh surfaces")
+        quit(1)
+        return
+    if int(erc_shell.get_meta("osm_way_id", -1)) != 124549217 or int(src_shell.get_meta("osm_way_id", -1)) != 125774787:
+        push_error("OSM shell provenance IDs do not match ERC/SRC source ways")
+        quit(1)
+        return
+    var erc_shell_bounds: Vector3 = erc_shell.mesh.get_aabb().size
+    var src_shell_bounds: Vector3 = src_shell.mesh.get_aabb().size
+    if absf(erc_shell_bounds.x - 77.57) > 0.5 or absf(erc_shell_bounds.z - 122.69) > 0.5 or absf(erc_shell_bounds.y - 13.8) > 0.01:
+        push_error("ERC OSM shell bounds or estimated extrusion height changed unexpectedly")
+        quit(1)
+        return
+    if absf(src_shell_bounds.x - 173.29) > 0.5 or absf(src_shell_bounds.z - 167.75) > 0.5 or absf(src_shell_bounds.y - 14.6) > 0.01:
+        push_error("SRC OSM shell bounds or estimated extrusion height changed unexpectedly")
+        quit(1)
+        return
+    var erc_proxy: Node3D = proxy_root.get_node("ERC") as Node3D
+    var proxy_collision_found: bool = false
+    for proxy_part in erc_proxy.get_children():
+        for proxy_child in proxy_part.get_children():
+            if proxy_child is StaticBody3D:
+                proxy_collision_found = true
+    if not proxy_collision_found:
+        push_error("estimated proxy collision must remain available during OSM shell comparison")
+        quit(1)
+        return
+    world.set_osm_shells_visible(true)
+    var details_hidden: bool = true
+    for detail in world.m2_detail_nodes:
+        if detail.visible:
+            details_hidden = false
+    if not osm_root.visible or proxy_root.visible or not details_hidden:
+        push_error("OSM shell comparison did not hide old proxy and facade visuals")
+        quit(1)
+        return
+    world.set_osm_shells_visible(false)
+    if osm_root.visible or not proxy_root.visible:
+        push_error("OSM shell comparison did not restore the proxy model")
         quit(1)
         return
     var erc_details: Node3D = world.get_node_or_null("BuildingMassing_Estimated/ERC/ArchitecturalStudy_NotSurveyed") as Node3D
@@ -115,11 +278,39 @@ func _smoke() -> void:
         push_error("east/north orientation is inconsistent")
         quit(1)
         return
+
+    for record in world.layout.get("buildings", []):
+        for part in record.get("parts", []):
+            var footprint: PackedVector2Array = minimap.building_footprint_points(record, part)
+            if footprint.size() != 4:
+                push_error("minimap footprint must contain four corners")
+                quit(1)
+                return
+            for corner in footprint:
+                var map_corner: Vector2 = minimap.world_to_map(Vector3(corner.x, 0.0, corner.y))
+                if map_corner.x < 17.0 or map_corner.x > 233.0 or map_corner.y < 17.0 or map_corner.y > 233.0:
+                    push_error("minimap clipped a building footprint: %s" % str(record.get("id", "")))
+                    quit(1)
+                    return
+    var plaza_record: Dictionary = world.layout.get("plaza", {})
+    var plaza_world: Vector3 = world.lonlat_to_world(float(plaza_record.get("lon", world.origin_lon)), float(plaza_record.get("lat", world.origin_lat)))
+    if str(world.nearest_landmark(plaza_world).get("id", "")) != "TOWN_PLAZA":
+        push_error("Town Plaza nearest-landmark identity failed")
+        quit(1)
+        return
+    if str(world.nearest_landmark(erc).get("id", "")) != "ERC":
+        push_error("ERC nearest-landmark identity failed")
+        quit(1)
+        return
+    if str(world.m2_profiles.get("ERC", {}).get("hud_summary", "")).is_empty() or str(world.m2_profiles.get("SRC", {}).get("hud_summary", "")).is_empty():
+        push_error("source-backed landmark summaries are missing")
+        quit(1)
+        return
     var data: Dictionary = world.layout.get("spatial_reference", {})
     if str(data.get("precision", "")).find("NOT survey") < 0:
         push_error("the provisional geography must remain clearly labelled")
         quit(1)
         return
-    print("PASS: scene, %d buildings, %d M2 facades, %d trees in 2 MultiMesh batches, %d paths, axes and provenance." % [world.generated_building_count, world.generated_facade_count, world.generated_tree_count, world.generated_path_count])
+    print("PASS: scene, %d buildings, %d M2 facades, %d trees, %d benches, %d lamps, %d guide signs, %d discoveries, %d paths and provenance." % [world.generated_building_count, world.generated_facade_count, world.generated_tree_count, world.generated_bench_count, world.generated_lamp_count, world.generated_guide_count, world.discovered_landmarks.size(), world.generated_path_count])
     instance.queue_free()
     quit(0)

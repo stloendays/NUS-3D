@@ -44,7 +44,7 @@ static func _erc_wing(wing: Node3D, part: Dictionary, estimates: Dictionary, mai
     var proj: float = float(estimates.get("canopy_projection", 2.0))
 
     var glass: Material = _material("#65919e", 0.23, 0.12)
-    var white: Material = _material("#e5e9e7")
+    var white: Material = _material("#c9d1ce")
     var silver: Material = _material("#aab6b8", 0.38, 0.4)
     var inset: Material = _material("#344d58", 0.32)
 
@@ -94,7 +94,7 @@ static func _src_wing(wing: Node3D, part: Dictionary, estimates: Dictionary) -> 
     var pitch: float = float(estimates.get("storey_pitch", 3.65))
     var spacing: float = float(estimates.get("mullion_spacing", 3.8))
     var glaze: Material = _material("#527d8b", 0.25, 0.08)
-    var concrete: Material = _material("#e2e5e1")
+    var concrete: Material = _material("#c6ceca")
     var aluminium: Material = _material("#b9c4c8", 0.37, 0.32)
 
     # Continuous bands wrap toward the east-side forecourt.
@@ -115,7 +115,7 @@ static func _src_wing(wing: Node3D, part: Dictionary, estimates: Dictionary) -> 
 
 static func _src_forum(root: Node3D, parts: Array, estimates: Dictionary) -> void:
     var metallic: Material = _material("#aabbbf", 0.32, 0.45)
-    var white: Material = _material("#e9eae6")
+    var white: Material = _material("#cbd2ce")
     var radius: float = float(estimates.get("disc_radius", 10.5))
     var height: float = float(estimates.get("disc_elevation", 14.5))
     var forum: Node3D = Node3D.new()

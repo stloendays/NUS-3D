@@ -71,3 +71,7 @@ The Blender generator's Python syntax is covered by the Godot CI workflow. A **s
 ## Evidence-based camera review (M2.1)
 
 A repeatable photo-reference camera workflow and Linux Xvfb software-rendered screenshot artifacts are tracked separately in [M2.1 viewpoint documentation](M2_1_VIEWPOINT_CALIBRATION.md). Camera EXIF and creative-commons photo references do not validate real measured geometry.
+
+## M2.4 OSM footprint shell comparison
+
+The next geometry step is documented in [M2.4 OSM building shells](M2_4_OSM_BUILDING_SHELLS.md). ERC and SRC now have OSM-polygon extrusions in a separate `OSMBuildingShells_Estimated` node. **G** toggles between these visual shells and the original proxy masses. The proxy collision remains active; OSM shells do not collide. Heights are estimated from the OSM four-level tags and the existing estimated storey pitches. SRC's `layer=-1` tag is not converted to a vertical height. This remains a visual comparison, not an as-built or accessible-route acceptance.

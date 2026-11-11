@@ -5,6 +5,9 @@ class_name UTownWorld
 
 const DATA_PATH: String = "res://data/utown_core.json"
 const M2_DATA_PATH: String = "res://data/m2_profiles.json"
+const OSM_DATA_PATH: String = "res://data/osm_utown_snapshot.json"
+const OSM_SHELL_PROFILE_PATH: String = "res://data/osm_shell_profiles.json"
+const CAMPUS_LIFE_PATH: String = "res://data/campus_life.json"
 const FACADE_KIT = preload("res://scripts/utown_facades.gd")
 const METRES_PER_DEG_LAT: float = 110574.0
 const METRES_PER_DEG_LON: float = 111320.0
@@ -19,9 +22,29 @@ var generated_tree_count: int = 0
 var generated_tree_positions: Array[Vector3] = []
 var generated_path_count: int = 0
 var m2_profiles: Dictionary = {}
+var osm_shell_profiles: Dictionary = {}
+var campus_life_data: Dictionary = {}
+var building_massing_root: Node3D
+var osm_shell_root: Node3D
+var osm_shell_count: int = 0
+var osm_shell_way_ids: Array[int] = []
+var osm_shells_visible: bool = false
 var m2_detail_nodes: Array[Node3D] = []
 var generated_facade_count: int = 0
 var m2_details_visible: bool = true
+var environment_data: Environment
+var world_environment: WorldEnvironment
+var sun_light: DirectionalLight3D
+var window_material: StandardMaterial3D
+var lamp_lights: Array[OmniLight3D] = []
+var night_mode: bool = false
+var generated_bench_count: int = 0
+var generated_lamp_count: int = 0
+var generated_guide_count: int = 0
+var campus_furniture_positions: Array[Vector3] = []
+var discovered_landmarks: Array[String] = []
+var discovery_feedback: String = ""
+var discovery_feedback_time: float = 0.0
 
 func _ready() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -42,13 +65,28 @@ func _ready() -> void:
             m2_profiles = profile_document.get("profiles", {})
         else:
             push_warning("M2 architecture profiles are invalid; plain massing will remain.")
+    if FileAccess.file_exists(OSM_SHELL_PROFILE_PATH):
+        var shell_profile_json: Variant = JSON.parse_string(FileAccess.get_file_as_string(OSM_SHELL_PROFILE_PATH))
+        if typeof(shell_profile_json) == TYPE_DICTIONARY:
+            var shell_profile_document: Dictionary = shell_profile_json
+            osm_shell_profiles = shell_profile_document.get("buildings", {})
+        else:
+            push_warning("OSM shell profiles are invalid; estimated massing remains active.")
+    if FileAccess.file_exists(CAMPUS_LIFE_PATH):
+        var campus_life_json: Variant = JSON.parse_string(FileAccess.get_file_as_string(CAMPUS_LIFE_PATH))
+        if typeof(campus_life_json) == TYPE_DICTIONARY:
+            campus_life_data = campus_life_json
+        else:
+            push_warning("Campus-life data is invalid; furniture and discovery content remain disabled.")
     _build_sky()
     _build_ground()
     _build_green()
     _build_plaza()
     _build_walkways()
     _build_buildings()
+    _build_osm_shells()
     _build_trees()
+    _build_campus_furniture()
     _build_waypoints()
 
 func lonlat_to_world(lon: float, lat: float) -> Vector3:
@@ -83,27 +121,78 @@ func _add_box(parent: Node3D, at: Vector3, size_m: Vector3, material: Material, 
     return part
 
 func _build_sky() -> void:
-    var env: Environment = Environment.new()
-    env.background_mode = Environment.BG_COLOR
-    env.background_color = Color.html("#c6d8df")
-    env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-    env.ambient_light_color = Color.html("#e8edf0")
-    env.ambient_light_energy = 0.78
-    var environment_node: WorldEnvironment = WorldEnvironment.new()
-    environment_node.environment = env
-    add_child(environment_node)
-    var sun: DirectionalLight3D = DirectionalLight3D.new()
-    sun.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
-    sun.light_energy = 1.0
-    sun.shadow_enabled = true
-    add_child(sun)
+    environment_data = Environment.new()
+    environment_data.background_mode = Environment.BG_COLOR
+    environment_data.background_color = Color.html("#c6d8df")
+    environment_data.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+    environment_data.ambient_light_color = Color.html("#e8edf0")
+    environment_data.ambient_light_energy = 0.54
+    environment_data.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+    world_environment = WorldEnvironment.new()
+    world_environment.environment = environment_data
+    add_child(world_environment)
+    sun_light = DirectionalLight3D.new()
+    sun_light.name = "Sun_Daylight"
+    sun_light.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
+    sun_light.light_color = Color.html("#fff0d5")
+    sun_light.light_energy = 0.68
+    sun_light.shadow_enabled = true
+    add_child(sun_light)
+
+func set_night_mode(enabled: bool) -> void:
+    night_mode = enabled
+    if environment_data != null:
+        environment_data.background_color = Color.html("#101a2c") if enabled else Color.html("#c6d8df")
+        environment_data.ambient_light_color = Color.html("#7187a8") if enabled else Color.html("#e8edf0")
+        environment_data.ambient_light_energy = 0.30 if enabled else 0.54
+    if sun_light != null:
+        sun_light.visible = not enabled
+    if window_material != null:
+        window_material.emission_enabled = true
+        window_material.emission = Color.html("#f5c982") if enabled else Color.html("#78919a")
+        window_material.emission_energy_multiplier = 0.62 if enabled else 0.02
+    for lamp in lamp_lights:
+        lamp.visible = enabled
 
 func _build_ground() -> void:
     var root: Node3D = Node3D.new()
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), _mat("#819e7a"), true)
+    var ground_material: StandardMaterial3D = _mat("#ffffff", 1.0)
+    ground_material.albedo_texture = _make_grass_texture()
+    ground_material.uv1_scale = Vector3(56.0, 1.0, 80.0)
+    _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), ground_material, true)
+
+func _make_grass_texture() -> ImageTexture:
+    var image: Image = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+    var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+    rng.seed = 20261111
+    for y in range(128):
+        for x in range(128):
+            var noise: float = rng.randf_range(-0.035, 0.035)
+            var blade: float = 0.02 if rng.randf() > 0.985 else 0.0
+            image.set_pixel(x, y, Color(
+                clampf(0.25 + noise + blade, 0.0, 1.0),
+                clampf(0.34 + noise * 1.1 + blade, 0.0, 1.0),
+                clampf(0.20 + noise * 0.7, 0.0, 1.0),
+                1.0
+            ))
+    return ImageTexture.create_from_image(image)
+
+func _make_paver_texture() -> ImageTexture:
+    var image: Image = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+    var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+    rng.seed = 20261112
+    for y in range(128):
+        for x in range(128):
+            var row: int = int(y / 32)
+            var staggered_x: int = (x + (16 if row % 2 == 1 else 0)) % 32
+            var grout: bool = (y % 32 < 2) or (staggered_x < 2)
+            var noise: float = rng.randf_range(-0.035, 0.035)
+            var base: float = 0.25 if grout else 0.48 + noise
+            image.set_pixel(x, y, Color(base, base * 0.99, base * 0.94, 1.0))
+    return ImageTexture.create_from_image(image)
 
 func _build_green() -> void:
     var poly: PackedVector2Array = PackedVector2Array()
@@ -121,11 +210,14 @@ func _build_green() -> void:
     surface.begin(Mesh.PRIMITIVE_TRIANGLES)
     for i in indices:
         surface.set_normal(Vector3.UP)
+        surface.set_uv(Vector2(poly[i].x * 0.055, poly[i].y * 0.055))
         surface.add_vertex(Vector3(poly[i].x, 0.025, poly[i].y))
     var grass: MeshInstance3D = MeshInstance3D.new()
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
-    var grass_mat: StandardMaterial3D = _mat("#8aba75")
+    var grass_mat: StandardMaterial3D = _mat("#ffffff", 1.0)
+    grass_mat.albedo_texture = _make_grass_texture()
+    grass_mat.uv1_scale = Vector3(1.0, 1.0, 1.0)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
     grass.material_override = grass_mat
     add_child(grass)
@@ -147,7 +239,9 @@ func _build_walkways() -> void:
     var root: Node3D = Node3D.new()
     root.name = "ConceptualFootpaths_NotSurveyed"
     add_child(root)
-    var path_material: Material = _mat("#c8c7bd")
+    var path_material: StandardMaterial3D = _mat("#ffffff", 0.92)
+    path_material.albedo_texture = _make_paver_texture()
+    path_material.uv1_scale = Vector3(5.0, 1.0, 8.0)
     for way in layout.get("walkways", []):
         var points: Array = way.get("lonlat", [])
         var width_m: float = float(way.get("width_m", 3.5))
@@ -165,21 +259,26 @@ func _build_walkways() -> void:
 func _building_color(role: String) -> StandardMaterial3D:
     match role:
         "academic":
-            return _mat("#e3e5df")
+            return _mat("#c2cbc7")
         "civic":
-            return _mat("#b3c4cc")
+            return _mat("#91a8b1")
         "research":
-            return _mat("#b9b5ac")
+            return _mat("#a6a59b")
         "residence":
-            return _mat("#d7c8ad")
+            return _mat("#b9ab91")
     return _mat("#c8c8c8")
 
 func _build_buildings() -> void:
-    var root: Node3D = Node3D.new()
-    root.name = "BuildingMassing_Estimated"
-    add_child(root)
-    var glass: Material = _mat("#688a9c", 0.34)
-    var roof: Material = _mat("#dde0dc")
+    building_massing_root = Node3D.new()
+    building_massing_root.name = "BuildingMassing_Estimated"
+    add_child(building_massing_root)
+    var root: Node3D = building_massing_root
+    window_material = _mat("#688a9c", 0.34)
+    window_material.emission_enabled = true
+    window_material.emission = Color.html("#78919a")
+    window_material.emission_energy_multiplier = 0.035
+    var glass: Material = window_material
+    var roof: Material = _mat("#c5cbc7")
     var entrance: Material = _mat("#426675", 0.32)
     for record in layout.get("buildings", []):
         var group: Node3D = Node3D.new()
@@ -216,10 +315,157 @@ func _build_buildings() -> void:
         generated_building_count += 1
         _add_sign(group, str(record.get("name", group.name)), Vector3(0.0, max_height + 6.0, 0.0), "#fbfbf8")
 
+func _extrude_footprint(points: PackedVector2Array, height_m: float, side_material: Material, roof_material: Material) -> ArrayMesh:
+    if points.size() < 3 or height_m <= 0.0:
+        return null
+    var triangles: PackedInt32Array = Geometry2D.triangulate_polygon(points)
+    if triangles.size() < 3:
+        return null
+
+    var signed_area: float = 0.0
+    for index in range(points.size()):
+        var a: Vector2 = points[index]
+        var b: Vector2 = points[(index + 1) % points.size()]
+        signed_area += a.x * b.y - b.x * a.y
+    if absf(signed_area) < 0.01:
+        return null
+    var winding: float = 1.0 if signed_area > 0.0 else -1.0
+
+    var mesh: ArrayMesh = ArrayMesh.new()
+    var walls: SurfaceTool = SurfaceTool.new()
+    walls.begin(Mesh.PRIMITIVE_TRIANGLES)
+    walls.set_material(side_material)
+    for index in range(points.size()):
+        var a: Vector2 = points[index]
+        var b: Vector2 = points[(index + 1) % points.size()]
+        var edge: Vector2 = b - a
+        if edge.length_squared() < 0.000001:
+            continue
+        var normal: Vector3 = Vector3(edge.y * winding, 0.0, -edge.x * winding).normalized()
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(a.x, 0.0, a.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(b.x, 0.0, b.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(b.x, height_m, b.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(a.x, 0.0, a.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(b.x, height_m, b.y))
+        walls.set_normal(normal)
+        walls.add_vertex(Vector3(a.x, height_m, a.y))
+    walls.commit(mesh)
+
+    var roof: SurfaceTool = SurfaceTool.new()
+    roof.begin(Mesh.PRIMITIVE_TRIANGLES)
+    roof.set_material(roof_material)
+    for index in range(0, triangles.size(), 3):
+        for vertex_index in [triangles[index], triangles[index + 1], triangles[index + 2]]:
+            var point: Vector2 = points[vertex_index]
+            roof.set_normal(Vector3.UP)
+            roof.add_vertex(Vector3(point.x, height_m, point.y))
+    roof.commit(mesh)
+    return mesh
+
+func _build_osm_shells() -> void:
+    if osm_shell_profiles.is_empty():
+        push_warning("No OSM shell profiles; estimated building massing remains active.")
+        return
+    if not FileAccess.file_exists(OSM_DATA_PATH):
+        push_warning("OSM footprint snapshot missing; estimated building massing remains active.")
+        return
+    var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(OSM_DATA_PATH))
+    if typeof(parsed) != TYPE_DICTIONARY:
+        push_warning("OSM footprint snapshot is invalid; estimated building massing remains active.")
+        return
+
+    var osm_document: Dictionary = parsed
+    var feature_by_id: Dictionary = {}
+    for feature in osm_document.get("features", []):
+        if typeof(feature) == TYPE_DICTIONARY:
+            feature_by_id[int(feature.get("osm_id", -1))] = feature
+
+    osm_shell_root = Node3D.new()
+    osm_shell_root.name = "OSMBuildingShells_Estimated"
+    osm_shell_root.visible = false
+    add_child(osm_shell_root)
+
+    for building_id in ["ERC", "SRC"]:
+        var profile: Dictionary = osm_shell_profiles.get(building_id, {})
+        if profile.is_empty():
+            push_warning("OSM shell profile missing for " + building_id)
+            continue
+        var way_id: int = int(profile.get("osm_way_id", -1))
+        var feature: Dictionary = feature_by_id.get(way_id, {})
+        if feature.is_empty() or str(feature.get("geometry_status", "")) != "complete":
+            push_warning("Complete OSM footprint missing for %s (way %d)" % [building_id, way_id])
+            continue
+        if str(feature.get("geometry_type", "")) != "Polygon":
+            push_warning("OSM shell source is not a Polygon for " + building_id)
+            continue
+
+        var coordinates: Array = feature.get("coordinates", [])
+        var point_count: int = coordinates.size()
+        if point_count >= 4:
+            var first_pair: Array = coordinates[0]
+            var last_pair: Array = coordinates[point_count - 1]
+            if absf(float(first_pair[0]) - float(last_pair[0])) < 0.0000001 and absf(float(first_pair[1]) - float(last_pair[1])) < 0.0000001:
+                point_count -= 1
+        if point_count < 3:
+            push_warning("OSM footprint has too few unique vertices for " + building_id)
+            continue
+
+        var site_points: PackedVector2Array = PackedVector2Array()
+        var centre: Vector2 = Vector2.ZERO
+        for index in range(point_count):
+            var pair: Array = coordinates[index]
+            var site: Vector3 = lonlat_to_world(float(pair[0]), float(pair[1]))
+            var point: Vector2 = Vector2(site.x, site.z)
+            site_points.append(point)
+            centre += point
+        centre /= float(site_points.size())
+
+        var local_points: PackedVector2Array = PackedVector2Array()
+        for point in site_points:
+            local_points.append(point - centre)
+
+        var height_m: float = float(profile.get("height_m", 0.0))
+        var side_material: StandardMaterial3D = _mat(str(profile.get("side_color", "#78949d")), 0.72)
+        side_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+        var roof_material: StandardMaterial3D = _mat(str(profile.get("roof_color", "#d7dfdc")), 0.86)
+        roof_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+        var mesh: ArrayMesh = _extrude_footprint(local_points, height_m, side_material, roof_material)
+        if mesh == null or mesh.get_surface_count() != 2:
+            push_warning("OSM footprint triangulation failed for " + building_id)
+            continue
+
+        var shell: MeshInstance3D = MeshInstance3D.new()
+        shell.name = building_id + "_OSMFootprintShell_NotSurveyed"
+        shell.mesh = mesh
+        shell.position = Vector3(centre.x, 0.0, centre.y)
+        shell.set_meta("osm_way_id", way_id)
+        shell.set_meta("osm_timestamp", str(feature.get("timestamp", "")))
+        shell.set_meta("osm_levels", int(profile.get("osm_levels", 0)))
+        shell.set_meta("estimated_height_m", height_m)
+        shell.set_meta("height_confidence", str(profile.get("height_confidence", "estimated")))
+        shell.set_meta("osm_layer_tag", str(profile.get("osm_layer_tag", "")))
+        osm_shell_root.add_child(shell)
+        osm_shell_way_ids.append(way_id)
+        osm_shell_count += 1
+
+func set_osm_shells_visible(enabled: bool) -> void:
+    osm_shells_visible = enabled
+    if osm_shell_root != null:
+        osm_shell_root.visible = enabled
+    if building_massing_root != null:
+        building_massing_root.visible = not enabled
+    for detail in m2_detail_nodes:
+        detail.visible = m2_details_visible and not enabled
+
 func set_m2_details_visible(enabled: bool) -> void:
     m2_details_visible = enabled
     for detail in m2_detail_nodes:
-        detail.visible = enabled
+        detail.visible = enabled and not osm_shells_visible
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
@@ -286,6 +532,9 @@ func _build_trees() -> void:
     var leaves: SphereMesh = SphereMesh.new()
     leaves.radius = 2.5
     leaves.height = 4.5
+    leaves.radial_segments = 12
+    leaves.rings = 8
+    trunk.radial_segments = 9
     var rng: RandomNumberGenerator = RandomNumberGenerator.new()
     rng.seed = 20261024
     var tree_positions: Array[Vector3] = []
@@ -323,12 +572,184 @@ func _build_trees() -> void:
     # Populate after the MultiMeshInstance3D nodes are attached to the scene tree.
     for i in range(tree_positions.size()):
         var base: Vector3 = tree_positions[i]
-        var trunk_transform: Transform3D = Transform3D(Basis(), base + Vector3(0.0, 2.2, 0.0))
-        var canopy_transform: Transform3D = Transform3D(Basis(), base + Vector3(0.0, 6.2, 0.0))
+        var scale: float = rng.randf_range(0.78, 1.24)
+        var rotation: float = rng.randf_range(0.0, TAU)
+        var trunk_basis: Basis = Basis(Vector3.UP, rotation).scaled(Vector3(scale * 0.9, scale, scale * 0.9))
+        var canopy_basis: Basis = Basis(Vector3.UP, rotation).scaled(Vector3(scale, scale, scale))
+        var trunk_transform: Transform3D = Transform3D(trunk_basis, base + Vector3(0.0, 2.2 * scale, 0.0))
+        var canopy_transform: Transform3D = Transform3D(canopy_basis, base + Vector3(0.0, 6.2 * scale, 0.0))
         trunk_batch.set_instance_transform(i, trunk_transform)
         canopy_batch.set_instance_transform(i, canopy_transform)
 
     generated_tree_count = tree_positions.size()
+
+func _green_polygon_world() -> PackedVector2Array:
+    var polygon: PackedVector2Array = PackedVector2Array()
+    var green: Dictionary = layout.get("green", {})
+    for lonlat in green.get("polygon_lonlat", []):
+        var point: Vector3 = lonlat_to_world(float(lonlat[0]), float(lonlat[1]))
+        polygon.append(Vector2(point.x, point.z))
+    return polygon
+
+func _is_valid_campus_prop_position(position: Vector3) -> bool:
+    var polygon: PackedVector2Array = _green_polygon_world()
+    if polygon.size() < 3 or not Geometry2D.is_point_in_polygon(Vector2(position.x, position.z), polygon):
+        return false
+    return is_tree_position_clear(Vector2(position.x, position.z), 2.5)
+
+func _add_cylinder(parent: Node3D, title: String, at: Vector3, radius: float, height: float, material: Material, sides: int = 12) -> MeshInstance3D:
+    var instance: MeshInstance3D = MeshInstance3D.new()
+    instance.name = title
+    var cylinder: CylinderMesh = CylinderMesh.new()
+    cylinder.top_radius = radius
+    cylinder.bottom_radius = radius
+    cylinder.height = height
+    cylinder.radial_segments = sides
+    instance.mesh = cylinder
+    instance.material_override = material
+    instance.position = at
+    parent.add_child(instance)
+    return instance
+
+func _build_bench(parent: Node3D, at: Vector3, yaw_deg: float, title: String) -> void:
+    var bench: Node3D = Node3D.new()
+    bench.name = title
+    bench.position = at
+    bench.rotation.y = deg_to_rad(yaw_deg)
+    parent.add_child(bench)
+    var timber: Material = _mat("#96704d", 0.82)
+    var metal: StandardMaterial3D = _mat("#394b4e", 0.62)
+    metal.metallic = 0.35
+    for slat in range(4):
+        _add_box(bench, Vector3(0.0, 0.49, -0.23 + float(slat) * 0.15),
+            Vector3(2.15, 0.075, 0.12), timber)
+    for slat in range(3):
+        _add_box(bench, Vector3(0.0, 0.72 + float(slat) * 0.16, -0.30),
+            Vector3(2.15, 0.12, 0.075), timber)
+    for side in [-1.0, 1.0]:
+        _add_box(bench, Vector3(side * 0.82, 0.25, -0.02), Vector3(0.09, 0.48, 0.09), metal)
+        _add_box(bench, Vector3(side * 0.82, 0.69, -0.29), Vector3(0.09, 0.88, 0.09), metal)
+        _add_box(bench, Vector3(side * 0.82, 0.91, -0.02), Vector3(0.09, 0.08, 0.60), metal)
+    generated_bench_count += 1
+
+func _build_lamp(parent: Node3D, at: Vector3, title: String) -> void:
+    var lamp: Node3D = Node3D.new()
+    lamp.name = title
+    lamp.position = at
+    parent.add_child(lamp)
+    var metal: StandardMaterial3D = _mat("#4a5553", 0.48)
+    metal.metallic = 0.55
+    var diffuser: StandardMaterial3D = _mat("#f5dca9", 0.34)
+    diffuser.emission_enabled = true
+    diffuser.emission = Color.html("#f5dca9")
+    diffuser.emission_energy_multiplier = 1.4
+    _add_cylinder(lamp, "Pole", Vector3(0.0, 2.05, 0.0), 0.075, 4.1, metal, 10)
+    _add_cylinder(lamp, "LightHead", Vector3(0.0, 4.12, 0.0), 0.22, 0.18, diffuser, 12)
+    var light: OmniLight3D = OmniLight3D.new()
+    light.name = "WarmLamp"
+    light.position = Vector3(0.0, 4.0, 0.0)
+    light.light_color = Color.html("#ffdca8")
+    light.light_energy = 1.8
+    light.omni_range = 16.0
+    light.shadow_enabled = false
+    light.visible = night_mode
+    lamp.add_child(light)
+    lamp_lights.append(light)
+    generated_lamp_count += 1
+
+func _build_guide(parent: Node3D, at: Vector3, yaw_deg: float, title: String) -> void:
+    var guide: Node3D = Node3D.new()
+    guide.name = title
+    guide.position = at
+    guide.rotation.y = deg_to_rad(yaw_deg)
+    parent.add_child(guide)
+    var dark_metal: StandardMaterial3D = _mat("#43575b", 0.48)
+    dark_metal.metallic = 0.42
+    var panel: Material = _mat("#e7e5d8", 0.82)
+    _add_box(guide, Vector3(0.0, 1.0, 0.0), Vector3(0.12, 2.0, 0.12), dark_metal)
+    _add_box(guide, Vector3(0.0, 2.02, 0.0), Vector3(1.8, 1.28, 0.14), panel)
+    var sign_lines: Array[Dictionary] = [
+        {"text": "UTOWN", "font_size": 32, "y": 2.39},
+        {"text": "CAMPUS GUIDE", "font_size": 22, "y": 2.04},
+        {"text": "ERC  ·  SRC  ·  GREEN", "font_size": 14, "y": 1.72}
+    ]
+    for index in range(sign_lines.size()):
+        var line: Dictionary = sign_lines[index]
+        var label: Label3D = Label3D.new()
+        label.name = "CampusGuideText_%02d" % index
+        label.text = str(line["text"])
+        label.font_size = int(line["font_size"])
+        label.pixel_size = 0.008
+        label.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        label.modulate = Color.html("#263b40")
+        label.outline_size = 3
+        label.rotation.y = 0.0
+        label.position = Vector3(0.0, float(line["y"]), 0.076)
+        guide.add_child(label)
+    generated_guide_count += 1
+
+func _build_campus_furniture() -> void:
+    if campus_life_data.is_empty():
+        return
+    var root: Node3D = Node3D.new()
+    root.name = "CampusFurniture_Illustrative"
+    add_child(root)
+    for item in campus_life_data.get("furniture", []):
+        var position: Vector3 = lonlat_to_world(float(item.get("lon", origin_lon)), float(item.get("lat", origin_lat)))
+        if not _is_valid_campus_prop_position(position):
+            push_warning("Skipping campus prop outside the safe Town Green placement area: " + str(item.get("id", "")))
+            continue
+        campus_furniture_positions.append(position)
+        var item_id: String = str(item.get("id", "CampusProp"))
+        match str(item.get("type", "")):
+            "bench":
+                _build_bench(root, position, float(item.get("yaw_deg", 0.0)), item_id)
+            "lamp":
+                _build_lamp(root, position, item_id)
+            "guide":
+                _build_guide(root, position, float(item.get("yaw_deg", 0.0)), item_id)
+    set_night_mode(night_mode)
+
+func _process(delta: float) -> void:
+    if discovery_feedback_time > 0.0:
+        discovery_feedback_time = maxf(0.0, discovery_feedback_time - delta)
+
+func nearby_discovery(position_m: Vector3, max_distance_m: float = 7.0) -> Dictionary:
+    var closest: Dictionary = {}
+    var best_distance: float = max_distance_m
+    for item in campus_life_data.get("discoveries", []):
+        var target: Vector3 = lonlat_to_world(float(item.get("lon", origin_lon)), float(item.get("lat", origin_lat)))
+        var distance_m: float = Vector2(position_m.x, position_m.z).distance_to(Vector2(target.x, target.z))
+        if distance_m <= best_distance:
+            best_distance = distance_m
+            closest = item.duplicate(true)
+            closest["distance_m"] = distance_m
+            closest["discovered"] = discovered_landmarks.has(str(item.get("id", "")))
+    return closest
+
+func discover_nearby_landmark(position_m: Vector3, max_distance_m: float = 7.0) -> Dictionary:
+    var item: Dictionary = nearby_discovery(position_m, max_distance_m)
+    if item.is_empty():
+        discovery_feedback = "Move closer to a campus landmark to explore it."
+        discovery_feedback_time = 3.0
+        return {"ok": false, "message": discovery_feedback}
+    var discovery_id: String = str(item.get("id", ""))
+    var already_discovered: bool = discovered_landmarks.has(discovery_id)
+    if not already_discovered:
+        discovered_landmarks.append(discovery_id)
+    var message: String = str(item.get("title", item.get("name", "Campus landmark"))) + "\n" + str(item.get("description", ""))
+    if already_discovered:
+        message = "Already explored\n" + message
+    elif discovered_landmarks.size() == campus_life_data.get("discoveries", []).size():
+        message += "\n\nCampus passport complete — all four UTown places explored."
+    else:
+        message += "\n\nCampus passport: %d / %d places explored." % [
+            discovered_landmarks.size(), campus_life_data.get("discoveries", []).size()
+        ]
+    discovery_feedback = message
+    discovery_feedback_time = 8.0
+    return {"ok": true, "already_discovered": already_discovered, "id": discovery_id, "message": message}
 
 func _build_waypoints() -> void:
     var root: Node3D = Node3D.new()
@@ -336,8 +757,8 @@ func _build_waypoints() -> void:
     add_child(root)
     var tint: Material = _mat("#e7ca75", 0.38)
     var ball: SphereMesh = SphereMesh.new()
-    ball.radius = 0.7
-    ball.height = 1.4
+    ball.radius = 0.36
+    ball.height = 0.72
     for stop in layout.get("loop", []):
         var p: Vector3 = lonlat_to_world(float(stop["lon"]), float(stop["lat"]))
         route_points.append(p)
@@ -345,22 +766,29 @@ func _build_waypoints() -> void:
         var marker: MeshInstance3D = MeshInstance3D.new()
         marker.mesh = ball
         marker.material_override = tint
-        marker.position = p + Vector3(0.0, 0.9, 0.0)
+        marker.position = p + Vector3(0.0, 0.42, 0.0)
         root.add_child(marker)
         _add_sign(root, str(stop["name"]), p + Vector3(0.0, 3.1, 0.0), "#fff4c4")
 
 func nearest_landmark(position_m: Vector3) -> Dictionary:
-    var answer: Dictionary = {"name": "Town Green", "distance": 0.0}
+    var answer: Dictionary = {"id": "TOWN_GREEN", "name": "Town Green", "role": "open_space", "distance": INF}
     var best: float = INF
     for record in layout.get("buildings", []):
         var p: Vector3 = lonlat_to_world(float(record["lon"]), float(record["lat"]))
         var distance_m: float = Vector2(position_m.x, position_m.z).distance_to(Vector2(p.x, p.z))
         if distance_m < best:
             best = distance_m
-            answer = {"name": str(record["name"]), "distance": distance_m}
+            answer = {"id": str(record.get("id", "")), "name": str(record.get("name", record.get("id", "Building"))), "role": str(record.get("role", "campus")), "priority": str(record.get("priority", "P1")), "distance": distance_m}
     if layout.has("green"):
         var g: Vector3 = lonlat_to_world(103.77312, 1.30504)
         var gd: float = Vector2(position_m.x, position_m.z).distance_to(Vector2(g.x, g.z))
         if gd < best:
-            answer = {"name": "Town Green", "distance": gd}
+            best = gd
+            answer = {"id": "TOWN_GREEN", "name": "Town Green", "role": "open_space", "distance": gd}
+    if layout.has("plaza"):
+        var plaza: Dictionary = layout["plaza"]
+        var p: Vector3 = lonlat_to_world(float(plaza.get("lon", origin_lon)), float(plaza.get("lat", origin_lat)))
+        var pd: float = Vector2(position_m.x, position_m.z).distance_to(Vector2(p.x, p.z))
+        if pd < best:
+            answer = {"id": str(plaza.get("id", "TOWN_PLAZA")), "name": str(plaza.get("name", "Town Plaza")), "role": "public_space", "priority": "P0", "distance": pd}
     return answer

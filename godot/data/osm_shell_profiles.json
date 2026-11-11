@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "estimated_extrusion_not_surveyed",
+  "source": "OpenStreetMap building footprints and building:levels tags",
+  "height_policy": "Estimated shell height = OSM building:levels × the existing M2 profile's estimated storey pitch. This is a visual proxy, not a measured building height.",
+  "ground_reference": {
+    "base_y_m": 0.0,
+    "status": "unverified_flat_proxy_ground",
+    "note": "The current Godot ground plane is a provisional local Y=0 reference; it is not tied to a verified vertical datum."
+  },
+  "vertical_offset_policy": "OSM layer tags are preserved as relative stacking metadata only. No vertical offset is inferred from layer=-1.",
+  "collision_policy": "Visual-only shell. Existing estimated proxy collision remains active until footprint overlap, route clearance and vertical circulation are independently reviewed.",
+  "buildings": {
+    "ERC": {
+      "osm_way_id": 124549217,
+      "osm_version": 18,
+      "osm_timestamp": "2026-09-17T11:08:07Z",
+      "osm_levels": 4,
+      "osm_layer_tag": null,
+      "storey_pitch_m": 3.45,
+      "height_m": 13.8,
+      "height_confidence": "estimated_from_OSM_levels",
+      "side_color": "#78949d",
+      "roof_color": "#d7dfdc"
+    },
+    "SRC": {
+      "osm_way_id": 125774787,
+      "osm_version": 15,
+      "osm_timestamp": "2024-09-23T04:28:17Z",
+      "osm_levels": 4,
+      "osm_layer_tag": "-1",
+      "storey_pitch_m": 3.65,
+      "height_m": 14.6,
+      "height_confidence": "estimated_from_OSM_levels",
+      "side_color": "#718c98",
+      "roof_color": "#cbd5d5"
+    }
+  }
+}

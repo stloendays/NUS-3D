@@ -5,6 +5,9 @@ on:
     branches: ["main", "feature/**"]
     paths:
       - "blender/build_m2_blockouts.py"
+      - "blender/build_m2_4_osm_shells.py"
+      - "godot/data/osm_utown_snapshot.json"
+      - "godot/data/osm_shell_profiles.json"
       - "godot/data/utown_core.json"
       - "godot/data/m2_profiles.json"
       - ".github/workflows/blender_m2.yml"
@@ -47,5 +50,46 @@ jobs:
           path: |
             build/m2_assets/*.blend
             build/m2_assets/*.glb
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Build editable ERC/SRC OSM footprint shells
+        run: |
+          blender --background --python-exit-code 1 --python blender/build_m2_4_osm_shells.py -- --out build/m2_4_osm_shells
+      - name: Validate OSM shell BLEND, GLB and manifest outputs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import struct
+
+          root = Path("build/m2_4_osm_shells")
+          manifest = json.loads((root / "osm_shell_manifest.json").read_text(encoding="utf-8"))
+          assert manifest["status"] == "estimated_osm_footprint_shells_not_surveyed"
+          assert {item["landmark_id"] for item in manifest["assets"]} == {"ERC", "SRC"}
+          for item in manifest["assets"]:
+              blend = root / item["blend_file"]
+              glb = root / item["glb_file"]
+              assert blend.exists() and blend.stat().st_size > 1000, blend
+              assert blend.open("rb").read(7) == b"BLENDER", blend
+              assert glb.exists() and glb.stat().st_size > 4096, glb
+              with glb.open("rb") as handle:
+                  magic, version, byte_length = struct.unpack("<4sII", handle.read(12))
+                  chunk_length, chunk_type = struct.unpack("<I4s", handle.read(8))
+                  payload = json.loads(handle.read(chunk_length))
+              assert magic == b"glTF" and version == 2 and byte_length == glb.stat().st_size, glb
+              assert chunk_type == b"JSON" and payload.get("meshes"), glb
+              assert any(node.get("name", "").startswith(f"UT_{item['landmark_id']}_OSMFootprintShell") for node in payload.get("nodes", [])), glb
+              assert item["vertices"] > 50 and item["faces"] > 50
+              print(f"PASS {item['landmark_id']}: BLEND={blend.stat().st_size} bytes, GLB={glb.stat().st_size} bytes, vertices={item['vertices']}, faces={item['faces']}")
+          PY
+      - name: Attach OSM footprint shell assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: nus3d-m2-4-osm-footprint-shells
+          path: |
+            build/m2_4_osm_shells/*.blend
+            build/m2_4_osm_shells/*.glb
+            build/m2_4_osm_shells/osm_shell_manifest.json
           if-no-files-found: error
           retention-days: 30

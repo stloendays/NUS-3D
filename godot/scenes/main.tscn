@@ -42,7 +42,7 @@ script = ExtResource("3")
 offset_left = 18.0
 offset_top = 18.0
 offset_right = 414.0
-offset_bottom = 160.0
+offset_bottom = 246.0
 
 [node name="VBox" type="VBoxContainer" parent="HUD/Info"]
 layout_mode = 2
@@ -63,6 +63,19 @@ text = "Next: Education Resource Centre"
 layout_mode = 2
 text = "Nearest landmark: Town Green"
 
+[node name="Detail" type="Label" parent="HUD/Info/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Landmark context and source notes"
+
+[node name="Prompt" type="Label" parent="HUD/Info/VBox"]
+layout_mode = 2
+text = "E · Explore nearby campus landmark"
+
+[node name="Progress" type="Label" parent="HUD/Info/VBox"]
+layout_mode = 2
+text = "Campus passport: 0 / 4 places explored"
+
 [node name="Perf" type="Label" parent="HUD/Info/VBox"]
 layout_mode = 2
 text = "WASD move  ·  Mouse look  ·  Shift sprint"
@@ -71,10 +84,10 @@ text = "WASD move  ·  Mouse look  ·  Shift sprint"
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -240.0
+offset_left = -268.0
 offset_top = 18.0
 offset_right = -18.0
-offset_bottom = 240.0
+offset_bottom = 268.0
 mouse_filter = 2
 script = ExtResource("4")
 
@@ -100,4 +113,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD walk   Shift run   Mouse look   Space jump   R reset   M map   F1 help   F2 facade   F3 camera   F4 PNG   Esc mouse"
+text = "WASD walk   Shift run   Mouse look   Space jump   E explore   N day/night   R reset   M map   G GIS shell   O OSM   P paths   T contours   F1 help   F2 facade   F3 camera   F4 PNG   Esc mouse"

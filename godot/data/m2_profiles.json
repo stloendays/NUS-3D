@@ -15,7 +15,7 @@
         "storey_pitch": 3.45,
         "mullion_spacing": 3.2,
         "arc_radius": 4.8,
-        "canopy_projection": 2.0
+        "canopy_projection": 2
       },
       "evidence_links": [
         "https://www.mfacade.com/projects/education-resource-centre-nus/",
@@ -23,7 +23,8 @@
         "https://uci.nus.edu.sg/campus-life/campus-services/utown/education-resource-centre/"
       ],
       "geometry_confidence": "estimated",
-      "license_status": "reference-only"
+      "license_status": "reference-only",
+      "hud_summary": "Lower-ground cafe faces Town Green; L1 Computer Commons; L2–3 study zones (NUS UCI)."
     },
     "SRC": {
       "style": "src",
@@ -45,7 +46,8 @@
         "https://www.dpa.com.sg/projects/dpd-stephen-riady-centre/"
       ],
       "geometry_confidence": "estimated",
-      "license_status": "reference-only"
+      "license_status": "reference-only",
+      "hud_summary": "Three-storey mixed-use centre; stacked circulation; elevated Forum disc (DP Architects)."
     }
   }
 }

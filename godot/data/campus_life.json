@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "status": "illustrative_campus_life_not_field_verified",
+  "placement_policy": "Furniture and lamp coordinates are original art placements selected inside the current approximate Town Green polygon and away from the conceptual walkway corridor and proxy building envelopes. They are not claims that these exact amenities exist at these exact positions.",
+  "discoveries": [
+    {
+      "id": "GREEN",
+      "landmark_id": "TOWN_GREEN",
+      "name": "Town Green",
+      "lon": 103.77314,
+      "lat": 1.305035,
+      "radius_m": 7.0,
+      "title": "Town Green — the campus living room",
+      "description": "An open social lawn for picnics and Frisbee by day, with concerts and performances under the stars at night.",
+      "source_urls": [
+        "https://uci.nus.edu.sg/campus-life/campus-services/utown/town-green/",
+        "https://www.landinc.ca/nus-university-town"
+      ]
+    },
+    {
+      "id": "ERC",
+      "landmark_id": "ERC",
+      "name": "Education Resource Centre",
+      "lon": 103.773,
+      "lat": 1.305615,
+      "radius_m": 7.0,
+      "title": "ERC — learning around the clock",
+      "description": "A collaborative learning hub with Computer Commons, study clusters and a lower-ground Learning Café overlooking Town Green.",
+      "source_urls": [
+        "https://uci.nus.edu.sg/campus-life/campus-services/utown/education-resource-centre/",
+        "https://www.mfacade.com/projects/education-resource-centre-nus/"
+      ]
+    },
+    {
+      "id": "SRC",
+      "landmark_id": "SRC",
+      "name": "Stephen Riady Centre",
+      "lon": 103.77296,
+      "lat": 1.30458,
+      "radius_m": 7.0,
+      "title": "SRC — where campus paths meet",
+      "description": "A mixed-use centre for learning, sports, performance, retail and dining. Its Forum is a meeting point for intersecting pedestrian routes.",
+      "source_urls": [
+        "https://www.dpa.com.sg/projects/stephen-riady-centre/",
+        "https://www.dpa.com.sg/projects/dpd-stephen-riady-centre/"
+      ]
+    },
+    {
+      "id": "PLAZA",
+      "landmark_id": "TOWN_PLAZA",
+      "name": "Town Plaza",
+      "lon": 103.77358,
+      "lat": 1.30419,
+      "radius_m": 7.0,
+      "title": "Town Plaza — learning spills outdoors",
+      "description": "A shared campus space connected with UTown teaching and seminar facilities, supporting informal exchange beyond the classroom.",
+      "source_urls": [
+        "https://uci.nus.edu.sg/campus-life/campus-services/utown/",
+        "https://www.dpa.com.sg/projects/nus-university-town/"
+      ]
+    }
+  ],
+  "furniture": [
+    {"id": "BENCH_01", "type": "bench", "lon": 103.77335, "lat": 1.3051, "yaw_deg": 25},
+    {"id": "BENCH_02", "type": "bench", "lon": 103.773, "lat": 1.30525, "yaw_deg": -20},
+    {"id": "BENCH_03", "type": "bench", "lon": 103.77345, "lat": 1.30485, "yaw_deg": 150},
+    {"id": "BENCH_04", "type": "bench", "lon": 103.77315, "lat": 1.30475, "yaw_deg": 80},
+    {"id": "LAMP_01", "type": "lamp", "lon": 103.77265, "lat": 1.3051, "yaw_deg": 0},
+    {"id": "LAMP_02", "type": "lamp", "lon": 103.7735, "lat": 1.3047, "yaw_deg": 0},
+    {"id": "LAMP_03", "type": "lamp", "lon": 103.7734, "lat": 1.30525, "yaw_deg": 0},
+    {"id": "GUIDE_TOTEM", "type": "guide", "lon": 103.77325, "lat": 1.30528, "yaw_deg": 0}
+  ],
+  "visual_policy": {
+    "benches": "Original low-poly wood and metal props; no collision in this milestone.",
+    "lamps": "Original low-poly poles with warm OmniLight3D sources enabled only in night mode.",
+    "guide": "Generic UTown wayfinding sign; no NUS logo or protected branding.",
+    "night_mode": "Manual day/night preview only; not a real-time astronomical or weather simulation."
+  }
+}
