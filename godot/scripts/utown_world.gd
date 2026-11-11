@@ -210,6 +210,7 @@ func _build_green() -> void:
     surface.begin(Mesh.PRIMITIVE_TRIANGLES)
     for i in indices:
         surface.set_normal(Vector3.UP)
+        surface.set_uv(Vector2(poly[i].x * 0.055, poly[i].y * 0.055))
         surface.add_vertex(Vector3(poly[i].x, 0.025, poly[i].y))
     var grass: MeshInstance3D = MeshInstance3D.new()
     grass.name = "TownGreen_approximate"
