@@ -618,7 +618,8 @@ func _build_bench(parent: Node3D, at: Vector3, yaw_deg: float, title: String) ->
     bench.rotation.y = deg_to_rad(yaw_deg)
     parent.add_child(bench)
     var timber: Material = _mat("#96704d", 0.82)
-    var metal: Material = _mat("#394b4e", 0.62, 0.35)
+    var metal: StandardMaterial3D = _mat("#394b4e", 0.62)
+    metal.metallic = 0.35
     for slat in range(4):
         _add_box(bench, Vector3(0.0, 0.49, -0.23 + float(slat) * 0.15),
             Vector3(2.15, 0.075, 0.12), timber)
@@ -636,7 +637,8 @@ func _build_lamp(parent: Node3D, at: Vector3, title: String) -> void:
     lamp.name = title
     lamp.position = at
     parent.add_child(lamp)
-    var metal: Material = _mat("#4a5553", 0.48, 0.55)
+    var metal: StandardMaterial3D = _mat("#4a5553", 0.48)
+    metal.metallic = 0.55
     var diffuser: StandardMaterial3D = _mat("#f5dca9", 0.34)
     diffuser.emission_enabled = true
     diffuser.emission = Color.html("#f5dca9")
@@ -661,7 +663,8 @@ func _build_guide(parent: Node3D, at: Vector3, yaw_deg: float, title: String) ->
     guide.position = at
     guide.rotation.y = deg_to_rad(yaw_deg)
     parent.add_child(guide)
-    var dark_metal: Material = _mat("#43575b", 0.48, 0.42)
+    var dark_metal: StandardMaterial3D = _mat("#43575b", 0.48)
+    dark_metal.metallic = 0.42
     var panel: Material = _mat("#e7e5d8", 0.82)
     _add_box(guide, Vector3(0.0, 1.0, 0.0), Vector3(0.12, 2.0, 0.12), dark_metal)
     _add_box(guide, Vector3(0.0, 2.02, 0.0), Vector3(1.45, 1.12, 0.14), panel)
