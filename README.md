@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.4 ERC/SRC OSM footprint shells implemented (2026-11-05)**. Godot and Blender now generate switchable OSM-derived visual shells; estimated heights, vertical datum, collision and as-built accuracy remain unverified.
+> Status: **M2.5 campus atmosphere and discovery first pass implemented (2026-11-11)**. Procedural grass/pavers, illustrative campus furniture, day/night lighting and a four-stop discovery passport are in Godot; amenity placements and all elevations remain unverified.
 
-[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 地图与地标信息](docs/M2_2_MAP_NAVIGATION.md) · [M2.3 GIS 数据基线](docs/M2_3_GEOSPATIAL_BASELINE.md) · [M2.4 建筑轮廓外壳](docs/M2_4_OSM_BUILDING_SHELLS.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 地图与地标信息](docs/M2_2_MAP_NAVIGATION.md) · [M2.3 GIS 数据基线](docs/M2_3_GEOSPATIAL_BASELINE.md) · [M2.4 建筑轮廓外壳](docs/M2_4_OSM_BUILDING_SHELLS.md) · [M2.5 校园氛围与探索](docs/M2_5_CAMPUS_ATMOSPHERE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -17,7 +17,7 @@
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **F3** to cycle public-geotag camera viewpoints, **G** to switch proxy visuals versus OSM ERC/SRC footprint shells (proxy collision stays active), **O** to toggle OSM building/landcover outlines, **P** to toggle the detailed pedestrian path network, **T** to toggle 5 m contour lines, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **F3** to cycle public-geotag camera viewpoints, **E** to discover Town Green/ERC/SRC/Town Plaza, **N** to toggle the manual day/night preview, **G** to switch proxy visuals versus OSM ERC/SRC footprint shells (proxy collision stays active), **O** to toggle OSM building/landcover outlines, **P** to toggle the detailed pedestrian path network, **T** to toggle 5 m contour lines, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1 milestone, or a Windows installer.**
 
@@ -124,3 +124,7 @@ The dated OSM snapshot is campus-filtered by the OSM boundary and retains origin
 ## M2.4 OSM footprint shells
 
 ERC (OSM way 124549217) and SRC (OSM way 125774787) now have separate, site-local extruded footprint shells in Godot, generated from their original OSM polygon rings. Press **G** to compare them with the existing proxy visuals. Estimated shell heights are 13.8 m (ERC) and 14.6 m (SRC), derived from OSM `building:levels` multiplied by the estimated M2 storey pitch; they are not measured heights. The OSM shells have no collision, and the original proxy collision remains active. Blender CI also generates editable .blend and GLB previews. See [M2.4 documentation](docs/M2_4_OSM_BUILDING_SHELLS.md).
+
+## M2.5 campus atmosphere and exploration
+
+The scene now has original procedural grass and paver textures, varied low-poly tree instances, four illustrative benches, three warm-light poles and a generic wayfinding totem. **N** toggles a manual day/night lighting preview; **E** discovers four source-backed UTown places and tracks progress in the campus passport. The furniture coordinates are art placements inside the approximate Town Green polygon, not claims about real existing amenities. See [M2.5 documentation](docs/M2_5_CAMPUS_ATMOSPHERE.md).
