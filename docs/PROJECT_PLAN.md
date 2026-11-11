@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-05 · Status: **M2.4 ERC/SRC OSM footprint shells and Blender/GLB generation implemented; measured height, vertical datum, collision and field survey pending**
+Date: 2026-11-11 · Status: **M2.5 atmosphere and discovery first pass implemented; field-verified props, audio, elevations and final collision pending**
 
 ## 1. 产品定位
 
@@ -155,6 +155,27 @@ The OSM planimetric bounds are approximately 77.57 × 122.69 m for ERC and 173.2
 - [ ] Run polygon collision and 3D route-clearance checks before replacing any proxy collision.
 
 See [M2.4 OSM building shell documentation](M2_4_OSM_BUILDING_SHELLS.md). Passing CI proves reproducible geometry generation and software behaviour, not as-built accuracy.
+
+
+### M2.5 — Campus atmosphere and exploration
+
+**2026-11-11:** the Town Green scene now has original procedural grass and paver textures, varied tree instance scales, four illustrative benches, three warm lamp poles and a generic wayfinding totem. The player has smoother acceleration and subtle speed-dependent head bob. Press **N** for a manual day/night preview and **E** to discover Town Green, ERC, SRC and Town Plaza using a four-stop campus passport.
+
+The feature choices follow public NUS/architect sources: Town Green supports daytime recreation and evening performances; ERC contains Computer Commons, study clusters and a lower-ground Learning Café; SRC is organised around a Forum and stacked pedestrian circulation. See [M2.5 documentation](M2_5_CAMPUS_ATMOSPHERE.md).
+
+- [x] Add original procedural grass and staggered paver textures.
+- [x] Add controlled scale/rotation variation to the existing two tree MultiMesh batches.
+- [x] Add four benches, three warm lamps and one generic wayfinding totem with safe-placement checks.
+- [x] Add manual day/night lighting and subtle proxy-window emission.
+- [x] Add four source-backed discovery points and a campus passport progress counter.
+- [x] Add player acceleration/deceleration and subtle walking head bob.
+- [x] Add Python placement/provenance validation, Godot smoke checks and day/night render captures.
+- [ ] Verify the exact furniture and lamp locations against current permitted photos or an on-site walk.
+- [ ] Replace approximate tree scatter with measured tree positions and verified species.
+- [ ] Add original/licensed ambient sound with a defined volume and provenance policy.
+- [ ] Replace flat surfaces only after vertical datum and measured ground elevations are available.
+
+Furniture coordinates are illustrative art placements, not surveyed or mapped existing amenities. Decorative props remain non-colliding. Night mode is a manual visual preview, not a real-time sun/weather simulation.
 
 ### M3 — Atmosphere / 环境与交互
 
