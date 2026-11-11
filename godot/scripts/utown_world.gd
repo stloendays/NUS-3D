@@ -126,7 +126,7 @@ func _build_sky() -> void:
     environment_data.background_color = Color.html("#c6d8df")
     environment_data.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
     environment_data.ambient_light_color = Color.html("#e8edf0")
-    environment_data.ambient_light_energy = 0.78
+    environment_data.ambient_light_energy = 0.54
     environment_data.tonemap_mode = Environment.TONE_MAPPER_FILMIC
     world_environment = WorldEnvironment.new()
     world_environment.environment = environment_data
@@ -135,7 +135,7 @@ func _build_sky() -> void:
     sun_light.name = "Sun_Daylight"
     sun_light.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
     sun_light.light_color = Color.html("#fff0d5")
-    sun_light.light_energy = 1.0
+    sun_light.light_energy = 0.68
     sun_light.shadow_enabled = true
     add_child(sun_light)
 
@@ -144,13 +144,13 @@ func set_night_mode(enabled: bool) -> void:
     if environment_data != null:
         environment_data.background_color = Color.html("#101a2c") if enabled else Color.html("#c6d8df")
         environment_data.ambient_light_color = Color.html("#7187a8") if enabled else Color.html("#e8edf0")
-        environment_data.ambient_light_energy = 0.42 if enabled else 0.78
+        environment_data.ambient_light_energy = 0.30 if enabled else 0.54
     if sun_light != null:
         sun_light.visible = not enabled
     if window_material != null:
         window_material.emission_enabled = true
         window_material.emission = Color.html("#f5c982") if enabled else Color.html("#78919a")
-        window_material.emission_energy_multiplier = 0.48 if enabled else 0.035
+        window_material.emission_energy_multiplier = 0.62 if enabled else 0.02
     for lamp in lamp_lights:
         lamp.visible = enabled
 
@@ -170,12 +170,12 @@ func _make_grass_texture() -> ImageTexture:
     rng.seed = 20261111
     for y in range(128):
         for x in range(128):
-            var noise: float = rng.randf_range(-0.055, 0.055)
-            var blade: float = 0.035 if rng.randf() > 0.985 else 0.0
+            var noise: float = rng.randf_range(-0.035, 0.035)
+            var blade: float = 0.02 if rng.randf() > 0.985 else 0.0
             image.set_pixel(x, y, Color(
-                clampf(0.34 + noise + blade, 0.0, 1.0),
-                clampf(0.47 + noise * 1.25 + blade, 0.0, 1.0),
-                clampf(0.29 + noise * 0.7, 0.0, 1.0),
+                clampf(0.25 + noise + blade, 0.0, 1.0),
+                clampf(0.34 + noise * 1.1 + blade, 0.0, 1.0),
+                clampf(0.20 + noise * 0.7, 0.0, 1.0),
                 1.0
             ))
     return ImageTexture.create_from_image(image)
@@ -190,7 +190,7 @@ func _make_paver_texture() -> ImageTexture:
             var staggered_x: int = (x + (16 if row % 2 == 1 else 0)) % 32
             var grout: bool = (y % 32 < 2) or (staggered_x < 2)
             var noise: float = rng.randf_range(-0.035, 0.035)
-            var base: float = 0.34 if grout else 0.63 + noise
+            var base: float = 0.25 if grout else 0.48 + noise
             image.set_pixel(x, y, Color(base, base * 0.99, base * 0.94, 1.0))
     return ImageTexture.create_from_image(image)
 
@@ -642,15 +642,15 @@ func _build_lamp(parent: Node3D, at: Vector3, title: String) -> void:
     var diffuser: StandardMaterial3D = _mat("#f5dca9", 0.34)
     diffuser.emission_enabled = true
     diffuser.emission = Color.html("#f5dca9")
-    diffuser.emission_energy_multiplier = 0.55
+    diffuser.emission_energy_multiplier = 1.4
     _add_cylinder(lamp, "Pole", Vector3(0.0, 2.05, 0.0), 0.075, 4.1, metal, 10)
-    _add_cylinder(lamp, "LightHead", Vector3(0.0, 4.12, 0.0), 0.24, 0.20, diffuser, 12)
+    _add_cylinder(lamp, "LightHead", Vector3(0.0, 4.12, 0.0), 0.22, 0.18, diffuser, 12)
     var light: OmniLight3D = OmniLight3D.new()
     light.name = "WarmLamp"
     light.position = Vector3(0.0, 4.0, 0.0)
     light.light_color = Color.html("#ffdca8")
-    light.light_energy = 0.72
-    light.omni_range = 12.0
+    light.light_energy = 1.8
+    light.omni_range = 16.0
     light.shadow_enabled = false
     light.visible = night_mode
     lamp.add_child(light)
@@ -668,16 +668,25 @@ func _build_guide(parent: Node3D, at: Vector3, yaw_deg: float, title: String) ->
     var panel: Material = _mat("#e7e5d8", 0.82)
     _add_box(guide, Vector3(0.0, 1.0, 0.0), Vector3(0.12, 2.0, 0.12), dark_metal)
     _add_box(guide, Vector3(0.0, 2.02, 0.0), Vector3(1.45, 1.12, 0.14), panel)
-    var label: Label3D = Label3D.new()
-    label.name = "CampusGuideText"
-    label.text = "UTOWN\nCAMPUS GUIDE\nERC  ·  SRC  ·  TOWN GREEN"
-    label.font_size = 34
-    label.pixel_size = 0.012
-    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    label.modulate = Color.html("#263b40")
-    label.outline_size = 4
-    label.position = Vector3(0.0, 2.02, 0.10)
-    guide.add_child(label)
+    var sign_lines: Array[Dictionary] = [
+        {"text": "UTOWN", "font_size": 30, "y": 2.31},
+        {"text": "CAMPUS GUIDE", "font_size": 20, "y": 2.02},
+        {"text": "ERC  ·  SRC  ·  GREEN", "font_size": 14, "y": 1.75}
+    ]
+    for index in range(sign_lines.size()):
+        var line: Dictionary = sign_lines[index]
+        var label: Label3D = Label3D.new()
+        label.name = "CampusGuideText_%02d" % index
+        label.text = str(line["text"])
+        label.font_size = int(line["font_size"])
+        label.pixel_size = 0.007
+        label.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        label.modulate = Color.html("#263b40")
+        label.outline_size = 3
+        label.rotation.y = PI
+        label.position = Vector3(0.0, float(line["y"]), 0.076)
+        guide.add_child(label)
     generated_guide_count += 1
 
 func _build_campus_furniture() -> void:
@@ -748,8 +757,8 @@ func _build_waypoints() -> void:
     add_child(root)
     var tint: Material = _mat("#e7ca75", 0.38)
     var ball: SphereMesh = SphereMesh.new()
-    ball.radius = 0.7
-    ball.height = 1.4
+    ball.radius = 0.36
+    ball.height = 0.72
     for stop in layout.get("loop", []):
         var p: Vector3 = lonlat_to_world(float(stop["lon"]), float(stop["lat"]))
         route_points.append(p)
@@ -757,7 +766,7 @@ func _build_waypoints() -> void:
         var marker: MeshInstance3D = MeshInstance3D.new()
         marker.mesh = ball
         marker.material_override = tint
-        marker.position = p + Vector3(0.0, 0.9, 0.0)
+        marker.position = p + Vector3(0.0, 0.42, 0.0)
         root.add_child(marker)
         _add_sign(root, str(stop["name"]), p + Vector3(0.0, 3.1, 0.0), "#fff4c4")
 
