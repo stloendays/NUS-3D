@@ -93,12 +93,37 @@ func _smoke() -> void:
         push_error("OSM outline should start invisible, not replace gameplay")
         quit(1)
         return
+    var panel: PanelContainer = instance.get_node_or_null("HUD/GISCard") as PanelContainer
+    var fit_text: Label = instance.get_node_or_null("HUD/GISCard/Summary") as Label
+    var hud: CanvasLayer = instance.get_node_or_null("HUD") as CanvasLayer
+    if panel == null or fit_text == null or hud == null:
+        push_error("M2.3 GIS comparison card is missing from HUD")
+        quit(1)
+        return
+    if not fit_text.text.contains("ERC") or not fit_text.text.contains("SRC"):
+        push_error("GIS card did not populate source-derived building metrics")
+        quit(1)
+        return
+    if panel.visible:
+        push_error("GIS card must start hidden while OSM reference layer is off")
+        quit(1)
+        return
     world.set_osm_reference_visible(true)
+    hud.call("_process", 0.0)
+    if not panel.visible:
+        push_error("GIS card did not appear with F6 OSM overlay")
+        quit(1)
+        return
     if not osm.visible or not world.osm_reference_visible:
         push_error("F6 reference outline visibility toggle failed")
         quit(1)
         return
     world.set_osm_reference_visible(false)
+    hud.call("_process", 0.0)
+    if panel.visible:
+        push_error("GIS card remained on screen after OSM overlay hidden")
+        quit(1)
+        return
     if osm.visible:
         push_error("F6 reference outline does not hide")
         quit(1)

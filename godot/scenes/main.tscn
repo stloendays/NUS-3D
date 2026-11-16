@@ -78,6 +78,23 @@ offset_bottom = 240.0
 mouse_filter = 2
 script = ExtResource("4")
 
+[node name="GISCard" type="PanelContainer" parent="HUD"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -359.0
+offset_top = 257.0
+offset_right = -18.0
+offset_bottom = 402.0
+mouse_filter = 2
+
+[node name="Summary" type="Label" parent="HUD/GISCard"]
+layout_mode = 2
+text = "GIS comparison loading..."
+theme_override_colors/font_color = Color(0.9, 0.95, 0.96, 1)
+theme_override_font_sizes/font_size = 14
+
 [node name="Crosshair" type="Label" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5

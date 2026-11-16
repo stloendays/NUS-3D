@@ -28,6 +28,28 @@ The standard-library implementation is [audit_osm_proxy_fit.py](../tools/audit_o
 
 The area comparison is mathematically exact (up to floating point) for the **two input 2D outer boundaries in the chosen approximate map projection**. It does not quantify physical model error or positioning accuracy. Source polygons are only as accurate and complete as OSM contributors made them.
 
+## Baseline outputs (16 November 2026 source snapshot)
+
+| Planar measure | ERC | SRC |
+|---|---:|---:|
+| OSM outer-ring area | 5,546.19 m² | 12,605.60 m² |
+| Union of estimated game boxes | 1,976.00 m² | 3,392.00 m² |
+| Shared plan area | 1,947.93 m² | 3,115.86 m² |
+| OSM only (not represented by boxes) | 3,598.26 m² | 9,489.74 m² |
+| Model only (outside OSM ring) | 28.07 m² | 276.14 m² |
+| 2D intersection-over-union | **34.95%** | **24.19%** |
+| OSM area covered by model | **35.1%** | **24.7%** |
+| Model area inside OSM | **98.6%** | **91.9%** |
+| Separation of planar area centroids | 4.46 m | 7.43 m |
+
+The model's boxes are largely within the source polygons, but large parts of each OSM polygon are absent from the playable massing. **Do not automatically fill the remainder with solid floors or walls**: OSM may include several levels, sheltered concourses, atria and other non-solid ground areas.
+
+## In-game F6 comparison card
+
+When the user enables the existing **F6** source outline, the minimap and a compact right-hand HUD now show ERC/SRC source overlap IoU and OSM coverage from godot/data/osm_fit_baseline.json. F6 off hides the card; F7 clean photo mode hides all HUD. The baseline is generated from the report then frozen for deterministic Godot runtime use, and a Python unit test recomputes the actual source geometry and **fails CI if any displayed number becomes stale**. It is not independent evidence of field accuracy.
+
+The graphical CI artifact utown-m2-1-view-review also includes SRC_GIS_F6_SCORECARD.png: a screenshot with the OSM boundary and the summary card enabled.
+
 ## Reproduce the result
 
 From repository root:

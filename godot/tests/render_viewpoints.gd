@@ -101,7 +101,29 @@ func _render() -> void:
             quit(1)
             return
         count += 1
+    # Capture a real windowed screenshot of the diagnostic card + F6 outline.
     world.set_lighting_mode(0)
+    world.set_osm_reference_visible(true)
+    hud.visible = true
+    if not review.select_view(3):
+        push_error("Cannot select map/metric comparison overview")
+        quit(1)
+        return
+    await process_frame
+    await process_frame
+    await RenderingServer.frame_post_draw
+    var gis_frame: Image = root.get_texture().get_image()
+    if gis_frame == null or gis_frame.is_empty():
+        push_error("Cannot render GIS comparison HUD")
+        quit(1)
+        return
+    if gis_frame.save_png(output.path_join("SRC_GIS_F6_SCORECARD.png")) != OK:
+        push_error("Cannot save GIS comparison HUD preview")
+        quit(1)
+        return
+    count += 1
+    hud.visible = false
+    world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
     if report == null:
         push_error("Cannot write preview manifest")

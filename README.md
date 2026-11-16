@@ -17,7 +17,7 @@
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed OSM ERC/SRC outline comparisons, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1/M2 milestone, or a Windows installer.**
 

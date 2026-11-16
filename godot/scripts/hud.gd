@@ -11,10 +11,14 @@ extends CanvasLayer
 @onready var perf_label: Label = $Info/VBox/Perf
 @onready var map_control: Control = $Minimap
 @onready var help_label: Label = $Help
+@onready var gis_card: PanelContainer = $GISCard
+@onready var gis_summary: Label = $GISCard/Summary
 
 var target_index: int = 0
 var show_full_help: bool = true
 var walked_loops: int = 0
+var gis_metric_count: int = 0
+const FIT_BASELINE_PATH: String = "res://data/osm_fit_baseline.json"
 
 func _ready() -> void:
     var panel: PanelContainer = $Info
@@ -34,8 +38,46 @@ func _ready() -> void:
     nearest_label.add_theme_font_size_override("font_size", 14)
     perf_label.add_theme_font_size_override("font_size", 13)
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
+    var gis_style: StyleBoxFlat = StyleBoxFlat.new()
+    gis_style.bg_color = Color(0.09, 0.16, 0.21, 0.92)
+    gis_style.set_corner_radius_all(10)
+    gis_style.content_margin_left = 13.0
+    gis_style.content_margin_top = 12.0
+    gis_style.content_margin_right = 13.0
+    gis_style.content_margin_bottom = 12.0
+    gis_card.add_theme_stylebox_override("panel", gis_style)
+    _load_osm_fit_summary()
+
+func _load_osm_fit_summary() -> void:
+    if not FileAccess.file_exists(FIT_BASELINE_PATH):
+        push_warning("GIS diagnostic card is missing its source-derived metric snapshot")
+        return
+    var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(FIT_BASELINE_PATH))
+    if typeof(parsed) != TYPE_DICTIONARY:
+        push_warning("GIS diagnostic card JSON is invalid")
+        return
+    var source: Dictionary = parsed
+    if str(source.get("status", "")) != "M2.3-static-review-snapshot-not-surveyed":
+        push_warning("GIS metric source lacks explicit provisional status")
+        return
+    var lines: PackedStringArray = PackedStringArray()
+    lines.append("OSM  /  ESTIMATED 3D MODEL")
+    for row in source.get("metrics", []):
+        if typeof(row) != TYPE_DICTIONARY:
+            continue
+        var name: String = str(row.get("id", ""))
+        if name != "ERC" and name != "SRC":
+            continue
+        lines.append("%s   IoU %.1f%%  |  OSM cover %.1f%%" % [
+            name, 100.0 * float(row.get("intersection_over_union", 0.0)),
+            float(row.get("osm_area_covered_pct", 0.0))])
+        gis_metric_count += 1
+    lines.append("2D data comparison; NOT real accuracy")
+    lines.append("OpenStreetMap contributors  |  ODbL")
+    gis_summary.text = "\n".join(lines)
 
 func _process(_delta: float) -> void:
+    gis_card.visible = world.osm_reference_visible and gis_metric_count == 2
     hint_label.text = "M2 %s [F2] | %s [T] | OSM %s [F6]" % ["ON" if world.m2_details_visible else "OFF", world.lighting_name(), "ON" if world.osm_reference_visible else "OFF"]
     if world.route_points.is_empty():
         return

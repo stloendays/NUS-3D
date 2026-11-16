@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "status": "M2.3-static-review-snapshot-not-surveyed",
+  "source_osm": "godot/data/osm_p0_reference.json",
+  "source_model": "godot/data/utown_core.json",
+  "osm_snapshot_retrieved_utc": "2026-11-16T05:06:27.664076+00:00",
+  "attribution": "© OpenStreetMap contributors",
+  "license": "ODbL 1.0",
+  "notice": "Percentages compare two projected outer-footprint datasets, NOT true building fidelity, walkable routes, levels, survey quality or public navigation.",
+  "metrics": [
+    {
+      "id": "ERC",
+      "osm_way_id": 124549217,
+      "intersection_over_union": 0.3495,
+      "osm_area_covered_pct": 35.1,
+      "proxy_area_inside_osm_pct": 98.6,
+      "centroid_shift_m": 4.46
+    },
+    {
+      "id": "SRC",
+      "osm_way_id": 125774787,
+      "intersection_over_union": 0.2419,
+      "osm_area_covered_pct": 24.7,
+      "proxy_area_inside_osm_pct": 91.9,
+      "centroid_shift_m": 7.43
+    }
+  ]
+}
