@@ -1,0 +1,31 @@
+name: Capture OSM ERC/SRC candidate footprints
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "tools/fetch_osm_footprints.py"
+      - "tools/test_fetch_osm_footprints.py"
+      - ".github/workflows/osm_reference.yml"
+
+jobs:
+  osm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run offline OSM parser regression tests
+        run: python -m unittest tools.test_fetch_osm_footprints -v
+      - name: Retrieve live OSM building-way candidates
+        run: python tools/fetch_osm_footprints.py --out build/osm-utown-candidates.json
+      - name: Save candidate polygons for manual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: utown-osm-candidate-geometry
+          path: build/osm-utown-candidates.json
+          retention-days: 30
+          if-no-files-found: error
