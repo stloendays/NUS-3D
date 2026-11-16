@@ -1,0 +1,136 @@
+name: Windows x64 portable preview (unsigned)
+
+on:
+  push:
+    branches: ["main", "feature/**"]
+    paths:
+      - "godot/**"
+      - "tools/package_windows_build.py"
+      - "tools/test_package_windows_build.py"
+      - ".github/workflows/windows_build.yml"
+  pull_request:
+    paths:
+      - "godot/**"
+      - "tools/package_windows_build.py"
+      - "tools/test_package_windows_build.py"
+      - ".github/workflows/windows_build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-export:
+    name: Export real Windows executable (Godot 4.4.1)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check data and package regressions before export
+        run: |
+          python tools/validate_utown_data.py
+          python tools/validate_osm_reference.py
+          python tools/validate_m2_profiles.py
+          python tools/validate_viewpoints.py
+          python -m unittest discover -s tools -t . -v
+      - name: Install exact Godot editor version
+        run: |
+          curl -fLsS --retry 4 --retry-all-errors -o /tmp/godot.zip \
+            https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+      - name: Cache extracted Windows export template
+        id: templates
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot/export_templates/4.4.1.stable
+          key: godot-4.4.1-stable-windows-x86_64-template-v1
+      - name: Download and hash-check official export templates
+        if: steps.templates.outputs.cache-hit != 'true'
+        run: |
+          curl -fL --retry 6 --retry-all-errors --retry-delay 10 \
+            -o /tmp/godot-templates.tpz \
+            https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          echo "7a8d14ade489fd4d22f178193021fe8a876a9e51068ed4dde26dac3ae4c59a88  /tmp/godot-templates.tpz" | sha256sum -c -
+          dest="$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          mkdir -p "$dest"
+          unzip -p /tmp/godot-templates.tpz templates/version.txt > "$dest/version.txt"
+          unzip -p /tmp/godot-templates.tpz templates/windows_release_x86_64.exe > "$dest/windows_release_x86_64.exe"
+          test "$(cat "$dest/version.txt")" = "4.4.1.stable"
+          test -s "$dest/windows_release_x86_64.exe"
+      - name: Import and verify the source scene
+        run: |
+          godot --headless --path godot --import --quit
+          godot --headless --path godot --script res://tests/smoke_test.gd
+      - name: Export Windows executable and separate PCK
+        run: |
+          mkdir -p build/windows
+          godot --headless --path godot --export-release "Windows Desktop" "$GITHUB_WORKSPACE/build/windows/NUS3D-UTown.exe"
+          ls -lh build/windows
+      - name: Check signatures, build manifest and ZIP integrity
+        run: |
+          python tools/package_windows_build.py \
+            --directory build/windows \
+            --output build/NUS3D-UTown-Windows-Experimental.zip \
+            --commit "$GITHUB_SHA" --godot-version 4.4.1
+          python tools/package_windows_build.py --verify build/NUS3D-UTown-Windows-Experimental.zip
+      - name: Upload experimental portable Windows bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: NUS3D-UTown-Windows-Experimental
+          path: build/NUS3D-UTown-Windows-Experimental.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  windows-launch-smoke:
+    name: Run exported build on Windows (headless)
+    needs: windows-export
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download exactly the freshly built bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: NUS3D-UTown-Windows-Experimental
+          path: build/download
+      - name: Check archive and source manifest again on Windows
+        run: python tools/package_windows_build.py --verify build/download/NUS3D-UTown-Windows-Experimental.zip
+      - name: Execute packaged runtime integrity test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $runDir = Join-Path (Resolve-Path ".").Path "build/run"
+          New-Item -ItemType Directory -Path $runDir -Force | Out-Null
+          Expand-Archive -Path "build/download/NUS3D-UTown-Windows-Experimental.zip" -DestinationPath $runDir -Force
+          $exe = Join-Path $runDir "NUS3D-UTown.exe"
+          $report = (Join-Path $runDir "smoke.json").Replace("\", "/")
+          $arguments = @("--headless", "--", "--nus3d-self-test", "--nus3d-self-test-report=$report")
+          $process = Start-Process -FilePath $exe -ArgumentList $arguments -WorkingDirectory $runDir -PassThru
+          if (-not $process.WaitForExit(90000)) {
+            Stop-Process -Id $process.Id -Force
+            throw "Exported game did not complete the 90-second self-test"
+          }
+          $process.Refresh()
+          if ($process.ExitCode -ne 0) { throw "Exported game returned exit code $($process.ExitCode)" }
+          if (-not (Test-Path $report)) { throw "Exported game never wrote its self-test report" }
+          $check = Get-Content -Path $report -Raw | ConvertFrom-Json
+          if ($check.result -ne "pass" -or $check.buildings -ne 9 -or $check.facades -ne 2 -or $check.trees -ne 64 -or $check.osm_features -ne 2) {
+            throw "Exported game loaded incomplete assets: $(Get-Content $report -Raw)"
+          }
+          Get-Content -Path $report
+      - name: Preserve Windows executable runtime report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nus3d-windows-exe-smoke-report
+          path: build/run/smoke.json
+          if-no-files-found: ignore
+          retention-days: 30

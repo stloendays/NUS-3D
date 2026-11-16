@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-16 · Status: **M2.2 OSM polygon comparison and M3 alpha lighting/photo controls implemented; real-world survey and Windows acceptance still pending**
+Date: 2026-11-16 · Status: **M2.3 footprint metrics, M3 lighting and M4 alpha export CI implemented; field survey and Windows GUI/performance acceptance remain pending**
 
 ## 1. 产品定位
 
@@ -152,6 +152,11 @@ See [M3 alpha documentation](M3_ATMOSPHERE.md).
 
 ### M4 — Release / 发布与检查
 
+**2026-11-16 M4 alpha:** a version-pinned Godot 4.4.1 Windows x86_64 portable packaging workflow, checksum-backed source manifest, Python tests and an exported-binary self-test running on a Windows CI runner are available. This is an **unsigned experiment**, not a GUI-verified or signed release. See [M4 portable Windows build](M4_WINDOWS_BUILD.md).
+
+- [x] Add a reproducible Windows x86_64 export preset and retain external PCK with explicitly included JSON source data.
+- [x] Add native Windows headless exported-EXE data/scene self-test, ZIP integrity checks and SHA-256 source manifest in CI.
+- [ ] Download the CI artifact and walk the complete scene on a Windows PC with a GPU; inspect F2/F3/F6/T lighting and photo controls.
 - [ ] Windows 导出独立可运行版本，并在一台非开发电脑上试运行。
 - [ ] 记录 1080p 性能测试结果：帧率分布、加载时间、显存/内存峰值（硬件配置随报告记录）。
 - [ ] 逐项清点资产版权、第三方许可、OSM 署名和 NUS 非官方声明。

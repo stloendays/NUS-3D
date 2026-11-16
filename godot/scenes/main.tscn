@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/hud.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/minimap.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/viewpoint_review.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/export_self_test.gd" id="6"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -34,6 +35,9 @@ far = 800.0
 
 [node name="ViewReview" type="Node" parent="."]
 script = ExtResource("5")
+
+[node name="ExportSelfTest" type="Node" parent="."]
+script = ExtResource("6")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("3")
