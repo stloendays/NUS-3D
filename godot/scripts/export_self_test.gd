@@ -11,6 +11,7 @@ const REQUIRED_SOURCE_FILES: Array[String] = [
     "res://data/viewpoints.json",
     "res://data/osm_p0_reference.json",
     "res://data/osm_fit_baseline.json",
+    "res://data/discovery_tour.json",
 ]
 
 func _ready() -> void:
@@ -22,6 +23,7 @@ func collect_issues() -> Array[String]:
     var site: UTownWorld = get_parent().get_node_or_null("World") as UTownWorld
     var player: CharacterBody3D = get_parent().get_node_or_null("Player") as CharacterBody3D
     var review: UTownViewReview = get_parent().get_node_or_null("ViewReview") as UTownViewReview
+    var tour: UTownTour = get_parent().get_node_or_null("Tour") as UTownTour
     var hud: CanvasLayer = get_parent().get_node_or_null("HUD") as CanvasLayer
 
     for source_file in REQUIRED_SOURCE_FILES:
@@ -55,6 +57,8 @@ func collect_issues() -> Array[String]:
         issues.append("Source comparison HUD not present")
     if review == null or review.viewpoint_count() != 4:
         issues.append("Evidence-linked camera registry did not load")
+    if tour == null or tour.stops.size() != 4 or tour.check_in_radius_m <= 0.0:
+        issues.append("Four-stop unofficial discovery activity did not load")
     return issues
 
 func _run_export_test() -> void:
@@ -64,6 +68,7 @@ func _run_export_test() -> void:
         if option.begins_with(REPORT_PREFIX):
             report_path = option.substr(REPORT_PREFIX.length())
     var world: UTownWorld = get_parent().get_node_or_null("World") as UTownWorld
+    var tour: UTownTour = get_parent().get_node_or_null("Tour") as UTownTour
     var results: Dictionary = {
         "schema_version": 1,
         "result": "pass" if issues.is_empty() else "fail",
@@ -73,6 +78,7 @@ func _run_export_test() -> void:
         "facades": world.generated_facade_count if world != null else 0,
         "trees": world.generated_tree_count if world != null else 0,
         "route_waypoints": world.route_points.size() if world != null else 0,
+        "tour_stops": tour.stops.size() if tour != null else 0,
         "osm_features": world.osm_reference_layer.feature_count if world != null and world.osm_reference_layer != null else 0,
         "issues": issues,
     }
