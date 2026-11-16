@@ -23,6 +23,16 @@ func _smoke() -> void:
         push_error("failed to parse site metadata")
         quit(1)
         return
+    var exported_test: Node = instance.get_node_or_null("ExportSelfTest")
+    if exported_test == null or not exported_test.has_method("collect_issues"):
+        push_error("M4 exported runtime test node is missing")
+        quit(1)
+        return
+    var runtime_issues: Array = exported_test.call("collect_issues")
+    if not runtime_issues.is_empty():
+        push_error("Export runtime contract failed in editor smoke: " + str(runtime_issues))
+        quit(1)
+        return
     if world.generated_building_count < 8 or world.generated_tree_count < 20:
         push_error("missing procedural buildings or vegetation")
         quit(1)
