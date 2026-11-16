@@ -36,7 +36,7 @@ func _ready() -> void:
     help_label.add_theme_color_override("font_color", Color.html("#283b43"))
 
 func _process(_delta: float) -> void:
-    hint_label.text = "M2 %s [F2] | F3: %s | F4 capture | NOT SURVEYED" % ["ON" if world.m2_details_visible else "OFF", review.current_name()]
+    hint_label.text = "M2 %s [F2] | F3 view | F4 PNG | OSM %s [F6] | UNSURVEYED" % ["ON" if world.m2_details_visible else "OFF", "ON" if world.osm_reference_visible else "OFF"]
     if world.route_points.is_empty():
         return
     var destination: Vector3 = world.route_points[target_index]

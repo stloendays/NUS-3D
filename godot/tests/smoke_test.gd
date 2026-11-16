@@ -84,6 +84,25 @@ func _smoke() -> void:
         push_error("Free-roam reset after reviewing viewpoints failed")
         quit(1)
         return
+    var osm: UTownOSMReference = world.get_node_or_null("OSMFootprints_ReferenceOnly") as UTownOSMReference
+    if osm == null or osm.feature_count != 2 or osm.edge_count < 100:
+        push_error("OSM ERC/SRC debug-only footprint geometry was not built")
+        quit(1)
+        return
+    if world.osm_reference_visible or osm.visible:
+        push_error("OSM outline should start invisible, not replace gameplay")
+        quit(1)
+        return
+    world.set_osm_reference_visible(true)
+    if not osm.visible or not world.osm_reference_visible:
+        push_error("F6 reference outline visibility toggle failed")
+        quit(1)
+        return
+    world.set_osm_reference_visible(false)
+    if osm.visible:
+        push_error("F6 reference outline does not hide")
+        quit(1)
+        return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
         push_error("the conceptual walkway loop was not constructed")
         quit(1)

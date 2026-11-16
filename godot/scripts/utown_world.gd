@@ -6,6 +6,7 @@ class_name UTownWorld
 const DATA_PATH: String = "res://data/utown_core.json"
 const M2_DATA_PATH: String = "res://data/m2_profiles.json"
 const FACADE_KIT = preload("res://scripts/utown_facades.gd")
+const OSM_KIT = preload("res://scripts/osm_reference.gd")
 const METRES_PER_DEG_LAT: float = 110574.0
 const METRES_PER_DEG_LON: float = 111320.0
 
@@ -22,6 +23,9 @@ var m2_profiles: Dictionary = {}
 var m2_detail_nodes: Array[Node3D] = []
 var generated_facade_count: int = 0
 var m2_details_visible: bool = true
+var osm_reference_layer: UTownOSMReference
+var osm_reference_data: Dictionary = {}
+var osm_reference_visible: bool = false
 
 func _ready() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -50,6 +54,7 @@ func _ready() -> void:
     _build_buildings()
     _build_trees()
     _build_waypoints()
+    _build_osm_reference()
 
 func lonlat_to_world(lon: float, lat: float) -> Vector3:
     var east: float = (lon - origin_lon) * METRES_PER_DEG_LON * cos(deg_to_rad(origin_lat))
@@ -216,14 +221,29 @@ func _build_buildings() -> void:
         generated_building_count += 1
         _add_sign(group, str(record.get("name", group.name)), Vector3(0.0, max_height + 6.0, 0.0), "#fbfbf8")
 
+func _build_osm_reference() -> void:
+    var overlay: UTownOSMReference = OSM_KIT.new()
+    overlay.name = "OSMFootprints_ReferenceOnly"
+    add_child(overlay)
+    osm_reference_layer = overlay
+    osm_reference_data = overlay.source_document
+
+func set_osm_reference_visible(enabled: bool) -> void:
+    osm_reference_visible = enabled
+    if osm_reference_layer != null:
+        osm_reference_layer.visible = enabled
+
 func set_m2_details_visible(enabled: bool) -> void:
     m2_details_visible = enabled
     for detail in m2_detail_nodes:
         detail.visible = enabled
 
 func _unhandled_input(event: InputEvent) -> void:
-    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
-        set_m2_details_visible(not m2_details_visible)
+    if event is InputEventKey and event.pressed and not event.echo:
+        if event.keycode == KEY_F2:
+            set_m2_details_visible(not m2_details_visible)
+        elif event.keycode == KEY_F6:
+            set_osm_reference_visible(not osm_reference_visible)
 
 func _add_sign(parent: Node3D, title: String, at: Vector3, color_hex: String) -> void:
     var sign: Label3D = Label3D.new()

@@ -53,6 +53,28 @@ func _render() -> void:
                 quit(1)
                 return
             count += 1
+    # Two additional source-outline frames make the proxy-to-OSM mismatch inspectable.
+    world.set_m2_details_visible(true)
+    world.set_osm_reference_visible(true)
+    for index in [2, 3]:
+        if not review.select_view(index):
+            push_error("Cannot select OSM comparison view")
+            quit(1)
+            return
+        await process_frame
+        await process_frame
+        await RenderingServer.frame_post_draw
+        var compare: Image = root.get_texture().get_image()
+        if compare == null or compare.is_empty():
+            push_error("Cannot capture OSM comparison")
+            quit(1)
+            return
+        if compare.save_png(output.path_join("%s_OSM.png" % str(review.viewpoints[index]["id"]))) != OK:
+            push_error("Cannot save OSM comparison frame")
+            quit(1)
+            return
+        count += 1
+    world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
     if report == null:
         push_error("Cannot write preview manifest")

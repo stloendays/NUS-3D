@@ -27,7 +27,7 @@ MAP_H = 945.0
 PANEL_X = 805.0
 
 
-def render_plan(document: dict) -> str:
+def render_plan(document: dict, osm: dict | None = None) -> str:
     """Draw a transparent, non-georeferenced visual audit from one JSON layout."""
     reference = document["spatial_reference"]
     lon0 = float(reference["origin_lon"])
@@ -85,6 +85,12 @@ def render_plan(document: dict) -> str:
             klass = "building-mass building-p0" if p0 else "building-mass"
             output.append(f'<polygon class="{klass}" points="{polygon(points)}"/>')
 
+    # Optional georeferenced OSM building outlines: reference, not measured geometry.
+    if osm is not None:
+        for feature in osm.get("features", []):
+            coords = [pair(ll) for ll in feature["coordinates_lonlat"]]
+            color = "#de8c22" if feature["id"] == "ERC" else "#12a9bd"
+            output.append(f'<polygon class="osm-reference" data-osm-way="{feature["osm_way_id"]}" points="{polygon(coords)}" fill="none" stroke="{color}" stroke-width="3.5" stroke-dasharray="3 2"/>')
     # The line is a centreline overlay, never a guarantee of a traversable surface.
     for index, walkway in enumerate(document["walkways"]):
         points = [pair(ll) for ll in walkway["lonlat"]]
@@ -156,9 +162,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, default=REPO / "godot/data/utown_core.json")
     parser.add_argument("--out", type=Path, default=REPO / "build/utown-audit-plan.svg")
+    parser.add_argument("--osm", type=Path, help="optional ODbL-credited reference outlines")
     args = parser.parse_args()
     document = json.loads(args.data.read_text(encoding="utf-8"))
-    rendered = render_plan(document)
+    osm = json.loads(args.osm.read_text(encoding="utf-8")) if args.osm else None
+    rendered = render_plan(document, osm)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(rendered, encoding="utf-8")
     print(f"Wrote schematic plan: {args.out} ({len(document['buildings'])} buildings)")

@@ -40,6 +40,13 @@ class RenderUTownPlanTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             render_plan(altered)
 
+    def test_reference_svg_contains_attributed_osm_edges(self):
+        source = json.loads((ROOT / "godot/data/osm_p0_reference.json").read_text(encoding="utf-8"))
+        svg = render_plan(self.site, source)
+        self.assertEqual(svg.count('class="osm-reference"'), 2)
+        self.assertIn('data-osm-way="124549217"', svg)
+        self.assertIn('data-osm-way="125774787"', svg)
+
     def test_svg_generation_is_deterministic(self):
         self.assertEqual(render_plan(self.site), render_plan(self.site))
 

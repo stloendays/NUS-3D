@@ -33,6 +33,15 @@ func _draw() -> void:
             draw_line(_to_map(world.lonlat_to_world(float(coords[i][0]), float(coords[i][1]))),
                 _to_map(world.lonlat_to_world(float(coords[i + 1][0]), float(coords[i + 1][1]))),
                 Color.html("#c5c8b9"), 2.1)
+    # Public OSM outlines are compare-only, never a traversable street overlay.
+    if world.osm_reference_visible:
+        for source in world.osm_reference_data.get("features", []):
+            var polygon: Array = source.get("coordinates_lonlat", [])
+            var outline_color: Color = Color.html("#f5bb44") if str(source["id"]) == "ERC" else Color.html("#49d5de")
+            for edge in range(polygon.size() - 1):
+                var a: Vector3 = world.lonlat_to_world(float(polygon[edge][0]), float(polygon[edge][1]))
+                var b: Vector3 = world.lonlat_to_world(float(polygon[edge + 1][0]), float(polygon[edge + 1][1]))
+                draw_line(_to_map(a), _to_map(b), outline_color, 1.7)
     for item in world.layout.get("buildings", []):
         var p: Vector2 = _to_map(world.lonlat_to_world(float(item["lon"]), float(item["lat"])))
         var priority: String = str(item.get("priority", "P1"))

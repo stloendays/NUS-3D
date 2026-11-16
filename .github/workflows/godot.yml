@@ -18,6 +18,10 @@ jobs:
         run: python tools/validate_utown_data.py
       - name: Audit conceptual pedestrian route clearance
         run: python tools/audit_route_clearance.py --strict --report build/route-clearance.json
+      - name: Validate frozen public OSM boundary data
+        run: python tools/validate_osm_reference.py
+      - name: Create OSM vs estimated building overview
+        run: python tools/render_utown_plan.py --osm godot/data/osm_p0_reference.json --out build/utown-osm-comparison.svg
       - name: Render original schematic top-down plan
         run: python tools/render_utown_plan.py --out build/utown-audit-plan.svg
       - name: Upload route audit report
@@ -27,6 +31,7 @@ jobs:
           path: |
             build/route-clearance.json
             build/utown-audit-plan.svg
+            build/utown-osm-comparison.svg
           if-no-files-found: error
       - name: Validate M2 architecture profile assumptions
         run: python tools/validate_m2_profiles.py
