@@ -182,6 +182,55 @@ func _smoke() -> void:
         push_error("the conceptual walkway loop was not constructed")
         quit(1)
         return
+    var tour: UTownTour = instance.get_node_or_null("Tour") as UTownTour
+    var card: PanelContainer = instance.get_node_or_null("HUD/TourCard") as PanelContainer
+    if tour == null or tour.stops.size() != 4 or card == null:
+        push_error("four-stop discovery task or its story card is missing")
+        quit(1)
+        return
+    if not tour.can_check_in():
+        push_error("starting at Town Green should expose the first discovery stop")
+        quit(1)
+        return
+    hud.call("_process", 0.0)
+    if not card.visible or not tour.card_text().contains("Press E"):
+        push_error("nearby checkpoint should display an interactive prompt")
+        quit(1)
+        return
+    player.global_position = Vector3(200.0, 0.18, 200.0)
+    if tour.can_check_in() or tour.try_check_in():
+        push_error("discovery check-in must reject distant interaction")
+        quit(1)
+        return
+    for stop_index in range(tour.stops.size()):
+        var stop: Dictionary = tour.current_stop()
+        if str(stop["id"]) != str(world.layout["loop"][stop_index]["id"]):
+            push_error("tour stops must use the existing conceptual loop ordering")
+            quit(1)
+            return
+        player.global_position = tour.stop_world_position(stop_index) + Vector3(0.0, 0.18, 0.0)
+        if not tour.can_check_in() or not tour.try_check_in():
+            push_error("nearby discovery did not advance at stop %d" % stop_index)
+            quit(1)
+            return
+        if not tour.has_discovered(str(stop["id"])):
+            push_error("unlocked checkpoint ID was not recorded")
+            quit(1)
+            return
+        if tour.try_check_in():
+            push_error("duplicate discovery interaction advanced without reaching a new stop")
+            quit(1)
+            return
+    if not tour.completed or tour.discovered_ids.size() != 4 or not tour.card_text().contains("EXPLORER COMPLETE"):
+        push_error("four discoveries must unlock completion and the original Explorer card")
+        quit(1)
+        return
+    tour.restart()
+    if tour.completed or tour.discovered_ids.size() != 0 or tour.current_index != 0:
+        push_error("replaying the exploration did not reset mission state")
+        quit(1)
+        return
+    player.call("reset_player")
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
     if trunks == null or canopies == null or trunks.multimesh == null or canopies.multimesh == null:
