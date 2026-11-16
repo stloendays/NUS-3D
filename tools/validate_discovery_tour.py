@@ -46,8 +46,9 @@ def validate_tour(tour: dict, layout: dict) -> list[str]:
             errors.append(f"Stop {index} duplicates the canonical loop coordinates.")
         for field in ("title", "observation", "discovery"):
             value = row.get(field)
-            if not isinstance(value, str) or not 12 <= len(value.strip()) <= 260:
-                errors.append(f"Stop {index}: {field} must have 12–260 characters of original text.")
+            min_length, max_length = (3, 80) if field == "title" else (12, 260)
+            if not isinstance(value, str) or not min_length <= len(value.strip()) <= max_length:
+                errors.append(f"Stop {index}: {field} must have {min_length}–{max_length} characters of original text.")
     if len(set(ids)) != len(ids):
         errors.append("Tour stop IDs must be unique.")
     if ids != waypoint_ids or len(ids) != 4:
