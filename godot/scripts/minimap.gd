@@ -3,6 +3,7 @@ extends Control
 
 @onready var world: UTownWorld = get_parent().get_parent().get_node("World")
 @onready var player: CharacterBody3D = get_parent().get_parent().get_node("Player")
+@onready var tour: UTownTour = get_parent().get_parent().get_node("Tour")
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
@@ -49,8 +50,17 @@ func _draw() -> void:
         draw_rect(Rect2(p - Vector2(5, 5), Vector2(10, 10)), color, true)
         if priority == "P0":
             draw_string(ThemeDB.fallback_font, p + Vector2(7, -3), str(item["id"]), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 12, Color.WHITE)
-    for i in range(world.route_points.size()):
-        draw_circle(_to_map(world.route_points[i]), 2.8, Color.html("#f1ce6a"))
+    # One source for stops: existing conceptual waypoints, not real directions.
+    for i in range(tour.stops.size()):
+        var item: Dictionary = tour.stops[i]
+        var marker: Vector2 = _to_map(tour.stop_world_position(i))
+        if tour.has_discovered(str(item["id"])):
+            draw_circle(marker, 4.6, Color.html("#70d4ae"))
+        elif i == tour.current_index and not tour.completed:
+            draw_circle(marker, 8.1, Color.html("#f1ce6a"), false, 2.0)
+            draw_circle(marker, 3.6, Color.html("#f1ce6a"))
+        else:
+            draw_circle(marker, 3.0, Color.html("#a7b2b0"))
     var pp: Vector2 = _to_map(player.global_position)
     draw_circle(pp, 5.0, Color.html("#52a6e0"))
     draw_circle(pp, 5.0, Color.WHITE, false, 1.1)
