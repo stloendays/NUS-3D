@@ -4,6 +4,7 @@ extends CanvasLayer
 @onready var world: UTownWorld = $"../World"
 @onready var player: CharacterBody3D = $"../Player"
 @onready var review: UTownViewReview = $"../ViewReview"
+@onready var tour: UTownTour = $"../Tour"
 @onready var title_label: Label = $Info/VBox/Title
 @onready var hint_label: Label = $Info/VBox/Hint
 @onready var target_label: Label = $Info/VBox/Target
@@ -13,10 +14,10 @@ extends CanvasLayer
 @onready var help_label: Label = $Help
 @onready var gis_card: PanelContainer = $GISCard
 @onready var gis_summary: Label = $GISCard/Summary
+@onready var tour_card: PanelContainer = $TourCard
+@onready var tour_message: Label = $TourCard/Message
 
-var target_index: int = 0
 var show_full_help: bool = true
-var walked_loops: int = 0
 var gis_metric_count: int = 0
 const FIT_BASELINE_PATH: String = "res://data/osm_fit_baseline.json"
 
@@ -46,6 +47,15 @@ func _ready() -> void:
     gis_style.content_margin_right = 13.0
     gis_style.content_margin_bottom = 12.0
     gis_card.add_theme_stylebox_override("panel", gis_style)
+    var tour_style: StyleBoxFlat = StyleBoxFlat.new()
+    tour_style.bg_color = Color(0.08, 0.16, 0.18, 0.93)
+    tour_style.set_corner_radius_all(10)
+    tour_style.content_margin_left = 16.0
+    tour_style.content_margin_right = 16.0
+    tour_style.content_margin_top = 13.0
+    tour_style.content_margin_bottom = 13.0
+    tour_card.add_theme_stylebox_override("panel", tour_style)
+    tour_message.add_theme_color_override("font_color", Color.html("#f3f1e8"))
     _load_osm_fit_summary()
 
 func _load_osm_fit_summary() -> void:
@@ -79,20 +89,19 @@ func _load_osm_fit_summary() -> void:
 func _process(_delta: float) -> void:
     gis_card.visible = world.osm_reference_visible and gis_metric_count == 2
     hint_label.text = "M2 %s [F2] | %s [T] | OSM %s [F6]" % ["ON" if world.m2_details_visible else "OFF", world.lighting_name(), "ON" if world.osm_reference_visible else "OFF"]
-    if world.route_points.is_empty():
-        return
-    var destination: Vector3 = world.route_points[target_index]
-    var separation_m: float = Vector2(player.global_position.x, player.global_position.z).distance_to(Vector2(destination.x, destination.z))
-    if separation_m < 10.0:
-        target_index = (target_index + 1) % world.route_points.size()
-        if target_index == 0:
-            walked_loops += 1
-        destination = world.route_points[target_index]
-        separation_m = Vector2(player.global_position.x, player.global_position.z).distance_to(Vector2(destination.x, destination.z))
-    target_label.text = "Next: %s  |  %.0f m" % [world.route_names[target_index], separation_m]
+    if tour.completed:
+        target_label.text = "Tour complete  |  %d/%d stops  [G replay]" % [tour.discovered_ids.size(), tour.stops.size()]
+    elif not tour.current_stop().is_empty():
+        var destination: Dictionary = tour.current_stop()
+        target_label.text = "Tour %d/%d  |  %s  %.0f m" % [tour.discovered_ids.size(), tour.stops.size(), str(destination["id"]), tour.current_distance_m()]
+    else:
+        target_label.text = "Tour unavailable"
     var nearby: Dictionary = world.nearest_landmark(player.global_position)
     nearest_label.text = "Near: %s  (%.0f m)" % [nearby["name"], float(nearby["distance"])]
-    perf_label.text = "FPS %d  |  Loop %d  |  X %+.0f / N %+.0f m" % [Engine.get_frames_per_second(), walked_loops, player.global_position.x, -player.global_position.z]
+    perf_label.text = "FPS %d  |  X %+.0f / N %+.0f m" % [Engine.get_frames_per_second(), player.global_position.x, -player.global_position.z]
+    var message: String = tour.card_text()
+    tour_card.visible = not message.is_empty()
+    tour_message.text = message
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:

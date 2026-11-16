@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/minimap.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/viewpoint_review.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/export_self_test.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/utown_tour.gd" id="7"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -36,6 +37,9 @@ far = 800.0
 [node name="ViewReview" type="Node" parent="."]
 script = ExtResource("5")
 
+[node name="Tour" type="Node" parent="."]
+script = ExtResource("7")
+
 [node name="ExportSelfTest" type="Node" parent="."]
 script = ExtResource("6")
 
@@ -53,7 +57,7 @@ layout_mode = 2
 
 [node name="Title" type="Label" parent="HUD/Info/VBox"]
 layout_mode = 2
-text = "NUS / UTOWN — M2 ARCHITECTURAL STUDY"
+text = "NUS / UTOWN — UNOFFICIAL 3D"
 
 [node name="Hint" type="Label" parent="HUD/Info/VBox"]
 layout_mode = 2
@@ -99,6 +103,22 @@ text = "GIS comparison loading..."
 theme_override_colors/font_color = Color(0.9, 0.95, 0.96, 1)
 theme_override_font_sizes/font_size = 14
 
+[node name="TourCard" type="PanelContainer" parent="HUD"]
+visible = false
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -259.0
+offset_right = 460.0
+offset_bottom = -75.0
+mouse_filter = 2
+
+[node name="Message" type="Label" parent="HUD/TourCard"]
+layout_mode = 2
+autowrap_mode = 3
+text = "SCHEMATIC EXPLORATION — not a real route."
+theme_override_font_sizes/font_size = 15
+
 [node name="Crosshair" type="Label" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5
@@ -121,4 +141,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD walk   Shift run   Mouse look   Space jump   R reset   M map   F1 help   F2 facade   F3 camera   F4 PNG   T time   F6 OSM   F7 photo   Esc mouse"
+text = "SCHEMATIC / NOT REAL DIRECTIONS   WASD walk   E discover   G replay   M map   F1 help   F2 facade   F3 view   F4 PNG   T time   F6 OSM   F7 photo   Esc mouse"

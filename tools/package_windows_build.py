@@ -30,7 +30,8 @@ Both NUS3D-UTown.exe and NUS3D-UTown.pck MUST remain in the same directory.
 Extract the ZIP and launch NUS3D-UTown.exe. No Godot editor is required.
 
 Controls: WASD walk, mouse look, Shift sprint, Space jump, Esc release mouse,
-R reset, M map, F1 help, F2 facade study, F3 viewpoints, F4 screenshot,
+R reset, M map, E discover nearby checkpoint, G replay completed tour,
+F1 help, F2 facade study, F3 viewpoints, F4 screenshot,
 F6 OSM reference, F7 hide HUD, T lighting cycle.
 
 The executable is unsigned; provenance and SHA-256 digests are in
