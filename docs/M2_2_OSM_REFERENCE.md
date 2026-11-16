@@ -30,3 +30,12 @@ The retrieved longitude/latitude node sequences, source metadata and ODbL licens
 - F6 begins **OFF**; the game keeps its original building meshes, collision, trees and schematic route unchanged.
 - CI runs tools/validate_osm_reference.py and unit tests, generates an OSM-vs-model SVG and two additional screenshot frames with the debug boundary visible. This validates an independent comparison workflow rather than real-world fit.
 - Source and license: OpenStreetMap contributors, ODbL 1.0: https://www.openstreetmap.org/copyright . Original feature pages: https://www.openstreetmap.org/way/124549217 and https://www.openstreetmap.org/way/125774787 .
+
+
+## External polygon vs schematic route, advisory only
+
+The original proxy collision audit compares routes only with game-generated rectangles. The source OSM polygons for ERC/SRC are larger and more irregular, and the guide overlaps portions of both polygons on a plan view. This does NOT prove the route is blocked in reality; SRC has covered/stacked walkways and building outlines can include ground-level arcades.
+
+Run: python tools/audit_osm_route.py
+
+The script checks concave polygon edges, writes build/osm-route-overlap.json, and prints each 2-D overlap by route segment and OSM way ID. CI attaches it alongside the OSM overlay SVG. The report is intentionally advisory (non-failing). The route remains unverified until ground-level routes, entrances, floor height and ramp accessibility are checked with independent evidence.

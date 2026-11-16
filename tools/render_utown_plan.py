@@ -50,6 +50,7 @@ def render_plan(document: dict, osm: dict | None = None) -> str:
 
     assessments = assess_layout(document)
     violations = sum(result.conflict for result in assessments)
+    heading = "M2.2 OSM vs proxy audit" if osm is not None else "M1.6 spatial audit"
     output = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{SVG_HEIGHT}" viewBox="0 0 {SVG_WIDTH} {SVG_HEIGHT}" role="img" aria-label="Schematic UTown site layout audit">',
               '<style>',
               '.title{font:bold 24px system-ui,sans-serif;fill:#182b3b}',
@@ -63,7 +64,7 @@ def render_plan(document: dict, osm: dict | None = None) -> str:
               '.waypoint-label{font:11px system-ui,sans-serif;fill:#123d72;paint-order:stroke;stroke:white;stroke-width:3}',
               '</style>',
               '<rect width="100%" height="100%" fill="#f7fafb"/>',
-              '<text x="48" y="40" class="title">NUS-3D / University Town — M1.6 spatial audit</text>',
+              f'<text x="48" y="40" class="title">NUS-3D / University Town — {heading}</text>',
               '<text x="48" y="63" class="subtitle">SCHEMATIC ONLY · not a real walking map, as-built model or accessibility survey</text>',
               f'<rect x="{left:.1f}" y="{top:.1f}" width="{map_width:.1f}" height="{map_height:.1f}" fill="#eef2e6" stroke="#84969a" stroke-width="1.5"/>']
 
@@ -131,6 +132,11 @@ def render_plan(document: dict, osm: dict | None = None) -> str:
         f'<text class="panel" x="{PANEL_X + 56}" y="489">SRC schematic detour points</text>',
         f'<text class="title" x="{PANEL_X + 24}" y="551">Survey needed</text>',
     ]
+    if osm is not None:
+        for y, color, label in [(512, "#de8c22", "ERC OSM (ODbL)"),
+                                (531, "#12a9bd", "SRC OSM (ODbL)")]:
+            output.append(f'<line x1="{PANEL_X + 25}" y1="{y}" x2="{PANEL_X + 44}" y2="{y}" stroke="{color}" stroke-width="3" stroke-dasharray="3 2"/>')
+            output.append(f'<text class="small" x="{PANEL_X + 56}" y="{y + 4}">{label}</text>')
     notes = [
         "Confirm genuine building outlines",
         "Check ERC / SRC main entrances",
@@ -143,6 +149,8 @@ def render_plan(document: dict, osm: dict | None = None) -> str:
     for index, note in enumerate(notes):
         output.append(f'<text class="small" x="{PANEL_X + 24}" y="{587 + index * 32}">• {escape(note)}</text>')
 
+    if osm is not None:
+        output.append('<text class="small" x="48" y="1077">OSM outlines © OpenStreetMap contributors (ODbL); not survey-grade or a real walking route.</text>')
     output += [
         f'<line x1="{PANEL_X + 65}" y1="885" x2="{PANEL_X + 65}" y2="824" stroke="#1b4862" stroke-width="3"/>',
         f'<polygon points="{PANEL_X + 65},810 {PANEL_X + 57},828 {PANEL_X + 73},828" fill="#1b4862"/>',
