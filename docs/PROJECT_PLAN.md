@@ -118,6 +118,18 @@ Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux scree
 
 See [M2.1 documentation](M2_1_VIEWPOINT_CALIBRATION.md). Passing software render is not an accurate-survey or Windows-performance claim.
 
+### M3 alpha — lighting/clean screenshot experience
+
+**2026-11-16 engineering progress:** the playable UTown scene offers T to cycle four artistic lighting presets, F7 to hide/restore HUD for photos, decorative low-cost nighttime path lamps outside proxy building/walkway footprints, and two new CI screenshot comparisons. This is not actual solar/weather data, surveyed lamp positioning or measured Windows frame rate.
+
+- [x] Daylight, golden hour, blue hour and evening scene switching.
+- [x] Clean full-screen photo view via F7, retaining F4 screenshot and source JSON sidecar.
+- [x] Limited, nonshadowing decorative lamps with deterministic placement and tests.
+- [ ] Add verified fixture/site photos and calibrate realistic evening look.
+- [ ] Run performance and accessibility checks on a Windows computer.
+
+See [M3 alpha documentation](M3_ATMOSPHERE.md).
+
 ### M3 — Atmosphere / 环境与交互
 
 - [ ] 热带树木和绿篱使用复用模型及 MultiMesh/实例化。

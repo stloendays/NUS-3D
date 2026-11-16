@@ -75,6 +75,32 @@ func _render() -> void:
             return
         count += 1
     world.set_osm_reference_visible(false)
+    # Two additional original twilight/evening renders, without HUD.
+    world.set_m2_details_visible(true)
+    if not review.select_view(3):
+        push_error("Cannot select evening preview view")
+        quit(1)
+        return
+    for mode in [1, 3]:
+        if not world.set_lighting_mode(mode):
+            push_error("Cannot set lighting preset for screenshot")
+            quit(1)
+            return
+        await process_frame
+        await process_frame
+        await RenderingServer.frame_post_draw
+        var atmosphere_frame: Image = root.get_texture().get_image()
+        if atmosphere_frame == null or atmosphere_frame.is_empty():
+            push_error("Cannot capture weather-independent atmosphere frame")
+            quit(1)
+            return
+        var filename: String = "SRC_EAST_PROXY_%s.png" % ("GOLDEN" if mode == 1 else "EVENING")
+        if atmosphere_frame.save_png(output.path_join(filename)) != OK:
+            push_error("Cannot save atmosphere preview")
+            quit(1)
+            return
+        count += 1
+    world.set_lighting_mode(0)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
     if report == null:
         push_error("Cannot write preview manifest")

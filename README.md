@@ -4,7 +4,7 @@
 >
 > Status: **M2.1 evidence-based review cameras + M1.6 path clearance (2026-11-04)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -17,7 +17,7 @@
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **F6** to show/hide ODbL-attributed OSM ERC/SRC outline comparisons, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed OSM ERC/SRC outline comparisons, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1 milestone, or a Windows installer.**
 
@@ -115,3 +115,7 @@ Godot now provides four photo-review positions through F3: ERC 2014, UTown 2020,
 ## M2.2 geographical reference overlay
 
 A source-frozen, dated OSM vector snapshot for ERC (way 124549217, v18) and SRC (way 125774787, v15) is provided in godot/data/osm_p0_reference.json with individual polygon nodes and ODbL attribution. Press **F6** to overlay bright ERC/SRC outlines in the 3D world and minimap, or use the CI-generated utown-osm-comparison.svg top-down drawing. The independent overlay has NO collisions and is hidden by default: it deliberately shows mismatches rather than making unsurveyed geometry look accurate. [Provenance and limits](docs/M2_2_OSM_REFERENCE.md).
+
+## M3 alpha: time-of-day and photo controls
+
+Press **T** for four hand-authored day/lighting states, **F7** to hide the HUD, **F4** to capture an original in-game PNG with metadata. Procedural unshadowed path lanterns illuminate blue-hour/evening views, without claiming real NUS lighting locations. CI compares the Daylight and Evening scene on Linux; Windows GPU performance and the real campus light schedule are unverified. [M3 guide](docs/M3_ATMOSPHERE.md).

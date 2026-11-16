@@ -103,6 +103,27 @@ func _smoke() -> void:
         push_error("F6 reference outline does not hide")
         quit(1)
         return
+    if world.generated_lamp_count < 2 or world.lamp_lights.size() != world.generated_lamp_count:
+        push_error("missing the low-cost illustrative path lanterns")
+        quit(1)
+        return
+    if not world.set_lighting_mode(3) or world.lighting_name() != "Evening":
+        push_error("night scene lighting preset failed")
+        quit(1)
+        return
+    for lamp in world.lamp_lights:
+        if not lamp.visible or lamp.light_energy <= 0.0 or lamp.shadow_enabled:
+            push_error("night lamps are not set to cheap, nonshadowed lighting")
+            quit(1)
+            return
+    if not world.set_lighting_mode(0) or world.lighting_name() != "Daylight":
+        push_error("lighting reset to default daytime failed")
+        quit(1)
+        return
+    if world.set_lighting_mode(99):
+        push_error("invalid lighting preset was accepted")
+        quit(1)
+        return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
         push_error("the conceptual walkway loop was not constructed")
         quit(1)

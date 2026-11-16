@@ -26,6 +26,13 @@ var m2_details_visible: bool = true
 var osm_reference_layer: UTownOSMReference
 var osm_reference_data: Dictionary = {}
 var osm_reference_visible: bool = false
+const LIGHTING_NAMES = ["Daylight", "Golden hour", "Blue hour", "Evening"]
+var lighting_mode: int = 0
+var sky_environment: Environment
+var sunlight: DirectionalLight3D
+var lamp_lights: Array[OmniLight3D] = []
+var lamp_locations: Array[Vector2] = []
+var generated_lamp_count: int = 0
 
 func _ready() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -52,9 +59,11 @@ func _ready() -> void:
     _build_plaza()
     _build_walkways()
     _build_buildings()
+    _build_lamps()
     _build_trees()
     _build_waypoints()
     _build_osm_reference()
+    set_lighting_mode(lighting_mode)
 
 func lonlat_to_world(lon: float, lat: float) -> Vector3:
     var east: float = (lon - origin_lon) * METRES_PER_DEG_LON * cos(deg_to_rad(origin_lat))
@@ -97,11 +106,13 @@ func _build_sky() -> void:
     var environment_node: WorldEnvironment = WorldEnvironment.new()
     environment_node.environment = env
     add_child(environment_node)
+    sky_environment = env
     var sun: DirectionalLight3D = DirectionalLight3D.new()
     sun.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
     sun.light_energy = 1.0
     sun.shadow_enabled = true
     add_child(sun)
+    sunlight = sun
 
 func _build_ground() -> void:
     var root: Node3D = Node3D.new()
@@ -238,12 +249,56 @@ func set_m2_details_visible(enabled: bool) -> void:
     for detail in m2_detail_nodes:
         detail.visible = enabled
 
+func lighting_name() -> String:
+    return str(LIGHTING_NAMES[lighting_mode])
+
+func set_lighting_mode(index: int) -> bool:
+    if index < 0 or index >= LIGHTING_NAMES.size() or sky_environment == null or sunlight == null:
+        return false
+    lighting_mode = index
+    match lighting_mode:
+        0: # Midday: reproduce the previous fixed lighting.
+            sky_environment.background_color = Color.html("#c6d8df")
+            sky_environment.ambient_light_color = Color.html("#e8edf0")
+            sky_environment.ambient_light_energy = 0.78
+            sunlight.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
+            sunlight.light_color = Color.WHITE
+            sunlight.light_energy = 1.0
+        1: # Warm late afternoon; not a simulated Singapore solar ephemeris.
+            sky_environment.background_color = Color.html("#e5c4a9")
+            sky_environment.ambient_light_color = Color.html("#ffddb3")
+            sky_environment.ambient_light_energy = 0.74
+            sunlight.rotation_degrees = Vector3(-22.0, -85.0, 0.0)
+            sunlight.light_color = Color.html("#ffc286")
+            sunlight.light_energy = 0.76
+        2: # Blue hour, with a limited number of unshadowed decorative lamps.
+            sky_environment.background_color = Color.html("#607e9c")
+            sky_environment.ambient_light_color = Color.html("#a3b9d0")
+            sky_environment.ambient_light_energy = 0.56
+            sunlight.rotation_degrees = Vector3(-9.0, -138.0, 0.0)
+            sunlight.light_color = Color.html("#e9bf9f")
+            sunlight.light_energy = 0.32
+        3: # Evening remains bright enough to navigate schematic flat ground.
+            sky_environment.background_color = Color.html("#243951")
+            sky_environment.ambient_light_color = Color.html("#96afce")
+            sky_environment.ambient_light_energy = 0.43
+            sunlight.rotation_degrees = Vector3(-5.0, -175.0, 0.0)
+            sunlight.light_color = Color.html("#a0b6db")
+            sunlight.light_energy = 0.14
+    sunlight.shadow_enabled = lighting_mode <= 1
+    for lamp in lamp_lights:
+        lamp.visible = lighting_mode >= 2
+        lamp.light_energy = 0.7 if lighting_mode == 2 else 1.1 if lighting_mode == 3 else 0.0
+    return true
+
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
         if event.keycode == KEY_F2:
             set_m2_details_visible(not m2_details_visible)
         elif event.keycode == KEY_F6:
             set_osm_reference_visible(not osm_reference_visible)
+        elif event.keycode == KEY_T:
+            set_lighting_mode((lighting_mode + 1) % LIGHTING_NAMES.size())
 
 func _add_sign(parent: Node3D, title: String, at: Vector3, color_hex: String) -> void:
     var sign: Label3D = Label3D.new()
@@ -291,7 +346,52 @@ func is_tree_position_clear(position: Vector2, building_clearance_m: float = 8.0
             var b: Vector3 = lonlat_to_world(float(points[i + 1][0]), float(points[i + 1][1]))
             if _distance_to_segment(position, Vector2(a.x, a.z), Vector2(b.x, b.z)) < path_clearance:
                 return false
+    # Keep procedurally placed tree canopies and lamp posts from occupying one point.
+    for lamp in lamp_locations:
+        if lamp.distance_to(position) < 6.0:
+            return false
     return true
+
+func _build_lamps() -> void:
+    # Schematic low-cost decorative wayfinding lamps, not surveyed fixture positions.
+    var root: Node3D = Node3D.new()
+    root.name = "PathLanterns_Artistic_NotSurveyed"
+    add_child(root)
+    var pole_material: Material = _mat("#435760", 0.58)
+    var fixture_material: StandardMaterial3D = _mat("#e7dac0", 0.24)
+    fixture_material.emission_enabled = true
+    fixture_material.emission = Color.html("#dcae66")
+    fixture_material.emission_energy_multiplier = 1.2
+    for walkway in layout.get("walkways", []):
+        var points: Array = walkway.get("lonlat", [])
+        for segment_index in range(points.size() - 1):
+            if generated_lamp_count >= 10:
+                break
+            var a: Vector3 = lonlat_to_world(float(points[segment_index][0]), float(points[segment_index][1]))
+            var b: Vector3 = lonlat_to_world(float(points[segment_index + 1][0]), float(points[segment_index + 1][1]))
+            var direction: Vector2 = Vector2(b.x - a.x, b.z - a.z)
+            if direction.length_squared() < 16.0:
+                continue
+            var sideways: Vector2 = Vector2(-direction.y, direction.x).normalized()
+            var centre: Vector2 = Vector2((a.x + b.x) * 0.5, (a.z + b.z) * 0.5)
+            var offset: float = float(walkway.get("width_m", 3.5)) * 0.5 + 5.0
+            var candidate: Vector2 = centre + sideways * offset
+            if not is_tree_position_clear(candidate, 4.0):
+                continue
+            _add_box(root, Vector3(candidate.x, 2.2, candidate.y), Vector3(0.16, 4.4, 0.16), pole_material)
+            _add_box(root, Vector3(candidate.x, 4.45, candidate.y), Vector3(0.88, 0.28, 0.88), fixture_material)
+            var light: OmniLight3D = OmniLight3D.new()
+            light.name = "SoftLamp_%02d" % generated_lamp_count
+            light.position = Vector3(candidate.x, 4.36, candidate.y)
+            light.omni_range = 17.0
+            light.light_color = Color.html("#ffe0a6")
+            light.light_energy = 0.0
+            light.shadow_enabled = false
+            light.visible = false
+            root.add_child(light)
+            lamp_lights.append(light)
+            lamp_locations.append(candidate)
+            generated_lamp_count += 1
 
 func _build_trees() -> void:
     var root: Node3D = Node3D.new()
