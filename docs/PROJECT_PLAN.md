@@ -118,6 +118,17 @@ Date: 2026-11-16 · Status: **M2.2 OSM polygon comparison and M3 alpha lighting/
 
 See [M2.1 documentation](M2_1_VIEWPOINT_CALIBRATION.md). Passing software render is not an accurate-survey or Windows-performance claim.
 
+### M2.3 — quantify footprint disagreement without altering collisions
+
+**2026-11-16:** add source-tracked, deterministic polygon intersection/union reporting for ERC and SRC: OSM-vs-proxy IoU, OSM coverage, model-inside-OSM coverage, OSM-only/box-only areas, centroid offset, and visual scorecards. Tests handle concave OSM outer rings and overlapping rotated game parts. CI publishes JSON plus a vector SVG. These measure projected dataset differences, not survey accuracy; current gameplay geometry stays unchanged.
+
+- [x] Exact planar comparison of source OSM outer rings with overlapping rotated estimated proxy part unions.
+- [x] Machine-readable CI report and human-readable SVG footprint scorecard.
+- [ ] Verify which OSM polygons represent real ground level and resolve covered concourses/courtyards.
+- [ ] Manually accept new exterior footprint, ramps, heights and waypoint adjustments with real-world references.
+
+See [M2.3 quantitative plan-view scorecard](M2_3_FOOTPRINT_FIT.md).
+
 ### M3 alpha — lighting/clean screenshot experience
 
 **2026-11-16 engineering progress:** the playable UTown scene offers T to cycle four artistic lighting presets, F7 to hide/restore HUD for photos, decorative low-cost nighttime path lamps outside proxy building/walkway footprints, and two new CI screenshot comparisons. This is not actual solar/weather data, surveyed lamp positioning or measured Windows frame rate.

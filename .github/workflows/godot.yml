@@ -22,6 +22,10 @@ jobs:
         run: python tools/validate_osm_reference.py
       - name: Report conceptual route vs OSM plan-view overlaps
         run: python tools/audit_osm_route.py
+      - name: Quantify P0 OSM vs estimated model footprint fit
+        run: python tools/audit_osm_proxy_fit.py --out build/osm-proxy-fit.json
+      - name: Draw OSM versus model quantitative scorecards
+        run: python tools/render_osm_proxy_fit.py --out build/utown-p0-fit-scorecard.svg
       - name: Create OSM vs estimated building overview
         run: python tools/render_utown_plan.py --osm godot/data/osm_p0_reference.json --out build/utown-osm-comparison.svg
       - name: Render original schematic top-down plan
@@ -35,6 +39,8 @@ jobs:
             build/utown-audit-plan.svg
             build/utown-osm-comparison.svg
             build/osm-route-overlap.json
+            build/osm-proxy-fit.json
+            build/utown-p0-fit-scorecard.svg
           if-no-files-found: error
       - name: Validate M2 architecture profile assumptions
         run: python tools/validate_m2_profiles.py

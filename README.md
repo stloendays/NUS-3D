@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.2 OSM geometry comparisons + M3 alpha day/evening/photo controls (2026-11-16)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2.3 quantitative OSM-vs-proxy fit, M2.2 reference overlay + M3 alpha day/evening/photo controls (2026-11-16)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -119,3 +119,7 @@ A source-frozen, dated OSM vector snapshot for ERC (way 124549217, v18) and SRC 
 ## M3 alpha: time-of-day and photo controls
 
 Press **T** for four hand-authored day/lighting states, **F7** to hide the HUD, **F4** to capture an original in-game PNG with metadata. Procedural unshadowed path lanterns illuminate blue-hour/evening views, without claiming real NUS lighting locations. CI compares the Daylight and Evening scene on Linux; Windows GPU performance and the real campus light schedule are unverified. [M3 guide](docs/M3_ATMOSPHERE.md).
+
+## M2.3 P0 footprint coverage scorecard
+
+M2.3 now computes reproducible, exact-in-local-projection plan-view IoU, two-sided area differences and centroid offset between the current ERC/SRC multi-part box massing and independently archived OpenStreetMap outer-ring polygons. CI publishes both `build/osm-proxy-fit.json` and an original SVG scorecard in `utown-route-clearance-audit`. **These are dataset agreement statistics, not validated true building dimensions, roads or accessibility.** See [M2.3 methodology and caveats](docs/M2_3_FOOTPRINT_FIT.md).
