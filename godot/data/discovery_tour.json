@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "original-storytelling-on-schematic-waypoints-not-surveyed",
+  "no_official_affiliation": true,
+  "route_disclaimer": "Conceptual flat waypoint loop; not surveyed and not suitable for real navigation or accessibility planning.",
+  "check_in_radius_m": 12,
+  "stops": [
+    {
+      "id": "GREEN",
+      "title": "Town Green",
+      "observation": "Find the open green at the heart of this miniature UTown.",
+      "discovery": "Town Green is a central open-space landmark. The lawn outline and trees here are a simplified procedural interpretation, not a landscaping survey."
+    },
+    {
+      "id": "ERC",
+      "title": "Education Resource Centre",
+      "observation": "Look for the light-coloured wings and the glazed facade study.",
+      "discovery": "This ERC model explores glazing, sunshades and a curved bay. Press F2 to compare the architectural study with the plain massing; all dimensions remain estimates."
+    },
+    {
+      "id": "SRC",
+      "title": "Stephen Riady Centre",
+      "observation": "Look toward the broad building complex and its elevated forum study.",
+      "discovery": "SRC has a separate schematic forum disc and connector. Press F6 to compare the source OSM footprint with the current estimated building geometry."
+    },
+    {
+      "id": "PLAZA",
+      "title": "Town Plaza",
+      "observation": "Find the paved civic space beside the CREATE-area proxy.",
+      "discovery": "Town Plaza completes the four-stop exploration. Its level paved surface and connecting paths are illustrative only, and should never be used as real-world access directions."
+    }
+  ]
+}
