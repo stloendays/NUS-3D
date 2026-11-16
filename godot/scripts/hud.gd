@@ -61,3 +61,4 @@ func _unhandled_input(event: InputEvent) -> void:
             help_label.visible = show_full_help
         elif event.keycode == KEY_F7:
             visible = not visible
+            world.set_navigation_markers_visible(visible)

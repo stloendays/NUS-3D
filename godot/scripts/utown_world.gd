@@ -33,6 +33,8 @@ var sunlight: DirectionalLight3D
 var lamp_lights: Array[OmniLight3D] = []
 var lamp_locations: Array[Vector2] = []
 var generated_lamp_count: int = 0
+var navigation_labels: Array[Label3D] = []
+var route_marker_root: Node3D
 
 func _ready() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -249,6 +251,13 @@ func set_m2_details_visible(enabled: bool) -> void:
     for detail in m2_detail_nodes:
         detail.visible = enabled
 
+func set_navigation_markers_visible(enabled: bool) -> void:
+    # Clean photo mode hides source-generated labels and waypoint spheres as well as HUD.
+    for label in navigation_labels:
+        label.visible = enabled
+    if route_marker_root != null:
+        route_marker_root.visible = enabled
+
 func lighting_name() -> String:
     return str(LIGHTING_NAMES[lighting_mode])
 
@@ -311,6 +320,7 @@ func _add_sign(parent: Node3D, title: String, at: Vector3, color_hex: String) ->
     sign.outline_size = 5
     sign.position = at
     parent.add_child(sign)
+    navigation_labels.append(sign)
 
 func _distance_to_segment(point: Vector2, start: Vector2, finish: Vector2) -> float:
     var segment: Vector2 = finish - start
@@ -454,6 +464,7 @@ func _build_waypoints() -> void:
     var root: Node3D = Node3D.new()
     root.name = "RouteBeacons_Conceptual"
     add_child(root)
+    route_marker_root = root
     var tint: Material = _mat("#e7ca75", 0.38)
     var ball: SphereMesh = SphereMesh.new()
     ball.radius = 0.7

@@ -25,6 +25,7 @@ func _render() -> void:
         quit(1)
         return
     hud.visible = false
+    world.set_navigation_markers_visible(false)
     var output: String = ProjectSettings.globalize_path("res://review_previews")
     if DirAccess.make_dir_recursive_absolute(output) != OK:
         push_error("Could not create review_previews folder")

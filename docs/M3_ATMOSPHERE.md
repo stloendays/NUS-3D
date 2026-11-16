@@ -12,3 +12,7 @@ The script procedurally places at most ten low-impact **illustrative** path lant
 Automated tests assert night lamp visibility/no shadow generation, mode reset, at least two decorative lights, preserved tree/route counts, and the original M1/M2/OSM smoke tests. Linux Xvfb CI produces two extra original-game PNGs (Golden hour and Evening at the synthetic SRC viewpoint) next to the existing reference comparisons. GPU timing, frame-rate and image quality on a Windows machine remain unmeasured; a Windows session still needs review for colour balance and performance.
 
 Provenance: this is original procedural 3D authoring with no NUS logos, weather data, copyrighted photographs or proprietary geometry. Source map/OSM credits continue separately.
+
+## Clean photo mode label visibility
+
+F7 now hides/restores not only the CanvasLayer HUD but also in-world procedural Label3D building and route signage plus the glowing conceptual route spheres. The photo mode does not remove building meshes, path geometry, OSM comparison boundaries or lighting. Linux automatic screenshot capture similarly disables all world labels for reproducible uncluttered review images.
