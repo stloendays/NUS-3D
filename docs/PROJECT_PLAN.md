@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-16 · Status: **M2.3 footprint metrics, M3 lighting and M4 alpha export CI implemented; field survey and Windows GUI/performance acceptance remain pending**
+Date: 2026-11-16 · Status: **M2.3 footprint metrics, M3 atmosphere and M3.1 discovery interaction, M4 alpha export CI implemented; field survey and Windows GUI/performance acceptance remain pending**
 
 ## 1. 产品定位
 
@@ -140,6 +140,18 @@ See [M2.3 quantitative plan-view scorecard](M2_3_FOOTPRINT_FIT.md).
 - [ ] Run performance and accessibility checks on a Windows computer.
 
 See [M3 alpha documentation](M3_ATMOSPHERE.md).
+
+### M3.1 — Interactive landmark discovery (not real navigation)
+
+**2026-11-16:** UTown Explorer is an original single-player four-stop task tied to canonical conceptual-loop IDs. E checks in within 12 m, HUD displays non-surveyed discovery stories and 0/4–4/4 progress, minimap marks active/visited stops, and G replays after completion. New Python validation and Godot/Windows export smoke assertions protect the source-coordinate contract. No real directions, GPS, commercial media or persistent account tracking are added.
+
+- [x] Add a lightweight original discovery experience without duplicating GIS coordinates.
+- [x] Validate waypoint order, interaction radius and no-survey/official-affiliation notices.
+- [x] Include the JSON and runtime check in the portable Windows preview.
+- [ ] Complete manual Windows GPU walkthrough and card/map legibility review.
+- [ ] Verify actual landmark access on site before considering any real-world directions.
+
+[Interaction specification, validation and disclaimer](M3_1_CAMPUS_DISCOVERY.md).
 
 ### M3 — Atmosphere / 环境与交互
 
