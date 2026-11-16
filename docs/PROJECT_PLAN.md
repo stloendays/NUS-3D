@@ -1,6 +1,6 @@
 # UTown-first project plan / NUS-3D 开发计划
 
-Date: 2026-11-04 · Status: **M2.1 geotagged-source camera views and Linux screenshot pipeline implemented; real-world survey and Windows checks pending**
+Date: 2026-11-16 · Status: **M2.2 OSM polygon comparison and M3 alpha lighting/photo controls implemented; real-world survey and Windows acceptance still pending**
 
 ## 1. 产品定位
 

@@ -85,12 +85,18 @@ func capture_review() -> void:
     if bitmap.save_png(png_file) != OK:
         push_error("Could not save preview PNG")
         return
+    var hud_layer: CanvasLayer = get_node_or_null("../HUD") as CanvasLayer
     var sidecar: Dictionary = {
         "status": "schematic-render-not-survey-verified",
         "image_file": basename + ".png",
         "viewpoint_id": view_id,
         "captured_at_utc": Time.get_datetime_string_from_system(true, true),
         "m2_visible": world.m2_details_visible,
+        "lighting_name": world.lighting_name(),
+        "lighting_index": world.lighting_mode,
+        "osm_reference_visible": world.osm_reference_visible,
+        "navigation_markers_visible": world.route_marker_root != null and world.route_marker_root.visible,
+        "hud_visible": hud_layer.visible if hud_layer != null else null,
         "provisional_eye_height_m": 1.84,
         "camera_world_xyz_m": [camera.global_position.x, camera.global_position.y, camera.global_position.z],
         "source_viewpoint": {} if current_index < 0 else viewpoints[current_index]

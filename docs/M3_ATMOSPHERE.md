@@ -16,3 +16,5 @@ Provenance: this is original procedural 3D authoring with no NUS logos, weather 
 ## Clean photo mode label visibility
 
 F7 now hides/restores not only the CanvasLayer HUD but also in-world procedural Label3D building and route signage plus the glowing conceptual route spheres. The photo mode does not remove building meshes, path geometry, OSM comparison boundaries or lighting. Linux automatic screenshot capture similarly disables all world labels for reproducible uncluttered review images.
+
+F4 capture sidecars also include the lighting preset name/index, whether the OSM debug outline was visible, HUD visibility and world navigation marker visibility. This makes repeated camera comparisons more interpretable; it does not verify physical accuracy.

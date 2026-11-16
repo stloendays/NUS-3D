@@ -62,3 +62,5 @@ The first software-rendered artifact was downloaded and individual PNGs inspecte
 - **SRC_EAST_PROXY M2**: initial view at the east forecourt path point was just metres from the proxy east wall and hid the Forum shape. Moved the **synthetic only** review camera farther east, toward the schematic Town Green side for whole-building comparison; real GPS/photo evidence is unaffected.
 - These are visual diagnosis notes, not validated photogrammetric error measurements. See Issue #5 for acceptance criteria.
 
+
+**2026-11-16 photo-state provenance:** F4 sidecar now records M2 state, chosen lighting preset, OSM footprint diagnostic visibility and clean photo-mode labels/HUD state; these details do not confer photographic georegistration or survey reliability.
