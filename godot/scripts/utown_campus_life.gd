@@ -632,7 +632,7 @@ func toggle_interior_floor() -> bool:
     var floor_position: Vector3 = Vector3(0.0, 0.18, 6.0) if interior_floor == 0 else Vector3(0.0, 3.58, -6.5)
     player.global_position = interior_anchors[active_interior] + floor_position
     player.rotation.y = 0.0 if interior_floor == 0 else PI
-    player.head.rotation = Vector3.ZERO
+    player.head.rotation = Vector3( -0.2, 0.0, 0.0) if interior_floor == 1 else Vector3.ZERO
     player.velocity = Vector3.ZERO
     message = "%s  |  %s floor" % [active_interior, "GROUND" if interior_floor == 0 else "MEZZANINE"]
     message_time = 3.5
