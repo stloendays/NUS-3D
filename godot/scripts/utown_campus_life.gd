@@ -3,8 +3,8 @@ class_name UTownCampusLife
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
 ## bicycle mode and a looping shuttle. Positions reuse schematic project data only.
 
-const NAMES: PackedStringArray = PackedStringArray(["Maya", "Ethan", "Aisha", "Lucas", "Mei", "Daniel"])
-const LINES: PackedStringArray = PackedStringArray([
+var npc_names: PackedStringArray = PackedStringArray(["Maya", "Ethan", "Aisha", "Lucas", "Mei", "Daniel"])
+var npc_lines: PackedStringArray = PackedStringArray([
     "I like taking a short break around Town Green.",
     "This little campus model is useful for exploring the ERC facade study.",
     "I am heading toward the next shuttle stop. The route is only a game-world proxy.",
@@ -12,7 +12,7 @@ const LINES: PackedStringArray = PackedStringArray([
     "Try bicycle mode if you want to cover the map faster.",
     "The weather presets are artistic effects, not a live Singapore forecast."
 ])
-const COLORS: PackedStringArray = PackedStringArray(["#d77f69", "#6d93bf", "#9b83bd", "#6eaa91", "#d4a65f", "#8a9da7"])
+var npc_colors: PackedStringArray = PackedStringArray(["#d77f69", "#6d93bf", "#9b83bd", "#6eaa91", "#d4a65f", "#8a9da7"])
 const TALK_RADIUS: float = 5.5
 const ENTRY_RADIUS: float = 18.0
 const BOARD_RADIUS: float = 7.0
@@ -81,7 +81,7 @@ func _sample_route(route: Array[Vector3], distance: float) -> Dictionary:
 
 func _build_pedestrians() -> void:
     var walkways: Array = world.layout.get("walkways", [])
-    for i in range(NAMES.size()):
+    for i in range(npc_names.size()):
         var path: Dictionary = walkways[i % walkways.size()]
         var route: Array[Vector3] = []
         for coords in path.get("lonlat", []):
@@ -97,14 +97,14 @@ func _build_pedestrians() -> void:
             "node": npc, "route": route, "distance": distance,
             "direction": 1.0 if i % 2 == 0 else -1.0,
             "speed": 0.72 + float(i % 3) * 0.16, "phase": float(i) * 1.13,
-            "name": NAMES[i], "line": LINES[i]
+            "name": npc_names[i], "line": npc_lines[i]
         })
 
 func _make_person(index: int) -> Node3D:
     var root := Node3D.new()
     root.name = "StudentNPC_%02d" % index
     var shirt := StandardMaterial3D.new()
-    shirt.albedo_color = Color.html(str(COLORS[index]))
+    shirt.albedo_color = Color.html(str(npc_colors[index]))
     var skin := StandardMaterial3D.new()
     skin.albedo_color = Color.html("#d9ad8d")
     var trousers := StandardMaterial3D.new()
@@ -263,7 +263,7 @@ func _add_rod(parent: Node3D, a: Vector3, b: Vector3, radius: float, material: M
     var rod := MeshInstance3D.new()
     rod.mesh = mesh
     rod.position = (a + b) * 0.5
-    rod.basis = Basis(Vector3.UP, direction.normalized())
+    rod.quaternion = Quaternion(Vector3.UP, direction.normalized())
     rod.material_override = material
     parent.add_child(rod)
 
