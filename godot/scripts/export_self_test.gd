@@ -96,7 +96,7 @@ func _run_export_test() -> void:
         "tour_stops": tour.stops.size() if tour != null else 0,
         "field_notes": challenge.items.size() if challenge != null else 0,
         "sprint_waypoints": challenge.sprint_route.size() if challenge != null else 0,
-        "weather_modes": weather.NAMES.size() if weather != null else 0,
+        "weather_modes": weather.mode_count() if weather != null else 0,
         "npc_count": campus_life.pedestrians.size() if campus_life != null else 0,
         "interior_count": campus_life.interiors.size() if campus_life != null else 0,
         "shuttle_loaded": campus_life.shuttle != null if campus_life != null else false,
