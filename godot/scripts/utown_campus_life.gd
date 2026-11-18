@@ -387,6 +387,7 @@ func _build_bicycle() -> void:
     var rider_trousers := _mat("#344553")
     var rider_hair := _mat("#344047")
     var rider_torso := MeshInstance3D.new()
+    rider_torso.name = "RiderTorso"
     var torso_mesh := CapsuleMesh.new()
     torso_mesh.radius = 0.25
     torso_mesh.height = 0.88
@@ -396,6 +397,7 @@ func _build_bicycle() -> void:
     rider_torso.material_override = rider_shirt
     bicycle.add_child(rider_torso)
     var rider_head := MeshInstance3D.new()
+    rider_head.name = "RiderHead"
     var head_mesh := SphereMesh.new()
     head_mesh.radius = 0.19
     rider_head.mesh = head_mesh
