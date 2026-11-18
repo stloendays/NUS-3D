@@ -343,8 +343,8 @@ func _smoke() -> void:
         push_error("ERC/SRC interior concepts or campus shuttle did not load")
         quit(1)
         return
-    if campus_life.bicycle_wheels.size() != 2 or campus_life.bicycle_handlebar == null or campus_life.bicycle_crank == null:
-        push_error("bicycle wheels, steering or pedal crank are missing")
+    if campus_life.bicycle_wheels.size() != 2 or campus_life.bicycle_handlebar == null or campus_life.bicycle_crank == null or campus_life.bicycle.get_node_or_null("RiderTorso") == null or campus_life.bicycle.get_node_or_null("RiderHead") == null:
+        push_error("bicycle wheels, steering, pedals or rider model are missing")
         quit(1)
         return
     if campus_life.shuttle_wheels.size() != 4 or campus_life.shuttle_passengers.size() != 3:
