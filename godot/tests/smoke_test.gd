@@ -312,8 +312,8 @@ func _smoke() -> void:
         push_error("five-mode weather controller is missing")
         quit(1)
         return
-    if weather.puddle_nodes.size() < 4:
-        push_error("weather puddles were not generated from the conceptual walkway data")
+    if weather.puddle_nodes.size() < 4 or weather.rain_streaks == null or weather.rain_multimesh.instance_count != 220:
+        push_error("weather puddles or the deterministic rain-streak MultiMesh were not generated")
         quit(1)
         return
     if not weather.set_mode(3) or not weather.rain.emitting or not weather.puddle_root.visible:
