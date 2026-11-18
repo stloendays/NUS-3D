@@ -4,6 +4,7 @@ extends Control
 @onready var world: UTownWorld = get_parent().get_parent().get_node("World")
 @onready var player: CharacterBody3D = get_parent().get_parent().get_node("Player")
 @onready var tour: UTownTour = get_parent().get_parent().get_node("Tour")
+@onready var challenge: UTownChallenge = get_parent().get_parent().get_node("Challenge")
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
@@ -61,6 +62,14 @@ func _draw() -> void:
             draw_circle(marker, 3.6, Color.html("#f1ce6a"))
         else:
             draw_circle(marker, 3.0, Color.html("#a7b2b0"))
+    # Optional collectible markers are derived from existing conceptual walkway segments.
+    for item_index in range(challenge.items.size()):
+        var item_id_value: String = challenge.item_id(item_index)
+        if not challenge.is_item_collected(item_id_value):
+            draw_circle(_to_map(challenge.item_world_position(item_index)), 3.2, Color.html("#b99aff"))
+    if challenge.sprint_active and challenge.sprint_next_index < challenge.sprint_route.size():
+        var sprint_target: Vector2 = _to_map(challenge.sprint_route[challenge.sprint_next_index])
+        draw_circle(sprint_target, 8.5, Color.html("#f2a8df"), false, 2.0)
     var pp: Vector2 = _to_map(player.global_position)
     draw_circle(pp, 5.0, Color.html("#52a6e0"))
     draw_circle(pp, 5.0, Color.WHITE, false, 1.1)

@@ -12,6 +12,7 @@ const REQUIRED_SOURCE_FILES: Array[String] = [
     "res://data/osm_p0_reference.json",
     "res://data/osm_fit_baseline.json",
     "res://data/discovery_tour.json",
+    "res://data/explorer_items.json",
 ]
 
 func _ready() -> void:
@@ -24,6 +25,7 @@ func collect_issues() -> Array[String]:
     var player: CharacterBody3D = get_parent().get_node_or_null("Player") as CharacterBody3D
     var review: UTownViewReview = get_parent().get_node_or_null("ViewReview") as UTownViewReview
     var tour: UTownTour = get_parent().get_node_or_null("Tour") as UTownTour
+    var challenge: UTownChallenge = get_parent().get_node_or_null("Challenge") as UTownChallenge
     var hud: CanvasLayer = get_parent().get_node_or_null("HUD") as CanvasLayer
 
     for source_file in REQUIRED_SOURCE_FILES:
@@ -59,6 +61,10 @@ func collect_issues() -> Array[String]:
         issues.append("Evidence-linked camera registry did not load")
     if tour == null or tour.stops.size() != 4 or tour.check_in_radius_m <= 0.0:
         issues.append("Four-stop unofficial discovery activity did not load")
+    if challenge == null or challenge.items.size() != 8 or challenge.item_markers.size() != 8:
+        issues.append("Eight local Field Notes or their runtime markers did not load")
+    if challenge != null and challenge.sprint_route.size() != 5:
+        issues.append("Campus Sprint did not resolve the four-stop loop and return")
     return issues
 
 func _run_export_test() -> void:
@@ -69,6 +75,7 @@ func _run_export_test() -> void:
             report_path = option.substr(REPORT_PREFIX.length())
     var world: UTownWorld = get_parent().get_node_or_null("World") as UTownWorld
     var tour: UTownTour = get_parent().get_node_or_null("Tour") as UTownTour
+    var challenge: UTownChallenge = get_parent().get_node_or_null("Challenge") as UTownChallenge
     var results: Dictionary = {
         "schema_version": 1,
         "result": "pass" if issues.is_empty() else "fail",
@@ -79,6 +86,8 @@ func _run_export_test() -> void:
         "trees": world.generated_tree_count if world != null else 0,
         "route_waypoints": world.route_points.size() if world != null else 0,
         "tour_stops": tour.stops.size() if tour != null else 0,
+        "field_notes": challenge.items.size() if challenge != null else 0,
+        "sprint_waypoints": challenge.sprint_route.size() if challenge != null else 0,
         "osm_features": world.osm_reference_layer.feature_count if world != null and world.osm_reference_layer != null else 0,
         "issues": issues,
     }

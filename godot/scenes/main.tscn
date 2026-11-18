@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/viewpoint_review.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/export_self_test.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/utown_tour.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/utown_challenge.gd" id="8"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -39,6 +40,9 @@ script = ExtResource("5")
 
 [node name="Tour" type="Node" parent="."]
 script = ExtResource("7")
+
+[node name="Challenge" type="Node" parent="."]
+script = ExtResource("8")
 
 [node name="ExportSelfTest" type="Node" parent="."]
 script = ExtResource("6")
@@ -119,6 +123,24 @@ autowrap_mode = 3
 text = "SCHEMATIC EXPLORATION — not a real route."
 theme_override_font_sizes/font_size = 15
 
+[node name="ChallengeCard" type="PanelContainer" parent="HUD"]
+anchors_preset = 15
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -370.0
+offset_top = -202.0
+offset_right = -18.0
+offset_bottom = -54.0
+mouse_filter = 2
+
+[node name="Message" type="Label" parent="HUD/ChallengeCard"]
+layout_mode = 2
+autowrap_mode = 3
+text = "UTOWN FIELD NOTES  0 / 8"
+theme_override_font_sizes/font_size = 14
+
 [node name="Crosshair" type="Label" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5
@@ -141,4 +163,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "SCHEMATIC / NOT REAL DIRECTIONS   WASD walk   E discover   G replay   M map   F1 help   F2 facade   F3 view   F4 PNG   T time   F6 OSM   F7 photo   Esc mouse"
+text = "SCHEMATIC / NOT REAL DIRECTIONS   WASD walk   Shift run   E discover   G replay   C collect   V sprint   M map   F1 help   F2 facade   F3 view   F4 PNG   T light   F6 OSM   F7 photo   Esc mouse"

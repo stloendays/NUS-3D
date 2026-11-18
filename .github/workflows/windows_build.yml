@@ -123,7 +123,7 @@ jobs:
           if ($process.ExitCode -ne 0) { throw "Exported game returned exit code $($process.ExitCode)" }
           if (-not (Test-Path $report)) { throw "Exported game never wrote its self-test report" }
           $check = Get-Content -Path $report -Raw | ConvertFrom-Json
-          if ($check.result -ne "pass" -or $check.buildings -ne 9 -or $check.facades -ne 2 -or $check.trees -ne 64 -or $check.osm_features -ne 2 -or $check.tour_stops -ne 4) {
+          if ($check.result -ne "pass" -or $check.buildings -ne 9 -or $check.facades -ne 2 -or $check.trees -ne 64 -or $check.osm_features -ne 2 -or $check.tour_stops -ne 4 -or $check.field_notes -ne 8 -or $check.sprint_waypoints -ne 5) {
             throw "Exported game loaded incomplete assets: $(Get-Content $report -Raw)"
           }
           Get-Content -Path $report

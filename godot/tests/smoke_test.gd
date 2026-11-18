@@ -231,6 +231,81 @@ func _smoke() -> void:
         quit(1)
         return
     player.call("reset_player")
+    var challenge: UTownChallenge = instance.get_node_or_null("Challenge") as UTownChallenge
+    if challenge == null or challenge.items.size() != 8 or challenge.item_markers.size() != 8:
+        push_error("eight collectible Field Notes or their visual markers are missing")
+        quit(1)
+        return
+    if challenge.sprint_route.size() != 5:
+        push_error("Campus Sprint must resolve the four existing stops and return to Town Green")
+        quit(1)
+        return
+    # Use an isolated per-run save file so local smoke tests never overwrite player progress.
+    challenge.save_path = "user://nus3d-smoke-%d.cfg" % Time.get_ticks_msec()
+    challenge.load_progress()
+    var first_item_id: String = challenge.item_id(0)
+    player.global_position = challenge.item_world_position(0) + Vector3(0.0, 0.18, 0.0)
+    if not challenge.can_collect_nearest() or not challenge.try_collect_nearest():
+        push_error("nearby Field Note could not be collected with the C interaction")
+        quit(1)
+        return
+    if not challenge.is_item_collected(first_item_id) or challenge.try_collect_nearest():
+        push_error("collected Field Note was not hidden or could be collected twice")
+        quit(1)
+        return
+    var progress_file: ConfigFile = ConfigFile.new()
+    if progress_file.load(challenge.save_path) != OK:
+        push_error("Field Note progress was not written to the local save file")
+        quit(1)
+        return
+    var saved_ids: Variant = progress_file.get_value("progress", "collected_ids", [])
+    if typeof(saved_ids) != TYPE_PACKED_STRING_ARRAY or not saved_ids.has(first_item_id):
+        push_error("local save did not preserve the collected Field Note ID")
+        quit(1)
+        return
+    challenge.load_progress()
+    if not challenge.is_item_collected(first_item_id) or challenge.item_markers[0].visible:
+        push_error("reloading local progress did not restore the collected Field Note")
+        quit(1)
+        return
+    player.global_position = Vector3(200.0, 0.18, 200.0)
+    if challenge.start_sprint():
+        push_error("Campus Sprint must only start near the Town Green start point")
+        quit(1)
+        return
+    player.global_position = challenge.sprint_route[0] + Vector3(0.0, 0.18, 0.0)
+    if not challenge.start_sprint() or not challenge.sprint_active:
+        push_error("Campus Sprint did not start from Town Green")
+        quit(1)
+        return
+    for route_index in range(1, challenge.sprint_route.size()):
+        player.global_position = challenge.sprint_route[route_index] + Vector3(0.0, 0.18, 0.0)
+        challenge.call("_process", 0.1)
+    if challenge.sprint_active or challenge.sprint_last_time < 0.0 or challenge.sprint_medal != "GOLD":
+        push_error("Campus Sprint did not complete the ordered loop or award its expected test medal")
+        quit(1)
+        return
+    if challenge.sprint_best_time < 0.0:
+        push_error("Campus Sprint personal best was not recorded")
+        quit(1)
+        return
+    challenge.load_progress()
+    if challenge.sprint_best_time < 0.0 or not challenge.is_item_collected(first_item_id):
+        push_error("local save did not restore both challenge progress and sprint best time")
+        quit(1)
+        return
+    challenge.set_markers_visible(false)
+    for marker in challenge.item_markers:
+        if marker.visible:
+            push_error("photo mode did not hide Field Note markers")
+            quit(1)
+            return
+    challenge.set_markers_visible(true)
+    if challenge.item_markers[0].visible:
+        push_error("photo mode restored an already-collected Field Note")
+        quit(1)
+        return
+    player.call("reset_player")
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
     if trunks == null or canopies == null or trunks.multimesh == null or canopies.multimesh == null:
