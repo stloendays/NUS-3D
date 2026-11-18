@@ -312,24 +312,45 @@ func _smoke() -> void:
         push_error("five-mode weather controller is missing")
         quit(1)
         return
-    if not weather.set_mode(3) or not weather.rain.emitting:
-        push_error("rain weather did not activate its particle system")
+    if weather.puddle_nodes.size() < 4:
+        push_error("weather puddles were not generated from the conceptual walkway data")
+        quit(1)
+        return
+    if not weather.set_mode(3) or not weather.rain.emitting or not weather.puddle_root.visible:
+        push_error("rain weather did not activate rain particles and wet-ground puddles")
         quit(1)
         return
     if not weather.set_mode(4):
         push_error("thunderstorm weather preset could not be selected")
         quit(1)
         return
-    if not weather.set_mode(0) or weather.rain.emitting:
-        push_error("clear weather did not restore the dry scene")
+    if not weather.set_mode(0) or weather.rain.emitting or weather.puddle_root.visible:
+        push_error("clear weather did not restore the dry scene and hide puddles")
         quit(1)
         return
-    if campus_life == null or campus_life.pedestrians.size() < 4:
-        push_error("procedural campus pedestrians did not spawn")
+    if campus_life == null or campus_life.pedestrians.size() != 6:
+        push_error("six procedural campus pedestrians did not spawn")
+        quit(1)
+        return
+    var first_npc: Node3D = campus_life.pedestrians[0]["node"]
+    if first_npc.get_node_or_null("LeftArmPivot") == null or first_npc.get_node_or_null("RightLegPivot") == null:
+        push_error("pedestrian limb pivots for procedural walk animation are missing")
+        quit(1)
+        return
         quit(1)
         return
     if campus_life.interiors.size() != 2 or campus_life.shuttle == null:
         push_error("ERC/SRC interior concepts or campus shuttle did not load")
+        quit(1)
+        return
+    if campus_life.bicycle_wheels.size() != 2 or campus_life.bicycle_handlebar == null or campus_life.bicycle_crank == null:
+        push_error("bicycle wheels, steering or pedal crank are missing")
+        quit(1)
+        return
+    if campus_life.shuttle_wheels.size() != 4 or campus_life.shuttle_passengers.size() != 3:
+        push_error("shuttle wheel animation or passenger silhouettes are missing")
+        quit(1)
+        return
         quit(1)
         return
     var exterior_before: Vector3 = player.global_position
@@ -341,6 +362,14 @@ func _smoke() -> void:
         push_error("interior pocket was not isolated from the outdoor proxy")
         quit(1)
         return
+    if not campus_life.toggle_interior_floor() or campus_life.interior_floor != 1 or player.global_position.y < 3.0:
+        push_error("ERC mezzanine lift did not move the player to the upper floor")
+        quit(1)
+        return
+    if not campus_life.toggle_interior_floor() or campus_life.interior_floor != 0 or player.global_position.y > 1.0:
+        push_error("ERC mezzanine lift did not return the player to the ground floor")
+        quit(1)
+        return
     campus_life.exit_interior()
     if campus_life.interior_active or weather.indoor or player.global_position.distance_to(exterior_before) > 0.01:
         push_error("interior exit did not restore the player's outdoor position")
@@ -348,6 +377,12 @@ func _smoke() -> void:
         return
     if not campus_life.set_bicycle(true) or not player.bicycle_mode or not campus_life.bicycle.visible:
         push_error("bicycle mode did not enable player speed and bicycle visual")
+        quit(1)
+        return
+    if not is_equal_approx(player.camera_target_fov, 84.0):
+        push_error("bicycle camera did not switch to the smooth follow-view target")
+        quit(1)
+        return
         quit(1)
         return
     if not campus_life.set_bicycle(false) or player.bicycle_mode or campus_life.bicycle.visible:
