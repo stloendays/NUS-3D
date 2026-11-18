@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/export_self_test.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/utown_tour.gd" id="7"]
 [ext_resource type="Script" path="res://scripts/utown_challenge.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/utown_weather.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/utown_campus_life.gd" id="10"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -43,6 +45,12 @@ script = ExtResource("7")
 
 [node name="Challenge" type="Node" parent="."]
 script = ExtResource("8")
+
+[node name="Weather" type="Node" parent="."]
+script = ExtResource("9")
+
+[node name="CampusLife" type="Node" parent="."]
+script = ExtResource("10")
 
 [node name="ExportSelfTest" type="Node" parent="."]
 script = ExtResource("6")
@@ -141,6 +149,19 @@ autowrap_mode = 3
 text = "UTOWN FIELD NOTES  0 / 8"
 theme_override_font_sizes/font_size = 14
 
+[node name="CampusCard" type="PanelContainer" parent="HUD"]
+offset_left = 18.0
+offset_top = 170.0
+offset_right = 430.0
+offset_bottom = 345.0
+mouse_filter = 2
+
+[node name="Message" type="Label" parent="HUD/CampusCard"]
+layout_mode = 2
+autowrap_mode = 3
+text = "WEATHER  CLEAR  |  [Y] change\nCAMPUS LIFE"
+theme_override_font_sizes/font_size = 13
+
 [node name="Crosshair" type="Label" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5
@@ -163,4 +184,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "SCHEMATIC / NOT REAL DIRECTIONS   WASD walk   Shift run   E discover   G replay   C collect   V sprint   M map   F1 help   F2 facade   F3 view   F4 PNG   T light   F6 OSM   F7 photo   Esc mouse"
+text = "WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD"
