@@ -16,18 +16,30 @@ const SPAWN: Vector3 = Vector3(0.0, 0.18, 0.0)
 
 var bicycle_mode: bool = false
 var movement_locked: bool = false
+var camera_target_position: Vector3 = Vector3.ZERO
+var camera_target_rotation: Vector3 = Vector3.ZERO
+var camera_target_fov: float = 78.0
 
 func _ready() -> void:
     Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     floor_snap_length = 0.25
+    camera_target_position = camera.position
+    camera_target_rotation = camera.rotation
+    camera_target_fov = camera.fov
 
 func set_bicycle_mode(enabled: bool) -> void:
     bicycle_mode = enabled
+    camera_target_position = Vector3(0.0, 0.35, 4.0) if enabled else Vector3.ZERO
+    camera_target_rotation = Vector3(-0.18, 0.0, 0.0) if enabled else Vector3.ZERO
+    camera_target_fov = 84.0 if enabled else 78.0
+
+func _process(delta: float) -> void:
     if camera == null:
         return
-    camera.position = Vector3(0.0, 0.35, 4.0) if enabled else Vector3.ZERO
-    camera.rotation = Vector3(-0.18, 0.0, 0.0) if enabled else Vector3.ZERO
-    camera.fov = 84.0 if enabled else 78.0
+    var blend: float = clampf(delta * 6.5, 0.0, 1.0)
+    camera.position = camera.position.lerp(camera_target_position, blend)
+    camera.rotation = camera.rotation.lerp(camera_target_rotation, blend)
+    camera.fov = lerpf(camera.fov, camera_target_fov, blend)
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
