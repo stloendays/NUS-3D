@@ -17,7 +17,7 @@
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **C** to collect Field Notes, **V** to start/cancel Campus Sprint, **Y** to cycle weather, **Q** to talk to fictional NPCs, **I** to enter/exit illustrative ERC/SRC interiors, **B** to ride a bicycle, **X** to board/alight the moving shuttle, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **C** to collect Field Notes, **V** to start/cancel Campus Sprint, **Y** to cycle weather, **Q** to talk to fictional NPCs, **I** to enter/exit illustrative ERC/SRC interiors, **L** to use the interior mezzanine lift, **B** to ride a bicycle, **X** to board/alight the moving shuttle, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1/M2 milestone, or a Windows installer.**
 
@@ -139,10 +139,10 @@ Eight glowing Field Notes are interpolated along existing schematic walkway segm
 
 ## M3.3: weather, campus life, interiors and transport
 
-- **Weather:** press **Y** to cycle Clear, Cloudy, Overcast, Rain and Thunderstorm. Procedural clouds, rain particles, fog and occasional lightning are local effects, not a live forecast.
-- **Pedestrians:** six fictional low-poly student NPCs walk along the existing schematic path polylines. Press **Q** nearby for a short original dialogue line.
-- **Interiors:** press **I** near the ERC or SRC conceptual approach to enter an original study-lounge or recreation-atrium pocket; press **I** again to return. These are standalone illustrative rooms, not actual NUS floor plans or connected building interiors.
-- **Bicycle:** press **B** to switch between walking and a faster bicycle mode. The first-person camera moves to a simple third-person follow view.
+- **Weather:** press **Y** to cycle Clear, Cloudy, Overcast, Rain and Thunderstorm. Procedural clouds, rain particles, wet-ground puddles, ripple rings, fog and occasional lightning are local effects, not a live forecast.
+- **Pedestrians:** six fictional low-poly student NPCs walk, pause at path ends and animate arms/legs. Press **Q** nearby for a short original dialogue line.
+- **Interiors:** press **I** near the ERC or SRC conceptual approach to enter an original two-level study-lounge or recreation-atrium pocket; use **L** to switch between the ground floor and mezzanine, and **I** again to return. These are standalone illustrative rooms, not actual NUS floor plans or connected building interiors.
+- **Bicycle:** press **B** to switch between walking and a faster bicycle mode. The follow camera eases into place, while wheels, pedals and handlebars animate.
 - **Shuttle:** a procedural bus loops between the four existing conceptual waypoints. Press **X** near it to board and **X** again to alight. It is a gameplay vehicle, not a real NUS service or route.
 - The minimap shows pedestrian and shuttle positions. All NPCs, interiors, vehicle geometry, weather and dialogue are offline and procedurally generated. No accounts, telemetry or network services are used.
 
