@@ -306,6 +306,71 @@ func _smoke() -> void:
         quit(1)
         return
     player.call("reset_player")
+    var weather: UTownWeather = instance.get_node_or_null("Weather") as UTownWeather
+    var campus_life: UTownCampusLife = instance.get_node_or_null("CampusLife") as UTownCampusLife
+    if weather == null or weather.NAMES.size() != 5:
+        push_error("five-mode weather controller is missing")
+        quit(1)
+        return
+    if not weather.set_mode(3) or not weather.rain.emitting:
+        push_error("rain weather did not activate its particle system")
+        quit(1)
+        return
+    if not weather.set_mode(4):
+        push_error("thunderstorm weather preset could not be selected")
+        quit(1)
+        return
+    if not weather.set_mode(0) or weather.rain.emitting:
+        push_error("clear weather did not restore the dry scene")
+        quit(1)
+        return
+    if campus_life == null or campus_life.pedestrians.size() < 4:
+        push_error("procedural campus pedestrians did not spawn")
+        quit(1)
+        return
+    if campus_life.interiors.size() != 2 or campus_life.shuttle == null:
+        push_error("ERC/SRC interior concepts or campus shuttle did not load")
+        quit(1)
+        return
+    var exterior_before: Vector3 = player.global_position
+    if not campus_life.enter_interior("ERC") or not campus_life.interior_active or not weather.indoor:
+        push_error("ERC illustrative interior could not be entered")
+        quit(1)
+        return
+    if player.global_position.x < 800.0:
+        push_error("interior pocket was not isolated from the outdoor proxy")
+        quit(1)
+        return
+    campus_life.exit_interior()
+    if campus_life.interior_active or weather.indoor or player.global_position.distance_to(exterior_before) > 0.01:
+        push_error("interior exit did not restore the player's outdoor position")
+        quit(1)
+        return
+    if not campus_life.set_bicycle(true) or not player.bicycle_mode or not campus_life.bicycle.visible:
+        push_error("bicycle mode did not enable player speed and bicycle visual")
+        quit(1)
+        return
+    if not campus_life.set_bicycle(false) or player.bicycle_mode or campus_life.bicycle.visible:
+        push_error("bicycle mode did not return to walking")
+        quit(1)
+        return
+    var npc_node: Node3D = campus_life.pedestrians[0]["node"]
+    player.global_position = npc_node.global_position
+    if not campus_life.talk_to_nearest() or campus_life.message.is_empty():
+        push_error("nearby campus NPC dialogue did not respond")
+        quit(1)
+        return
+    player.global_position = campus_life.shuttle.global_position
+    if not campus_life.board_or_alight() or not campus_life.on_shuttle or not player.movement_locked:
+        push_error("player could not board the nearby shuttle")
+        quit(1)
+        return
+    campus_life.alight_shuttle()
+    if campus_life.on_shuttle or player.movement_locked:
+        push_error("player could not leave the shuttle")
+        quit(1)
+        return
+    player.call("reset_player")
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
     if trunks == null or canopies == null or trunks.multimesh == null or canopies.multimesh == null:
