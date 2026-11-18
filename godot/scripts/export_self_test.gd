@@ -26,6 +26,8 @@ func collect_issues() -> Array[String]:
     var review: UTownViewReview = get_parent().get_node_or_null("ViewReview") as UTownViewReview
     var tour: UTownTour = get_parent().get_node_or_null("Tour") as UTownTour
     var challenge: UTownChallenge = get_parent().get_node_or_null("Challenge") as UTownChallenge
+    var weather: UTownWeather = get_parent().get_node_or_null("Weather") as UTownWeather
+    var campus_life: UTownCampusLife = get_parent().get_node_or_null("CampusLife") as UTownCampusLife
     var hud: CanvasLayer = get_parent().get_node_or_null("HUD") as CanvasLayer
 
     for source_file in REQUIRED_SOURCE_FILES:
@@ -65,6 +67,10 @@ func collect_issues() -> Array[String]:
         issues.append("Eight local Field Notes or their runtime markers did not load")
     if challenge != null and challenge.sprint_route.size() != 5:
         issues.append("Campus Sprint did not resolve the four-stop loop and return")
+    if weather == null or weather.NAMES.size() != 5 or weather.rain == null:
+        issues.append("Five-mode weather controller or rain particles did not load")
+    if campus_life == null or campus_life.pedestrians.size() < 4 or campus_life.interiors.size() != 2 or campus_life.shuttle == null:
+        issues.append("Campus NPCs, two interior concepts or shuttle did not load")
     return issues
 
 func _run_export_test() -> void:
@@ -76,6 +82,8 @@ func _run_export_test() -> void:
     var world: UTownWorld = get_parent().get_node_or_null("World") as UTownWorld
     var tour: UTownTour = get_parent().get_node_or_null("Tour") as UTownTour
     var challenge: UTownChallenge = get_parent().get_node_or_null("Challenge") as UTownChallenge
+    var weather: UTownWeather = get_parent().get_node_or_null("Weather") as UTownWeather
+    var campus_life: UTownCampusLife = get_parent().get_node_or_null("CampusLife") as UTownCampusLife
     var results: Dictionary = {
         "schema_version": 1,
         "result": "pass" if issues.is_empty() else "fail",
@@ -88,6 +96,10 @@ func _run_export_test() -> void:
         "tour_stops": tour.stops.size() if tour != null else 0,
         "field_notes": challenge.items.size() if challenge != null else 0,
         "sprint_waypoints": challenge.sprint_route.size() if challenge != null else 0,
+        "weather_modes": weather.NAMES.size() if weather != null else 0,
+        "npc_count": campus_life.pedestrians.size() if campus_life != null else 0,
+        "interior_count": campus_life.interiors.size() if campus_life != null else 0,
+        "shuttle_loaded": campus_life.shuttle != null if campus_life != null else false,
         "osm_features": world.osm_reference_layer.feature_count if world != null and world.osm_reference_layer != null else 0,
         "issues": issues,
     }
