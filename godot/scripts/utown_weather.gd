@@ -16,6 +16,9 @@ var mode: int = 0
 var indoor: bool = false
 var rain: GPUParticles3D
 var clouds: Node3D
+var puddle_root: Node3D
+var puddle_nodes: Array[Node3D] = []
+var puddle_ripples: Array[MeshInstance3D] = []
 var flash: OmniLight3D
 var flash_wait: float = 8.0
 var flash_time: float = 0.0
@@ -23,6 +26,7 @@ var applied_lighting: int = -1
 
 func _ready() -> void:
     _build_effects()
+    _build_puddles()
     _apply()
 
 func mode_count() -> int:
@@ -96,10 +100,72 @@ func _build_effects() -> void:
     flash.shadow_enabled = false
     add_child(flash)
 
+func _build_puddles() -> void:
+    puddle_root = Node3D.new()
+    puddle_root.name = "ProceduralRainPuddles"
+    add_child(puddle_root)
+    var water := StandardMaterial3D.new()
+    water.albedo_color = Color(0.48, 0.67, 0.75, 0.46)
+    water.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    water.metallic = 0.68
+    water.roughness = 0.12
+    water.specular_mode = BaseMaterial3D.SPECULAR_SCHLICK_GGX
+    var ripple_material := StandardMaterial3D.new()
+    ripple_material.albedo_color = Color(0.78, 0.9, 0.95, 0.48)
+    ripple_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    ripple_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+    ripple_material.roughness = 0.16
+    var walkways: Array = world.layout.get("walkways", [])
+    for path_index in range(walkways.size()):
+        var coordinates: Array = walkways[path_index].get("lonlat", [])
+        if coordinates.size() < 2:
+            continue
+        var segment_index: int = mini(path_index % (coordinates.size() - 1), coordinates.size() - 2)
+        var a_coords: Array = coordinates[segment_index]
+        var b_coords: Array = coordinates[segment_index + 1]
+        var a: Vector3 = world.lonlat_to_world(float(a_coords[0]), float(a_coords[1]))
+        var b: Vector3 = world.lonlat_to_world(float(b_coords[0]), float(b_coords[1]))
+        var direction: Vector3 = (b - a).normalized()
+        var side: Vector3 = Vector3(-direction.z, 0.0, direction.x)
+        var centre: Vector3 = a.lerp(b, 0.42) + side * (1.2 + float(path_index % 2) * 0.55)
+        var puddle := Node3D.new()
+        puddle.name = "Puddle_%02d" % path_index
+        puddle.position = centre + Vector3(0.0, 0.035, 0.0)
+        puddle_root.add_child(puddle)
+        var pool := MeshInstance3D.new()
+        var pool_mesh := CylinderMesh.new()
+        pool_mesh.top_radius = 1.0
+        pool_mesh.bottom_radius = 1.0
+        pool_mesh.height = 0.018
+        pool_mesh.radial_segments = 24
+        pool.mesh = pool_mesh
+        pool.scale = Vector3(1.45, 1.0, 0.72)
+        pool.material_override = water
+        puddle.add_child(pool)
+        var ripple := MeshInstance3D.new()
+        var ripple_mesh := TorusMesh.new()
+        ripple_mesh.inner_radius = 0.34
+        ripple_mesh.outer_radius = 0.38
+        ripple_mesh.rings = 6
+        ripple_mesh.ring_segments = 20
+        ripple.mesh = ripple_mesh
+        ripple.rotation.x = PI * 0.5
+        ripple.scale = Vector3(1.15, 0.68, 1.0)
+        ripple.position.y = 0.025
+        ripple.material_override = ripple_material
+        puddle.add_child(ripple)
+        puddle_nodes.append(puddle)
+        puddle_ripples.append(ripple)
+
 func _process(delta: float) -> void:
     if world.lighting_mode != applied_lighting:
         _apply()
     clouds.global_position = Vector3(player.global_position.x, 0.0, player.global_position.z)
+    for i in range(puddle_ripples.size()):
+        var ripple: MeshInstance3D = puddle_ripples[i]
+        ripple.rotation.y += delta * (0.22 + float(i % 3) * 0.08)
+        var pulse: float = 1.0 + sin(float(Time.get_ticks_msec()) * 0.0018 + float(i)) * 0.045
+        ripple.scale = Vector3(1.15 * pulse, 0.68 * pulse, 1.0)
     rain.global_position = player.global_position + Vector3(0.0, 12.0, 0.0)
     flash.global_position = player.global_position + Vector3(0.0, 22.0, 0.0)
     if mode == 4 and not indoor:
@@ -156,6 +222,7 @@ func _refresh_effects() -> void:
     if clouds == null or rain == null:
         return
     clouds.visible = mode >= 1 and not indoor
+    puddle_root.visible = mode >= 3 and not indoor
     rain.visible = mode >= 3 and not indoor
     rain.emitting = mode >= 3 and not indoor
     if indoor:
