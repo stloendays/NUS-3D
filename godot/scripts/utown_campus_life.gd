@@ -19,7 +19,7 @@ const BOARD_RADIUS: float = 7.0
 const SHUTTLE_SPEED: float = 5.2
 
 @onready var world: UTownWorld = $"../World"
-@onready var player: CharacterBody3D = $"../Player"
+@onready var player: UTownPlayer = $"../Player"
 @onready var weather: UTownWeather = $"../Weather"
 
 var pedestrians: Array[Dictionary] = []
