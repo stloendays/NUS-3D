@@ -404,11 +404,15 @@ func _build_shuttle() -> void:
     var body := _mat("#356b67")
     var dark := _mat("#263b43")
     var glass := _mat("#9ec5d1", 0.42)
-    _box(shuttle, "BusBody", Vector3(0, 0.78, 0), Vector3(2.25, 1.25, 5.2), body)
-    shuttle_roof = _box(shuttle, "BusRoof", Vector3(0, 1.48, 0), Vector3(2.2, 0.16, 5.0), dark)
-    _box(shuttle, "LeftWindows", Vector3(-1.14, 1.15, 0), Vector3(0.06, 0.64, 4.3), glass)
-    _box(shuttle, "RightWindows", Vector3(1.14, 1.15, 0), Vector3(0.06, 0.64, 4.3), glass)
-    _box(shuttle, "FrontWindow", Vector3(0, 1.16, -2.62), Vector3(1.85, 0.6, 0.06), glass)
+    _box(shuttle, "BusBody", Vector3(0, 0.38, 0), Vector3(2.25, 0.52, 5.2), body)
+    _box(shuttle, "LowerLeftPanel", Vector3(-1.13, 0.48, 0), Vector3(0.08, 0.48, 5.0), body)
+    _box(shuttle, "LowerRightPanel", Vector3(1.13, 0.48, 0), Vector3(0.08, 0.48, 5.0), body)
+    shuttle_roof = _box(shuttle, "BusRoof", Vector3(0, 1.76, 0), Vector3(2.2, 0.16, 5.0), dark)
+    _box(shuttle, "LeftWindows", Vector3(-1.14, 1.15, 0), Vector3(0.06, 0.92, 4.3), glass)
+    _box(shuttle, "RightWindows", Vector3(1.14, 1.15, 0), Vector3(0.06, 0.92, 4.3), glass)
+    _box(shuttle, "FrontWindow", Vector3(0, 1.2, -2.62), Vector3(1.85, 0.9, 0.06), glass)
+    _box(shuttle, "RearWindow", Vector3(0, 1.2, 2.62), Vector3(1.85, 0.9, 0.06), glass)
+    shuttle_wheels.clear()
     for side in [-1.0, 1.0]:
         for z in [-1.75, 1.75]:
             var wheel := MeshInstance3D.new()
@@ -420,6 +424,32 @@ func _build_shuttle() -> void:
             wheel.position = Vector3(side * 1.12, 0.38, z)
             wheel.material_override = dark
             shuttle.add_child(wheel)
+            shuttle_wheels.append(wheel)
+    # Seats and fictional seated passengers are visible through the side windows.
+    for passenger_index in range(3):
+        var z: float = -1.35 + float(passenger_index) * 1.3
+        _box(shuttle, "PassengerSeat_%d" % passenger_index, Vector3(0.45, 0.7, z), Vector3(0.72, 0.14, 0.62), dark)
+        var passenger := Node3D.new()
+        passenger.name = "Passenger_%d" % passenger_index
+        passenger.position = Vector3(0.42, 0.76, z)
+        var torso := MeshInstance3D.new()
+        var torso_mesh := CapsuleMesh.new()
+        torso_mesh.radius = 0.16
+        torso_mesh.height = 0.62
+        torso.mesh = torso_mesh
+        torso.position.y = 0.28
+        var passenger_material := _mat(["#d28c70", "#7d9eb4", "#c4a16b"][passenger_index])
+        torso.material_override = passenger_material
+        passenger.add_child(torso)
+        var head_mesh := MeshInstance3D.new()
+        var head_sphere := SphereMesh.new()
+        head_sphere.radius = 0.14
+        head_mesh.mesh = head_sphere
+        head_mesh.position.y = 0.72
+        head_mesh.material_override = _mat("#d9ad8d")
+        passenger.add_child(head_mesh)
+        shuttle.add_child(passenger)
+        shuttle_passengers.append(passenger)
     var label := Label3D.new()
     label.text = "UTOWN SHUTTLE"
     label.font_size = 26
@@ -428,6 +458,14 @@ func _build_shuttle() -> void:
     label.outline_size = 5
     label.position = Vector3(0, 2.2, 0)
     shuttle.add_child(label)
+    var route_sign := Label3D.new()
+    route_sign.text = "UTOWN LOOP"
+    route_sign.font_size = 18
+    route_sign.pixel_size = 0.012
+    route_sign.modulate = Color.html("#fff0bf")
+    route_sign.outline_size = 4
+    route_sign.position = Vector3(0, 1.95, -2.68)
+    shuttle.add_child(route_sign)
     shuttle.look_at(shuttle_route[1] + Vector3(0, 0.12, 0), Vector3.UP)
     for i in range(shuttle_route.size()):
         var stop := Node3D.new()
@@ -451,11 +489,18 @@ func _build_shuttle() -> void:
         sign.material_override = body
         stop.add_child(sign)
         var stop_label := Label3D.new()
-        stop_label.text = "SHUTTLE"
+        stop_label.text = shuttle_stop_names[i]
         stop_label.font_size = 18
         stop_label.pixel_size = 0.012
         stop_label.position.y = 2.75
         stop.add_child(stop_label)
+        var stop_number := Label3D.new()
+        stop_number.text = "STOP %d" % (i + 1)
+        stop_number.font_size = 14
+        stop_number.pixel_size = 0.01
+        stop_number.modulate = Color.html("#e7f1ed")
+        stop_number.position = Vector3(0.0, 3.15, 0.0)
+        stop.add_child(stop_number)
 
 func _process(delta: float) -> void:
     message_time = maxf(0.0, message_time - delta)
@@ -463,22 +508,57 @@ func _process(delta: float) -> void:
     for state in pedestrians:
         var route: Array[Vector3] = state["route"]
         var total: float = _route_length(route)
-        var distance: float = float(state["distance"]) + float(state["direction"]) * float(state["speed"]) * delta
-        if distance >= total:
-            distance = total
-            state["direction"] = -1.0
-        elif distance <= 0.0:
-            distance = 0.0
-            state["direction"] = 1.0
-        state["distance"] = distance
-        var sample: Dictionary = _sample_route(route, distance)
+        var talk_remaining: float = maxf(0.0, float(state["talk_remaining"]) - delta)
+        state["talk_remaining"] = talk_remaining
+        var idle_remaining: float = maxf(0.0, float(state["idle_remaining"]) - delta)
+        if talk_remaining <= 0.0 and idle_remaining <= 0.0:
+            var next_distance: float = float(state["distance"]) + float(state["direction"]) * float(state["speed"]) * delta
+            if next_distance >= total:
+                next_distance = total
+                state["direction"] = -1.0
+                state["idle_remaining"] = randf_range(0.7, 1.7)
+            elif next_distance <= 0.0:
+                next_distance = 0.0
+                state["direction"] = 1.0
+                state["idle_remaining"] = randf_range(0.7, 1.7)
+            state["distance"] = next_distance
+        var sample: Dictionary = _sample_route(route, float(state["distance"]))
         var npc: Node3D = state["node"]
-        npc.position = sample["position"] + Vector3(0, sin(now * 4.0 + float(state["phase"])) * 0.025, 0)
-        var facing: Vector3 = sample["direction"] * float(state["direction"])
-        if facing.length() > 0.01:
-            npc.look_at(npc.global_position + facing, Vector3.UP)
+        var walking: bool = talk_remaining <= 0.0 and idle_remaining <= 0.0
+        var gait: float = sin(now * 6.2 + float(state["phase"])) if walking else sin(now * 1.8 + float(state["phase"])) * 0.08
+        var bob: float = absf(sin(now * 6.2 + float(state["phase"]))) * 0.035 if walking else sin(now * 1.8 + float(state["phase"])) * 0.012
+        npc.position = sample["position"] + Vector3(0.0, bob, 0.0)
+        if talk_remaining > 0.0:
+            var to_player: Vector3 = player.global_position - npc.global_position
+            to_player.y = 0.0
+            if to_player.length() > 0.05:
+                npc.look_at(npc.global_position + to_player, Vector3.UP)
+        else:
+            var facing: Vector3 = sample["direction"] * float(state["direction"])
+            if facing.length() > 0.01:
+                npc.look_at(npc.global_position + facing, Vector3.UP)
+        var left_arm: Node3D = state["left_arm"]
+        var right_arm: Node3D = state["right_arm"]
+        var left_leg: Node3D = state["left_leg"]
+        var right_leg: Node3D = state["right_leg"]
+        left_arm.rotation.x = gait * 0.48
+        right_arm.rotation.x = -gait * 0.48
+        left_leg.rotation.x = -gait * 0.62
+        right_leg.rotation.x = gait * 0.62
+
+    if bicycle_enabled:
+        var bike_speed: float = Vector2(player.velocity.x, player.velocity.z).length()
+        var wheel_turn: float = bike_speed * delta / 0.36
+        for wheel in bicycle_wheels:
+            wheel.rotation.x += wheel_turn
+        if bicycle_crank != null:
+            bicycle_crank.rotation.x += wheel_turn * 0.55
+        if bicycle_handlebar != null:
+            var steer: float = float(Input.is_physical_key_pressed(KEY_D)) - float(Input.is_physical_key_pressed(KEY_A))
+            bicycle_handlebar.rotation.y = lerpf(bicycle_handlebar.rotation.y, steer * 0.28, clampf(delta * 8.0, 0.0, 1.0))
 
     if shuttle != null and not shuttle_route.is_empty():
+        var moved_distance: float = 0.0
         if shuttle_dwell > 0.0:
             shuttle_dwell = maxf(0.0, shuttle_dwell - delta)
         else:
@@ -488,13 +568,17 @@ func _process(delta: float) -> void:
             diff.y = 0.0
             var distance_to_stop: float = diff.length()
             if distance_to_stop <= SHUTTLE_SPEED * delta:
+                moved_distance = distance_to_stop
                 shuttle.global_position = target
                 shuttle_segment = target_index
-                shuttle_dwell = 1.6
+                shuttle_dwell = 3.0
             elif distance_to_stop > 0.001:
                 var direction: Vector3 = diff.normalized()
-                shuttle.global_position += direction * SHUTTLE_SPEED * delta
+                moved_distance = SHUTTLE_SPEED * delta
+                shuttle.global_position += direction * moved_distance
                 shuttle.look_at(shuttle.global_position + direction, Vector3.UP)
+        for wheel in shuttle_wheels:
+            wheel.rotation.x += moved_distance / 0.34
         if on_shuttle:
             player.global_position = shuttle.global_position + Vector3(0, 0.18, 0)
             player.rotation.y = shuttle.rotation.y
@@ -516,6 +600,7 @@ func talk_to_nearest() -> bool:
         message = "No campus character is close enough to talk."
         message_time = 2.5
         return false
+    pedestrians[index]["talk_remaining"] = 6.0
     message = "%s  |  %s" % [str(pedestrians[index]["name"]), str(pedestrians[index]["line"])]
     message_time = 6.0
     return true
@@ -529,6 +614,7 @@ func enter_interior(id: String) -> bool:
     if bicycle_enabled:
         set_bicycle(false)
     active_interior = id
+    interior_floor = 0
     interior_active = true
     player.velocity = Vector3.ZERO
     player.global_position = interior_anchors[id] + Vector3(0, 0.18, 6)
@@ -539,6 +625,17 @@ func enter_interior(id: String) -> bool:
     message_time = 4.0
     return true
 
+func toggle_interior_floor() -> bool:
+    if not interior_active:
+        return false
+    interior_floor = 1 - interior_floor
+    var floor_y: float = 0.18 if interior_floor == 0 else 3.58
+    player.global_position = interior_anchors[active_interior] + Vector3(-9.2, floor_y, -6.5)
+    player.velocity = Vector3.ZERO
+    message = "%s  |  %s floor" % [active_interior, "GROUND" if interior_floor == 0 else "MEZZANINE"]
+    message_time = 3.5
+    return true
+
 func exit_interior() -> void:
     if not interior_active:
         return
@@ -547,6 +644,7 @@ func exit_interior() -> void:
     player.head.rotation = return_head_rotation
     player.velocity = Vector3.ZERO
     active_interior = ""
+    interior_floor = 0
     interior_active = false
     weather.set_indoor(false)
     message = "Returned to the schematic outdoor scene."
@@ -610,7 +708,7 @@ func status_text() -> String:
     var lines := PackedStringArray()
     lines.append("CAMPUS LIFE  |  %d pedestrians  |  [Q] talk" % pedestrians.size())
     if interior_active:
-        lines.append("INDOORS: %s concept  |  [I] return" % active_interior)
+        lines.append("INDOORS: %s / %s floor  |  [L] lift  [I] exit" % [active_interior, "MEZZANINE" if interior_floor == 1 else "GROUND"])
     elif on_shuttle:
         lines.append("ON UTOWN SHUTTLE  |  [X] alight")
     else:
@@ -630,6 +728,8 @@ func _unhandled_input(event: InputEvent) -> void:
         match event.keycode:
             KEY_I:
                 enter_nearest_interior()
+            KEY_L:
+                toggle_interior_floor()
             KEY_Q:
                 talk_to_nearest()
             KEY_B:
