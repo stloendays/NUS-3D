@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.3 source-footprint comparison + M3/M3.1 atmosphere and guided exploration + M4 alpha Windows portable build pipeline (2026-11-16)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M4 alpha Windows portable build pipeline (2026-11-18)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -12,12 +12,12 @@
 
 - **第一版核心区**：Town Green + Town Plaza + Education Resource Centre (ERC) + Stephen Riady Centre (SRC)。
 - **周边占位模型**：Tembusu College、College of Alice & Peter Tan (CAPT)、Residential College 4 (RC4)、Cinnamon College、UTown Residence、CREATE；待核实后按批次完善。
-- **暂不做**：整个 Kent Ridge 校区、所有室内、精细 BIM、联网多人、自动真实校车仿真。
+- **暂不做**：整个 Kent Ridge 校区、完整楼层级室内复刻、精细 BIM、联网多人和真实校车时刻/路径仿真。当前室内和交通仅是独立的玩法原型。
 - **原则**：不是 NUS 官方项目；不要将尚未验证的点云、建筑高度或模型授权表述为已取得。
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **C** to collect Field Notes, **V** to start/cancel Campus Sprint, **Y** to cycle weather, **Q** to talk to fictional NPCs, **I** to enter/exit illustrative ERC/SRC interiors, **B** to ride a bicycle, **X** to board/alight the moving shuttle, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1/M2 milestone, or a Windows installer.**
 
@@ -53,7 +53,7 @@ NUS official map + OpenStreetMap outlines + reference photographs/360 views
 | M0 — Evidence | UTown 基础地图与可追踪来源 | 明确边界、坐标基准、建筑清单；每项来源有授权状态 |
 | M1 — Greybox | 可行走的 Town Green 核心区 | ERC/SRC/Plaza/Green 位置与比例基本准确，能连续绕行 |
 | M2 — Architecture | 第一批实景辨识度模型 | 4 个核心地标外形、入口及连接路径可辨识 |
-| M3 — Atmosphere | 有生命感的校园 | 树木/草地、基础光照与日夜变化、行走音效 |
+| M3 — Atmosphere & play | 有生命感且可互动的校园 | 天气、NPC、示意室内、自行车、循环穿梭巴士和可重复挑战均可运行；图形界面验收另行完成 |
 | M4 — Release | Windows 可执行文件 | 普通 Windows 电脑可运行；性能测量与版权清单完成 |
 | M5 — Optional | Three.js 在线参观 | 同一 GLB 资产可重用，网页版有自由相机和建筑标签 |
 
@@ -131,3 +131,19 @@ The playable scene now includes an original, optional **UTown Explorer** check-i
 ## M2.3 P0 footprint coverage scorecard
 
 M2.3 now computes reproducible, exact-in-local-projection plan-view IoU, two-sided area differences and centroid offset between the current ERC/SRC multi-part box massing and independently archived OpenStreetMap outer-ring polygons. CI publishes both `build/osm-proxy-fit.json` and an original SVG scorecard in `utown-route-clearance-audit`. **These are dataset agreement statistics, not validated true building dimensions, roads or accessibility.** See [M2.3 methodology and caveats](docs/M2_3_FOOTPRINT_FIT.md).
+
+
+## M3.2: Field Notes and Campus Sprint
+
+Eight glowing Field Notes are interpolated along existing schematic walkway segments; press **C** nearby to collect one. Press **V** near Town Green to start the four-stop Campus Sprint (ERC → SRC → Town Plaza → return to Green). The timer awards a game-design medal, and collected-note IDs plus the best Sprint time persist in a local save file. See [M3.2 usage and save contract](docs/M3_2_PLAYABLE_CHALLENGES.md).
+
+## M3.3: weather, campus life, interiors and transport
+
+- **Weather:** press **Y** to cycle Clear, Cloudy, Overcast, Rain and Thunderstorm. Procedural clouds, rain particles, fog and occasional lightning are local effects, not a live forecast.
+- **Pedestrians:** six fictional low-poly student NPCs walk along the existing schematic path polylines. Press **Q** nearby for a short original dialogue line.
+- **Interiors:** press **I** near the ERC or SRC conceptual approach to enter an original study-lounge or recreation-atrium pocket; press **I** again to return. These are standalone illustrative rooms, not actual NUS floor plans or connected building interiors.
+- **Bicycle:** press **B** to switch between walking and a faster bicycle mode. The first-person camera moves to a simple third-person follow view.
+- **Shuttle:** a procedural bus loops between the four existing conceptual waypoints. Press **X** near it to board and **X** again to alight. It is a gameplay vehicle, not a real NUS service or route.
+- The minimap shows pedestrian and shuttle positions. All NPCs, interiors, vehicle geometry, weather and dialogue are offline and procedurally generated. No accounts, telemetry or network services are used.
+
+See [M3.3 implementation and limitations](docs/M3_3_CAMPUS_LIFE_WEATHER.md). The current rooms and shuttle use isolated/estimated game-space positions; visual GUI testing and route/placement review remain necessary.
