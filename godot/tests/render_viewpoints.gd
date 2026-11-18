@@ -137,6 +137,9 @@ func _render() -> void:
     world.set_lighting_mode(0)
     review.select_view(3)
     weather.set_mode(3)
+    weather.rain.restart()
+    for rain_frame in range(60):
+        await process_frame
     if not await _capture_frame(output, "M3_3_WEATHER_RAIN.png"):
         push_error("Could not capture the rain and puddle showcase")
         quit(1)
@@ -146,6 +149,8 @@ func _render() -> void:
     weather.set_mode(4)
     weather.flash_wait = 60.0
     weather.flash_time = 0.14
+    for storm_frame in range(8):
+        await process_frame
     if not await _capture_frame(output, "M3_3_WEATHER_THUNDERSTORM.png"):
         push_error("Could not capture the thunderstorm showcase")
         quit(1)
