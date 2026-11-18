@@ -139,7 +139,7 @@ Eight glowing Field Notes are interpolated along existing schematic walkway segm
 
 ## M3.3: weather, campus life, interiors and transport
 
-- **Weather:** press **Y** to cycle Clear, Cloudy, Overcast, Rain and Thunderstorm. Procedural clouds, rain particles, wet-ground puddles, ripple rings, fog and occasional lightning are local effects, not a live forecast.
+- **Weather:** press **Y** to cycle Clear, Cloudy, Overcast, Rain and Thunderstorm. Procedural clouds, rain particles and deterministic rain-streak MultiMesh, wet-ground puddles, ripple rings, fog and occasional lightning are local effects, not a live forecast.
 - **Pedestrians:** six fictional low-poly student NPCs walk, pause at path ends and animate arms/legs. Press **Q** nearby for a short original dialogue line.
 - **Interiors:** press **I** near the ERC or SRC conceptual approach to enter an original two-level study-lounge or recreation-atrium pocket; use **L** to switch between the ground floor and mezzanine, and **I** again to return. These are standalone illustrative rooms, not actual NUS floor plans or connected building interiors.
 - **Bicycle:** press **B** to switch between walking and a faster bicycle mode. The follow camera eases into place, while wheels, pedals and handlebars animate.
