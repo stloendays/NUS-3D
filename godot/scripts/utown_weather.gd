@@ -2,11 +2,12 @@ extends Node
 class_name UTownWeather
 ## Offline weather presets layered over the project's artistic time-of-day settings.
 
-const NAMES: PackedStringArray = PackedStringArray(["Clear", "Cloudy", "Overcast", "Rain", "Thunderstorm"])
-const SKY: Array[Color] = [Color("#c6d8df"), Color("#e5c4a9"), Color("#607e9c"), Color("#243951")]
-const AMBIENT: Array[Color] = [Color("#e8edf0"), Color("#ffddb3"), Color("#a3b9d0"), Color("#96afce")]
-const SUN: PackedFloat32Array = PackedFloat32Array([1.0, 0.76, 0.32, 0.14])
-const AMBIENT_ENERGY: PackedFloat32Array = PackedFloat32Array([0.78, 0.74, 0.56, 0.43])
+const MODE_COUNT: int = 5
+var names: PackedStringArray = PackedStringArray(["Clear", "Cloudy", "Overcast", "Rain", "Thunderstorm"])
+var sky_colors: Array[Color] = [Color("#c6d8df"), Color("#e5c4a9"), Color("#607e9c"), Color("#243951")]
+var ambient_colors: Array[Color] = [Color("#e8edf0"), Color("#ffddb3"), Color("#a3b9d0"), Color("#96afce")]
+var sun_energy_by_time: PackedFloat32Array = PackedFloat32Array([1.0, 0.76, 0.32, 0.14])
+var ambient_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.78, 0.74, 0.56, 0.43])
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: CharacterBody3D = $"../Player"
@@ -24,8 +25,11 @@ func _ready() -> void:
     _build_effects()
     _apply()
 
+func mode_count() -> int:
+    return MODE_COUNT
+
 func set_mode(value: int) -> bool:
-    if value < 0 or value >= NAMES.size():
+    if value < 0 or value >= MODE_COUNT:
         return false
     mode = value
     flash_wait = randf_range(5.0, 11.0)
@@ -34,7 +38,7 @@ func set_mode(value: int) -> bool:
     return true
 
 func cycle() -> void:
-    set_mode((mode + 1) % NAMES.size())
+    set_mode((mode + 1) % MODE_COUNT)
 
 func set_indoor(value: bool) -> void:
     indoor = value
@@ -115,10 +119,10 @@ func _process(delta: float) -> void:
 func _apply() -> void:
     var t: int = clampi(world.lighting_mode, 0, 3)
     applied_lighting = t
-    var sky: Color = SKY[t]
-    var ambient: Color = AMBIENT[t]
-    var sun_energy: float = SUN[t]
-    var ambient_energy: float = AMBIENT_ENERGY[t]
+    var sky: Color = sky_colors[t]
+    var ambient: Color = ambient_colors[t]
+    var sun_energy: float = sun_energy_by_time[t]
+    var ambient_energy: float = ambient_energy_by_time[t]
     match mode:
         1:
             sky = sky.lerp(Color("#aebbc3"), 0.24)
@@ -159,7 +163,7 @@ func _refresh_effects() -> void:
 
 func status_text() -> String:
     var condition: String = "Dry" if mode <= 2 else "Rain active" if mode == 3 else "Lightning possible"
-    return "WEATHER  %s  |  %s  |  [Y] change" % [str(NAMES[mode]).to_upper(), condition]
+    return "WEATHER  %s  |  %s  |  [Y] change" % [str(names[mode]).to_upper(), condition]
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_Y:
