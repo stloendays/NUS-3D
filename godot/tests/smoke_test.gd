@@ -308,7 +308,7 @@ func _smoke() -> void:
     player.call("reset_player")
     var weather: UTownWeather = instance.get_node_or_null("Weather") as UTownWeather
     var campus_life: UTownCampusLife = instance.get_node_or_null("CampusLife") as UTownCampusLife
-    if weather == null or weather.NAMES.size() != 5:
+    if weather == null or weather.mode_count() != 5:
         push_error("five-mode weather controller is missing")
         quit(1)
         return
