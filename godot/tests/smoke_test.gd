@@ -383,8 +383,6 @@ func _smoke() -> void:
         push_error("bicycle camera did not switch to the smooth follow-view target")
         quit(1)
         return
-        quit(1)
-        return
     if not campus_life.set_bicycle(false) or player.bicycle_mode or campus_life.bicycle.visible:
         push_error("bicycle mode did not return to walking")
         quit(1)
