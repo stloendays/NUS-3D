@@ -67,10 +67,12 @@ func collect_issues() -> Array[String]:
         issues.append("Eight local Field Notes or their runtime markers did not load")
     if challenge != null and challenge.sprint_route.size() != 5:
         issues.append("Campus Sprint did not resolve the four-stop loop and return")
-    if weather == null or weather.mode_count() != 5 or weather.rain == null:
-        issues.append("Five-mode weather controller or rain particles did not load")
-    if campus_life == null or campus_life.pedestrians.size() < 4 or campus_life.interiors.size() != 2 or campus_life.shuttle == null:
+    if weather == null or weather.mode_count() != 5 or weather.rain == null or weather.puddle_nodes.size() < 4:
+        issues.append("Five-mode weather controller, rain particles or puddles did not load")
+    if campus_life == null or campus_life.pedestrians.size() != 6 or campus_life.interiors.size() != 2 or campus_life.shuttle == null:
         issues.append("Campus NPCs, two interior concepts or shuttle did not load")
+    if campus_life != null and (campus_life.bicycle_wheels.size() != 2 or campus_life.shuttle_wheels.size() != 4 or campus_life.shuttle_passengers.size() != 3):
+        issues.append("Bicycle or shuttle visual components are incomplete")
     return issues
 
 func _run_export_test() -> void:
@@ -100,6 +102,10 @@ func _run_export_test() -> void:
         "npc_count": campus_life.pedestrians.size() if campus_life != null else 0,
         "interior_count": campus_life.interiors.size() if campus_life != null else 0,
         "shuttle_loaded": campus_life.shuttle != null if campus_life != null else false,
+        "puddle_count": weather.puddle_nodes.size() if weather != null else 0,
+        "bicycle_wheels": campus_life.bicycle_wheels.size() if campus_life != null else 0,
+        "shuttle_passengers": campus_life.shuttle_passengers.size() if campus_life != null else 0,
+        "shuttle_wheels": campus_life.shuttle_wheels.size() if campus_life != null else 0,
         "osm_features": world.osm_reference_layer.feature_count if world != null and world.osm_reference_layer != null else 0,
         "issues": issues,
     }
