@@ -15,6 +15,10 @@ var ambient_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.78, 0.74,
 var mode: int = 0
 var indoor: bool = false
 var rain: GPUParticles3D
+var rain_streaks: MultiMeshInstance3D
+var rain_multimesh: MultiMesh
+var rain_offsets: Array[Vector3] = []
+var rain_speeds: PackedFloat32Array = PackedFloat32Array()
 var clouds: Node3D
 var puddle_root: Node3D
 var puddle_nodes: Array[Node3D] = []
@@ -92,6 +96,34 @@ func _build_effects() -> void:
     rain.draw_pass_1 = streak
     add_child(rain)
 
+    # A deterministic MultiMesh rain curtain guarantees readable streaks in
+    # low-end and software-rendered preview environments where GPU particles
+    # can be visually sparse.
+    rain_streaks = MultiMeshInstance3D.new()
+    rain_streaks.name = "RainStreakMultiMesh"
+    rain_multimesh = MultiMesh.new()
+    rain_multimesh.transform_format = MultiMesh.TRANSFORM_3D
+    var streak_mesh := BoxMesh.new()
+    streak_mesh.size = Vector3(0.025, 0.58, 0.025)
+    var streak_material := StandardMaterial3D.new()
+    streak_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+    streak_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    streak_material.albedo_color = Color(0.72, 0.86, 0.98, 0.82)
+    streak_material.emission_enabled = true
+    streak_material.emission = Color(0.22, 0.3, 0.38)
+    streak_material.emission_energy_multiplier = 0.25
+    streak_mesh.material = streak_material
+    rain_multimesh.mesh = streak_mesh
+    rain_multimesh.instance_count = 220
+    for i in range(rain_multimesh.instance_count):
+        var offset := Vector3(randf_range(-16.0, 16.0), randf_range(-6.0, 14.0), randf_range(-16.0, 16.0))
+        rain_offsets.append(offset)
+        rain_speeds.append(randf_range(13.0, 19.0))
+        rain_multimesh.set_instance_transform(i, Transform3D(Basis(Vector3.FORWARD, deg_to_rad(-8.0)), offset))
+    rain_streaks.multimesh = rain_multimesh
+    rain_streaks.visible = false
+    add_child(rain_streaks)
+
     flash = OmniLight3D.new()
     flash.name = "StormFlash"
     flash.light_color = Color(0.72, 0.83, 1.0)
@@ -167,6 +199,18 @@ func _process(delta: float) -> void:
         var pulse: float = 1.0 + sin(float(Time.get_ticks_msec()) * 0.0018 + float(i)) * 0.045
         ripple.scale = Vector3(1.15 * pulse, 0.68 * pulse, 1.0)
     rain.global_position = player.global_position + Vector3(0.0, 12.0, 0.0)
+    rain_streaks.global_position = player.global_position
+    if mode >= 3 and not indoor:
+        for i in range(rain_offsets.size()):
+            var offset: Vector3 = rain_offsets[i]
+            offset.y -= rain_speeds[i] * delta
+            offset.x -= 1.15 * delta
+            if offset.y < -6.0:
+                offset.y = randf_range(10.0, 16.0)
+                offset.x = randf_range(-16.0, 16.0)
+                offset.z = randf_range(-16.0, 16.0)
+            rain_offsets[i] = offset
+            rain_multimesh.set_instance_transform(i, Transform3D(Basis(Vector3.FORWARD, deg_to_rad(-8.0)), offset))
     flash.global_position = player.global_position + Vector3(0.0, 22.0, 0.0)
     if mode == 4 and not indoor:
         flash_wait -= delta
@@ -225,6 +269,7 @@ func _refresh_effects() -> void:
     puddle_root.visible = mode >= 3 and not indoor
     rain.visible = mode >= 3 and not indoor
     rain.emitting = mode >= 3 and not indoor
+    rain_streaks.visible = mode >= 3 and not indoor
     if indoor:
         flash.light_energy = 0.0
 
