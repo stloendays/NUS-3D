@@ -203,11 +203,9 @@ func _render() -> void:
     campus_life.set_bicycle(false)
 
     var bus: Node3D = campus_life.shuttle
-    player.global_position = bus.global_position + Vector3(12.0, 0.18, 12.0)
-    player.rotation.y = 0.0
+    player.global_position = bus.global_position + Vector3(10.0, 0.18, 10.0)
     player.head.rotation = Vector3.ZERO
-    player.camera.global_position = bus.global_position + Vector3(10.0, 5.0, 10.0)
-    player.camera.look_at(bus.global_position + Vector3(0.0, 1.0, 0.0), Vector3.UP)
+    player.look_at(bus.global_position + Vector3(0.0, 1.0, 0.0), Vector3.UP)
     if not await _capture_frame(output, "M3_3_UTOWN_SHUTTLE.png"):
         push_error("Could not capture the shuttle showcase")
         quit(1)
