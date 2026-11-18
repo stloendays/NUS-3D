@@ -380,6 +380,41 @@ func _build_bicycle() -> void:
     _add_rod(bicycle_crank, Vector3(-0.36, 0.0, 0.0), Vector3(-0.58, -0.05, 0.0), 0.04, frame)
     _add_rod(bicycle_crank, Vector3(0.36, 0.0, 0.0), Vector3(0.58, 0.05, 0.0), 0.04, frame)
 
+    # A simple low-poly rider makes the follow-camera mode read as cycling,
+    # rather than a floating bicycle prop.
+    var rider_shirt := _mat("#477b91")
+    var rider_skin := _mat("#d9ad8d")
+    var rider_trousers := _mat("#344553")
+    var rider_hair := _mat("#344047")
+    var rider_torso := MeshInstance3D.new()
+    var torso_mesh := CapsuleMesh.new()
+    torso_mesh.radius = 0.25
+    torso_mesh.height = 0.88
+    rider_torso.mesh = torso_mesh
+    rider_torso.position = Vector3(0.0, 1.47, -0.55)
+    rider_torso.rotation.x = -0.22
+    rider_torso.material_override = rider_shirt
+    bicycle.add_child(rider_torso)
+    var rider_head := MeshInstance3D.new()
+    var head_mesh := SphereMesh.new()
+    head_mesh.radius = 0.19
+    rider_head.mesh = head_mesh
+    rider_head.position = Vector3(0.0, 2.08, -0.72)
+    rider_head.material_override = rider_skin
+    bicycle.add_child(rider_head)
+    var hair := MeshInstance3D.new()
+    var hair_mesh := SphereMesh.new()
+    hair_mesh.radius = 0.195
+    hair.mesh = hair_mesh
+    hair.scale = Vector3(1.0, 0.48, 1.0)
+    hair.position = Vector3(0.0, 2.19, -0.72)
+    hair.material_override = rider_hair
+    bicycle.add_child(hair)
+    _add_rod(bicycle, Vector3(-0.2, 1.72, -0.48), Vector3(-0.43, 1.0, -1.28), 0.105, rider_shirt)
+    _add_rod(bicycle, Vector3(0.2, 1.72, -0.48), Vector3(0.43, 1.0, -1.28), 0.105, rider_shirt)
+    _add_rod(bicycle, Vector3(-0.15, 1.18, -0.52), Vector3(-0.32, 0.56, -0.78), 0.12, rider_trousers)
+    _add_rod(bicycle, Vector3(0.15, 1.18, -0.52), Vector3(0.32, 0.56, -0.78), 0.12, rider_trousers)
+
 func set_bicycle(value: bool) -> bool:
     if value and (interior_active or on_shuttle):
         return false
