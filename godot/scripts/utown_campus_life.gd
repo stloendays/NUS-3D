@@ -23,10 +23,17 @@ const SHUTTLE_SPEED: float = 5.2
 @onready var weather: UTownWeather = $"../Weather"
 
 var pedestrians: Array[Dictionary] = []
+var bicycle_wheels: Array[MeshInstance3D] = []
+var bicycle_handlebar: Node3D
+var bicycle_crank: Node3D
+var shuttle_wheels: Array[MeshInstance3D] = []
+var shuttle_passengers: Array[Node3D] = []
+var shuttle_stop_names: PackedStringArray = PackedStringArray(["Town Green", "ERC", "SRC", "Town Plaza"])
 var entry_positions: Dictionary = {}
 var interiors: Dictionary = {}
 var interior_anchors: Dictionary = {"ERC": Vector3(900.0, 0.0, 0.0), "SRC": Vector3(940.0, 0.0, 0.0)}
 var interior_active: bool = false
+var interior_floor: int = 0
 var active_interior: String = ""
 var return_position: Vector3 = Vector3.ZERO
 var return_rotation: Vector3 = Vector3.ZERO
@@ -97,6 +104,9 @@ func _build_pedestrians() -> void:
             "node": npc, "route": route, "distance": distance,
             "direction": 1.0 if i % 2 == 0 else -1.0,
             "speed": 0.72 + float(i % 3) * 0.16, "phase": float(i) * 1.13,
+            "idle_remaining": 0.0, "talk_remaining": 0.0,
+            "left_arm": npc.get_node("LeftArmPivot"), "right_arm": npc.get_node("RightArmPivot"),
+            "left_leg": npc.get_node("LeftLegPivot"), "right_leg": npc.get_node("RightLegPivot"),
             "name": npc_names[i], "line": npc_lines[i]
         })
 
@@ -109,6 +119,7 @@ func _make_person(index: int) -> Node3D:
     skin.albedo_color = Color.html("#d9ad8d")
     var trousers := StandardMaterial3D.new()
     trousers.albedo_color = Color.html("#354353")
+
     var torso := MeshInstance3D.new()
     var torso_mesh := CapsuleMesh.new()
     torso_mesh.radius = 0.27
@@ -117,6 +128,7 @@ func _make_person(index: int) -> Node3D:
     torso.position.y = 0.98
     torso.material_override = shirt
     root.add_child(torso)
+
     var head_mesh := MeshInstance3D.new()
     var head_sphere := SphereMesh.new()
     head_sphere.radius = 0.22
@@ -124,24 +136,34 @@ func _make_person(index: int) -> Node3D:
     head_mesh.position.y = 1.72
     head_mesh.material_override = skin
     root.add_child(head_mesh)
+
     for side in [-1.0, 1.0]:
+        var suffix: String = "Left" if side < 0.0 else "Right"
+        var leg_pivot := Node3D.new()
+        leg_pivot.name = suffix + "LegPivot"
+        leg_pivot.position = Vector3(side * 0.14, 0.68, 0.0)
+        root.add_child(leg_pivot)
         var leg := MeshInstance3D.new()
         var leg_mesh := CapsuleMesh.new()
         leg_mesh.radius = 0.12
         leg_mesh.height = 0.72
         leg.mesh = leg_mesh
-        leg.position = Vector3(side * 0.14, 0.37, 0.0)
+        leg.position.y = -0.31
         leg.material_override = trousers
-        root.add_child(leg)
+        leg_pivot.add_child(leg)
+
+        var arm_pivot := Node3D.new()
+        arm_pivot.name = suffix + "ArmPivot"
+        arm_pivot.position = Vector3(side * 0.34, 1.29, 0.0)
+        root.add_child(arm_pivot)
         var arm := MeshInstance3D.new()
         var arm_mesh := CapsuleMesh.new()
         arm_mesh.radius = 0.095
         arm_mesh.height = 0.7
         arm.mesh = arm_mesh
-        arm.position = Vector3(side * 0.34, 1.0, 0.0)
-        arm.rotation.z = side * -0.18
+        arm.position.y = -0.31
         arm.material_override = skin
-        root.add_child(arm)
+        arm_pivot.add_child(arm)
     return root
 
 func _mat(hex: String, alpha: float = 1.0) -> StandardMaterial3D:
@@ -181,6 +203,7 @@ func _build_interiors() -> void:
         room.position = interior_anchors[id]
         add_child(room)
         _build_room_shell(room, id)
+        _build_mezzanine(room, id)
         if id == "ERC":
             _build_study_room(room)
         else:
@@ -193,29 +216,36 @@ func _build_room_shell(room: Node3D, id: String) -> void:
     var glass := _mat("#7da6b6", 0.34)
     var trim := _mat("#506d78")
     _box(room, "Floor", Vector3(0, -0.15, 0), Vector3(24, 0.3, 18), floor, true)
-    _box(room, "WestWall", Vector3(-12, 2, 0), Vector3(0.3, 4, 18), wall, true)
-    _box(room, "EastWall", Vector3(12, 2, 0), Vector3(0.3, 4, 18), wall, true)
-    _box(room, "NorthWall", Vector3(0, 2, -9), Vector3(24, 4, 0.3), wall, true)
-    _box(room, "EntryWest", Vector3(-8.25, 2, 9), Vector3(7.5, 4, 0.3), wall, true)
-    _box(room, "EntryEast", Vector3(8.25, 2, 9), Vector3(7.5, 4, 0.3), wall, true)
-    _box(room, "WindowBand", Vector3(0, 2.45, -8.78), Vector3(15, 1.75, 0.08), glass)
+    _box(room, "WestWall", Vector3(-12, 3.25, 0), Vector3(0.3, 6.5, 18), wall, true)
+    _box(room, "EastWall", Vector3(12, 3.25, 0), Vector3(0.3, 6.5, 18), wall, true)
+    _box(room, "NorthWall", Vector3(0, 3.25, -9), Vector3(24, 6.5, 0.3), wall, true)
+    _box(room, "EntryWest", Vector3(-8.25, 3.25, 9), Vector3(7.5, 6.5, 0.3), wall, true)
+    _box(room, "EntryEast", Vector3(8.25, 3.25, 9), Vector3(7.5, 6.5, 0.3), wall, true)
+    _box(room, "WindowBand", Vector3(0, 4.4, -8.78), Vector3(15, 2.0, 0.08), glass)
     for x in [-8.0, -4.0, 0.0, 4.0, 8.0]:
-        _box(room, "CeilingBeam", Vector3(x, 3.88, 0), Vector3(0.16, 0.22, 17.5), trim)
+        _box(room, "CeilingBeam", Vector3(x, 6.38, 0), Vector3(0.16, 0.22, 17.5), trim)
     var title := Label3D.new()
     title.text = "ERC / STUDY LOUNGE CONCEPT" if id == "ERC" else "SRC / RECREATION ATRIUM CONCEPT"
     title.font_size = 30
     title.pixel_size = 0.018
     title.modulate = Color.html("#f5f3e9")
     title.outline_size = 5
-    title.position = Vector3(0, 3.05, -8.55)
+    title.position = Vector3(0, 5.55, -8.55)
     room.add_child(title)
     var light := OmniLight3D.new()
-    light.position = Vector3(0, 3, 0)
+    light.position = Vector3(0, 5.2, 0)
     light.light_color = Color("#ffe2b5")
     light.light_energy = 1.35
     light.omni_range = 28
     light.shadow_enabled = false
     room.add_child(light)
+    var lower_light := OmniLight3D.new()
+    lower_light.position = Vector3(0, 2.6, 0)
+    lower_light.light_color = Color("#e6f0ef")
+    lower_light.light_energy = 0.65
+    lower_light.omni_range = 24
+    lower_light.shadow_enabled = false
+    room.add_child(lower_light)
     var exit_label := Label3D.new()
     exit_label.text = "EXIT / PRESS I"
     exit_label.font_size = 24
@@ -223,6 +253,31 @@ func _build_room_shell(room: Node3D, id: String) -> void:
     exit_label.modulate = Color.html("#f1d18a")
     exit_label.position = Vector3(0, 2.7, 8.55)
     room.add_child(exit_label)
+
+func _build_mezzanine(room: Node3D, id: String) -> void:
+    var deck := _mat("#aeb9b4" if id == "ERC" else "#858f91")
+    var rail := _mat("#82aab1", 0.5)
+    var metal := _mat("#465b63")
+    _box(room, "UpperMezzanineFloor", Vector3(0, 3.25, -6.5), Vector3(23.4, 0.3, 5.0), deck, true)
+    _box(room, "MezzanineFrontRail", Vector3(0, 4.05, -4.0), Vector3(22.8, 0.12, 0.12), rail)
+    for x in [-11.2, 11.2]:
+        _box(room, "MezzanineSideRail", Vector3(x, 4.05, -6.5), Vector3(0.12, 0.12, 5.0), rail)
+    for x in [-10.5, -7.0, -3.5, 0.0, 3.5, 7.0, 10.5]:
+        _box(room, "BalconyPost", Vector3(x, 3.95, -4.0), Vector3(0.08, 0.9, 0.08), metal)
+    # A clearly visible staircase study links the lower floor to the upper deck.
+    for step in range(16):
+        var rise: float = float(step + 1) * 0.205
+        var z: float = 3.5 - float(step) * 0.49
+        _box(room, "StairStep_%02d" % step, Vector3(9.25, rise, z), Vector3(1.8, 0.22, 0.5), deck, true)
+    _box(room, "LiftCallPanel", Vector3(-9.2, 1.55, -6.45), Vector3(0.16, 1.0, 0.5), metal)
+    var lift_label := Label3D.new()
+    lift_label.text = "LIFT / PRESS L"
+    lift_label.font_size = 20
+    lift_label.pixel_size = 0.013
+    lift_label.modulate = Color.html("#f3d58e")
+    lift_label.outline_size = 4
+    lift_label.position = Vector3(-8.8, 2.35, -5.8)
+    room.add_child(lift_label)
 
 func _build_study_room(room: Node3D) -> void:
     var table := _mat("#8b6f55")
@@ -239,6 +294,10 @@ func _build_study_room(room: Node3D) -> void:
         for shelf in [0.55, 1.25, 1.95]:
             _box(room, "BookShelf", Vector3(-9.75, shelf, z), Vector3(0.12, 0.08, 2.45), table)
     _box(room, "NoticeBoard", Vector3(0, 1.8, -8.55), Vector3(5.5, 1.8, 0.12), dark)
+    for x in [-5.0, 0.0, 5.0]:
+        _box(room, "UpperStudyDesk", Vector3(x, 3.95, -6.5), Vector3(2.7, 0.14, 1.0), table)
+        _box(room, "UpperStudySeat", Vector3(x, 3.68, -5.7), Vector3(0.7, 0.12, 0.65), seat)
+    _box(room, "UpperQuietBooth", Vector3(9.5, 4.0, -6.5), Vector3(1.4, 0.9, 2.6), dark)
 
 func _build_recreation_room(room: Node3D) -> void:
     var dark := _mat("#4e6269")
@@ -252,6 +311,9 @@ func _build_recreation_room(room: Node3D) -> void:
             _box(room, "BenchBase", Vector3(x, 0.27, z), Vector3(0.22, 0.55, 0.22), dark)
     _box(room, "DisplayPanel", Vector3(0, 2.2, -8.5), Vector3(6.5, 2.0, 0.16), dark)
     _box(room, "DisplayAccent", Vector3(0, 2.2, -8.38), Vector3(4.6, 0.16, 0.08), accent)
+    for x in [-8.0, -4.0, 4.0, 8.0]:
+        _box(room, "UpperViewingBench", Vector3(x, 3.78, -6.5), Vector3(2.6, 0.16, 0.7), accent)
+    _box(room, "UpperDisplayConsole", Vector3(0, 3.95, -8.0), Vector3(4.5, 0.18, 0.8), dark)
 
 func _add_rod(parent: Node3D, a: Vector3, b: Vector3, radius: float, material: Material) -> void:
     var direction: Vector3 = b - a
@@ -276,6 +338,7 @@ func _build_bicycle() -> void:
     var rubber := _mat("#252d31")
     var frame := _mat("#d18b42")
     var metal := _mat("#b9c3c4")
+    bicycle_wheels.clear()
     for z in [0.0, -1.6]:
         var wheel := MeshInstance3D.new()
         var torus := TorusMesh.new()
@@ -286,6 +349,7 @@ func _build_bicycle() -> void:
         wheel.position = Vector3(0, 0.45, z)
         wheel.material_override = rubber
         bicycle.add_child(wheel)
+        bicycle_wheels.append(wheel)
     var rear := Vector3(0, 0.45, 0)
     var front := Vector3(0, 0.45, -1.6)
     var seat := Vector3(0, 1.0, -0.52)
@@ -299,7 +363,22 @@ func _build_bicycle() -> void:
     _add_rod(bicycle, head, front, 0.055, frame)
     _add_rod(bicycle, seat, Vector3(0, 1.18, -0.48), 0.07, metal)
     _box(bicycle, "Seat", Vector3(0, 1.23, -0.5), Vector3(0.52, 0.12, 0.22), rubber)
-    _add_rod(bicycle, Vector3(-0.48, 1.0, -1.28), Vector3(0.48, 1.0, -1.28), 0.045, metal)
+
+    bicycle_handlebar = Node3D.new()
+    bicycle_handlebar.name = "SteeringHandlebar"
+    bicycle_handlebar.position = Vector3(0, 1.0, -1.28)
+    bicycle.add_child(bicycle_handlebar)
+    _add_rod(bicycle_handlebar, Vector3(-0.48, 0.0, 0.0), Vector3(0.48, 0.0, 0.0), 0.045, metal)
+    _box(bicycle_handlebar, "LeftGrip", Vector3(-0.5, 0.0, 0.0), Vector3(0.22, 0.08, 0.08), rubber)
+    _box(bicycle_handlebar, "RightGrip", Vector3(0.5, 0.0, 0.0), Vector3(0.22, 0.08, 0.08), rubber)
+
+    bicycle_crank = Node3D.new()
+    bicycle_crank.name = "PedalCrank"
+    bicycle_crank.position = crank
+    bicycle.add_child(bicycle_crank)
+    _add_rod(bicycle_crank, Vector3(-0.36, 0.0, 0.0), Vector3(0.36, 0.0, 0.0), 0.045, metal)
+    _add_rod(bicycle_crank, Vector3(-0.36, 0.0, 0.0), Vector3(-0.58, -0.05, 0.0), 0.04, frame)
+    _add_rod(bicycle_crank, Vector3(0.36, 0.0, 0.0), Vector3(0.58, 0.05, 0.0), 0.04, frame)
 
 func set_bicycle(value: bool) -> bool:
     if value and (interior_active or on_shuttle):
