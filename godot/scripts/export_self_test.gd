@@ -67,7 +67,7 @@ func collect_issues() -> Array[String]:
         issues.append("Eight local Field Notes or their runtime markers did not load")
     if challenge != null and challenge.sprint_route.size() != 5:
         issues.append("Campus Sprint did not resolve the four-stop loop and return")
-    if weather == null or weather.NAMES.size() != 5 or weather.rain == null:
+    if weather == null or weather.mode_count() != 5 or weather.rain == null:
         issues.append("Five-mode weather controller or rain particles did not load")
     if campus_life == null or campus_life.pedestrians.size() < 4 or campus_life.interiors.size() != 2 or campus_life.shuttle == null:
         issues.append("Campus NPCs, two interior concepts or shuttle did not load")
