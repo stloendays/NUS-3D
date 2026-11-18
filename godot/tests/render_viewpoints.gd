@@ -158,7 +158,10 @@ func _render() -> void:
     count += 1
 
     weather.set_mode(0)
-    review.select_view(3)
+    var featured_npc: Node3D = campus_life.pedestrians[0]["node"]
+    player.global_position = featured_npc.global_position + Vector3(0.0, 0.18, 6.5)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(featured_npc.global_position + Vector3(0.0, 1.0, 0.0), Vector3.UP)
     if not await _capture_frame(output, "M3_3_CAMPUS_NPCS_AND_HUD.png"):
         push_error("Could not capture the campus-life HUD showcase")
         quit(1)
@@ -208,7 +211,7 @@ func _render() -> void:
     campus_life.set_bicycle(false)
 
     var bus: Node3D = campus_life.shuttle
-    player.global_position = bus.global_position + Vector3(10.0, 0.18, 10.0)
+    player.global_position = bus.global_position + Vector3(5.0, 0.18, 5.0)
     player.head.rotation = Vector3.ZERO
     player.look_at(bus.global_position + Vector3(0.0, 1.0, 0.0), Vector3.UP)
     if not await _capture_frame(output, "M3_3_UTOWN_SHUTTLE.png"):
