@@ -1,4 +1,5 @@
 extends CharacterBody3D
+class_name UTownPlayer
 ## Simple offline first-person controller, metres/second.
 ## Player origin is at foot level; camera height is defined by the scene.
 
