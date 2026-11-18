@@ -6,6 +6,8 @@ extends CanvasLayer
 @onready var review: UTownViewReview = $"../ViewReview"
 @onready var tour: UTownTour = $"../Tour"
 @onready var challenge: UTownChallenge = $"../Challenge"
+@onready var weather: UTownWeather = $"../Weather"
+@onready var campus_life: UTownCampusLife = $"../CampusLife"
 @onready var title_label: Label = $Info/VBox/Title
 @onready var hint_label: Label = $Info/VBox/Hint
 @onready var target_label: Label = $Info/VBox/Target
@@ -19,6 +21,8 @@ extends CanvasLayer
 @onready var tour_message: Label = $TourCard/Message
 @onready var challenge_card: PanelContainer = $ChallengeCard
 @onready var challenge_message: Label = $ChallengeCard/Message
+@onready var campus_card: PanelContainer = $CampusCard
+@onready var campus_message: Label = $CampusCard/Message
 
 var show_full_help: bool = true
 var gis_metric_count: int = 0
@@ -69,6 +73,16 @@ func _ready() -> void:
     challenge_card.add_theme_stylebox_override("panel", challenge_style)
     challenge_message.add_theme_color_override("font_color", Color.html("#eeeaf7"))
     challenge_message.add_theme_font_size_override("font_size", 14)
+    var campus_style: StyleBoxFlat = StyleBoxFlat.new()
+    campus_style.bg_color = Color(0.08, 0.14, 0.18, 0.92)
+    campus_style.set_corner_radius_all(10)
+    campus_style.content_margin_left = 13.0
+    campus_style.content_margin_right = 13.0
+    campus_style.content_margin_top = 10.0
+    campus_style.content_margin_bottom = 10.0
+    campus_card.add_theme_stylebox_override("panel", campus_style)
+    campus_message.add_theme_color_override("font_color", Color.html("#edf3ef"))
+    campus_message.add_theme_font_size_override("font_size", 13)
     _load_osm_fit_summary()
 
 func _load_osm_fit_summary() -> void:
@@ -117,6 +131,8 @@ func _process(_delta: float) -> void:
     tour_message.text = message
     challenge_message.text = challenge.status_text()
     challenge_card.visible = not challenge_message.text.is_empty()
+    campus_message.text = weather.status_text() + "\n" + campus_life.status_text()
+    campus_card.visible = true
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
