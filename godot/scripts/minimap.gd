@@ -5,6 +5,7 @@ extends Control
 @onready var player: CharacterBody3D = get_parent().get_parent().get_node("Player")
 @onready var tour: UTownTour = get_parent().get_parent().get_node("Tour")
 @onready var challenge: UTownChallenge = get_parent().get_parent().get_node("Challenge")
+@onready var campus_life: UTownCampusLife = get_parent().get_parent().get_node("CampusLife")
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
@@ -70,6 +71,11 @@ func _draw() -> void:
     if challenge.sprint_active and challenge.sprint_next_index < challenge.sprint_route.size():
         var sprint_target: Vector2 = _to_map(challenge.sprint_route[challenge.sprint_next_index])
         draw_circle(sprint_target, 8.5, Color.html("#f2a8df"), false, 2.0)
+    for state in campus_life.pedestrians:
+        var npc: Node3D = state["node"]
+        draw_circle(_to_map(npc.global_position), 2.2, Color.html("#e8a17c"))
+    if campus_life.shuttle != null:
+        draw_rect(Rect2(_to_map(campus_life.shuttle.global_position) - Vector2(4.0, 3.0), Vector2(8.0, 6.0)), Color.html("#f2a85d"), true)
     var pp: Vector2 = _to_map(player.global_position)
     draw_circle(pp, 5.0, Color.html("#52a6e0"))
     draw_circle(pp, 5.0, Color.WHITE, false, 1.1)
