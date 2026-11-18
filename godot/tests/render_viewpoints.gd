@@ -122,6 +122,98 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    # M3.3 gameplay showcase: original Godot renders of weather, pedestrians,
+    # isolated interior concepts, bicycle mode and the procedural shuttle.
+    var player: UTownPlayer = instance.get_node_or_null("Player") as UTownPlayer
+    var weather: UTownWeather = instance.get_node_or_null("Weather") as UTownWeather
+    var campus_life: UTownCampusLife = instance.get_node_or_null("CampusLife") as UTownCampusLife
+    if player == null or weather == null or campus_life == null:
+        push_error("M3.3 showcase controllers did not load")
+        quit(1)
+        return
+    hud.visible = true
+    world.set_osm_reference_visible(false)
+    world.set_m2_details_visible(true)
+    world.set_lighting_mode(0)
+    review.select_view(3)
+    weather.set_mode(3)
+    if not await _capture_frame(output, "M3_3_WEATHER_RAIN.png"):
+        push_error("Could not capture the rain and puddle showcase")
+        quit(1)
+        return
+    count += 1
+
+    weather.set_mode(4)
+    weather.flash_wait = 60.0
+    weather.flash_time = 0.14
+    if not await _capture_frame(output, "M3_3_WEATHER_THUNDERSTORM.png"):
+        push_error("Could not capture the thunderstorm showcase")
+        quit(1)
+        return
+    count += 1
+
+    weather.set_mode(0)
+    review.select_view(3)
+    if not await _capture_frame(output, "M3_3_CAMPUS_NPCS_AND_HUD.png"):
+        push_error("Could not capture the campus-life HUD showcase")
+        quit(1)
+        return
+    count += 1
+
+    if not campus_life.enter_interior("ERC"):
+        push_error("Could not enter ERC interior for screenshot")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_3_ERC_INTERIOR_GROUND.png"):
+        push_error("Could not capture ERC interior ground floor")
+        quit(1)
+        return
+    count += 1
+    campus_life.toggle_interior_floor()
+    if not await _capture_frame(output, "M3_3_ERC_INTERIOR_MEZZANINE.png"):
+        push_error("Could not capture ERC interior mezzanine")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+
+    if not campus_life.enter_interior("SRC"):
+        push_error("Could not enter SRC interior for screenshot")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_3_SRC_INTERIOR.png"):
+        push_error("Could not capture SRC interior")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+
+    review.select_view(3)
+    if not campus_life.set_bicycle(true):
+        push_error("Could not enable bicycle for screenshot")
+        quit(1)
+        return
+    for frame_index in range(12):
+        await process_frame
+    if not await _capture_frame(output, "M3_3_BICYCLE_RIDE.png"):
+        push_error("Could not capture bicycle mode")
+        quit(1)
+        return
+    count += 1
+    campus_life.set_bicycle(false)
+
+    var bus: Node3D = campus_life.shuttle
+    player.global_position = bus.global_position + Vector3(12.0, 0.18, 12.0)
+    player.rotation.y = 0.0
+    player.head.rotation = Vector3.ZERO
+    player.camera.global_position = bus.global_position + Vector3(10.0, 5.0, 10.0)
+    player.camera.look_at(bus.global_position + Vector3(0.0, 1.0, 0.0), Vector3.UP)
+    if not await _capture_frame(output, "M3_3_UTOWN_SHUTTLE.png"):
+        push_error("Could not capture the shuttle showcase")
+        quit(1)
+        return
+    count += 1
+
     hud.visible = false
     world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
@@ -135,9 +227,19 @@ func _render() -> void:
         "engine": str(Engine.get_version_info().get("string", "")),
         "viewpoints": review.viewpoints,
         "image_count": count,
-        "note": "Original scene screenshots, not real reference photo files. No Windows GPU performance claim."
+        "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
+        "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
     print("PASS: generated %d original Godot view comparison PNGs" % count)
     instance.queue_free()
     quit(0)
+
+func _capture_frame(output: String, filename: String) -> bool:
+    await process_frame
+    await process_frame
+    await RenderingServer.frame_post_draw
+    var frame: Image = root.get_texture().get_image()
+    if frame == null or frame.is_empty() or frame.get_width() < 400 or frame.get_height() < 300:
+        return false
+    return frame.save_png(output.path_join(filename)) == OK
