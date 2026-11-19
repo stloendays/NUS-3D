@@ -611,4 +611,82 @@ func _build_amenity_zone(zone: Node3D, kind: String) -> void:
             _box(zone, "Washer_%d" % i, Vector3(-7.5 + i * 5, 1.1, 0), Vector3(3.1, 2.2, 2.9), "#b9cbd0")
     elif kind in ["WATER", "NOTICE"]:
         _box(zone, "CampusFixture", Vector3(0, 1.25, 0), Vector3(3.0, 2.5, 1.4), "#80aaa9")
+    _refine_amenity_models(zone, kind)
     _label(zone, kind.replace("_", " "), Vector3(0, 3.6, -7), "#f8f2e4", 17)
+
+
+# Second-pass geometry: readable silhouettes, actual functional parts and softer materials.
+# This adds a small bounded number of meshes per zone, without importing assets.
+func _refine_amenity_models(zone: Node3D, kind: String) -> void:
+    if kind in ["MAKER", "WORKSHOP", "PROJECT", "COMPUTER"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            _box(zone, "MonitorStand_%d" % i, Vector3(x, 1.12, -0.5), Vector3(0.15, 0.45, 0.16), "#aeb9b7")
+            _box(zone, "MonitorBezel_%d" % i, Vector3(x, 1.6, -0.38), Vector3(1.85, 1.28, 0.09), "#344f5a")
+            _box(zone, "Screen_%d" % i, Vector3(x, 1.6, -0.31), Vector3(1.57, 1.02, 0.04), "#8bbbc0")
+            for side in [-1.0, 1.0]:
+                _box(zone, "BenchLeg_%d_%d" % [i, int(side)], Vector3(x + side * 1.8, 0.45, 0), Vector3(0.22, 0.9, 1.75), "#777d76")
+        if kind in ["MAKER", "WORKSHOP"]:
+            _box(zone, "ToolRack", Vector3(0, 2.3, -7.5), Vector3(14.0, 3.5, 0.45), "#b7b6aa")
+            for i in range(5):
+                _box(zone, "RackTool_%d" % i, Vector3(-5.5 + float(i) * 2.6, 2.2, -7.15), Vector3(0.35, 1.45, 0.18), "#667f84")
+    elif kind in ["READING", "STUDY", "DISCUSSION", "PRESENT"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            _box(zone, "ChairBack_%d" % i, Vector3(x, 1.0, 2.65), Vector3(1.25, 1.1, 0.18), "#738c91")
+            _box(zone, "DeskLamp_%d" % i, Vector3(x - 1.1, 1.35, -0.6), Vector3(0.15, 0.55, 0.15), "#7e9995")
+            _box(zone, "LampShade_%d" % i, Vector3(x - 1.1, 1.65, -0.6), Vector3(0.75, 0.15, 0.6), "#e7d6b5")
+        if kind in ["READING", "STUDY"]:
+            for i in range(2):
+                _box(zone, "Bookshelf_%d" % i, Vector3(-5.0 + float(i) * 10.0, 1.6, -7.2), Vector3(5.5, 3.2, 0.85), "#b59b7d")
+                for shelf in range(3):
+                    _box(zone, "BookRow_%d_%d" % [i, shelf], Vector3(-5.0 + float(i) * 10.0, 0.65 + float(shelf) * 0.9, -6.65), Vector3(4.8, 0.55, 0.4), "#7f9d98" if shelf % 2 == 0 else "#d7b999")
+    elif kind in ["DINING", "COFFEE", "COMMONS", "LOUNGE", "SEATING", "WAITING"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            _box(zone, "SeatBack_%d" % i, Vector3(x, 1.05, 2.3), Vector3(2.65, 1.1, 0.22), "#7b9788")
+            _box(zone, "TablePedestal_%d" % i, Vector3(x, 0.47, 0), Vector3(0.25, 0.85, 0.25), "#8b9290")
+        if kind in ["DINING", "COFFEE"]:
+            _box(zone, "CounterTop", Vector3(0, 2.57, -7), Vector3(15.6, 0.15, 1.8), "#efe3d1")
+            for i in range(3):
+                _box(zone, "MenuPanel_%d" % i, Vector3(-5 + i * 5, 3.6, -7.2), Vector3(3.9, 1.25, 0.12), "#5d7f7b")
+    elif kind in ["EXHIBIT", "ART"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            var sculpture: MeshInstance3D = MeshInstance3D.new()
+            sculpture.name = "CurvedSculpture_%d" % i
+            var capsule: CapsuleMesh = CapsuleMesh.new()
+            capsule.radius = 0.43 + float(i) * 0.12
+            capsule.height = 1.8 + float(i) * 0.4
+            sculpture.mesh = capsule
+            sculpture.position = Vector3(x, 2.6, 0)
+            sculpture.rotation.z = 0.25 + float(i) * 0.24
+            sculpture.material_override = _material("#b1bdb0" if i % 2 == 0 else "#d8b9a0")
+            zone.add_child(sculpture)
+    elif kind == "PRINT":
+        for i in range(3):
+            var x: float = -6.0 + float(i) * 6.0
+            _box(zone, "PrinterControl_%d" % i, Vector3(x, 1.75, 1.2), Vector3(1.2, 0.25, 0.1), "#527a8a")
+            _box(zone, "PaperTray_%d" % i, Vector3(x, 0.7, 1.35), Vector3(1.7, 0.2, 0.7), "#e9ece7")
+    elif kind == "LAUNDRY":
+        for i in range(4):
+            var x: float = -7.5 + float(i) * 5.0
+            var door: MeshInstance3D = MeshInstance3D.new()
+            door.name = "WasherDoor_%d" % i
+            var cylinder: CylinderMesh = CylinderMesh.new()
+            cylinder.top_radius = 0.85
+            cylinder.bottom_radius = 0.85
+            cylinder.height = 0.14
+            door.mesh = cylinder
+            door.rotation.x = PI * 0.5
+            door.position = Vector3(x, 1.25, 1.52)
+            door.material_override = _material("#577f89")
+            zone.add_child(door)
+            _box(zone, "WasherControls_%d" % i, Vector3(x, 1.95, 1.55), Vector3(1.65, 0.18, 0.10), "#e8e9e2")
+    elif kind == "WATER":
+        _box(zone, "WaterTap", Vector3(0, 1.7, 0.85), Vector3(0.65, 0.25, 0.45), "#dce7e4")
+        _box(zone, "WaterTray", Vector3(0, 1.25, 0.9), Vector3(1.3, 0.15, 0.65), "#a7c5c5")
+    elif kind == "NOTICE":
+        _box(zone, "NoticeBoard", Vector3(0, 1.9, 0.85), Vector3(7.0, 3.3, 0.22), "#c8ad8b")
+        for i in range(3):
+            _box(zone, "Poster_%d" % i, Vector3(-2.2 + float(i) * 2.2, 1.95, 1.0), Vector3(1.65, 2.2, 0.05), "#e7dfcb" if i % 2 == 0 else "#9ab8b3")
