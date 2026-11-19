@@ -507,15 +507,18 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-    if event is not InputEventKey or not event.pressed or event.echo:
+    if not (event is InputEventKey):
         return
-    if event.keycode == KEY_F10:
+    var key_event: InputEventKey = event as InputEventKey
+    if not key_event.pressed or key_event.echo:
+        return
+    if key_event.keycode == KEY_F10:
         _toggle_language()
         get_viewport().set_input_as_handled()
         return
     if not accounts.is_logged_in():
         return
-    if event.keycode == KEY_J:
+    if key_event.keycode == KEY_J:
         if mail_cover.visible:
             _close_mail()
         else:
