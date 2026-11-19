@@ -231,6 +231,9 @@ func open_lounge() -> bool:
         life.message = "完成任一学院全部 3 个 Coursework 任务后解锁棋牌与聚会。"
         life.message_time = 4.0
         return false
+    var voice: Node = get_parent().get_node_or_null("VoicePresentation")
+    if voice != null and voice.get("is_open") == true:
+        return false
     if intro.playing or course_ui.modal_visible or course_ui.intro_blocked or coursework.current_faculty_id.is_empty():
         return false
     if life.on_shuttle or life.bicycle_enabled:
@@ -333,6 +336,9 @@ func _process(_delta: float) -> void:
         status_chip.text = "POST-COURSE CLUB  [Tab]  |  五子棋 · 纸牌 · 聚会" + ("  |  39/39 MASTER" if leisure.grand_master_unlocked() else "")
 
 func _input(event: InputEvent) -> void:
+    var voice: Node = get_parent().get_node_or_null("VoicePresentation")
+    if voice != null and voice.get("is_open") == true:
+        return
     var exams: Node = get_parent().get_node_or_null("EnglishExams")
     if exams != null and bool(exams.get("is_open")):
         return

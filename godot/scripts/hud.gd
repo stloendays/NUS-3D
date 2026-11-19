@@ -76,8 +76,8 @@ func _ready() -> void:
 
 func _help_text() -> String:
     if language_service.is_chinese():
-        return "WASD 移动  Shift 冲刺  Space 跳跃  B 骑车  X 校车  I 进出室内  L 楼层  Q 对话\n[P] 作业手册  [Shift+P] 学院  [K] 接/交任务  [U] 老师  [LMB] 扔玩具\n[O] 商店  [Z] 金币  [N] 食堂外送  [H] DDL  [Shift+H] 多结局  [Tab] 课后社团  [J] 邮箱  [F8] 专业考试  [F11] 联机/画质\n[M] 地图  [Y] 天气  [T] 时段  [F7] 拍照  [F9] 声音  [F10] 语言  [F1] 帮助"
-    return "WASD move  Shift sprint  Space jump  B bike  X shuttle  I indoors  L floor  Q talk\n[P] coursework  [Shift+P] faculty  [K] task  [U] professor  [LMB] throw toy\n[O] shop  [Z] coins  [N] food delivery  [H] DDL  [Shift+H] endings  [Tab] club  [J] mailbox  [F8] major exams  [F11] LAN/graphics\n[M] map  [Y] weather  [T] time  [F7] photo  [F9] sound  [F10] language  [F1] help"
+        return "WASD 移动  Shift 冲刺  Space 跳跃  B 骑车  X 校车  I 进出室内  L 楼层  Q 对话\n[P] 作业手册  [Shift+P] 学院  [K] 接/交任务  [U] 老师  [LMB] 扔玩具\n[O] 商店  [Z] 金币  [N] 食堂外送  [H] DDL  [Shift+H] 多结局  [Tab] 课后社团  [J] 邮箱  [F8] 专业考试  [F11] 联机/画质  [F12] 管理员\n[M] 地图  [Y] 天气  [T] 时段  [F7] 拍照  [F9] 声音  [F10] 语言  [F1] 帮助"
+    return "WASD move  Shift sprint  Space jump  B bike  X shuttle  I indoors  L floor  Q talk\n[P] coursework  [Shift+P] faculty  [K] task  [U] professor  [LMB] throw toy\n[O] shop  [Z] coins  [N] food delivery  [H] DDL  [Shift+H] endings  [Tab] club  [J] mailbox  [F8] major exams  [F11] LAN/graphics  [F12] admin\n[M] map  [Y] weather  [T] time  [F7] photo  [F9] sound  [F10] language  [F1] help"
 
 
 func _apply_language(_locale: String) -> void:

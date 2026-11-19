@@ -331,8 +331,27 @@ func _read_helper_checksum() -> String:
     var expected: String = str(entry.get("sha256", ""))
     return expected if _is_sha256_hex(expected) else ""
 
+func _has_active_game_modal() -> bool:
+    var shell: Node = get_parent()
+    if shell == null:
+        return false
+    var game_root: Node = shell.get("game") as Node
+    if game_root != null:
+        for node_name in ["VoicePresentation", "EnglishExams", "LeisureUI", "CourseworkUI"]:
+            var modal: Node = game_root.get_node_or_null(node_name)
+            if modal != null and (bool(modal.get("is_open")) if node_name != "CourseworkUI" else bool(modal.get("modal_visible"))):
+                return true
+        var coins: Node = game_root.get_node_or_null("Coins")
+        if coins != null and bool(coins.get("shop_open")):
+            return true
+    var admin: Node = shell.get("admin_console") as Node
+    return admin != null and admin.visible
+
 func _install_after_confirmation() -> void:
     if state != "ready" or OS.get_name() != "Windows":
+        return
+    if _has_active_game_modal():
+        _show_state("ready", "Finish your active task or close the menu before restarting.")
         return
     if not FileAccess.file_exists(download_path) or FileAccess.get_sha256(download_path).to_lower() != release_sha256:
         _remove_cache()

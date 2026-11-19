@@ -11,6 +11,8 @@ var tour: UTownTour
 var challenge: UTownChallenge
 var story_director: NUS3DStoryDirector
 var session_overlay: NUS3DSessionOverlay
+var admin_authority: NUS3DAdminAuthority
+var admin_console: NUS3DAdminConsole
 var ui: CanvasLayer
 var login_cover: Control
 var mail_cover: Control
@@ -84,14 +86,12 @@ func _ready() -> void:
     session_overlay.name = "MultiplayerAndGraphics"
     add_child(session_overlay)
     session_overlay.setup(self, game)
+    _build_admin_console()
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
     _on_language_changed(language_service.locale)
     _show_login()
-    # The updater does not own gameplay input and is inert in editor/headless CI.
-    # A newer stable release is downloaded asynchronously and installed only
-    # after explicit player confirmation.
     var release_updater := NUS3DAutoUpdater.new()
     release_updater.name = "StableReleaseUpdater"
     add_child(release_updater)
@@ -104,8 +104,8 @@ func save_for_version_update() -> void:
         return
     _scan_rewards()
     challenge._save_progress()
-    var names: Array[String] = ["Coursework", "EnglishExams", "Arcade", "Coins", "Leisure", "CampusLife", "DDLStory"]
-    var methods: Array[String] = ["_save_progress", "_save_progress", "_save_progress", "save_progress", "_save_stats", "_save_activities", "_save_progress"]
+    var names: Array[String] = ["Coursework", "EnglishExams", "VoicePresentation", "Arcade", "Coins", "Leisure", "CampusLife", "DDLStory"]
+    var methods: Array[String] = ["_save_progress", "_save_progress", "_save_progress", "_save_progress", "save_progress", "_save_stats", "_save_activities", "_save_progress"]
     for i in range(names.size()):
         var system: Node = game.get_node_or_null(names[i])
         if system != null and system.has_method(methods[i]):
@@ -260,13 +260,59 @@ func _open_tutorial() -> void:
         tutorial.open_guide()
 
 
+func _build_admin_console() -> void:
+    admin_authority = NUS3DAdminAuthority.new()
+    admin_authority.name = "AdminAuthority"
+    admin_authority.accounts = accounts
+    admin_authority.game = game
+    add_child(admin_authority)
+    admin_console = NUS3DAdminConsole.new()
+    admin_console.name = "AdminConsole"
+    ui.add_child(admin_console)
+    admin_console.setup(admin_authority)
+    admin_console.close_requested.connect(_close_admin_console)
+
+
+func _open_admin_console() -> void:
+    if admin_console == null or not accounts.is_logged_in():
+        return
+    if login_cover.visible or mail_cover.visible or get_tree().paused:
+        return
+    var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
+    var coursework_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
+    var leisure_ui: UTownLeisureUI = game.get_node_or_null("LeisureUI") as UTownLeisureUI
+    if (intro != null and intro.playing) or (coursework_ui != null and coursework_ui.modal_visible):
+        return
+    if (exams != null and exams.is_open) or (leisure_ui != null and leisure_ui.is_open):
+        return
+    if story_director != null and story_director.cover != null and story_director.cover.visible:
+        return
+    if session_overlay != null and (session_overlay.is_open or session_overlay.network.state != NUS3DNetworkSession.State.OFFLINE):
+        return
+    get_tree().paused = true
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    profile_card.hide()
+    admin_console.open_console()
+
+
+func _close_admin_console() -> void:
+    if admin_console == null:
+        return
+    admin_console.close_console()
+    if accounts.is_logged_in() and not login_cover.visible and not mail_cover.visible:
+        profile_card.show()
+        get_tree().paused = false
+        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
 func _build_profile_card() -> void:
     profile_card = PanelContainer.new()
     profile_card.name = "ProfileStatus"
     profile_card.anchor_left = 0.5
     profile_card.anchor_right = 0.5
-    profile_card.offset_left = -410
-    profile_card.offset_right = 410
+    profile_card.offset_left = -510
+    profile_card.offset_right = 510
     profile_card.offset_top = 10
     profile_card.offset_bottom = 61
     profile_card.add_theme_stylebox_override("panel", _panel_style(Color(0.03, 0.14, 0.20, 0.88)))
@@ -282,6 +328,7 @@ func _build_profile_card() -> void:
     profile_sound_button = _button("Sound ON", _toggle_ui_sound)
     row.add_child(profile_sound_button)
     row.add_child(_button("Mail [J]", _open_mail))
+    row.add_child(_button("Admin [F12]", _open_admin_console))
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
 
@@ -392,6 +439,10 @@ func _show_login() -> void:
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     login_cover.show()
     mail_cover.hide()
+    if admin_console != null:
+        admin_console.close_console()
+    if admin_authority != null:
+        admin_authority.lock()
     profile_card.hide()
     _shown_level = 0
     _refresh_sound_buttons()
@@ -423,6 +474,8 @@ func _submit_login() -> void:
 
 
 func _enter_game() -> void:
+    if admin_authority != null:
+        admin_authority.lock()
     challenge.sprint_active = false
     challenge.sprint_elapsed = 0
     challenge.sprint_last_time = -1
@@ -464,6 +517,10 @@ func _enter_game() -> void:
 func _logout() -> void:
     if not accounts.is_logged_in():
         return
+    if admin_authority != null:
+        admin_authority.lock()
+    if admin_console != null:
+        admin_console.close_console()
     challenge.sprint_active = false
     if story_director != null:
         story_director.on_logout()
@@ -515,7 +572,7 @@ func _on_mailbox_changed() -> void:
 
 
 func _open_mail() -> void:
-    if not accounts.is_logged_in():
+    if not accounts.is_logged_in() or (admin_console != null and admin_console.visible):
         return
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -723,6 +780,15 @@ func _unhandled_input(event: InputEvent) -> void:
         get_viewport().set_input_as_handled()
         return
     if not accounts.is_logged_in():
+        return
+    if key_event.keycode == KEY_F12:
+        if admin_console != null and admin_console.visible:
+            _close_admin_console()
+        else:
+            _open_admin_console()
+        get_viewport().set_input_as_handled()
+        return
+    if admin_console != null and admin_console.visible:
         return
     var coursework_modal: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if coursework_modal != null and coursework_modal.modal_visible:

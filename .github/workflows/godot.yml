@@ -58,6 +58,8 @@ jobs:
         run: python tools/validate_discovery_tour.py
       - name: Validate fictional coursework options and mission stages
         run: python tools/validate_coursework_data.py
+      - name: Validate English oral presentations and microphone privacy contracts
+        run: python tools/validate_presentations.py
       - name: Install Godot 4.4.1
         run: |
           curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
@@ -68,7 +70,7 @@ jobs:
         run: godot --headless --path godot --import --quit
       - name: Validate scene and geometry
         run: godot --headless --path godot --script res://tests/smoke_test.gd
-      - name: Check safe stable-release auto-update version, URL and SHA-256 rules
+      - name: Check official stable-release updater version, URL and SHA-256 rules
         run: godot --headless --path godot --script res://tests/auto_update_smoke_test.gd
       - name: Validate English exam catalog
         run: python tools/validate_english_exams.py
@@ -89,6 +91,7 @@ jobs:
             kent_ridge_expansion_smoke_test.gd \
             ambient_ecology_smoke_test.gd \
             english_exams_smoke_test.gd \
+            voice_presentation_smoke_test.gd \
             multiplayer_performance_smoke_test.gd \
             story_smoke_test.gd \
             leisure_smoke_test.gd \

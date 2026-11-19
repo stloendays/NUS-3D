@@ -35,14 +35,33 @@ func _run() -> void:
     if world == null or extension == null or bus == null or player == null or minimap == null or hud == null:
         _fail("Existing world or new travel scene nodes are absent")
         return
-    if extension.districts.size() != 10 or extension.stops.size() != 11:
-        _fail("Expected 10 extended districts and 11 shuttle stop anchors")
+    if extension.districts.size() != 11 or extension.stops.size() != 12:
+        _fail("Expected 11 extended districts and 12 travel/walking anchors")
         return
     if extension.shelter_count != 11 or extension.building_count < 24:
         _fail("Shelters and low-poly campus building geometry are missing")
         return
     if extension.bus_states.size() != 2:
         _fail("Visual D1/D2 route buses did not initialize")
+        return
+    if extension.get_node_or_null("ScienceSportsGround/FootballGrass") == null or extension.get_node_or_null("ScienceSportsGround/TrackBed") == null:
+        _fail("Science-side sports pitch and running track are missing")
+        return
+    if extension.get_node_or_null("FrontierCanteenTerrace/DiningTable") == null:
+        _fail("Frontier Canteen tables are missing")
+        return
+    if extension.get_node_or_null("ScienceSportsGround/PracticeBall") == null:
+        _fail("Science sports activity ball is missing")
+        return
+    var science_activities: NUSScienceCampusActivities = scene.get_node_or_null("ScienceCampusActivities") as NUSScienceCampusActivities
+    if science_activities == null or science_activities.panel == null:
+        _fail("Science sports/canteen interaction UI is missing")
+        return
+    if extension.get_node_or_null("WoodedCampusBoundary") == null:
+        _fail("Low-poly wooded campus perimeter is missing")
+        return
+    if extension.shelter_count != 11:
+        _fail("Walk-only sports access created an invalid shuttle shelter")
         return
     if extension.get_node_or_null("CampusBaseTerrain_Estimated") == null:
         _fail("Large walkable campus terrain is missing")
