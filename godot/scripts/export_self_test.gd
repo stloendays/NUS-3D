@@ -33,6 +33,7 @@ func collect_issues() -> Array[String]:
     var polish: UTownVisualPolish = get_parent().get_node_or_null("VisualPolish") as UTownVisualPolish
     var coursework: UTownCoursework = get_parent().get_node_or_null("Coursework") as UTownCoursework
     var course_ui: UTownCourseworkUI = get_parent().get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    var intro: UTownIntro = get_parent().get_node_or_null("Intro") as UTownIntro
     var hud: CanvasLayer = get_parent().get_node_or_null("HUD") as CanvasLayer
 
     for source_file in REQUIRED_SOURCE_FILES:
@@ -92,6 +93,10 @@ func collect_issues() -> Array[String]:
             issues.append("All 39 original fictional coursework quests must load")
     if course_ui == null or course_ui.faculty_picker == null or course_ui.faculty_picker.item_count != 13:
         issues.append("Faculty selection modal and journal UI are missing")
+    if intro == null or intro.cinematic_camera == null or intro.key_frames.size() != 6:
+        issues.append("M3.7 camera flyover does not contain six scripted viewpoints")
+    if intro != null and (intro.skip_button == null or intro.progress == null or not is_equal_approx(intro.DURATION_S, 12.0)):
+        issues.append("M3.7 skippable cinematic UI or duration is missing")
     if polish == null or polish.facade_groups.size() != 2 or polish.facade_panes < 40:
         issues.append("Material-study facade layers missing")
     if polish != null and (polish.indoor_finish_groups.size() != 2 or polish.indoor_lamps.size() != 2 or polish.facade_lamps.size() != 2 or polish.material_panel_count < 100):
@@ -124,6 +129,7 @@ func _run_export_test() -> void:
     var polish: UTownVisualPolish = get_parent().get_node_or_null("VisualPolish") as UTownVisualPolish
     var coursework: UTownCoursework = get_parent().get_node_or_null("Coursework") as UTownCoursework
     var course_ui: UTownCourseworkUI = get_parent().get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    var intro: UTownIntro = get_parent().get_node_or_null("Intro") as UTownIntro
     var quests_total: int = 0
     if coursework != null:
         for faculty in coursework.faculty_options:
@@ -159,6 +165,9 @@ func _run_export_test() -> void:
         "coursework_quests": quests_total,
         "faculty_picker_items": course_ui.faculty_picker.item_count if course_ui != null and course_ui.faculty_picker != null else 0,
         "coursework_marker_loaded": coursework.marker != null if coursework != null else false,
+        "opening_cinematic_frames": intro.key_frames.size() if intro != null else 0,
+        "opening_skip_loaded": intro.skip_button != null if intro != null else false,
+        "opening_runtime_seconds": intro.DURATION_S if intro != null else 0.0,
         "shuttle_wheels": campus_life.shuttle_wheels.size() if campus_life != null else 0,
         "osm_features": world.osm_reference_layer.feature_count if world != null and world.osm_reference_layer != null else 0,
         "issues": issues,
