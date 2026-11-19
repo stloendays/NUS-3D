@@ -425,6 +425,9 @@ func _complete_quest() -> void:
     active_quest_index += 1
     active_stage = STAGE_BRIEF
     current_time_left = 0.0
+    if active_quest_index >= (faculty_by_id[current_faculty_id]["quests"] as Array).size():
+        feedback += "\n解锁：下课后社团 [P] — 五子棋、牌局和聚会！"
+        feedback_left = 9.0
     _save_progress()
     _refresh_marker()
 
