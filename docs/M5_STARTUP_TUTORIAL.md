@@ -34,3 +34,7 @@
 运行 `godot --headless --path godot --script res://tests/account_smoke_test.gd` 验证：启动前可打开教程、6 页齐全、上一页/下一页边界有效、关闭后仍处于暂停的登录状态，之后账号登录与既有游玩测试继续正常。
 
 这是独立制作的非官方校园游戏，教程中的场景、路线、室内及校车内容不能当作 NUS 实际导航或交通资料。
+
+## 集成版新增提示 (PR #20)
+
+六章内容在 `godot/data/startup_tutorial.json` 内追加说明，不增加页数：学院任务 P/Shift+P/K、卡通玩具鼠标左键/1-3/U、金币 Z/O、食堂外送 N、DDL H、课后社团 Tab、音效 F9、双语 F10、账号存档隔离。主线任务和邮箱绝不能共用 J；完整对照见 `docs/INTEGRATION_QA_2026-11-19.md`。

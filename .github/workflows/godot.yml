@@ -70,7 +70,7 @@ jobs:
         run: godot --headless --path godot --script res://tests/smoke_test.gd
       - name: Validate integrated campaign, accounts and controls
         run: |
-          set -e
+          set -eo pipefail
           for test in \
             account_smoke_test.gd \
             language_smoke_test.gd \
@@ -85,7 +85,14 @@ jobs:
             integration_smoke_test.gd
           do
             echo "Testing $test"
-            timeout 65s godot --headless --path godot --script "res://tests/$test"
+            log_file="$(mktemp)"
+            timeout 65s godot --headless --path godot --script "res://tests/$test" 2>&1 | tee "$log_file"
+            if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$log_file"; then
+              echo "Engine errors reported during $test"
+              rm -f "$log_file"
+              exit 1
+            fi
+            rm -f "$log_file"
           done
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |

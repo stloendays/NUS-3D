@@ -16,15 +16,15 @@
         },
         {
           "heading": "独立存档",
-          "body": "每个账号都有自己的探索、收藏、竞速成绩、等级和邮件。顶部账号栏显示等级与经验，点击 Log out 可安全返回登录页面。",
+          "body": "每个本地账号分别保存探索、收藏、竞速、Coursework、战斗、金币、课后社团、DDL 剧情、等级和邮件。不同账号不会共用这些进度；顶部账号栏显示总 XP。仅首次注册时会尝试复制旧版离线存档。",
           "heading_en": "Separate saves",
-          "body_en": "Each account has its own exploration checkpoints, collectibles, Sprint best, XP, level and mail. The top account bar shows your progress. Choose Log out to return to the sign-in screen."
+          "body_en": "Each local account has separate saves for exploration, Field Notes, Sprint, Coursework, arcade, coins, club activities, DDL story, level and mail. XP is unified once per source, without replay rewards. Only the first registration may copy legacy offline saves."
         },
         {
           "heading": "重要说明",
           "body": "这是非官方的离线单机游戏，不是新加坡国立大学官方服务，也不能使用 NUS 学生账号登录。游戏账号和邮件保存在本机，不会自动跨设备同步。",
           "heading_en": "Important disclaimer",
-          "body_en": "This unofficial single-player prototype is not a National University of Singapore service or a real NUS login. Profiles and mailbox contents stay on this computer and do not sync automatically."
+          "body_en": "This unofficial single-player prototype is not a National University of Singapore service or a real NUS login. Profiles and mailbox contents stay on this computer and do not sync automatically. Building footprints, ride routes and floor interiors remain approximate."
         }
       ],
       "title_en": "01  Getting Started",
@@ -79,6 +79,18 @@
           "body": "回到 Town Green 起点按 V 启动 Campus Sprint，按指示经过各检查点并返回起点；竞速途中再次按 V 可以取消。个人最佳用时会自动保存。",
           "heading_en": "Campus Sprint / V",
           "body_en": "Return to the Town Green starting point and press V to start Campus Sprint. Visit the checkpoints in order and return to the start. Press V again to cancel. Personal-best time saves automatically."
+        },
+        {
+          "heading": "学院 Coursework / P、Shift+P、K",
+          "body": "Shift+P 选择 13 个原创学院角色；P 打开任务手册；在附近的任务终端按 K 接取或提交。每个学院三章，共 39 个虚构 DDL 挑战。课程经验同步到账号等级且不会重复结算。",
+          "heading_en": "Faculty Coursework / P, Shift+P, K",
+          "body_en": "Use Shift+P to choose from 13 fictional faculty roles; P opens your assignment journal. Press K at a nearby terminal to accept or submit coursework. There are 39 fictional deadlines across 13 faculties; XP grants are replay-proof."
+        },
+        {
+          "heading": "其他校园目标 / H、N、Z、O",
+          "body": "靠近原创 DDL 道具按 H 互动；距离较远时可按 H 短暂显示方向指引。按 Z 收集路边金币，O 打开游戏商店，N 使用校园外送小游戏。游戏金币不可兑换现实货币。",
+          "heading_en": "Other missions / H, N, Z, O",
+          "body_en": "Press H near a comic DDL prop to interact; when further away, H briefly shows a bearing hint. Press Z to collect coins, O to open the local shop, and N for the fictional dining-delivery mission. Coins have no real-world value."
         }
       ],
       "title_en": "03  Exploration & Quests",
@@ -106,6 +118,18 @@
           "body": "按 Y 在晴天、多云、阴天、雨天、雷暴天气之间切换；按 T 切换不同时间的光照。天气不连接实时预报。",
           "heading_en": "Weather & lighting",
           "body_en": "Press Y to cycle between Clear, Cloudy, Overcast, Rain and Thunderstorm; press T to switch lighting times. These weather modes are not real-time forecasts."
+        },
+        {
+          "heading": "校园玩具战斗 / 鼠标左键、1–3、U",
+          "body": "鼠标左键发射纸飞机、粉笔弹或橡胶鸡等夸张玩具；1/2/3 切换已解锁玩具，U 与虚构教师互动。所有角色为非伤害性滑稽游戏设定，战斗经验会同步到当前账号。",
+          "heading_en": "Cartoon arcade / Mouse 1, 1–3, U",
+          "body_en": "Click to throw harmless cartoon toys such as paper planes, chalk poppers or rubber chickens. Keys 1/2/3 switch unlocked toys; U interacts with fictional teachers. Arcade XP is reflected in your local account progress."
+        },
+        {
+          "heading": "课后社团 / Tab",
+          "body": "完成任意学院的三章 Coursework 后，可按 Tab 打开课后社团。包含 9×9 五子棋、五轮纸牌小游戏和虚构社交场景；不涉及下注、货币兑换或现实奖励。",
+          "heading_en": "Post-Course Club / Tab",
+          "body_en": "After finishing all three chapters for any faculty, press Tab to open the Post-Course Club. Play 9×9 Gomoku, a five-round card duel or a fictional social scene. No betting, cash redemption or real prizes."
         }
       ],
       "title_en": "04  Campus Life",
@@ -133,6 +157,12 @@
           "body": "按 J 或点击顶部 Mail 打开 Campus Post，可查看收件箱、已发送邮件、阅读、删除或撰写消息。仅支持向本机已注册的其他游戏账号发送邮件，不会发送真实网络电子邮件。打开邮箱时游戏自动暂停。",
           "heading_en": "In-game mail / J",
           "body_en": "Press J or click Mail to open Campus Post. Browse Inbox and Sent, read/delete messages, or write to another local account registered on this computer. No actual network email is sent. The world pauses while the mailbox is open."
+        },
+        {
+          "heading": "奖励与存档隔离",
+          "body": "探索、Coursework 和卡通战斗的经验会汇总到账号等级，并通过逐来源累计校验避免重复奖励。金币与社团统计按本地账号保存；离线存档没有云端备份功能。",
+          "heading_en": "Rewards & save isolation",
+          "body_en": "Exploration, Coursework and arcade XP contribute to the local profile's level through monotonic per-source checkpoints. Coins and club records are isolated per profile. Offline saves are not backed up to the cloud."
         }
       ],
       "title_en": "05  Levels & Campus Post",
@@ -160,6 +190,12 @@
           "body": "NUS-3D 是独立制作的虚构化校园探索作品。部分路线、室内、NPC、校车及天气为示意或游戏内容，不应作为真实校园导航、交通或安全信息。",
           "heading_en": "Unofficial campus model",
           "body_en": "NUS-3D is a fictionalized, independently created exploration game. Some routes, interiors, NPCs, shuttle and weather visuals are illustrative and must not be used for real campus navigation, transportation or safety guidance."
+        },
+        {
+          "heading": "界面、音效与语言",
+          "body": "F1 查看完整帮助；F9 开关程序化反馈音效；F10 切换中英文。HUD 中的按键帽会响应实际按键，F7 仍可隐藏 HUD。视角与楼体为非官方示意，不能作为实地寻路依据。",
+          "heading_en": "HUD, sound & languages",
+          "body_en": "F1 toggles detailed controls, F9 switches synthesized UI sounds, and F10 changes between Chinese and English. On-screen keycaps animate on input; F7 still hides the HUD. This remains an unofficial schematic campus world."
         }
       ],
       "title_en": "06  Extra Controls & Notes",
