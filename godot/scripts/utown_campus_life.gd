@@ -19,6 +19,9 @@ var npc_colors: PackedStringArray = PackedStringArray(["#d77f69", "#6d93bf", "#9
 ## Cosmetic variety is independent of personality, affinity, and gameplay rewards.
 const SKIN_TONES = ["#f3cba8", "#8c553e", "#c98d62", "#e0ac82", "#633d30", "#ae7153"]
 const HAIR_TONES = ["#292c30", "#382923", "#4d342a", "#1f252c", "#624737", "#353136"]
+const AMBIENT_COUNT: int = 18
+const AMBIENT_NAMES = ["Student", "Researcher", "Visitor", "Runner", "Exchange student", "Teaching assistant"]
+const AMBIENT_LINES = ["Heading to class!", "Is the shuttle coming?", "I need coffee.", "Which way is the canteen?", "My presentation starts soon!", "Nice weather for a campus walk."]
 const TALK_RADIUS: float = 5.5
 const ENTRY_RADIUS: float = 18.0
 const BOARD_RADIUS: float = 7.0
@@ -97,7 +100,10 @@ func _sample_route(route: Array[Vector3], distance: float) -> Dictionary:
 
 func _build_pedestrians() -> void:
     var walkways: Array = world.layout.get("walkways", [])
-    for i in range(npc_names.size()):
+    if walkways.is_empty():
+        return
+    for i in range(npc_names.size() + AMBIENT_COUNT):
+        var ambient: bool = i >= npc_names.size()
         var path: Dictionary = walkways[i % walkways.size()]
         var route: Array[Vector3] = []
         for coords in path.get("lonlat", []):
@@ -105,9 +111,13 @@ func _build_pedestrians() -> void:
         if route.size() < 2:
             continue
         var total: float = _route_length(route)
-        var distance: float = total * float((i % 3) + 1) / 4.0
+        if total <= 0.001:
+            continue
+        var distance: float = total * float((i % 7) + 1) / 8.0
         var npc: Node3D = _make_person(i)
         npc.position = _sample_route(route, distance)["position"]
+        var height_scale: float = 0.87 + float((i * 7 + 3) % 13) * 0.023
+        npc.scale = Vector3(height_scale * (0.96 + float(i % 4) * 0.025), height_scale, height_scale * (0.96 + float(i % 4) * 0.025))
         add_child(npc)
         pedestrians.append({
             "node": npc, "route": route, "distance": distance,
@@ -116,15 +126,17 @@ func _build_pedestrians() -> void:
             "idle_remaining": 0.0, "talk_remaining": 0.0,
             "left_arm": npc.get_node("LeftArmPivot"), "right_arm": npc.get_node("RightArmPivot"),
             "left_leg": npc.get_node("LeftLegPivot"), "right_leg": npc.get_node("RightLegPivot"),
-            "name": npc_names[i], "line": npc_lines[i],
-            "personality_enabled": ["Maya", "Ethan", "Mei"].has(npc_names[i])
+            "name": AMBIENT_NAMES[i % AMBIENT_NAMES.size()] if ambient else npc_names[i],
+            "line": AMBIENT_LINES[i % AMBIENT_LINES.size()] if ambient else npc_lines[i],
+            "ambient": ambient,
+            "personality_enabled": not ambient and ["Maya", "Ethan", "Mei"].has(npc_names[i] if not ambient else "")
         })
 
 func _make_person(index: int) -> Node3D:
     var root := Node3D.new()
     root.name = "StudentNPC_%02d" % index
     var shirt := StandardMaterial3D.new()
-    shirt.albedo_color = Color.html(str(npc_colors[index]))
+    shirt.albedo_color = Color.html(str(npc_colors[index % npc_colors.size()]))
     var skin := StandardMaterial3D.new()
     skin.albedo_color = Color.html(SKIN_TONES[index % SKIN_TONES.size()])
     var trousers := StandardMaterial3D.new()
@@ -689,8 +701,8 @@ func talk_to_nearest() -> bool:
     pedestrians[index]["talk_remaining"] = 6.0
     var speaker: String = str(pedestrians[index]["name"])
     var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
-    var role: String = bank.role_for("outdoor", speaker) if bank != null else "Student"
-    var line: String = bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"])
+    var role: String = "Passerby" if bool(pedestrians[index].get("ambient", false)) else (bank.role_for("outdoor", speaker) if bank != null else "Student")
+    var line: String = str(pedestrians[index]["line"]) if bool(pedestrians[index].get("ambient", false)) else (bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"]))
     var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
     var affinity_line: String = ""
     var affinity_status: String = ""
