@@ -170,7 +170,9 @@ func _paper_scraps(root: Node3D, transforms: Array[Transform3D], tints: Array[Co
     var renderer := MultiMeshInstance3D.new()
     renderer.name = "ScatteredHandouts_OneBatch"
     renderer.multimesh = batch
-    renderer.material_override = _mat("#ffffff")
+    var scrap_material: StandardMaterial3D = _mat("#ffffff")
+    scrap_material.vertex_color_use_as_albedo = true
+    renderer.material_override = scrap_material
     renderer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
     root.add_child(renderer)
     for i in range(transforms.size()):
