@@ -220,6 +220,73 @@ func _render() -> void:
         return
     count += 1
 
+    # M3.4 visual QA: roof-shadowed, furnished indoor spaces and wet pavements.
+    # Capture the project's real Godot viewport, never a generated concept image.
+    hud.visible = false
+    world.set_lighting_mode(0)
+    weather.set_mode(0)
+    var erc_room: Node3D = campus_life.interiors["ERC"]
+    if not campus_life.enter_interior("ERC"):
+        push_error("Could not enter ERC for M3.4 interior review")
+        quit(1)
+        return
+    player.global_position = erc_room.to_global(Vector3(-2.8, 0.18, 5.5))
+    player.rotation = Vector3(0.0, PI * 0.5, 0.0)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_4_ERC_CAFE_CORNER.png"):
+        push_error("Cannot capture new ERC cafe corner")
+        quit(1)
+        return
+    count += 1
+    if not campus_life.toggle_interior_floor():
+        push_error("Cannot access the ERC mezzanine")
+        quit(1)
+        return
+    player.rotation = Vector3(0.0, PI, 0.0)
+    player.head.rotation = Vector3(-0.1, 0.0, 0.0)
+    if not await _capture_frame(output, "M3_4_ERC_MEZZANINE_ATRIUM.png"):
+        push_error("Cannot capture ERC mezzanine atrium")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+    var src_room: Node3D = campus_life.interiors["SRC"]
+    if not campus_life.enter_interior("SRC"):
+        push_error("Could not enter SRC for M3.4 interior review")
+        quit(1)
+        return
+    player.global_position = src_room.to_global(Vector3(-3.5, 0.18, -0.5))
+    var src_aim: Vector3 = src_room.to_global(Vector3(-9.0, 0.18, -5.5))
+    player.look_at(src_aim, Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_4_SRC_EQUIPMENT_AND_HALL.png"):
+        push_error("Cannot capture new SRC activity corner")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+
+    if not review.select_view(3):
+        push_error("Cannot select wet-weather overview")
+        quit(1)
+        return
+    weather.set_mode(3)
+    for wet_frame in range(85):
+        await process_frame
+    if not await _capture_frame(output, "M3_4_RAIN_DARKENED_WALKWAYS.png"):
+        push_error("Cannot capture wet paving scene")
+        quit(1)
+        return
+    count += 1
+    weather.set_mode(0)
+    for clearing_frame in range(18):
+        await process_frame
+    if not await _capture_frame(output, "M3_4_AFTER_RAIN_DRYING.png"):
+        push_error("Cannot capture gradual rain-to-clear transition")
+        quit(1)
+        return
+    count += 1
+
     hud.visible = false
     world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
@@ -234,6 +301,7 @@ func _render() -> void:
         "viewpoints": review.viewpoints,
         "image_count": count,
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
+        "m34_showcase": ["erc_cafe", "erc_atrium", "src_equipment", "wet_walkways", "rain_drying"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
