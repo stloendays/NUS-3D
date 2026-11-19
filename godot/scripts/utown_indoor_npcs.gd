@@ -236,6 +236,9 @@ func talk_to_nearest() -> bool:
         var chinese: bool = language != null and language.is_chinese()
         affinity_status = relationships.conversation(speaker, chinese)
         affinity_line = relationships.contextual_line(speaker, chinese)
+        var invitation: String = relationships.invitation(speaker, chinese)
+        if not invitation.is_empty():
+            affinity_line += "\n" + invitation
     life.message = "%s / %s\n%s" % [speaker, role, line]
     if not affinity_line.is_empty():
         life.message += "\n" + affinity_line
