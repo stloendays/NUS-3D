@@ -70,6 +70,17 @@ func _ready() -> void:
     _show_login()
 
 
+func _ui_sound_service() -> NUS3DUISound:
+    # SceneTree scripts can load the autoload before its identifier enters static scope.
+    return get_node_or_null("/root/UISound") as NUS3DUISound
+
+
+func _play_ui_sound(effect: String) -> void:
+    var service: NUS3DUISound = _ui_sound_service()
+    if service != null:
+        service.play_ui(effect)
+
+
 func _panel_style(background: Color) -> StyleBoxFlat:
     return NUS3DUISkin.panel(background, Color("#79d6dd"), 16, 19)
 
@@ -87,7 +98,7 @@ func _button(title: String, callback: Callable) -> Button:
     result.text = title
     result.custom_minimum_size.y = 39.0
     NUS3DUISkin.button(result)
-    result.pressed.connect(func() -> void: UISound.play_ui("press"))
+    result.pressed.connect(func() -> void: _play_ui_sound("press"))
     result.pressed.connect(callback)
     return result
 
@@ -260,7 +271,8 @@ func _build_mail() -> void:
 
 
 func _refresh_sound_buttons() -> void:
-    var active: bool = UISound.enabled
+    var service: NUS3DUISound = _ui_sound_service()
+    var active: bool = service != null and service.enabled
     if login_sound_button != null:
         login_sound_button.text = "UI sound: ON  [F9]" if active else "UI sound: OFF  [F9]"
     for button in [profile_sound_button, mail_sound_button]:
@@ -269,7 +281,9 @@ func _refresh_sound_buttons() -> void:
 
 
 func _toggle_ui_sound() -> void:
-    UISound.toggle_enabled()
+    var service: NUS3DUISound = _ui_sound_service()
+    if service != null:
+        service.toggle_enabled()
     _refresh_sound_buttons()
 
 
@@ -300,10 +314,10 @@ func _submit_login() -> void:
     login_password.clear()
     if not error.is_empty():
         login_message.text = error
-        UISound.play_ui("error")
+        _play_ui_sound("error")
         return
     _enter_game()
-    UISound.play_ui("confirm")
+    _play_ui_sound("confirm")
 
 
 func _enter_game() -> void:
@@ -353,7 +367,7 @@ func _refresh_profile() -> void:
     var progress: Dictionary = accounts.level_progress()
     var current_level: int = int(progress["level"])
     if _shown_level > 0 and current_level > _shown_level:
-        UISound.play_ui("reward")
+        _play_ui_sound("reward")
     _shown_level = current_level
     profile_label.text = "%s   LV %d   XP %d/%d  |  Mail %d" % [
         accounts.get_username(), int(progress["level"]),
@@ -374,7 +388,7 @@ func _open_mail() -> void:
     profile_card.hide()
     mail_status.text = ""
     _show_mailbox("inbox")
-    UISound.play_ui("open")
+    _play_ui_sound("open")
 
 
 func _close_mail() -> void:
@@ -383,7 +397,7 @@ func _close_mail() -> void:
         profile_card.show()
         get_tree().paused = false
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-        UISound.play_ui("release")
+        _play_ui_sound("release")
 
 
 func _show_mailbox(mode: String) -> void:
@@ -408,7 +422,7 @@ func _select_mail(index: int) -> void:
     var message: Dictionary = displayed_messages[index]
     selected_message_id = str(message.get("id", ""))
     mail_heading.text = str(message.get("subject", "(no subject)"))
-    UISound.play_ui("release")
+    _play_ui_sound("release")
     mail_body.text = "FROM  %s\nTO  %s\nDATE  %s\n\n%s" % [
         str(message.get("from", "")), str(message.get("to", "")),
         str(message.get("time", "")), str(message.get("body", ""))]
@@ -437,9 +451,9 @@ func _send_mail() -> void:
     var status: String = accounts.send_mail_to(compose_to.text, compose_subject.text, compose_body.text)
     if not status.is_empty():
         mail_status.text = status
-        UISound.play_ui("error")
+        _play_ui_sound("error")
         return
-    UISound.play_ui("confirm")
+    _play_ui_sound("confirm")
     compose_to.clear()
     compose_subject.clear()
     compose_body.clear()
