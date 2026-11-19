@@ -285,7 +285,7 @@ func _drop_at(position: Vector3, amount: int) -> bool:
         state["life"] = DROP_LIFETIME
         var root: Node3D = state["node"]
         root.global_position = state["base"]
-        root.visible = true
+        root.visible = hud.visible
         return true
     return false
 
@@ -354,10 +354,12 @@ func credit(amount: int, reason: String) -> bool:
 func reward_once(reward_id: String, amount: int, reason: String) -> bool:
     if reward_id.is_empty() or claimed_rewards.has(reward_id) or amount <= 0:
         return false
-    if not credit(amount, reason):
-        return false
+    # Include the claim in the same atomic ConfigFile write as the deposit.
+    # A crash between two saves must not make an already-paid quest claimable again.
     claimed_rewards[reward_id] = true
-    _save_progress()
+    if not credit(amount, reason):
+        claimed_rewards.erase(reward_id)
+        return false
     return true
 
 func _poll_mission_rewards() -> void:
