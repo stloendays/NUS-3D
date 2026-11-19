@@ -7,7 +7,7 @@ signal language_changed(locale: String)
 
 const CATALOG_PATH: String = "res://data/language_catalog.json"
 const LOCALE_SAVE: String = "user://nus3d_locale.cfg"
-const SUPPORTED: PackedStringArray = PackedStringArray(["en", "zh"])
+const SUPPORTED: Array[String] = ["en", "zh"]
 
 var locale: String = "en"
 var save_path: String = LOCALE_SAVE
