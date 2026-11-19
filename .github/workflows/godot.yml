@@ -6,7 +6,7 @@ concurrency:
 
 on:
   push:
-    branches: ["main", "feature/**"]
+    branches: ["main", "feature/**", "integration/**"]
   pull_request:
 
 jobs:
@@ -68,6 +68,23 @@ jobs:
         run: godot --headless --path godot --import --quit
       - name: Validate scene and geometry
         run: godot --headless --path godot --script res://tests/smoke_test.gd
+      - name: Validate integrated campaign, accounts and controls
+        run: |
+          set -e
+          for test in \
+            account_smoke_test.gd \
+            language_smoke_test.gd \
+            ui_feedback_smoke_test.gd \
+            arcade_smoke_test.gd \
+            m3_7_smoke_test.gd \
+            green_dining_smoke_test.gd \
+            coins_smoke_test.gd \
+            experience_guide_smoke_test.gd \
+            integration_smoke_test.gd
+          do
+            echo "Testing $test"
+            timeout 65s godot --headless --path godot --script "res://tests/$test"
+          done
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |
           sudo apt-get update -qq
