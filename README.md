@@ -48,13 +48,13 @@ cd NUS-3D
 godot --editor --path godot
 ```
 
-Use **Godot 4.4.1 or newer**. Import the project, open the main scene, and press **F5**. The core controls are **WASD** to move, mouse to look, **Shift** to run, **M** for minimap, **P** for coursework, and **Esc** to release the mouse. See the [full control guide](docs/M1_GREYBOX.md) and in-game prompts for context-sensitive actions.
+Use **Godot 4.4.1 or newer**. Import the project, open the main scene, and press **F5**. The core controls are **WASD** to move, mouse to look, **Shift** to run, **M** for minimap, **P** for coursework, **F5** for the in-game cosmetic wardrobe, **F6** for the GIS geometry overlay, **F11** for optional Campus AI, and **Esc** to release the mouse. See the [full control guide](docs/M1_GREYBOX.md) and in-game prompts for context-sensitive actions.
 
 ## 🗺️ World / 游戏世界
 
-**Available on `main`:** UTown Town Green, Town Plaza, ERC and SRC; schematic Kent Ridge districts including Science/Frontier, sports facilities, MD1, campus game buses, time/weather, course challenges and optional F11 Campus AI links.
+**Available on `main`:** UTown Town Green, Town Plaza, ERC and SRC; schematic Kent Ridge districts including Science/Frontier, sports facilities, MD1, campus game buses, time/weather, course challenges, an F5 cosmetic character wardrobe preview and optional F11 Campus AI links.
 
-**In draft / pending verification:** more detailed faculty-specific facilities, optimized 3D props, player wardrobe, advanced terrain elevations, richer NPC interactions and a verified Windows auto-update path. All campus geometry and game transit links are stylized interpretations, **not surveyed buildings or official shuttle navigation**.
+**In draft / pending verification:** more detailed faculty-specific facilities, optimized 3D props, advanced terrain elevations, richer NPC interactions and a verified Windows auto-update path. All campus geometry and game transit links are stylized interpretations, **not surveyed buildings or official shuttle navigation**.
 
 [Official campus map reference](https://map.nus.edu.sg/) · [Science / Frontier integration #48](https://github.com/stloendays/NUS-3D/pull/48) · [MD1 #49](https://github.com/stloendays/NUS-3D/pull/49) · [Map art #50](https://github.com/stloendays/NUS-3D/pull/50) · [Campus AI #66](https://github.com/stloendays/NUS-3D/pull/66)
 
