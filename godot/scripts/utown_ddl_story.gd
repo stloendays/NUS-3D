@@ -47,6 +47,7 @@ var stage_points: Array[Vector3] = []
 var stage_roots: Array[Node3D] = []
 var display_layer: CanvasLayer
 var display_label: Label
+var countdown_label: Label
 var elapsed_since_refresh: float = 0.0
 var panic_notified: bool = false
 var final_warning_notified: bool = false
@@ -113,10 +114,10 @@ func _build_ui() -> void:
     panel.anchor_right = 0.5
     panel.anchor_top = 1.0
     panel.anchor_bottom = 1.0
-    panel.offset_left = -203.0
-    panel.offset_right = 203.0
-    panel.offset_top = -183.0
-    panel.offset_bottom = -55.0
+    panel.offset_left = -236.0
+    panel.offset_right = 236.0
+    panel.offset_top = -213.0
+    panel.offset_bottom = -52.0
     panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
     var style := StyleBoxFlat.new()
     style.bg_color = Color(0.24, 0.10, 0.20, 0.94)
@@ -129,13 +130,23 @@ func _build_ui() -> void:
     style.content_margin_bottom = 10.0
     panel.add_theme_stylebox_override("panel", style)
     display_layer.add_child(panel)
+    var content := VBoxContainer.new()
+    content.name = "PanicCardContents"
+    content.add_theme_constant_override("separation", 3)
+    panel.add_child(content)
+    countdown_label = Label.new()
+    countdown_label.name = "CountdownHeadline"
+    countdown_label.add_theme_font_size_override("font_size", 21)
+    countdown_label.add_theme_color_override("font_color", Color.html("#ffe386"))
+    countdown_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    content.add_child(countdown_label)
     display_label = Label.new()
-    display_label.name = "EpisodeAndCountdown"
+    display_label.name = "EpisodeDescription"
     display_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     display_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    display_label.add_theme_font_size_override("font_size", 12)
+    display_label.add_theme_font_size_override("font_size", 15)
     display_label.add_theme_color_override("font_color", Color.html("#fff3d9"))
-    panel.add_child(display_label)
+    content.add_child(display_label)
 
 func reset_episode() -> void:
     stage = 0
@@ -207,12 +218,12 @@ func _refresh() -> void:
     var minutes: int = int(ceil(deadline_left)) / 60
     var seconds: int = int(ceil(deadline_left)) % 60
     var timer_label: String = "%02d:%02d" % [minutes, seconds]
+    countdown_label.text = "DDL DOOM   %s   |   RETRIES %d" % [timer_label, fail_count]
     var lines := PackedStringArray()
-    lines.append("DDL DOOM  |  %s  |  RETRIES %d" % [timer_label, fail_count])
     if completed:
         lines.append("SUBMITTED! Best: %.1f s | [H] at Green to replay" % best_seconds)
     else:
-        lines.append("ACT %d/4  %s" % [stage + 1, EPISODES[stage]["name"]])
+        lines.append("ACT %d/4   %s" % [stage + 1, EPISODES[stage]["name"]])
         lines.append("%s  |  [H] at marker" % EPISODES[stage]["hint"])
     lines.append(latest_line)
     display_label.text = "\n".join(lines)
