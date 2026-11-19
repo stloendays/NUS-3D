@@ -7,6 +7,7 @@ const UI_FONT_KIT = preload("res://scripts/utown_ui_font.gd")
 @onready var coursework: UTownCoursework = $"../Coursework"
 @onready var player: UTownPlayer = $"../Player"
 @onready var life: UTownCampusLife = $"../CampusLife"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var hud_enabled: bool = true
 var status_card: PanelContainer
@@ -31,8 +32,51 @@ func _ready() -> void:
     var font_theme: Theme = UI_FONT_KIT.make_theme()
     status_card.theme = font_theme
     shade.theme = font_theme
+    if language != null:
+        language.language_changed.connect(_apply_language)
+        _apply_language(language.locale)
     if coursework.current_faculty_id.is_empty():
         show_selector()
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _dual_label(zh: String, en: String, size: int, color: Color) -> Label:
+    var label := _label(_t(zh, en), size, color)
+    label.set_meta("locale_zh", zh)
+    label.set_meta("locale_en", en)
+    return label
+
+
+func _dual_button(button: Button, zh: String, en: String) -> void:
+    button.set_meta("locale_zh", zh)
+    button.set_meta("locale_en", en)
+    button.text = _t(zh, en)
+
+
+func _apply_language(_code: String) -> void:
+    _refresh_dual_nodes(self)
+    for i in range(coursework.faculty_options.size()):
+        var item: Dictionary = coursework.faculty_options[i]
+        var name: String = str(item.get("zh", "")) if language != null and language.is_chinese()             else str(item.get("name", ""))
+        faculty_picker.set_item_text(i, "%s | %s" % [str(item.get("abbr", "")), name])
+    if faculty_picker.selected >= 0:
+        _on_faculty_highlighted(faculty_picker.selected)
+    _refresh_journal()
+
+
+func _refresh_dual_nodes(node: Node) -> void:
+    if node.has_meta("locale_zh") and node.has_meta("locale_en"):
+        var translated: String = _t(str(node.get_meta("locale_zh")), str(node.get_meta("locale_en")))
+        if node is Label:
+            (node as Label).text = translated
+        elif node is Button:
+            (node as Button).text = translated
+    for child in node.get_children():
+        _refresh_dual_nodes(child)
+
 
 func _style_panel(panel: PanelContainer, background: Color) -> void:
     var style := StyleBoxFlat.new()
@@ -67,9 +111,10 @@ func _build_status() -> void:
     var column := VBoxContainer.new()
     column.add_theme_constant_override("separation", 4)
     status_card.add_child(column)
-    status_title = _label("COURSEWORK // THE DDL APOCALYPSE", 14, Color.html("#f3c372"))
+    status_title = _dual_label("课程任务 · 截止时间危机", "COURSEWORK · DEADLINE APOCALYPSE", 14, Color.html("#f3c372"))
     column.add_child(status_title)
-    status_body = _label("Choose your faculty. [Shift+P] Faculty  [P] Coursework", 12, Color.html("#edf2ed"))
+    status_body = _dual_label("选择学院 [Shift+P] · 手册 [P]",
+        "Choose faculty [Shift+P] · Journal [P]", 12, Color.html("#edf2ed"))
     column.add_child(status_body)
     status_feedback = _label("", 12, Color.html("#a9e4b7"))
     column.add_child(status_feedback)
@@ -99,16 +144,17 @@ func _build_modal() -> void:
     selector_box.name = "FacultySelector"
     selector_box.add_theme_constant_override("separation", 12)
     body.add_child(selector_box)
-    selector_box.add_child(_label("NUS-3D  /  CHOOSE YOUR FACULTY", 25, Color.html("#f5c46a")))
-    selector_box.add_child(_label("学院选择  |  你的作业，你的灾难。", 18, Color.html("#e8eee8")))
-    selector_box.add_child(_label("Fictional game curriculum. Not an actual NUS module, transcript or deadline.", 12, Color.html("#aabdc4")))
+    selector_box.add_child(_dual_label("NUS-3D · 选择学院", "NUS-3D · CHOOSE FACULTY", 25, Color.html("#f5c46a")))
+    selector_box.add_child(_dual_label("你的学院，你的截止时间危机。", "Your faculty. Your deadline crisis.", 18, Color.html("#e8eee8")))
+    selector_box.add_child(_dual_label("游戏虚构任务，不代表真实课程、成绩或截止日期。", "Fictional game quests, not real courses, grades or deadlines.", 12, Color.html("#aabdc4")))
     faculty_picker = OptionButton.new()
     faculty_picker.name = "FacultyPicker"
     faculty_picker.custom_minimum_size = Vector2(520, 42)
     selector_box.add_child(faculty_picker)
     for i in range(coursework.faculty_options.size()):
         var item: Dictionary = coursework.faculty_options[i]
-        faculty_picker.add_item("%s  |  %s  /  %s" % [item["abbr"], item["zh"], item["name"]])
+        faculty_picker.add_item("%s | %s" % [item["abbr"],
+            str(item["zh"]) if language != null and language.is_chinese() else str(item["name"])])
         faculty_picker.set_item_metadata(i, str(item["id"]))
     faculty_picker.item_selected.connect(_on_faculty_highlighted)
     faculty_description = _label("", 16, Color.html("#d7dfda"))
@@ -116,34 +162,34 @@ func _build_modal() -> void:
     selector_box.add_child(faculty_description)
     var start := Button.new()
     start.name = "ConfirmFaculty"
-    start.text = "进入学院 / START THE DDL CHAOS"
+    _dual_button(start, "进入学院 · 开始挑战", "Enter Faculty · Start Adventure")
     start.custom_minimum_size.y = 43.0
     start.pressed.connect(_confirm_faculty)
     selector_box.add_child(start)
-    selector_box.add_child(_label("学院可以以后更换。每个学院的课程进度分别保留；已有探索和奖励不会重置。", 12, Color.html("#aebebc")))
+    selector_box.add_child(_dual_label("可随时切换学院，各学院进度分别保存，其他奖励不会重置。", "Switch faculties later; each questline is saved independently.", 12, Color.html("#aebebc")))
 
     journal_box = VBoxContainer.new()
     journal_box.name = "CourseworkJournal"
     journal_box.add_theme_constant_override("separation", 12)
     body.add_child(journal_box)
     journal_box.visible = false
-    journal_box.add_child(_label("COURSEWORK JOURNAL  /  任务手册", 22, Color.html("#f5c46a")))
+    journal_box.add_child(_dual_label("课程任务手册", "COURSEWORK JOURNAL", 22, Color.html("#f5c46a")))
     journal_text = _label("", 15, Color.html("#e7ede9"))
     journal_text.custom_minimum_size = Vector2(520, 210)
     journal_box.add_child(journal_text)
     var exam_button := Button.new()
     exam_button.name = "OpenEnglishMajorExams"
-    exam_button.text = "模拟专业考试 / ENGLISH MAJOR EXAMS [F8]"
+    _dual_button(exam_button, "专业模拟考试 [F8]", "Major Practice Exams [F8]")
     exam_button.custom_minimum_size.y = 43.0
     exam_button.pressed.connect(_open_major_exams)
     journal_box.add_child(exam_button)
     var switch_button := Button.new()
-    switch_button.text = "切换学院 / CHANGE FACULTY"
+    _dual_button(switch_button, "切换学院", "Change Faculty")
     switch_button.custom_minimum_size.y = 37.0
     switch_button.pressed.connect(show_selector)
     journal_box.add_child(switch_button)
     journal_button = Button.new()
-    journal_button.text = "返回游戏 / RESUME"
+    _dual_button(journal_button, "返回游戏", "Resume Game")
     journal_button.custom_minimum_size.y = 37.0
     journal_button.pressed.connect(hide_modal)
     journal_box.add_child(journal_button)
@@ -153,9 +199,10 @@ func _on_faculty_highlighted(index: int) -> void:
         return
     var faculty: Dictionary = coursework.faculty_options[index]
     var quests: Array = faculty["quests"]
-    faculty_description.text = "学院剧情：%s\n本学院有 3 个原创 Coursework 任务。\n第一关：%s\n需要接通知、做室内活动、找队友、按时提交。\n" % [
-        str(faculty["flavor"]), str(quests[0]["title"])
-    ]
+    faculty_description.text = _t(
+        "学院剧情：%s\n本学院有 3 个原创课程任务。\n第一关：%s\n收集通知、完成活动、寻找队友并提交。",
+        "Faculty story: %s\nThis faculty has three original coursework quests.\nFirst quest: %s\nCollect the brief, do an activity, find a teammate and submit."
+    ) % [coursework.faculty_flavor(faculty), coursework.quest_title(quests[0])]
 
 func _set_game_input_locked(locked: bool) -> void:
     coursework.modal_open = locked
@@ -235,21 +282,26 @@ func hide_modal() -> void:
     _set_game_input_locked(false)
 
 func _refresh_journal() -> void:
-    var current: Dictionary = coursework.current_quest()
-    var line: String = "选择学院：%s\n等级 Lv.%d  |  总经验 %d XP  |  学园积分 %d\n已完成课程：%d / 3（本学院）\n\n" % [
-        coursework.faculty_name(), coursework.level(), coursework.total_xp,
-        coursework.credits, coursework.active_quest_index
-    ]
-    if current.is_empty():
-        line += "本学院 Coursework 全部完成！可继续探索或换学院。\n"
+    if journal_text == null:
+        return
+    var quest: Dictionary = coursework.current_quest()
+    var line: String = _t(
+        "学院：%s\n等级 %d | 经验 %d XP | 积分 %d\n本学院完成：%d / 3\n\n",
+        "Faculty: %s\nLevel %d | Experience %d XP | Credits %d\nCompleted here: %d / 3\n\n"
+    ) % [coursework.faculty_name(), coursework.level(), coursework.total_xp,
+        coursework.credits, coursework.active_quest_index]
+    if quest.is_empty():
+        line += _t("本学院全部课程任务已完成。可以继续探索或切换学院。\n",
+            "All faculty coursework completed. Explore the campus or change faculty.\n")
     else:
-        line += "任务 %d/3：%s\n%s\n\nDDL：%s\n当前目标：%s\n" % [
-            coursework.active_quest_index + 1, str(current["title"]),
-            str(current["story"]), coursework.format_ddl(), coursework.objective_description()
-        ]
+        line += _t("任务 %d/3：%s\n%s\n\n截止时间：%s\n当前目标：%s\n",
+            "Quest %d/3: %s\n%s\n\nDeadline: %s\nCurrent objective: %s\n") % [
+            coursework.active_quest_index + 1, coursework.quest_title(quest),
+            coursework.quest_story(quest), coursework.format_ddl(), coursework.objective_description()]
     if not coursework.last_grade.is_empty():
-        line += "\n最近评分：" + coursework.last_grade
-    line += "\n\n[P] 返回  [Shift+P] 切换学院   |   进度已存于本地"
+        line += _t("\n最近评分：", "\nLatest grade: ") + coursework.last_grade
+    line += _t("\n\n[P] 返回  [Shift+P] 切换学院 | 进度自动保存在本机",
+        "\n\n[P] Back  [Shift+P] Change faculty | Saved locally")
     journal_text.text = line
 
 func set_hud_enabled(enabled: bool) -> void:
