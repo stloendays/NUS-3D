@@ -3,6 +3,7 @@ class_name UTownCampusLife
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
 const CLASSROOM_PROPS = preload("res://scripts/utown_classroom_props.gd")
 const CAMPUS_PROPS = preload("res://scripts/utown_campus_props.gd")
+const INTERIOR_LIFE_PROPS = preload("res://scripts/utown_interior_life_props.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -244,8 +245,10 @@ func _build_interiors() -> void:
         _build_mezzanine(room, id)
         if id == "ERC":
             _build_study_room(room)
+            INTERIOR_LIFE_PROPS.decorate_study(room)
         else:
             _build_recreation_room(room)
+            INTERIOR_LIFE_PROPS.decorate_recreation(room)
         activity_spots[id] = INTERIOR_KIT.decorate(room, id)
         interiors[id] = room
 
