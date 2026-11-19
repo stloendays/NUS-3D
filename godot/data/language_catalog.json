@@ -563,16 +563,16 @@
     }
   },
   "world_names": {
-    "Town Green": "Town Green 草坪",
-    "Town Plaza": "Town Plaza 广场",
-    "Education Resource Centre": "教育资源中心 ERC",
-    "Stephen Riady Centre": "Stephen Riady Centre（SRC）",
-    "UTown Residence": "UTown 宿舍",
-    "Tembusu College": "Tembusu 学院",
-    "College of Alice & Peter Tan": "Alice & Peter Tan 学院",
-    "Residential College 4": "RC4 学院",
-    "Cinnamon College": "Cinnamon 学院",
-    "CREATE": "CREATE 科研区"
+    "Town Green": "中央草坪",
+    "Town Plaza": "中央广场",
+    "Education Resource Centre": "教育资源中心",
+    "Stephen Riady Centre": "斯蒂芬·里亚迪中心",
+    "UTown Residence": "大学城宿舍",
+    "Tembusu College": "天宝书院",
+    "College of Alice & Peter Tan": "爱丽丝与彼得陈书院",
+    "Residential College 4": "第四住宿书院",
+    "Cinnamon College": "桂苑书院",
+    "CREATE": "科研中心"
   },
   "item_zh": {
     "Local Coordinate Frame": "局部坐标系",
