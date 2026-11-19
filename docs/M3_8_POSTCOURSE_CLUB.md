@@ -4,7 +4,7 @@
 
 ## Unlock and progression
 
-Finish all three Coursework chapters in any single selected faculty to permanently unlock the Post-Course Club. Press P while on foot to open it. The unlock remains after switching faculties, derived from existing per-faculty saved coursework progress; no separate paid entitlement or account exists.
+Finish all three Coursework chapters in any single selected faculty to permanently unlock the Post-Course Club. Press Tab while on foot to open it. The unlock remains after switching faculties, derived from existing per-faculty saved coursework progress; no separate paid entitlement or account exists.
 
 Finish all 39 chapters across thirteen academic roleplay options for the additional cosmetic "校园休闲大师 / All Faculty Master" label. This is not required to access the club.
 
@@ -28,7 +28,7 @@ The conceptual SRC lounge gets a procedural Gomoku table, card table, drinks cou
 
 ## Controls
 
-- P opens or closes the unlocked club while the player is on foot.
+- Tab opens or closes the unlocked club while the player is on foot.
 - Esc closes the club and restores mouse-look.
 - Use mouse clicks for chess moves, card selection, drink options and rematches.
 - O/J retain their original faculty selector and coursework journal behavior but do not open through this modal.

@@ -72,12 +72,14 @@ func _style_panel(panel: PanelContainer, color_hex: String) -> void:
 func _build() -> void:
     status_chip = _label("", 15, "#ffd591")
     status_chip.name = "PostCourseShortcut"
-    status_chip.anchor_left = 0.5
-    status_chip.anchor_right = 0.5
-    status_chip.offset_left = -238.0
-    status_chip.offset_right = 238.0
-    status_chip.offset_top = 15.0
-    status_chip.offset_bottom = 48.0
+    status_chip.anchor_left = 0.0
+    status_chip.anchor_right = 0.0
+    status_chip.anchor_top = 1.0
+    status_chip.anchor_bottom = 1.0
+    status_chip.offset_left = 22.0
+    status_chip.offset_right = 480.0
+    status_chip.offset_top = -91.0
+    status_chip.offset_bottom = -62.0
     status_chip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     status_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
     add_child(status_chip)
@@ -328,15 +330,18 @@ func _process(_delta: float) -> void:
         return
     status_chip.visible = leisure.unlocked() and not is_open and hud.visible and not course_ui.modal_visible and not intro.playing
     if status_chip.visible:
-        status_chip.text = "POST-COURSE CLUB  [P]  |  五子棋 · 纸牌 · 聚会" + ("  |  39/39 MASTER" if leisure.grand_master_unlocked() else "")
+        status_chip.text = "POST-COURSE CLUB  [Tab]  |  五子棋 · 纸牌 · 聚会" + ("  |  39/39 MASTER" if leisure.grand_master_unlocked() else "")
 
 func _input(event: InputEvent) -> void:
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    if exams != null and bool(exams.get("is_open")):
+        return
     if not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
     if not key.pressed or key.echo:
         return
-    if key.keycode == KEY_P:
+    if key.keycode == KEY_TAB:
         if is_open:
             close_lounge()
         else:

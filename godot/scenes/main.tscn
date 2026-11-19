@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -15,8 +15,19 @@
 [ext_resource type="Script" path="res://scripts/utown_coursework.gd" id="13"]
 [ext_resource type="Script" path="res://scripts/utown_coursework_ui.gd" id="14"]
 [ext_resource type="Script" path="res://scripts/utown_intro.gd" id="15"]
-[ext_resource type="Script" path="res://scripts/utown_leisure.gd" id="16"]
-[ext_resource type="Script" path="res://scripts/utown_leisure_ui.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/utown_arcade.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/utown_streetscape.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/utown_ddl_story.gd" id="18"]
+[ext_resource type="Script" path="res://scripts/utown_green_dining.gd" id="19"]
+[ext_resource type="Script" path="res://scripts/utown_coins.gd" id="20"]
+[ext_resource type="Script" path="res://scripts/utown_experience_guide.gd" id="21"]
+[ext_resource type="Script" path="res://scripts/utown_building_accuracy.gd" id="22"]
+[ext_resource type="Script" path="res://scripts/utown_leisure.gd" id="23"]
+[ext_resource type="Script" path="res://scripts/utown_leisure_ui.gd" id="24"]
+[ext_resource type="Script" path="res://scripts/kent_ridge_world.gd" id="25"]
+[ext_resource type="Script" path="res://scripts/kent_ridge_bus.gd" id="26"]
+[ext_resource type="Script" path="res://scripts/utown_ambient_ecology.gd" id="27"]
+[ext_resource type="Script" path="res://scripts/utown_english_exams.gd" id="28"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -42,7 +53,7 @@ position = Vector3(0, 1.66, 0)
 current = true
 fov = 78.0
 near = 0.08
-far = 800.0
+far = 1100.0
 
 [node name="ViewReview" type="Node" parent="."]
 script = ExtResource("5")
@@ -79,12 +90,6 @@ script = ExtResource("14")
 
 [node name="Intro" type="Node" parent="."]
 script = ExtResource("15")
-
-[node name="Leisure" type="Node" parent="."]
-script = ExtResource("16")
-
-[node name="LeisureUI" type="CanvasLayer" parent="."]
-script = ExtResource("17")
 
 [node name="Info" type="PanelContainer" parent="HUD"]
 offset_left = 18.0
@@ -212,4 +217,43 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD move  B bike  X bus  I indoors  L floor  F activity  Q talk  O faculty  J coursework  K submit  P leisure  Y weather  C notes  V sprint  M map  F7 photo  F1 help"
+text = "WASD move  B bike  X shuttle  I indoors  L floor  F activity  Q talk  [P] coursework  [Shift+P] faculty  [K] task  [U] teacher  [LMB] throw  [O] shop  [Z] coin  [N] delivery  [H] story  [Tab] club  [J] mail  [F10] language  [Y] weather  [C] notes  [V] sprint  [M] map  [F7] photo  [F1] help"
+
+[node name="Arcade" type="Node3D" parent="."]
+script = ExtResource("16")
+
+[node name="Streetscape" type="Node3D" parent="."]
+script = ExtResource("17")
+
+[node name="DDLStory" type="Node3D" parent="."]
+script = ExtResource("18")
+
+[node name="GreenDining" type="Node3D" parent="."]
+script = ExtResource("19")
+
+[node name="AmbientEcology" type="Node3D" parent="."]
+script = ExtResource("27")
+
+[node name="Coins" type="Node3D" parent="."]
+script = ExtResource("20")
+
+[node name="ExperienceGuide" type="CanvasLayer" parent="."]
+script = ExtResource("21")
+
+[node name="BuildingAccuracy" type="Node3D" parent="."]
+script = ExtResource("22")
+
+[node name="Leisure" type="Node" parent="."]
+script = ExtResource("23")
+
+[node name="LeisureUI" type="CanvasLayer" parent="."]
+script = ExtResource("24")
+
+[node name="KentRidgeExpansion" type="Node3D" parent="."]
+script = ExtResource("25")
+
+[node name="CampusBusTravel" type="CanvasLayer" parent="."]
+script = ExtResource("26")
+
+[node name="EnglishExams" type="CanvasLayer" parent="."]
+script = ExtResource("28")

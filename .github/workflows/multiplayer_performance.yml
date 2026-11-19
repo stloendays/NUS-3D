@@ -1,0 +1,25 @@
+name: M10 multiplayer and compatibility smoke
+on:
+  push:
+    branches: ["feature/m10-*"]
+  pull_request:
+
+jobs:
+  m10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+      - name: Import Godot resources
+        run: godot --headless --path godot --import --quit
+      - name: Verify multiplayer and graphics contracts
+        run: godot --headless --path godot --script res://tests/multiplayer_performance_smoke_test.gd
+      - name: Run integrated world smoke
+        run: godot --headless --path godot --script res://tests/integration_smoke_test.gd
+      - name: Low-spec startup smoke
+        run: godot --headless --path godot --quit-after 40 -- --nus3d-self-test --nus3d-low-spec

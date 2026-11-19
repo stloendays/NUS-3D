@@ -1,0 +1,518 @@
+{
+  "schema_version": 1,
+  "unofficial_fictional": true,
+  "locale_fallback": "en",
+  "characters": {
+    "outdoor": {
+      "Maya": {
+        "role": {
+          "zh": "DDL幸存者",
+          "en": "Deadline survivor"
+        },
+        "fixed": [
+          {
+            "zh": "我叫 Maya，正在研究如何在 DDL 前一天学会一学期的内容。",
+            "en": "I'm Maya, researching how to learn a whole semester the night before the deadline."
+          },
+          {
+            "zh": "这片草地很适合放空，直到 Canvas 提醒你还有三份作业。",
+            "en": "This lawn is perfect for relaxing, until Canvas reminds you of three assignments."
+          }
+        ],
+        "random": [
+          {
+            "zh": "我把课程表贴在墙上。墙先崩溃了。",
+            "en": "I pinned my timetable on the wall. The wall had a breakdown first."
+          },
+          {
+            "zh": "谁发明了早八？我要给他写一篇 8000 字的反思。",
+            "en": "Who invented 8 a.m. lectures? I owe them an 8,000-word reflection."
+          },
+          {
+            "zh": "我的 GPA 正在锻炼：每学期都做自由落体。",
+            "en": "My GPA exercises regularly. It does free fall every semester."
+          },
+          {
+            "zh": "要不要一起去打印作业？打印机说它今天精神状态不佳。",
+            "en": "Want to print our coursework? The printer says it's emotionally unavailable."
+          },
+          {
+            "zh": "晚上十二点和凌晨两点只有一个区别：DDL 更近了。",
+            "en": "Midnight and 2 a.m. have one difference: the deadline is closer."
+          }
+        ],
+        "weather": [
+          {
+            "zh": "下暴雨了？完美，天空也在为我的成绩哭泣。",
+            "en": "A thunderstorm? Perfect. The sky is crying about my grades too."
+          }
+        ]
+      },
+      "Ethan": {
+        "role": {
+          "zh": "图书馆流浪者",
+          "en": "Library wanderer"
+        },
+        "fixed": [
+          {
+            "zh": "我是 Ethan，号称喜欢图书馆，其实只是那里有插座。",
+            "en": "I'm Ethan. I claim to love the library, but really I love the power sockets."
+          },
+          {
+            "zh": "我每次打开课件，都觉得它在反过来阅读我。",
+            "en": "Every time I open the lecture slides, I feel like they're reading me."
+          }
+        ],
+        "random": [
+          {
+            "zh": "读完这页我就去吃饭。上一页我也是这么说的。",
+            "en": "I'll eat after this page. I said that on the last page too."
+          },
+          {
+            "zh": "老师说考试开卷。结果我连书在哪都不知道。",
+            "en": "The exam is open-book. Unfortunately, I don't know where the book is."
+          },
+          {
+            "zh": "我复习时效率很高：五分钟整理笔记，一小时调整字体。",
+            "en": "I'm efficient at revision: five minutes taking notes, one hour adjusting fonts."
+          },
+          {
+            "zh": "我的电脑风扇听到 Python 报错，就开始替我尖叫。",
+            "en": "My laptop fan starts screaming for me whenever Python throws an error."
+          },
+          {
+            "zh": "不要打扰我，我正在和参考文献进行一场没有结果的约会。",
+            "en": "Don't interrupt. I'm on a date with my references, and it's going nowhere."
+          }
+        ],
+        "weather": [
+          {
+            "zh": "雨声适合学习，雷声适合假装没听见老师提问。",
+            "en": "Rain helps me study. Thunder helps me pretend I didn't hear the lecturer."
+          }
+        ]
+      },
+      "Aisha": {
+        "role": {
+          "zh": "校车追逐冠军",
+          "en": "Shuttle chaser"
+        },
+        "fixed": [
+          {
+            "zh": "我是 Aisha，我追校车的速度比我赶 DDL 还快。",
+            "en": "I'm Aisha. I run faster for a shuttle than I do for deadlines."
+          },
+          {
+            "zh": "这游戏里的校车不会真的把你送去上课，但我已经感动了。",
+            "en": "The shuttle here won't take you to a real lecture, and I'm still moved."
+          }
+        ],
+        "random": [
+          {
+            "zh": "每当校车开走，我都会体验一次人生重启。",
+            "en": "Every time a bus drives away, I experience a complete life reset."
+          },
+          {
+            "zh": "手机显示还有三分钟。我一抬头，校车已经到下学期了。",
+            "en": "My phone said three minutes. I looked up and the shuttle was in next semester."
+          },
+          {
+            "zh": "跑步软件问我的目标是什么，我填了‘赶上校车’。",
+            "en": "My running app asked for a goal. I entered 'catch the shuttle'."
+          },
+          {
+            "zh": "公交站上最常见的运动，是站着怀疑人生。",
+            "en": "The most popular sport at the bus stop is standing and questioning life."
+          },
+          {
+            "zh": "我已经很擅长等车了，就差一门选修课给我学分。",
+            "en": "I'm so good at waiting for buses that I deserve elective credits."
+          }
+        ],
+        "weather": [
+          {
+            "zh": "雨天追车像水上芭蕾，只是观众只有我的书包。",
+            "en": "Chasing a shuttle in the rain is aquatic ballet, with my backpack as the only audience."
+          }
+        ]
+      },
+      "Lucas": {
+        "role": {
+          "zh": "健身与拖延双修",
+          "en": "Fitness procrastinator"
+        },
+        "fixed": [
+          {
+            "zh": "我是 Lucas，计划每天健身。计划本身已经练出肌肉了。",
+            "en": "I'm Lucas. I plan to exercise daily. The plan itself has developed muscles."
+          },
+          {
+            "zh": "我决定每天跑五公里，但先从跑去食堂开始。",
+            "en": "I decided to run five kilometres a day. I'm starting with a dash to the canteen."
+          }
+        ],
+        "random": [
+          {
+            "zh": "深蹲让我腿酸，实验报告让我灵魂酸。",
+            "en": "Squats hurt my legs. Lab reports hurt my soul."
+          },
+          {
+            "zh": "健身房里的杠铃比我的课程负担还轻。",
+            "en": "The weights at the gym are lighter than my course load."
+          },
+          {
+            "zh": "今天的有氧训练：从寝室冲到还有一分钟截止的教室。",
+            "en": "Today's cardio: sprinting from my room to class with one minute left."
+          },
+          {
+            "zh": "我用运动手环记录心率，DDL 一来它直接申请辞职。",
+            "en": "My fitness tracker measured my heart rate. The deadline made it resign."
+          },
+          {
+            "zh": "同学问我要腹肌还是 GPA，我说能先给我睡眠吗？",
+            "en": "Someone asked abs or GPA. I asked whether sleep was an option."
+          }
+        ],
+        "weather": [
+          {
+            "zh": "这么大雨，我的跑步计划终于有了合法借口。",
+            "en": "With this rain, my running plan finally has a legal excuse."
+          }
+        ]
+      },
+      "Mei": {
+        "role": {
+          "zh": "咖啡因工程师",
+          "en": "Caffeine engineer"
+        },
+        "fixed": [
+          {
+            "zh": "我是 Mei，研究咖啡浓度与清醒程度的非线性关系。",
+            "en": "I'm Mei, investigating the nonlinear relationship between coffee strength and consciousness."
+          },
+          {
+            "zh": "如果咖啡可以折算学分，我早该毕业三次了。",
+            "en": "If coffee counted as course credits, I'd have graduated three times already."
+          }
+        ],
+        "random": [
+          {
+            "zh": "第三杯咖啡下肚，我的手开始能打出指数符号了。",
+            "en": "After coffee number three, my hands can type exponential notation."
+          },
+          {
+            "zh": "我不是没睡醒，我只是在进行低功耗运行。",
+            "en": "I'm not sleepy. I'm operating in low-power mode."
+          },
+          {
+            "zh": "食堂排队十五分钟，是我一天里唯一的正念冥想。",
+            "en": "Fifteen minutes in the canteen queue is my only daily meditation."
+          },
+          {
+            "zh": "老师问实验为什么没出结果，我说仪器也需要周末。",
+            "en": "The lecturer asked why the experiment failed. I said the instrument needs weekends."
+          },
+          {
+            "zh": "我给自己设置了番茄钟，结果只记得吃番茄。",
+            "en": "I set a Pomodoro timer. Now all I remember is eating tomatoes."
+          }
+        ],
+        "weather": [
+          {
+            "zh": "暴雨配热咖啡很浪漫，配湿袜子就只剩科研精神。",
+            "en": "Rain and hot coffee are romantic. Rain and wet socks are just research."
+          }
+        ]
+      },
+      "Daniel": {
+        "role": {
+          "zh": "校园哲学家",
+          "en": "Campus philosopher"
+        },
+        "fixed": [
+          {
+            "zh": "我是 Daniel。人生有三大未解之谜：DDL、DDL 和为什么还是 DDL。",
+            "en": "I'm Daniel. Life has three mysteries: deadlines, deadlines, and why more deadlines."
+          },
+          {
+            "zh": "我们以为在找教室，其实教室在找迟到的我们。",
+            "en": "We think we're looking for classrooms. Perhaps the classrooms are looking for late students."
+          }
+        ],
+        "random": [
+          {
+            "zh": "迷路不可怕，可怕的是发现自己已经走到了别人的专业。",
+            "en": "Getting lost is fine. Ending up in another major is the problem."
+          },
+          {
+            "zh": "我曾问地图‘我在哪’，地图说‘在截止日期边缘’。",
+            "en": "I asked the map where I was. It said 'on the edge of a deadline'."
+          },
+          {
+            "zh": "人为什么要做小组作业？为了学会在沉默中发出求救信号。",
+            "en": "Why do group projects exist? To teach us how to scream silently."
+          },
+          {
+            "zh": "我今天没有拖延，只是给任务充分的思考空间。",
+            "en": "I'm not procrastinating. I'm giving the task room to think."
+          },
+          {
+            "zh": "校园里最真实的天气是‘作业多云转 DDL 暴雨’。",
+            "en": "The real campus forecast is 'partly assignments, with deadline storms'."
+          }
+        ],
+        "weather": [
+          {
+            "zh": "你听，雷声是天空在大声提交作业。",
+            "en": "Listen: thunder is the sky submitting its coursework loudly."
+          }
+        ]
+      }
+    },
+    "indoor": {
+      "Maya": {
+        "role": {
+          "zh": "咖啡厅实习魔法师",
+          "en": "Cafe sorcerer"
+        },
+        "fixed": [
+          {
+            "zh": "欢迎来到虚构咖啡厅，我们的招牌是‘DDL 续命拿铁’。",
+            "en": "Welcome to the fictional cafe. Our special is the Deadline Survival Latte."
+          }
+        ],
+        "random": [
+          {
+            "zh": "咖啡能提神，但无法替你提交作业。",
+            "en": "Coffee wakes you up, but it cannot submit assignments for you."
+          },
+          {
+            "zh": "今日特价：点一杯焦虑，免费续杯。",
+            "en": "Today's special: buy one anxiety, get unlimited refills."
+          },
+          {
+            "zh": "本店不提供时间机器，抱歉。",
+            "en": "Sorry, our cafe does not have a time machine."
+          },
+          {
+            "zh": "再喝一杯？你的键盘说不需要了。",
+            "en": "Another cup? Your keyboard says no."
+          }
+        ]
+      },
+      "Ethan": {
+        "role": {
+          "zh": "安静阅读员",
+          "en": "Quiet reader"
+        },
+        "fixed": [
+          {
+            "zh": "我在复习明天的考试。明天是哪天？等等。",
+            "en": "I'm revising for tomorrow's exam. Wait, which tomorrow?"
+          }
+        ],
+        "random": [
+          {
+            "zh": "这本教材很重，知识倒是完全没有进入大脑。",
+            "en": "This textbook is heavy. The knowledge has not entered my brain."
+          },
+          {
+            "zh": "请小声点，我在假装认真学习。",
+            "en": "Please keep it down. I'm pretending to study."
+          },
+          {
+            "zh": "书签比我记得的内容还多。",
+            "en": "My bookmarks know more than I do."
+          },
+          {
+            "zh": "我给每页都写了总结，现在我需要总结这些总结。",
+            "en": "I summarized every page. Now I need to summarize the summaries."
+          }
+        ]
+      },
+      "Mei": {
+        "role": {
+          "zh": "夹层找座位专家",
+          "en": "Mezzanine seat hunter"
+        },
+        "fixed": [
+          {
+            "zh": "楼上有空位！我找了一个小时才敢相信。",
+            "en": "There's a free seat upstairs! It took me an hour to believe it."
+          }
+        ],
+        "random": [
+          {
+            "zh": "占座是一门艺术，我目前只会远远欣赏。",
+            "en": "Finding a seat is an art. So far, I can only admire it from afar."
+          },
+          {
+            "zh": "我爬上夹层，不是为了高度，是为了离 DDL 远一点。",
+            "en": "I climbed upstairs not for the view, but to get farther from my deadline."
+          },
+          {
+            "zh": "空椅子出现了！是稀有刷新点！",
+            "en": "An empty chair! A rare spawn!"
+          },
+          {
+            "zh": "我的背包占的空间比我整个社交圈都大。",
+            "en": "My backpack takes more space than my social circle."
+          }
+        ]
+      },
+      "Lucas": {
+        "role": {
+          "zh": "假装热身大师",
+          "en": "Warm-up expert"
+        },
+        "fixed": [
+          {
+            "zh": "热身完成！等等，我还没开始。",
+            "en": "Warm-up complete! Wait, I haven't started yet."
+          }
+        ],
+        "random": [
+          {
+            "zh": "运动前要拉伸，写代码前要先祈祷。",
+            "en": "Stretch before sports. Pray before coding."
+          },
+          {
+            "zh": "我做了十个俯卧撑，然后做了二十个借口。",
+            "en": "I did ten push-ups and twenty excuses."
+          },
+          {
+            "zh": "我与杠铃之间存在不可克服的相互排斥。",
+            "en": "There's an insurmountable repulsive force between me and this barbell."
+          },
+          {
+            "zh": "这里的运动馆是示意版，但我的气喘是真实的。",
+            "en": "This gym is conceptual. My heavy breathing is real."
+          }
+        ]
+      },
+      "Aisha": {
+        "role": {
+          "zh": "观赛摸鱼评论员",
+          "en": "Spectator commentator"
+        },
+        "fixed": [
+          {
+            "zh": "从楼上看比赛很刺激，尤其当我不用上场时。",
+            "en": "Watching from upstairs is thrilling, especially when I don't have to play."
+          }
+        ],
+        "random": [
+          {
+            "zh": "我的运动天赋主要体现在鼓掌。",
+            "en": "My main athletic talent is clapping."
+          },
+          {
+            "zh": "我给这场比赛打十分，给自己参与度打零分。",
+            "en": "Ten out of ten for the match. Zero for my participation."
+          },
+          {
+            "zh": "观众席是我唯一能稳定发挥的场地。",
+            "en": "The spectator stand is where I perform best."
+          },
+          {
+            "zh": "这不是偷懒，这是战术性观察。",
+            "en": "This isn't laziness. It's tactical observation."
+          }
+        ]
+      },
+      "Daniel": {
+        "role": {
+          "zh": "补水哲学顾问",
+          "en": "Refill philosopher"
+        },
+        "fixed": [
+          {
+            "zh": "按 F 体验补水站！这是虚构设施，但水分很重要。",
+            "en": "Press F to try the refill station! It's fictional, but hydration matters."
+          }
+        ],
+        "random": [
+          {
+            "zh": "水能续命，DDL 只能续稿。",
+            "en": "Water keeps you alive. Deadlines keep the drafts alive."
+          },
+          {
+            "zh": "实验室里最珍贵的液体，是不洒出来的那杯水。",
+            "en": "The most precious lab liquid is the water you don't spill."
+          },
+          {
+            "zh": "人生如水杯，空了就得去补，但作业会自动灌满。",
+            "en": "Life is a water bottle: refill when empty. Homework refills itself."
+          },
+          {
+            "zh": "喝水之前先放下咖啡杯。这个操作很高级。",
+            "en": "Put down the coffee before drinking water. Advanced move."
+          }
+        ]
+      }
+    },
+    "professor": {
+      "Prof. Deadline": {
+        "role": {
+          "zh": "截止日期教授（虚构）",
+          "en": "Deadline Professor (fictional)"
+        },
+        "fixed": [
+          {
+            "zh": "同学，昨天的作业怎么今天还没交？时空不等人！",
+            "en": "Student, yesterday's homework is still missing. Space-time waits for nobody!"
+          }
+        ],
+        "random": [
+          {
+            "zh": "我的课从不迟到，是同学们的钟表太慢。",
+            "en": "My lectures are never late. The students' clocks are slow."
+          },
+          {
+            "zh": "课程要求很简单：在截止时间之前完成不可能的任务。",
+            "en": "Course policy is simple: finish the impossible before the deadline."
+          },
+          {
+            "zh": "作业一共三道题，每一道都可以发展成博士论文。",
+            "en": "Just three questions. Each one could become a PhD thesis."
+          },
+          {
+            "zh": "你可以申请延期，但延期的申请昨天就截止了。",
+            "en": "You may request an extension. The request deadline was yesterday."
+          }
+        ]
+      },
+      "Dr. Plot Twist": {
+        "role": {
+          "zh": "剧情反转博士（虚构）",
+          "en": "Dr. Plot Twist (fictional)"
+        },
+        "fixed": [
+          {
+            "zh": "开卷考试！只不过参考书在平行宇宙。",
+            "en": "Open-book exam! The reference book is in a parallel universe."
+          }
+        ],
+        "random": [
+          {
+            "zh": "恭喜你，考试范围是‘已经学过和未来会学的所有内容’。",
+            "en": "Congratulations. The syllabus covers everything you've learned and everything you'll ever learn."
+          },
+          {
+            "zh": "这不是突击测验，只是公告发得非常突然。",
+            "en": "This isn't a surprise quiz. The announcement was merely sudden."
+          },
+          {
+            "zh": "论文的结局只有一个反转：还要补充实验。",
+            "en": "Every paper has one final plot twist: more experiments."
+          },
+          {
+            "zh": "不要怕，老师也不知道标准答案。",
+            "en": "Don't panic. The lecturer doesn't know the answer either."
+          }
+        ]
+      }
+    }
+  },
+  "usage": "First talks use fixed introductions; later interactions select contextual/random lines with immediate-repeat avoidance. No gameplay rewards depend on dialogue."
+}
