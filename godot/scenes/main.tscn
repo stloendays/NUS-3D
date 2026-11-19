@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -16,6 +16,8 @@
 [ext_resource type="Script" path="res://scripts/utown_green_dining.gd" id="14"]
 [ext_resource type="Script" path="res://scripts/utown_coins.gd" id="15"]
 [ext_resource type="Script" path="res://scripts/utown_experience_guide.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/kent_ridge_world.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/kent_ridge_bus.gd" id="18"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -41,7 +43,7 @@ position = Vector3(0, 1.66, 0)
 current = true
 fov = 78.0
 near = 0.08
-far = 800.0
+far = 1100.0
 
 [node name="ViewReview" type="Node" parent="."]
 script = ExtResource("5")
@@ -210,3 +212,8 @@ script = ExtResource("15")
 [node name="ExperienceGuide" type="CanvasLayer" parent="."]
 script = ExtResource("16")
 
+[node name="KentRidgeExpansion" type="Node3D" parent="."]
+script = ExtResource("17")
+
+[node name="CampusBusTravel" type="CanvasLayer" parent="."]
+script = ExtResource("18")
