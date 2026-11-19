@@ -91,6 +91,7 @@ func _ready() -> void:
 func _apply_language(_locale: String) -> void:
     GameLanguage.apply_static_ui(title_label)
     GameLanguage.apply_static_ui(help_label)
+    help_label.text += GameLanguage.localized_text("   P 剧情任务 / 结局", "   P story quests / endings")
     _load_osm_fit_summary()
     if GameLanguage.is_chinese():
         gis_summary.text = GameLanguage.game_text(gis_summary.text)
