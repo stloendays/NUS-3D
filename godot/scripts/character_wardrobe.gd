@@ -15,6 +15,7 @@ var preview: SubViewport
 var character: Node3D
 var summary: Label
 var is_open: bool = false
+var previous_mouse_mode: int = Input.MOUSE_MODE_CAPTURED
 
 
 func _ready() -> void:
@@ -97,6 +98,16 @@ func _make_interface() -> void:
     close.text = "SAVE & RETURN"
     close.pressed.connect(_toggle)
     outer.add_child(close)
+    var rotate_row := HBoxContainer.new()
+    outer.add_child(rotate_row)
+    var turn_left := Button.new()
+    turn_left.text = "ROTATE LEFT"
+    rotate_row.add_child(turn_left)
+    turn_left.pressed.connect(_rotate_preview.bind(-1.0))
+    var turn_right := Button.new()
+    turn_right.text = "ROTATE RIGHT"
+    rotate_row.add_child(turn_right)
+    turn_right.pressed.connect(_rotate_preview.bind(1.0))
 
 
 func _mat(hex: String) -> StandardMaterial3D:
@@ -233,16 +244,26 @@ func _save_outfit() -> void:
         push_warning("Could not save cosmetic outfit.")
 
 
+func _rotate_preview(direction: float) -> void:
+    if character != null:
+        character.rotate_y(direction * 0.4)
+
+
 func _toggle() -> void:
     is_open = not is_open
     panel.visible = is_open
-    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if is_open else Input.MOUSE_MODE_CAPTURED
+    if is_open:
+        previous_mouse_mode = Input.mouse_mode
+        Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    else:
+        Input.mouse_mode = previous_mouse_mode
     var player: Node = get_parent().get_node_or_null("Player")
     if player != null:
         player.set("movement_locked", is_open)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_H:
-        _toggle()
-        get_viewport().set_input_as_handled()
+    if event is InputEventKey and event.pressed and not event.echo:
+        if event.keycode == KEY_H or (is_open and event.keycode == KEY_ESCAPE):
+            _toggle()
+            get_viewport().set_input_as_handled()
