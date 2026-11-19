@@ -14,6 +14,7 @@ const REQUIRED_SOURCE_FILES: Array[String] = [
     "res://data/discovery_tour.json",
     "res://data/explorer_items.json",
     "res://data/coursework_quests.json",
+    "res://data/campus_links.json",
 ]
 
 func _ready() -> void:
