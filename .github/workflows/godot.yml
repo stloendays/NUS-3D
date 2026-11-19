@@ -90,6 +90,7 @@ jobs:
             ambient_ecology_smoke_test.gd \
             english_exams_smoke_test.gd \
             voice_presentation_smoke_test.gd \
+            wardrobe_smoke_test.gd \
             boot_loading_smoke_test.gd \
             multiplayer_performance_smoke_test.gd \
             story_smoke_test.gd \
