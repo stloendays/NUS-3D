@@ -101,7 +101,7 @@ class InputTests(unittest.TestCase):
         })
         self.assertEqual(value["mode"], "admin_plan")
         self.assertNotIn("secret", value)
-        self.assertIn("approval", bridge.MODE_PROMPTS["admin_plan"].lower())
+        self.assertIn("approve each action", bridge.MODE_PROMPTS["admin_plan"].lower())
         fake = {"output": [{"content": [
             {"type": "output_text", "text": '{"action":"weather","value":3,"reason":"rain"}'}
         ]}]}
