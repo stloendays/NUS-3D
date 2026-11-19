@@ -19,6 +19,7 @@ var login_password: LineEdit
 var login_message: Label
 var login_submit: Button
 var login_toggle: Button
+var tutorial: NUS3DTutorial
 var registering: bool = false
 var mail_list: ItemList
 var mail_heading: Label
@@ -61,6 +62,7 @@ func _ready() -> void:
     _build_login()
     _build_mail()
     _build_profile_card()
+    _build_tutorial()
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     _show_login()
@@ -149,6 +151,7 @@ func _build_login() -> void:
     box.add_child(login_submit)
     login_toggle = _button("Create a new local account", _toggle_register)
     box.add_child(login_toggle)
+    box.add_child(_button("新手教程  /  HOW TO PLAY", _open_tutorial))
     login_message = _label("", 13, Color.html("#efb8ad"))
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
@@ -157,6 +160,18 @@ func _build_login() -> void:
         12, Color.html("#a4c0c6"))
     foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(foot)
+
+
+func _build_tutorial() -> void:
+    tutorial = NUS3DTutorial.new()
+    tutorial.name = "StartupTutorial"
+    ui.add_child(tutorial)
+
+
+func _open_tutorial() -> void:
+    # Opening the guide never signs in, changes a save, or resumes gameplay.
+    if tutorial != null and login_cover.visible:
+        tutorial.open_guide()
 
 
 func _build_profile_card() -> void:
@@ -251,6 +266,8 @@ func _show_login() -> void:
     login_cover.show()
     mail_cover.hide()
     profile_card.hide()
+    if tutorial != null:
+        tutorial.close_guide()
     login_password.clear()
     login_message.text = ""
     login_name.call_deferred("grab_focus")
