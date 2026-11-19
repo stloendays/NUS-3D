@@ -36,6 +36,8 @@ var umbrella_owned: bool = false
 var sprint_boost_seconds: float = 0.0
 var shop_stock: Dictionary = {"coffee": 5, "snack": 8, "umbrella": 1}
 var shop_stock_day: int = -1
+var shop_last_minute: float = 0.0
+@onready var campus_clock: UTownCampusClock = $"../CampusClock"
 var source_student_wins: int = 0
 var reward_poll_timer: float = 0.0
 var drop_timer: float = 0.0
@@ -72,6 +74,7 @@ func _ready() -> void:
     _build_shop()
     _load_delivery_anchors()
     load_progress()
+    shop_last_minute = campus_clock.minute_of_day
     source_student_wins = arcade.student_wins
     for i in range(5):
         _spawn_random_coin(true)
@@ -209,7 +212,7 @@ func _build_shop() -> void:
     contents.add_theme_constant_override("separation", 9)
     shop_panel.add_child(contents)
     var heading := Label.new()
-    heading.text = "CAMPUS COIN SHOP  |  OPEN 24/7"
+    heading.text = "TOWN PLAZA CAMPUS SHOP"
     heading.add_theme_font_size_override("font_size", 20)
     contents.add_child(heading)
     shop_status = Label.new()
@@ -233,6 +236,9 @@ func _purchase_tip() -> void:
     purchase("tip")
 
 func purchase(item_id: String) -> bool:
+    if not _can_buy():
+        _notify("Visit the Town Plaza counter to buy items.", 2.5)
+        return false
     var price: int = 0
     match item_id:
         "lucky":
@@ -470,6 +476,9 @@ func toggle_shop() -> void:
         return
     if not hud.visible or campus_life.on_shuttle or campus_life.interior_active:
         return
+    if not _near_shop():
+        _notify("Shop counter: Town Plaza. Walk closer to buy.", 3.0)
+        return
     shop_open = true
     shop_panel.visible = true
     capture_mouse_before_shop = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
@@ -576,7 +585,30 @@ func drink_coffee() -> bool:
     _notify("CAFFEINE MODE: faster sprint for 60 seconds!", 3.0)
     return true
 
+func _restock_if_new_day() -> void:
+    if campus_clock == null:
+        return
+    var current: float = campus_clock.minute_of_day
+    if current < shop_last_minute - 720.0:
+        shop_stock["coffee"] = 5
+        shop_stock["snack"] = 8
+        shop_stock["umbrella"] = 0 if umbrella_owned else 1
+        _save_progress()
+    shop_last_minute = current
+
+func _near_shop() -> bool:
+    var plaza: Node3D = world.get_node_or_null("TownPlaza_approximate") as Node3D
+    if plaza == null:
+        return false
+    return _horizontal_distance(player.global_position, plaza.global_position) <= 27.0
+
+func _can_buy() -> bool:
+    return shop_open and _near_shop() and not campus_life.interior_active and not campus_life.on_shuttle
+
 func _process(delta: float) -> void:
+    _restock_if_new_day()
+    if shop_open and (not _near_shop() or campus_life.interior_active or campus_life.on_shuttle):
+        _close_shop()
     sprint_boost_seconds = maxf(0.0, sprint_boost_seconds - delta)
     notice_time = maxf(0.0, notice_time - delta)
     delivery_cooldown = maxf(0.0, delivery_cooldown - delta)
