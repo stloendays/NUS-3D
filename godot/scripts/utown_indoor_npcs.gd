@@ -66,6 +66,27 @@ func _spawn_occupants() -> void:
         actor.visible = false
         room.add_child(actor)
 
+        # Distinguishable head silhouettes, small faces and shoes keep the
+        # fictional indoor cast readable from the new third-person screenshots.
+        var hair_cap := MeshInstance3D.new()
+        hair_cap.name = "HairCap"
+        var hair_mesh := SphereMesh.new()
+        hair_mesh.radius = 0.227
+        hair_mesh.height = 0.454
+        hair_cap.mesh = hair_mesh
+        hair_cap.position = Vector3(0.0, 1.84, 0.0)
+        hair_cap.scale = Vector3(1.03, 0.48, 1.03)
+        var hair_palette: PackedStringArray = PackedStringArray([
+            "#323b40", "#584534", "#292f36", "#4e3931", "#39434e", "#53463f"])
+        hair_cap.material_override = _mat(hair_palette[i], 0.92)
+        actor.add_child(hair_cap)
+        var features := _mat("#2d3439")
+        for eye_side in [-1.0, 1.0]:
+            _prop(actor, "Eye", Vector3(eye_side * 0.076, 1.72, -0.207),
+                Vector3(0.038, 0.038, 0.026), features)
+            _prop(actor, "Shoe", Vector3(eye_side * 0.14, 0.10, -0.13),
+                Vector3(0.21, 0.15, 0.30), _mat("#2d3c46"))
+
         var routine: String = str(spec["routine"])
         var label := Label3D.new()
         label.name = "NPCNameTag"
