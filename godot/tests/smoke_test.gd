@@ -459,6 +459,51 @@ func _smoke() -> void:
         push_error("reset did not clean up bicycle mode")
         quit(1)
         return
+    var indoor_npcs: UTownIndoorNPCs = instance.get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+    var polish: UTownVisualPolish = instance.get_node_or_null("VisualPolish") as UTownVisualPolish
+    if indoor_npcs == null or indoor_npcs.indoor_count != 6 or indoor_npcs.actors.size() != 6:
+        push_error("six fictional room-life NPCs did not spawn")
+        quit(1)
+        return
+    if polish == null or polish.facade_groups.size() != 2 or polish.facade_panes < 40:
+        push_error("ERC and SRC material-detail facades were not generated")
+        quit(1)
+        return
+    if polish.indoor_finish_groups.size() != 2 or polish.material_panel_count < 100:
+        push_error("two room material finishes and floor-wall cladding are missing")
+        quit(1)
+        return
+    if polish.indoor_lamps.size() != 2 or polish.facade_lamps.size() != 2:
+        push_error("responsive indoor/exterior accent lighting registry incomplete")
+        quit(1)
+        return
+    if not campus_life.enter_interior("ERC"):
+        push_error("ERC NPC smoke scenario could not enter the study room")
+        quit(1)
+        return
+    indoor_npcs._process(0.016)
+    if indoor_npcs.active_count() != 3:
+        push_error("three active ERC room NPCs were not visible")
+        quit(1)
+        return
+    var indoor_guest: Node3D = indoor_npcs.actors[0]["node"]
+    player.global_position = indoor_guest.global_position + Vector3(0.0, 0.18, 1.6)
+    if not campus_life.talk_to_nearest() or indoor_npcs.last_spoken.is_empty():
+        push_error("Q did not redirect dialogue to indoor room NPC")
+        quit(1)
+        return
+    campus_life.exit_interior()
+    indoor_npcs._process(0.016)
+    if indoor_npcs.active_count() != 0 or indoor_guest.visible:
+        push_error("room NPCs remained active after the player exited")
+        quit(1)
+        return
+    polish._process(0.25)
+    if polish.facade_lamps[0].light_energy < 0.0:
+        push_error("building entrance accent lighting became invalid")
+        quit(1)
+        return
+    player.call("reset_player")
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
     if trunks == null or canopies == null or trunks.multimesh == null or canopies.multimesh == null:
