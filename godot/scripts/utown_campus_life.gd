@@ -658,8 +658,11 @@ func talk_to_nearest() -> bool:
         message_time = 2.5
         return false
     pedestrians[index]["talk_remaining"] = 6.0
-    message = "%s  |  %s" % [str(pedestrians[index]["name"]), str(pedestrians[index]["line"])]
-    message_time = 6.0
+    var speaker: String = str(pedestrians[index]["name"])
+    var role: String = DialogueBank.role_for("outdoor", speaker)
+    var line: String = DialogueBank.next_line("outdoor", speaker, weather.mode)
+    message = "%s · %s\n%s" % [speaker, role, line]
+    message_time = 7.0
     return true
 
 func enter_interior(id: String) -> bool:
