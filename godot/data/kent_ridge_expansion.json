@@ -726,6 +726,15 @@
       "lon": 103.78118,
       "lat": 1.29078,
       "tagline": "Dormitory side-quests never end."
+    },
+    {
+      "id": "SPORTS",
+      "district": "SPORTS",
+      "name": "Sports Field / Walk Access",
+      "lon": 103.77895,
+      "lat": 1.2982,
+      "tagline": "Jogging is cheaper than therapy.",
+      "walk_only": true
     }
   ],
   "routes": {
