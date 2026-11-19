@@ -215,7 +215,8 @@ func _build_stations() -> void:
     # Town Plaza, not through residential-college lawns.
     var guide: Node3D = Node3D.new()
     guide.name = "TownGreen_ToPlazaBus_Wayfinding"
-    guide.position = Vector3(0.0, 0.0, 0.0)
+    # Keep the sign off the initial spawn/camera path.
+    guide.position = Vector3(12.0, 0.0, 9.0)
     stops_root.add_child(guide)
     _box(guide, "GuidePole", Vector3(0, 1.45, 0), Vector3(0.18, 2.9, 0.18), "#304953")
     _box(guide, "GuideBoard", Vector3(0, 2.95, 0), Vector3(4.7, 0.82, 0.16), "#37666d")
