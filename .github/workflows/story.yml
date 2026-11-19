@@ -1,0 +1,40 @@
+name: M8 side quests and multiple endings
+
+on:
+  push:
+    branches: ["feature/m8-sidequests-multiple-endings-20261119"]
+  pull_request:
+    paths:
+      - "godot/data/story_campaign.json"
+      - "godot/scripts/story_director.gd"
+      - "godot/tests/story_smoke_test.gd"
+      - "godot/scripts/game_shell.gd"
+      - "godot/scripts/utown_campus_life.gd"
+      - "godot/scripts/hud.gd"
+      - ".github/workflows/story.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  story-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+      - name: Import Godot world and campaign scripts
+        run: godot --headless --path godot --import --quit
+      - name: Verify six endings, quests, saves, replay and pause
+        run: godot --headless --path godot --script res://tests/story_smoke_test.gd
+      - name: Verify bilingual UI and funny NPC dialogue regression
+        run: godot --headless --path godot --script res://tests/language_smoke_test.gd
+      - name: Verify login, mail and progression regression
+        run: godot --headless --path godot --script res://tests/account_smoke_test.gd
+      - name: Verify original UTown gameplay smoke
+        run: godot --headless --path godot --script res://tests/smoke_test.gd
