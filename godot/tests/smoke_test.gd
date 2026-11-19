@@ -312,6 +312,12 @@ func _smoke() -> void:
         push_error("five-mode weather controller is missing")
         quit(1)
         return
+    if world.weather_reactive_materials.size() != 2:
+        push_error("plaza and walkway materials are not weather-responsive")
+        quit(1)
+        return
+    var path_material: StandardMaterial3D = world.weather_reactive_materials[1]
+    var dry_roughness: float = path_material.roughness
     if weather.puddle_nodes.size() < 4 or weather.rain_streaks == null or weather.rain_multimesh.instance_count != 220:
         push_error("weather puddles or the deterministic rain-streak MultiMesh were not generated")
         quit(1)
@@ -320,12 +326,26 @@ func _smoke() -> void:
         push_error("rain weather did not activate rain particles and wet-ground puddles")
         quit(1)
         return
+    weather._process(1.0)
+    if weather.wetness < 0.5 or path_material.roughness >= dry_roughness or weather.target_fog <= 0.0:
+        push_error("rain did not wet shared pavement materials or target storm fog")
+        quit(1)
+        return
     if not weather.set_mode(4):
         push_error("thunderstorm weather preset could not be selected")
         quit(1)
         return
-    if not weather.set_mode(0) or weather.rain.emitting or weather.puddle_root.visible:
-        push_error("clear weather did not restore the dry scene and hide puddles")
+    if not weather.set_mode(0) or weather.rain.emitting:
+        push_error("clear weather did not stop rain")
+        quit(1)
+        return
+    if not weather.puddle_root.visible:
+        push_error("puddles should persist briefly after rain stops")
+        quit(1)
+        return
+    weather._process(6.0)
+    if weather.wetness > 0.01 or weather.puddle_root.visible or not is_equal_approx(path_material.roughness, dry_roughness):
+        push_error("wet surfaces did not dry and restore original materials")
         quit(1)
         return
     if campus_life == null or campus_life.pedestrians.size() != 6:
@@ -343,6 +363,20 @@ func _smoke() -> void:
         push_error("ERC/SRC interior concepts or campus shuttle did not load")
         quit(1)
         return
+    for interior_id in ["ERC", "SRC"]:
+        var room: Node3D = campus_life.interiors[interior_id]
+        if room.get_node_or_null("InteriorFinishM34/OpaqueRoofShadow") == null:
+            push_error("interior roof and daylight shelter missing from " + interior_id)
+            quit(1)
+            return
+        if room.get_node_or_null("WalkableStairSlope") == null:
+            push_error("continuous, walkable mezzanine stair collider missing from " + interior_id)
+            quit(1)
+            return
+        if not campus_life.activity_spots.has(interior_id) or campus_life.activity_spots[interior_id].size() != 3:
+            push_error("three visitable indoor activity areas missing from " + interior_id)
+            quit(1)
+            return
     if campus_life.bicycle_wheels.size() != 2 or campus_life.bicycle_handlebar == null or campus_life.bicycle_crank == null or campus_life.bicycle.get_node_or_null("RiderTorso") == null or campus_life.bicycle.get_node_or_null("RiderHead") == null:
         push_error("bicycle wheels, steering, pedals or rider model are missing")
         quit(1)
@@ -360,6 +394,13 @@ func _smoke() -> void:
         return
     if player.global_position.x < 800.0:
         push_error("interior pocket was not isolated from the outdoor proxy")
+        quit(1)
+        return
+    var cafe: Dictionary = campus_life.activity_spots["ERC"][0]
+    var erc_room: Node3D = campus_life.interiors["ERC"]
+    player.global_position = erc_room.to_global(cafe["position"])
+    if not campus_life.interact_nearby() or not campus_life.visited_activities.has("ERC/cafe"):
+        push_error("ERC indoor activity discovery did not work")
         quit(1)
         return
     if not campus_life.toggle_interior_floor() or campus_life.interior_floor != 1 or player.global_position.y < 3.0:
