@@ -195,7 +195,7 @@ func _build_ui() -> void:
     install_button.pressed.connect(_install_after_confirmation)
     buttons.add_child(install_button)
     retry_button = Button.new()
-    retry_button.text = "TRY DOWNLOAD AGAIN"
+    retry_button.text = "DOWNLOAD UPDATE"
     retry_button.visible = false
     retry_button.pressed.connect(_start_download)
     buttons.add_child(retry_button)
@@ -212,7 +212,8 @@ func _show_state(next: String, note: String) -> void:
     message.text = note
     progress.visible = next == "downloading"
     install_button.visible = next == "ready"
-    retry_button.visible = next == "failed" and not release_url.is_empty()
+    retry_button.visible = next in ["available", "failed"] and not release_url.is_empty()
+    retry_button.text = "DOWNLOAD UPDATE" if next == "available" else "RETRY DOWNLOAD"
 
 func _check_for_release() -> void:
     if not enabled or state not in ["inactive", "current", "failed"]:
@@ -360,6 +361,10 @@ func _install_after_confirmation() -> void:
         "-WaitPid", str(OS.get_process_id()),
         "-StatusFile", status_file
     ])
+    # Persist quests, coins, exam records, profiles and progress before exit.
+    var shell: Node = get_parent()
+    if shell != null and shell.has_method("save_for_version_update"):
+        shell.call("save_for_version_update")
     var spawned_pid: int = OS.create_process("powershell.exe", args)
     if spawned_pid <= 0:
         _show_state("failed", "Could not launch the local installer. No changes were made.")
