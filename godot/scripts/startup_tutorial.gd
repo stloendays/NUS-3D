@@ -71,7 +71,8 @@ func _make_label(text_value: String, font_size: int, color: Color) -> Label:
     element.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     element.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     element.add_theme_font_size_override("font_size", font_size)
-    element.add_theme_color_override("font_color", color)
+    element.add_theme_color_override("font_color",
+        NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color)
     return element
 
 
@@ -79,6 +80,7 @@ func _make_button(text_value: String, action: Callable) -> Button:
     var element: Button = Button.new()
     element.text = text_value
     element.custom_minimum_size = Vector2(135, 42)
+    NUS3DUISkin.button(element)
     element.pressed.connect(action)
     return element
 
@@ -86,7 +88,7 @@ func _make_button(text_value: String, action: Callable) -> Button:
 func _build_view() -> void:
     var dimmer: ColorRect = ColorRect.new()
     dimmer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    dimmer.color = Color(0.016, 0.038, 0.055, 0.96)
+    dimmer.color = NUS3DUISkin.BACKDROP
     dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
     add_child(dimmer)
 
@@ -96,15 +98,7 @@ func _build_view() -> void:
 
     var card: PanelContainer = PanelContainer.new()
     card.custom_minimum_size = Vector2(860, 580)
-    var card_style: StyleBoxFlat = StyleBoxFlat.new()
-    card_style.bg_color = Color.html("#10222f")
-    card_style.border_color = Color.html("#537785")
-    card_style.set_border_width_all(1)
-    card_style.set_corner_radius_all(17)
-    card_style.content_margin_left = 30
-    card_style.content_margin_right = 30
-    card_style.content_margin_top = 24
-    card_style.content_margin_bottom = 24
+    var card_style: StyleBoxFlat = NUS3DUISkin.glass(Color("#8AB8C6"), 27, 26, true)
     card.add_theme_stylebox_override("panel", card_style)
     center.add_child(card)
 

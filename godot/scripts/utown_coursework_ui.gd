@@ -54,6 +54,7 @@ func _dual_button(button: Button, zh: String, en: String) -> void:
     button.set_meta("locale_zh", zh)
     button.set_meta("locale_en", en)
     button.text = _t(zh, en)
+    NUS3DUISkin.button(button)
 
 
 func _apply_language(_code: String) -> void:
@@ -78,22 +79,17 @@ func _refresh_dual_nodes(node: Node) -> void:
         _refresh_dual_nodes(child)
 
 
-func _style_panel(panel: PanelContainer, background: Color) -> void:
-    var style := StyleBoxFlat.new()
-    style.bg_color = background
-    style.set_corner_radius_all(12)
-    style.content_margin_left = 15.0
-    style.content_margin_right = 15.0
-    style.content_margin_top = 11.0
-    style.content_margin_bottom = 11.0
-    panel.add_theme_stylebox_override("panel", style)
+func _style_panel(panel: PanelContainer, _legacy_background: Color) -> void:
+    panel.add_theme_stylebox_override("panel",
+        NUS3DUISkin.glass(Color("#8AAFB9"), 22, 15, true))
 
 func _label(text_value: String, font_size: int, color: Color) -> Label:
     var label := Label.new()
     label.text = text_value
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.add_theme_font_size_override("font_size", font_size)
-    label.add_theme_color_override("font_color", color)
+    label.add_theme_color_override("font_color",
+        NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color)
     return label
 
 func _build_status() -> void:
@@ -122,7 +118,7 @@ func _build_status() -> void:
 func _build_modal() -> void:
     shade = ColorRect.new()
     shade.name = "CourseworkModalShade"
-    shade.color = Color(0.025, 0.055, 0.075, 0.83)
+    shade.color = NUS3DUISkin.BACKDROP
     shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     shade.mouse_filter = Control.MOUSE_FILTER_STOP
     shade.visible = false
@@ -151,6 +147,7 @@ func _build_modal() -> void:
     faculty_picker.name = "FacultyPicker"
     faculty_picker.custom_minimum_size = Vector2(520, 42)
     selector_box.add_child(faculty_picker)
+    NUS3DUISkin.button(faculty_picker)
     for i in range(coursework.faculty_options.size()):
         var item: Dictionary = coursework.faculty_options[i]
         faculty_picker.add_item("%s | %s" % [item["abbr"],

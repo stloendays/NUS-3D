@@ -151,27 +151,18 @@ func _refresh_sound_buttons() -> void:
             "Sound ON" if active else "Sound OFF")
 
 
-func _panel_style(background: Color) -> StyleBoxFlat:
-    var style: StyleBoxFlat = StyleBoxFlat.new()
-    style.bg_color = background
-    style.border_color = Color.html("#446878")
-    style.set_border_width_all(1)
-    style.set_corner_radius_all(15)
-    style.content_margin_left = 23.0
-    style.content_margin_right = 23.0
-    style.content_margin_top = 22.0
-    style.content_margin_bottom = 22.0
-    style.shadow_color = Color(0.01, 0.035, 0.055, 0.72)
-    style.shadow_size = 9
-    style.shadow_offset = Vector2(0, 5)
-    return style
+func _panel_style(_legacy_background: Color) -> StyleBoxFlat:
+    # All entry, profile and mail panels use one accessible light-glass material.
+    return NUS3DUISkin.glass(Color("#87B9C5"), 25, 22, true)
 
 
 func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> Label:
     var label: Label = Label.new()
     label.text = value
     label.add_theme_font_size_override("font_size", font_size)
-    label.add_theme_color_override("font_color", color)
+    # Legacy dark shell authored labels in white; maintain contrast on glass.
+    var legible: Color = NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color
+    label.add_theme_color_override("font_color", legible)
     return label
 
 
@@ -193,7 +184,7 @@ func _cover(name: String) -> Control:
     ui.add_child(cover)
 
     var backdrop: ColorRect = ColorRect.new()
-    backdrop.color = Color(0.025, 0.067, 0.091, 0.91)
+    backdrop.color = NUS3DUISkin.BACKDROP
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
     cover.add_child(backdrop)
@@ -206,7 +197,7 @@ func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
     cover.add_child(center)
     var panel: PanelContainer = PanelContainer.new()
     panel.custom_minimum_size = size
-    panel.add_theme_stylebox_override("panel", _panel_style(Color.html("#10212c")))
+    panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#85B4C5"), 26, 23, true))
     center.add_child(panel)
     var content: VBoxContainer = VBoxContainer.new()
     content.add_theme_constant_override("separation", 13)
@@ -368,7 +359,7 @@ func _build_profile_card() -> void:
     profile_card.offset_right = 510
     profile_card.offset_top = 10
     profile_card.offset_bottom = 61
-    profile_card.add_theme_stylebox_override("panel", _panel_style(Color(0.03, 0.14, 0.20, 0.88)))
+    profile_card.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#7EB6BE"), 23, 12, true))
     ui.add_child(profile_card)
     var row: HBoxContainer = HBoxContainer.new()
     row.add_theme_constant_override("separation", 10)

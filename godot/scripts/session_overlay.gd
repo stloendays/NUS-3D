@@ -90,12 +90,7 @@ func _build() -> void:
     panel.offset_right = 255
     panel.offset_top = -235
     panel.offset_bottom = 235
-    var style: StyleBoxFlat = StyleBoxFlat.new()
-    style.bg_color = Color("#12232d")
-    style.border_color = Color("#79a6b5")
-    style.set_border_width_all(2)
-    style.set_corner_radius_all(12)
-    style.set_content_margin_all(18)
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#86B4C5"), 25, 19, true)
     panel.add_theme_stylebox_override("panel", style)
     add_child(panel)
     var layout: VBoxContainer = VBoxContainer.new()
@@ -105,12 +100,15 @@ func _build() -> void:
     session_title.text = _t("校园联机与性能 [F11]", "CAMPUS LOBBY & PERFORMANCE [F11]")
     session_title.add_theme_font_size_override("font_size", 19)
     layout.add_child(session_title)
+    session_title.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     status = Label.new()
     status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    status.add_theme_color_override("font_color", NUS3DUISkin.DIM)
     layout.add_child(status)
     address = LineEdit.new()
     address.placeholder_text = _t("局域网地址（例如 192.168.1.20）", "LAN IP or hostname (e.g. 192.168.1.20)")
     layout.add_child(address)
+    NUS3DUISkin.field(address)
     port_input = SpinBox.new()
     port_input.min_value = 1024
     port_input.max_value = 65535
@@ -127,17 +125,20 @@ func _build() -> void:
     graphics_title = Label.new()
     graphics_title.text = _t("画质（仅影响本机）", "Graphics quality (local device only)")
     layout.add_child(graphics_title)
+    graphics_title.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     quality = OptionButton.new()
     for option in NUS3DGraphicsSettings.ORDER:
         quality.add_item(_quality_label(str(option)))
     quality.select(NUS3DGraphicsSettings.ORDER.find(graphics.preset))
     quality.item_selected.connect(_quality_changed)
+    NUS3DUISkin.button(quality)
     layout.add_child(quality)
     adaptive = CheckBox.new()
     adaptive.text = _t("自适应三维分辨率", "Adaptive 3D resolution")
     adaptive.button_pressed = graphics.adaptive_resolution
     adaptive.toggled.connect(func(value: bool) -> void: graphics.set_adaptive_resolution(value); _refresh())
     layout.add_child(adaptive)
+    adaptive.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     layout.add_child(_button("resume", _t("返回游戏 [F11]", "Resume Game [F11]"), toggle))
     panel.hide()
     _refresh()
@@ -146,6 +147,7 @@ func _build() -> void:
 func _button(key: String, text_value: String, action: Callable) -> Button:
     var button: Button = Button.new()
     button.text = text_value
+    NUS3DUISkin.button(button)
     button.set_meta("locale_key", key)
     menu_buttons.append(button)
     button.pressed.connect(action)
