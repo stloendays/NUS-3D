@@ -86,7 +86,7 @@ func _draw() -> void:
     var arrow: Vector2 = Vector2(front.x, front.z).normalized()
     draw_line(pp, pp + arrow * 14.0, Color.WHITE, 2.0)
     draw_string(ThemeDB.fallback_font, Vector2(106, 19), "N", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, Color.WHITE)
-    draw_string(ThemeDB.fallback_font, Vector2(9, MAP_SIZE - 12), "SCHEMATIC", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#a6b8b9"))
+    draw_string(ThemeDB.fallback_font, Vector2(9, MAP_SIZE - 12), GameLanguage.localized_text("示意地图", "SCHEMATIC"), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#a6b8b9"))
 
 func _interior_map(p: Vector3) -> Vector2:
     return Vector2(MAP_SIZE * 0.5 + p.x * 8.0, MAP_SIZE * 0.5 + p.z * 8.0)
@@ -95,7 +95,7 @@ func _draw_interior_plan() -> void:
     # Fictional room pocket navigation only. Not a measured floor plan.
     var room: Node3D = campus_life.interiors[campus_life.active_interior]
     var level: int = campus_life.interior_floor
-    var heading: String = "%s  |  %s" % [campus_life.active_interior, "MEZZANINE" if level == 1 else "GROUND"]
+    var heading: String = "%s  |  %s" % [campus_life.active_interior, GameLanguage.localized_text("夹层", "MEZZANINE") if level == 1 else GameLanguage.localized_text("底层", "GROUND")]
     draw_string(ThemeDB.fallback_font, Vector2(12, 20), heading, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, Color.html("#e5f3ee"))
     var outline := Rect2(Vector2(15, 39), Vector2(192, 144))
     draw_rect(outline, Color.html("#324b54"), true)
@@ -110,7 +110,7 @@ func _draw_interior_plan() -> void:
                 draw_rect(Rect2(Vector2(bay_x - 7.0, bay_y - 4.0), Vector2(14, 8)), Color.html("#b9a787"), true)
     var stairs := Rect2(_interior_map(Vector3(9.25, 0, -3.9)), Vector2(14, 57))
     draw_rect(stairs, Color.html("#d7bb79"), false, 2.0)
-    draw_string(ThemeDB.fallback_font, Vector2(169, 165), "STAIRS", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#e7d59d"))
+    draw_string(ThemeDB.fallback_font, Vector2(169, 165), GameLanguage.localized_text("楼梯", "STAIRS"), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#e7d59d"))
     for activity in campus_life.activity_spots.get(campus_life.active_interior, []):
         var p3: Vector3 = activity["position"]
         if (p3.y > 2.0) != (level == 1):
@@ -126,4 +126,4 @@ func _draw_interior_plan() -> void:
     var forward: Vector3 = -player.global_transform.basis.z
     var arrow := Vector2(forward.x, forward.z).normalized()
     draw_line(pos, pos + arrow * 12.0, Color.WHITE, 2.0)
-    draw_string(ThemeDB.fallback_font, Vector2(12, 204), "ILLUSTRATIVE / NOT FLOOR PLAN", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#abc2c5"))
+    draw_string(ThemeDB.fallback_font, Vector2(12, 204), GameLanguage.localized_text("示意 / 非实际楼层图", "ILLUSTRATIVE / NOT FLOOR PLAN"), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#abc2c5"))
