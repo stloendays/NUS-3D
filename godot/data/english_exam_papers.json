@@ -379,7 +379,7 @@
             "3 A"
           ],
           "correct_index": 3,
-          "explanation": "Ohm's law is I = V/R = 12/4 = 3 A."
+          "explanation": "Ohm's law gives current I = V/R = 12 V / 4 ohms = 3 amperes."
         },
         {
           "id": "electrical_engineering_q2",
@@ -729,7 +729,7 @@
             "$90"
           ],
           "correct_index": 2,
-          "explanation": "Present value is 110 / 1.10 = 100."
+          "explanation": "Discounting the future cash flow gives present value PV = $110 / 1.10 = $100."
         },
         {
           "id": "finance_q2",
