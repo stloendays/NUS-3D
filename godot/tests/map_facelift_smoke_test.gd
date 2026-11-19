@@ -53,8 +53,17 @@ func _run() -> void:
     if styling.bush_count > 0 and (shrub_batch == null or shrub_batch.multimesh.instance_count != styling.bush_count):
         _fail("Repeated shrubs were not instanced")
         return
-    if world.generated_building_count != 9 or ridge.districts.size() != 10:
-        _fail("Canonical campus sites changed while restyling")
+    # Validate against the current source data, not a frozen district count:
+    # newer main branches legitimately add Science and other campus content.
+    var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(ridge.DATA_PATH))
+    if typeof(parsed) != TYPE_DICTIONARY:
+        _fail("The canonical Kent Ridge data document is unavailable")
+        return
+    var record: Dictionary = parsed
+    var source_districts: Array = record.get("districts", [])
+    var source_buildings: Array = world.layout.get("buildings", [])
+    if world.generated_building_count != source_buildings.size() or ridge.districts.size() != source_districts.size():
+        _fail("Map dressing modified an existing campus district or building")
         return
     print("PASS: map facelift: %d path edges, %d meadow patches, %d shrubs, %d benches and %d Ridge trees." % [
         styling.path_edge_count, styling.meadow_patch_count, styling.bush_count,
