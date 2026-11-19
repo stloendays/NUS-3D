@@ -386,6 +386,7 @@ func _submit_login() -> void:
 
 
 func _enter_game() -> void:
+    _restore_game_features()
     challenge.sprint_active = false
     challenge.sprint_elapsed = 0
     challenge.sprint_last_time = -1
@@ -421,6 +422,12 @@ func _logout() -> void:
     if not accounts.is_logged_in():
         return
     challenge.sprint_active = false
+    var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
+    if coursework != null:
+        coursework._save_progress()
+    var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
+    if coins != null:
+        coins.save_progress()
     accounts.sign_out()
     _show_login()
 
@@ -540,9 +547,67 @@ func _send_mail() -> void:
     _show_mailbox("sent")
 
 
+func _restore_game_features() -> void:
+    if not accounts.is_logged_in():
+        return
+    var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
+    if coursework != null:
+        coursework.save_path = accounts.feature_save_path("coursework")
+        coursework._load_progress()
+        coursework._refresh_marker()
+    var ui_course: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if ui_course != null:
+        if coursework != null and coursework.current_faculty_id.is_empty():
+            ui_course.show_selector()
+        elif ui_course.modal_visible:
+            ui_course.hide_modal()
+    var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
+    if arcade != null:
+        arcade.save_path = accounts.feature_save_path("arcade")
+        arcade.load_progress()
+        arcade._refresh_status()
+    var life: UTownCampusLife = game.get_node_or_null("CampusLife") as UTownCampusLife
+    if life != null:
+        life.activity_save_path = accounts.feature_save_path("activities")
+        life._load_activities()
+    var story: UTownDDLStory = game.get_node_or_null("DDLStory") as UTownDDLStory
+    if story != null:
+        story.save_path = accounts.feature_save_path("ddl_story")
+        story.load_progress()
+    var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
+    if coins != null:
+        coins.save_path = accounts.feature_save_path("coins")
+        coins.load_progress()
+        coins.source_student_wins = arcade.student_wins if arcade != null else 0
+        coins._poll_mission_rewards()
+
+
+func _scan_source_rewards() -> void:
+    var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
+    if coursework != null:
+        accounts.sync_source_xp("coursework", coursework.total_xp)
+    var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
+    if arcade != null:
+        accounts.sync_source_xp("arcade", arcade.lifetime_xp)
+    var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
+    if coursework == null or coins == null:
+        return
+    for faculty_id in coursework.faculty_progress.keys():
+        if not coursework.faculty_by_id.has(faculty_id):
+            continue
+        var state: Dictionary = coursework.faculty_progress[faculty_id]
+        var grades: PackedStringArray = state.get("grades", PackedStringArray())
+        var quests: Array = coursework.faculty_by_id[faculty_id]["quests"]
+        for index in range(mini(grades.size(), quests.size())):
+            var grade: String = str(grades[index])
+            var payout: int = int(round(float(quests[index]["credits"]) * (0.55 if grade == "C (Late)" else 1.0)))
+            coins.reward_once("coursework:" + str(faculty_id) + ":" + str(index), payout, "Coursework reward")
+
+
 func _scan_rewards() -> void:
     if not accounts.is_logged_in():
         return
+    _scan_source_rewards()
     if tour.discovered_ids != observed_tour_ids:
         var saved_ids: Array = []
         for stop_id in tour.discovered_ids:
@@ -581,6 +646,9 @@ func _unhandled_input(event: InputEvent) -> void:
         get_viewport().set_input_as_handled()
         return
     if not accounts.is_logged_in():
+        return
+    var coursework_modal: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if coursework_modal != null and coursework_modal.modal_visible:
         return
     if key_event.keycode == KEY_J:
         if mail_cover.visible:
