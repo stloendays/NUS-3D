@@ -331,6 +331,9 @@ func _process(_delta: float) -> void:
         status_chip.text = "POST-COURSE CLUB  [P]  |  五子棋 · 纸牌 · 聚会" + ("  |  39/39 MASTER" if leisure.grand_master_unlocked() else "")
 
 func _input(event: InputEvent) -> void:
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    if exams != null and bool(exams.get("is_open")):
+        return
     if not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
