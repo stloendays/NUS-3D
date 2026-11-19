@@ -53,8 +53,11 @@ func _case(director: NUS3DStoryDirector, choices: Dictionary, expected: String, 
 
 
 func _run() -> void:
-    GameLanguage.save_path = "user://nus3d-story-language-%d.cfg" % Time.get_ticks_usec()
-    GameLanguage.set_locale("zh")
+    NUS3DTestAutoloadBootstrap.ensure(self)
+    var language: NUS3DGameLanguage = root.get_node("GameLanguage") as NUS3DGameLanguage
+    var dialogue: NUS3DDialogueBank = root.get_node("DialogueBank") as NUS3DDialogueBank
+    language.save_path = "user://nus3d-story-language-%d.cfg" % Time.get_ticks_usec()
+    language.set_locale("zh")
     var scene: PackedScene = load("res://scenes/game_shell.tscn") as PackedScene
     if scene == null:
         _fail("Could not load login shell")
@@ -173,7 +176,7 @@ func _run() -> void:
     if accounts.profile.get("awards", {}).size() < 5:
         _fail("Story XP was not integrated into account progression")
         return
-    GameLanguage.set_locale("en")
+    language.set_locale("en")
     director.open_journal()
     if not director.heading.text.contains("QUEST JOURNAL"):
         _fail("Quest journal did not respond to English localization")
