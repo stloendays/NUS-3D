@@ -12,6 +12,14 @@ const STAGE_BRIEF: int = 0
 const STAGE_ACTIVITY: int = 1
 const STAGE_PARTNER: int = 2
 const STAGE_SUBMIT: int = 3
+const ACTIVITY_LABELS: Dictionary = {
+    "ERC/cafe": "咖啡角",
+    "ERC/reading": "阅读区",
+    "ERC/mezzanine": "二层学习区",
+    "SRC/refill": "饮水站",
+    "SRC/warmup": "热身区",
+    "SRC/viewing": "观众席"
+}
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
@@ -195,7 +203,8 @@ func total_completed() -> int:
     var count: int = 0
     for state in faculty_progress.values():
         if typeof(state) == TYPE_DICTIONARY:
-            count += (state.get("grades", PackedStringArray()) as PackedStringArray).size()
+            var grades: PackedStringArray = state.get("grades", PackedStringArray())
+            count += grades.size()
     return count
 
 func _quest_location(id: String) -> Vector3:
@@ -236,7 +245,7 @@ func objective_description() -> String:
             return "前往 %s，靠近任务告示按 K 领取作业" % waypoint_target()
         STAGE_ACTIVITY:
             var p: PackedStringArray = str(quest["activity"]).split("/")
-            return "进入 %s 室内，在 %s 活动点按 F" % [p[0], p[1]]
+            return "进入 %s 室内，在 %s 活动点按 F" % [p[0], str(ACTIVITY_LABELS.get(str(quest["activity"]), p[1]))]
         STAGE_PARTNER:
             var p: PackedStringArray = str(quest["partner"]).split("/")
             return "在 %s 寻找队友 %s，靠近按 Q" % [p[0], p[1]]
