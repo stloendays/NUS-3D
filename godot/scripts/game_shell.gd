@@ -429,7 +429,20 @@ func _enter_game() -> void:
     login_cover.hide()
     mail_cover.hide()
     profile_card.show()
-    game.get_node("Player").call("reset_player")
+    # Respawning clears the controller's movement lock. Restore the lock for
+    # first-time faculty selection or the intro *after* the player reset.
+    var player_actor: UTownPlayer = game.get_node_or_null("Player") as UTownPlayer
+    if player_actor != null:
+        player_actor.reset_player()
+        var intro_state: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
+        var faculty_state: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+        player_actor.movement_locked = (
+            (intro_state != null and intro_state.playing)
+            or (faculty_state != null and (faculty_state.modal_visible or faculty_state.intro_blocked))
+        )
+    var coin_session: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
+    if coin_session != null:
+        coin_session.seed_session_drops()
     _play_ui_sound("confirm")
     get_tree().paused = false
     var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
@@ -458,6 +471,10 @@ func _logout() -> void:
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
         coins.save_progress()
+        coins.reset_runtime_session()
+    var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
+    if arcade != null:
+        arcade.reset_runtime_session()
     var leisure: UTownLeisure = game.get_node_or_null("Leisure") as UTownLeisure
     if leisure != null:
         leisure._save_stats()
@@ -610,6 +627,7 @@ func _restore_game_features() -> void:
         exams._restore_missing_awards()
     var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
     if arcade != null:
+        arcade.reset_runtime_session()
         arcade.save_path = accounts.feature_save_path("arcade")
         arcade.load_progress()
         arcade._refresh_status()
@@ -627,6 +645,9 @@ func _restore_game_features() -> void:
         leisure._load_stats()
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
+        # Restore wallet and one-time rewards for the new account while leaving
+        # only transient pickups/delivery behind; account data is not reset.
+        coins.reset_runtime_session()
         coins.save_path = accounts.feature_save_path("coins")
         coins.load_progress()
         coins.source_student_wins = arcade.student_wins if arcade != null else 0

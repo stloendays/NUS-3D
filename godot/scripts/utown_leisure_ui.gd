@@ -227,6 +227,9 @@ func _on_age_confirm(enabled: bool) -> void:
 func open_lounge() -> bool:
     if is_open:
         return true
+    var coins: Node = get_parent().get_node_or_null("Coins")
+    if (coins != null and bool(coins.get("shop_open"))) or player.movement_locked or coursework.modal_open:
+        return false
     if not leisure.unlocked():
         life.message = "完成任一学院全部 3 个 Coursework 任务后解锁棋牌与聚会。"
         life.message_time = 4.0
@@ -333,6 +336,9 @@ func _process(_delta: float) -> void:
         status_chip.text = "POST-COURSE CLUB  [Tab]  |  五子棋 · 纸牌 · 聚会" + ("  |  39/39 MASTER" if leisure.grand_master_unlocked() else "")
 
 func _input(event: InputEvent) -> void:
+    var coins: Node = get_parent().get_node_or_null("Coins")
+    if coins != null and bool(coins.get("shop_open")):
+        return
     var exams: Node = get_parent().get_node_or_null("EnglishExams")
     if exams != null and bool(exams.get("is_open")):
         return
