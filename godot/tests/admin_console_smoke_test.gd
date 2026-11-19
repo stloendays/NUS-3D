@@ -92,7 +92,7 @@ func _run() -> void:
         return
 
     shell._open_admin_console()
-    if not paused or not console.visible or not shell.profile_card.visible == false:
+    if not paused or not console.visible or shell.profile_card.visible:
         _fail("Admin console did not pause the game")
         return
     if admin.is_unlocked():
