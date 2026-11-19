@@ -673,6 +673,11 @@ func _smoke() -> void:
         return
     leisure.save_path = "user://nus3d_leisure_smoke_temp.cfg"
     DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
+    leisure.chess_wins = 0
+    leisure.chess_games = 0
+    leisure.card_wins = 0
+    leisure.card_games = 0
+    leisure.social_visits = 0
     if leisure.unlocked() or leisure_ui.open_lounge():
         push_error("Leisure must remain locked until 3 faculty coursework chapters complete")
         quit(1)
