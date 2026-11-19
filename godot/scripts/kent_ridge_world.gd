@@ -240,7 +240,7 @@ func _build_district_ramp(district: Node3D, elevation: float, depth_m: float) ->
     var ramp: Node3D = Node3D.new()
     ramp.name = "DistrictPedestrianRamp"
     ramp.position = Vector3(0.0, -elevation * 0.5 + 0.12, depth_m * 0.5 + run_length * 0.5)
-    ramp.rotation.x = -atan2(elevation, run_length)
+    ramp.rotation.x = atan2(elevation, run_length)
     district.add_child(ramp)
     _box(ramp, "SlopedWalkSurface", Vector3.ZERO,
         Vector3(4.2, 0.28, sqrt(run_length * run_length + elevation * elevation)),
