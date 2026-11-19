@@ -16,6 +16,7 @@ var sound_clips: Dictionary = {}
 var _material_cache: Dictionary = {}
 var _sphere_cache: Dictionary = {}
 var _box_cache: Dictionary = {}
+var camera: Camera3D
 var leaf_batch: MultiMeshInstance3D
 var footstep_count: int = 0
 var bird_startle_count: int = 0
@@ -270,6 +271,8 @@ func _process(delta: float) -> void:
         return
     var elapsed: float = tick
     tick = 0.0
+    if not is_instance_valid(camera) or not camera.is_current():
+        camera = get_viewport().get_camera_3d()
     var indoor: bool = life.interior_active or weather.indoor
     var rain: bool = weather.mode >= 3
     var night: bool = world.lighting_mode >= 2
@@ -286,7 +289,9 @@ func _update_animals(delta: float, indoor: bool, rain: bool, night: bool) -> voi
             var base: Vector3 = state["base"]
             var distance_sq: float = player.global_position.distance_squared_to(base)
             node.visible = not indoor and distance_sq < 7225.0
-            if not node.visible:
+            if node.visible and camera != null and distance_sq > 36.0:
+                node.visible = camera.is_position_in_frustum(base + Vector3.UP)
+            if not node.visible and distance_sq > 36.0:
                 continue
             var distance: float = sqrt(distance_sq)
             if kind == "butterflies":
