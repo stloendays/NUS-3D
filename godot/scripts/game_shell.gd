@@ -11,6 +11,7 @@ var tour: UTownTour
 var challenge: UTownChallenge
 var story_director: NUS3DStoryDirector
 var session_overlay: NUS3DSessionOverlay
+var horror_mode: UTownHorrorMode
 var admin_authority: NUS3DAdminAuthority
 var admin_console: NUS3DAdminConsole
 var campus_hub: NUS3DCampusHub
@@ -89,6 +90,7 @@ func _ready() -> void:
     session_overlay.setup(self, game)
     _build_admin_console()
     _build_campus_hub()
+    horror_mode = game.get_node_or_null("MidnightHorror") as UTownHorrorMode
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
@@ -261,7 +263,7 @@ func _build_admin_console() -> void:
 
 
 func _open_admin_console() -> void:
-    if admin_console == null or not accounts.is_logged_in():
+    if admin_console == null or not accounts.is_logged_in() or (horror_mode != null and horror_mode.active):
         return
     if login_cover.visible or mail_cover.visible or get_tree().paused:
         return
@@ -302,7 +304,7 @@ func _build_campus_hub() -> void:
 
 
 func _open_campus_hub() -> void:
-    if campus_hub == null or not accounts.is_logged_in() or login_cover.visible or mail_cover.visible:
+    if campus_hub == null or not accounts.is_logged_in() or login_cover.visible or mail_cover.visible or (horror_mode != null and horror_mode.active):
         return
     if get_tree().paused or (admin_console != null and admin_console.visible):
         return
@@ -338,6 +340,25 @@ func _close_campus_hub() -> void:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
+func _open_horror_mode() -> void:
+    if horror_mode == null or not accounts.is_logged_in():
+        return
+    if login_cover.visible or mail_cover.visible or admin_console.visible or campus_hub.visible:
+        return
+    if session_overlay != null and session_overlay.is_open:
+        return
+    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
+    var course_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
+    if (exams != null and exams.is_open) or (course_ui != null and course_ui.modal_visible):
+        return
+    if intro != null and intro.playing:
+        return
+    if story_director != null and story_director.cover != null and story_director.cover.visible:
+        return
+    horror_mode.request_mode_menu()
+
+
 func _build_profile_card() -> void:
     profile_card = PanelContainer.new()
     profile_card.name = "ProfileStatus"
@@ -360,6 +381,7 @@ func _build_profile_card() -> void:
     row.add_child(_button("Mail [J]", _open_mail))
     row.add_child(_button("Campus AI [F11]", _open_campus_hub))
     row.add_child(_button("Admin [F12]", _open_admin_console))
+    row.add_child(_button("午夜追逐" if language_service.is_chinese() else "Night Shift", _open_horror_mode))
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
 
@@ -480,6 +502,8 @@ func _show_login() -> void:
         admin_console.close_console()
     if admin_authority != null:
         admin_authority.lock()
+    if horror_mode != null:
+        horror_mode.detach_profile()
     if campus_hub != null:
         campus_hub.clear_session()
         campus_hub.close_hub()
@@ -538,6 +562,8 @@ func _enter_game() -> void:
     # Feature rewards must read the newly restored tour and challenge, never the
     # previous user's objects during account switching.
     _restore_game_features()
+    if horror_mode != null:
+        horror_mode.attach_profile(accounts)
     observed_tour_ids.clear()
     observed_note_ids.clear()
     observed_sprint_time = -1
@@ -559,6 +585,8 @@ func _enter_game() -> void:
 func _logout() -> void:
     if not accounts.is_logged_in():
         return
+    if horror_mode != null:
+        horror_mode.detach_profile()
     if campus_hub != null:
         campus_hub.clear_session()
         campus_hub.close_hub()
@@ -617,7 +645,7 @@ func _on_mailbox_changed() -> void:
 
 
 func _open_mail() -> void:
-    if not accounts.is_logged_in() or (admin_console != null and admin_console.visible) or (campus_hub != null and campus_hub.visible):
+    if not accounts.is_logged_in() or (horror_mode != null and horror_mode.active) or (admin_console != null and admin_console.visible) or (campus_hub != null and campus_hub.visible):
         return
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -826,6 +854,12 @@ func _unhandled_input(event: InputEvent) -> void:
         get_viewport().set_input_as_handled()
         return
     if not accounts.is_logged_in():
+        return
+    if key_event.keycode == KEY_F6 and key_event.ctrl_pressed and not key_event.alt_pressed:
+        _open_horror_mode()
+        get_viewport().set_input_as_handled()
+        return
+    if horror_mode != null and horror_mode.active:
         return
     if campus_hub != null and campus_hub.visible:
         if key_event.keycode == KEY_F11 or key_event.keycode == KEY_ESCAPE:
