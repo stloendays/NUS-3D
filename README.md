@@ -4,7 +4,7 @@
 >
 > Status: **M2/M3 source-informed UTown + Coursework/cinematic + comic DDL/landscaping/arcade/coins/leisure + M5 local accounts and mailbox + M6 tactile HUD/audio + M7 bilingual NPCs + M4 experimental Windows build (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M3.6 选择学院与 Coursework 任务](docs/M3_6_COURSEWORK_FACULTY.md) · [M3.7 入场动画](docs/M3_7_CINEMATIC_INTRO.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[登录单语言规范（M18）](docs/M18_SINGLE_LANGUAGE_LOGIN.md) · [Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M3.6 选择学院与 Coursework 任务](docs/M3_6_COURSEWORK_FACULTY.md) · [M3.7 入场动画](docs/M3_7_CINEMATIC_INTRO.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -19,11 +19,19 @@
 
 The integration branch combines formerly separate arcade, coursework, campus-life, comic DDL story, food courts, coins and delivery, contextual guide, offline profile/messaging and bilingual HUD features. The merge is gated by actual CI and GUI review; do not assume the draft branch is release-ready.
 
-**Controls:** P = Coursework journal; Shift+P = faculty; K = accept/submit tasks; J = Campus Post; Tab = Post-Course Club after completing one faculty; U = professor; left mouse = cartoon toy; 1–3 = choose unlocked toy; H = fictional DDL step or direction pulse; Z = coin pickup; O = shop; N = food delivery; F9 = UI sound; F10 = Chinese/English. Existing WASD/E/C/V/Q/I/L/F/B/X/T/Y/M/F1/F7 controls remain.
+**Controls:** P = Coursework journal; Shift+P = faculty; K = accept/submit tasks; J = Campus Post; Tab = Post-Course Club after completing one faculty; U = professor; left mouse = cartoon toy; 1–3 = choose unlocked toy; H = fictional DDL step or direction pulse; Z = coin pickup; O = shop; N = food delivery; F9 = UI sound; **F10 = choose Chinese/English on the login screen only**. During play, every game-authored text uses the language chosen at sign-in. Existing WASD/E/C/V/Q/I/L/F/B/X/T/Y/M/F1/F7 controls remain.
 
 Per-account feature saves are separated for Coursework, arcade, outdoor/indoor activities, coins, DDL and leisure. XP is imported into the account level once per cumulative source; no repeated level grants. Older single-device saves are copied (not erased) only into the first newly registered profile. This is not real NUS SSO, cloud email or financial money.
 
 **QA:** [Integration controls, automatic checks and manual GPU checklist](docs/INTEGRATION_QA_2026-11-19.md). The source-informed high-rises and facades are still provisional; no accurate field survey or full Kent Ridge campus model is claimed.
+
+## Single-language player experience (M18)
+
+At the login screen, choose **English** or **中文**. All authored gameplay interfaces and dialogue use only that selection for the entire signed-in session; the game no longer mixes Chinese and English labels or permits F10 to switch languages mid-game. Logging out makes the language picker editable again. The selected login language is remembered in the local player profile without changing XP, coursework, email, settings or saved exploration progress.
+
+The login language controls **all 39 fictional Coursework chapter stories**, menus, the cinematic intro, club chess/cards/social dialogue, original DDL stories, arcade, coins/delivery, directional HUD, LAN controls and exam interface. Original English exam questions remain in English by design, and user-written mail and usernames are never altered. Unmerged feature branches must adopt the same language API when integrated.
+
+Details, save boundaries and QA checklist: [M18 Single Language at Login](docs/M18_SINGLE_LANGUAGE_LOGIN.md).
 
 ## Play the first prototype / 运行第一版
 
