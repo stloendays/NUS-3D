@@ -111,9 +111,17 @@ func _make_animals() -> void:
                 "cooldown": 0.0, "moving": false}
             animal.position = base
             if kind == "birds":
-                _part(animal, "Body", _sphere(0.16), Vector3(0, 0.19, 0), Color("#41464b"))
-                _part(animal, "Head", _sphere(0.11), Vector3(0, 0.32, -0.13), Color("#30333a"))
-                _part(animal, "Beak", _box(Vector3(0.11, 0.045, 0.12)), Vector3(0, 0.3, -0.25), Color("#e5b24f"))
+                var feather: Color = Color("#40484c") if i % 2 == 0 else Color("#5a514c")
+                _part(animal, "Body", _sphere(0.17), Vector3(0, 0.22, 0), feather)
+                _part(animal, "Chest", _sphere(0.125), Vector3(0, 0.22, -0.11), Color("#b4a99a"))
+                _part(animal, "Head", _sphere(0.12), Vector3(0, 0.35, -0.14), Color("#30383c"))
+                _part(animal, "Beak", _box(Vector3(0.11, 0.045, 0.16)), Vector3(0, 0.32, -0.29), Color("#e8ae4e"))
+                _part(animal, "LeftWing", _box(Vector3(0.09, 0.05, 0.24)), Vector3(-0.16, 0.23, 0.04), feather)
+                _part(animal, "RightWing", _box(Vector3(0.09, 0.05, 0.24)), Vector3(0.16, 0.23, 0.04), feather)
+                _part(animal, "Tail", _box(Vector3(0.10, 0.035, 0.25)), Vector3(0, 0.19, 0.25), feather)
+                for side in [-1.0, 1.0]:
+                    _part(animal, "Eye", _sphere(0.022), Vector3(side * 0.105, 0.37, -0.205), Color("#e5c75e"))
+                    _part(animal, "Leg", _box(Vector3(0.025, 0.16, 0.025)), Vector3(side * 0.07, 0.08, 0), Color("#c5a15b"))
                 birds.append(state)
             elif kind == "butterflies":
                 _part(animal, "Body", _sphere(0.045), Vector3.ZERO, Color("#5c4b41"))
@@ -122,19 +130,42 @@ func _make_animals() -> void:
                 state["base"] = base + Vector3(0, 1.2, 0)
                 butterflies.append(state)
             elif kind == "cats":
-                _part(animal, "Body", _sphere(0.32), Vector3(0, 0.36, 0.13), Color("#d2ad80"))
-                _part(animal, "Head", _sphere(0.20), Vector3(0, 0.48, -0.23), Color("#d2ad80"))
-                _part(animal, "Tail", _box(Vector3(0.10, 0.47, 0.10)), Vector3(0, 0.55, 0.42), Color("#d2ad80"))
+                var fur: Color = [Color("#d2ad80"), Color("#77777d"), Color("#d7d2c7")][i % 3]
+                _part(animal, "Body", _sphere(0.33), Vector3(0, 0.36, 0.12), fur)
+                _part(animal, "Chest", _sphere(0.20), Vector3(0, 0.36, -0.16), Color("#efe1c9"))
+                _part(animal, "Head", _sphere(0.22), Vector3(0, 0.52, -0.24), fur)
+                _part(animal, "Muzzle", _sphere(0.105), Vector3(0, 0.44, -0.43), Color("#f0e4d3"))
+                _part(animal, "Nose", _sphere(0.036), Vector3(0, 0.48, -0.525), Color("#b77c7a"))
+                _part(animal, "Tail", _box(Vector3(0.10, 0.47, 0.10)), Vector3(0, 0.55, 0.43), fur)
+                for side in [-1.0, 1.0]:
+                    var ear := _part(animal, "Ear", _box(Vector3(0.16, 0.19, 0.07)),
+                        Vector3(side * 0.15, 0.73, -0.27), fur)
+                    ear.rotation.z = side * -0.25
+                    _part(animal, "Eye", _sphere(0.036), Vector3(side * 0.11, 0.55, -0.427), Color("#60856b"))
+                    for leg_z in [-0.18, 0.27]:
+                        _part(animal, "Paw", _sphere(0.09),
+                            Vector3(side * 0.22, 0.1, leg_z), fur)
                 cats.append(state)
             else:
-                _part(animal, "Body", _sphere(0.28), Vector3(0, 0.35, 0.04), Color("#c58b50"))
-                _part(animal, "Head", _sphere(0.16), Vector3(0, 0.62, -0.19), Color("#cf9d62"))
-                _part(animal, "Comb", _box(Vector3(0.13, 0.16, 0.08)), Vector3(0, 0.83, -0.2), Color("#cf403a"))
-                _part(animal, "Beak", _box(Vector3(0.13, 0.06, 0.15)), Vector3(0, 0.59, -0.36), Color("#e9b43f"))
-                _part(animal, "LeftWing", _box(Vector3(0.12, 0.24, 0.28)), Vector3(-0.26, 0.4, 0), Color("#a76b43"))
-                _part(animal, "RightWing", _box(Vector3(0.12, 0.24, 0.28)), Vector3(0.26, 0.4, 0), Color("#a76b43"))
-                _part(animal, "LegL", _box(Vector3(0.06, 0.25, 0.07)), Vector3(-0.12, 0.12, 0), Color("#c69a42"))
-                _part(animal, "LegR", _box(Vector3(0.06, 0.25, 0.07)), Vector3(0.12, 0.12, 0), Color("#c69a42"))
+                var plumage: Color = [Color("#c58b50"), Color("#eee5d3"), Color("#8e7564")][i % 3]
+                _part(animal, "Body", _sphere(0.30), Vector3(0, 0.38, 0.05), plumage)
+                _part(animal, "Breast", _sphere(0.23), Vector3(0, 0.41, -0.18), plumage.lightened(0.10))
+                _part(animal, "Head", _sphere(0.17), Vector3(0, 0.68, -0.22), plumage)
+                _part(animal, "Comb", _box(Vector3(0.13, 0.16, 0.08)), Vector3(0, 0.90, -0.2), Color("#cf403a"))
+                _part(animal, "Beak", _box(Vector3(0.13, 0.06, 0.15)), Vector3(0, 0.64, -0.41), Color("#e9b43f"))
+                _part(animal, "LeftWing", _box(Vector3(0.12, 0.24, 0.28)), Vector3(-0.29, 0.43, 0), plumage.darkened(0.17))
+                _part(animal, "RightWing", _box(Vector3(0.12, 0.24, 0.28)), Vector3(0.29, 0.43, 0), plumage.darkened(0.17))
+                for side in [-1.0, 1.0]:
+                    _part(animal, "Eye", _sphere(0.028), Vector3(side * 0.145, 0.71, -0.29), Color("#282725"))
+                    _part(animal, "Wattle", _sphere(0.065), Vector3(side * 0.06, 0.53, -0.39), Color("#c74a43"))
+                    _part(animal, "Leg", _box(Vector3(0.055, 0.25, 0.065)), Vector3(side * 0.13, 0.12, 0), Color("#c69a42"))
+                    for toe in [-1.0, 0.0, 1.0]:
+                        _part(animal, "Toe", _box(Vector3(0.038, 0.045, 0.18)),
+                            Vector3(side * 0.13 + toe * 0.055, 0.035, -0.10), Color("#c69a42"))
+                for feather_index in range(3):
+                    var tail := _part(animal, "TailFeather", _box(Vector3(0.085, 0.32, 0.085)),
+                        Vector3((float(feather_index) - 1.0) * 0.10, 0.63, 0.31), plumage.darkened(0.24))
+                    tail.rotation.x = -0.48
                 chickens.append(state)
 
 func _make_leaves() -> void:
