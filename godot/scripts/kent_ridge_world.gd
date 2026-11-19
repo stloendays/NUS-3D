@@ -57,6 +57,8 @@ func _ready() -> void:
     add_child(bus_root)
     _build_road_links()
     _build_districts()
+    _build_sports_ground()
+    _build_campus_edge()
     _build_stations()
     _build_buses()
 
@@ -110,6 +112,12 @@ func _build_extended_ground() -> void:
     var max_x: float = 320.0
     var min_z: float = -450.0
     var max_z: float = 450.0
+    for district in districts:
+        var dp: Vector3 = district["position"]
+        min_x = minf(min_x, dp.x - 220.0)
+        max_x = maxf(max_x, dp.x + 220.0)
+        min_z = minf(min_z, dp.z - 220.0)
+        max_z = maxf(max_z, dp.z + 220.0)
     for stop in stops:
         var p: Vector3 = stop["position"]
         min_x = minf(min_x, p.x - 160.0)
@@ -352,3 +360,86 @@ func _decorate_building(parent: Node3D, info: Dictionary, width_m: float, depth_
         _box(parent, "CoveredCampusWalk", Vector3(0, 3.4, depth_m * 0.5 + 5.5), Vector3(minf(width_m * 0.76, 26.0), 0.36, 8.5), "#d3d4c6")
         for x in [-8.0, 8.0]:
             _box(parent, "WalkColumn", Vector3(x, 1.7, depth_m * 0.5 + 8.4), Vector3(0.35, 3.3, 0.35), "#c7c9c0")
+
+
+func _build_sports_ground() -> void:
+    var sports: Dictionary = {}
+    for district in districts:
+        if str(district["id"]) == "SPORTS":
+            sports = district
+            break
+    if sports.is_empty():
+        return
+    var root_node: Node3D = Node3D.new()
+    root_node.name = "ScienceSportsGround"
+    root_node.position = sports["position"]
+    add_child(root_node)
+    _box(root_node, "TrackBed", Vector3(0, 0.16, 0), Vector3(142, 0.12, 96), "#a95d51")
+    _box(root_node, "InnerTrack", Vector3(0, 0.24, 0), Vector3(117, 0.10, 75), "#c17a63")
+    _box(root_node, "FootballGrass", Vector3(0, 0.32, 0), Vector3(104, 0.10, 64), "#468c59")
+    for x in [-51.0, 51.0]:
+        _box(root_node, "GoalLine", Vector3(x, 0.40, 0), Vector3(0.25, 0.03, 64), "#f2eee0")
+        _box(root_node, "GoalCrossbar", Vector3(x, 2.4, 0), Vector3(0.22, 0.22, 7.4), "#e9eae6")
+        for z in [-3.7, 3.7]:
+            _box(root_node, "GoalPost", Vector3(x, 1.2, z), Vector3(0.22, 2.4, 0.22), "#e9eae6")
+    for z in [-31.0, 31.0]:
+        _box(root_node, "Sideline", Vector3(0, 0.40, z), Vector3(104, 0.03, 0.24), "#f2eee0")
+    _box(root_node, "HalfwayLine", Vector3(0, 0.41, 0), Vector3(0.20, 0.03, 64), "#f2eee0")
+    for lane in range(4):
+        var z: float = 37.7 + float(lane) * 2.3
+        for sign in [-1.0, 1.0]:
+            _box(root_node, "RunningLane", Vector3(0, 0.32, z * sign), Vector3(132, 0.03, 0.15), "#f2d9cb")
+    for side in [-1.0, 1.0]:
+        for tier in range(3):
+            _box(root_node, "Bleacher", Vector3(side * 76.0, 0.55 + tier * 0.48, 0), Vector3(4.0, 0.42, 65.0 - tier * 3.0), "#c7c6b8")
+        for z in [-46.0, 46.0]:
+            _box(root_node, "FloodlightPole", Vector3(side * 83.0, 7.0, z), Vector3(0.42, 14.0, 0.42), "#a6b3b2")
+            _box(root_node, "Floodlight", Vector3(side * 83.0, 14.2, z), Vector3(3.6, 1.1, 0.65), "#e8e6cf")
+    _label(root_node, "CAMPUS SPORTS FIELD", Vector3(0, 5.2, -51), "#fff3db", 25)
+
+
+func _build_campus_edge() -> void:
+    # Low-poly tree belt + natural ridge, rather than invisible map-edge walls.
+    # Keep a margin beyond the actual terrain and make the edge visibly scenic.
+    var land: Node3D = get_node_or_null("CampusBaseTerrain_Estimated")
+    if land == null:
+        return
+    var ground: MeshInstance3D = land.get_node_or_null("GroundBeyondUTown") as MeshInstance3D
+    if ground == null:
+        return
+    var shape: BoxMesh = ground.mesh as BoxMesh
+    var center: Vector3 = ground.position
+    var half_x: float = shape.size.x * 0.5
+    var half_z: float = shape.size.z * 0.5
+    var edge: Node3D = Node3D.new()
+    edge.name = "WoodedCampusBoundary"
+    add_child(edge)
+    var segments: int = 18
+    for side in range(4):
+        for i in range(segments + 1):
+            var t: float = float(i) / float(segments)
+            var x: float = center.x + lerpf(-half_x, half_x, t)
+            var z: float = center.z + lerpf(-half_z, half_z, t)
+            if side == 0:
+                z = center.z - half_z + 7.0
+            elif side == 1:
+                z = center.z + half_z - 7.0
+            elif side == 2:
+                x = center.x - half_x + 7.0
+            else:
+                x = center.x + half_x - 7.0
+            var trunk_height: float = 7.0 + float((i * 7 + side * 11) % 5)
+            _box(edge, "TreeTrunk", Vector3(x, trunk_height * 0.5, z), Vector3(1.0, trunk_height, 1.0), "#6b6048")
+            var canopy: MeshInstance3D = MeshInstance3D.new()
+            canopy.name = "BoundaryCanopy"
+            var sphere: SphereMesh = SphereMesh.new()
+            sphere.radius = 4.8
+            sphere.height = 9.6
+            canopy.mesh = sphere
+            canopy.position = Vector3(x, trunk_height + 3.5, z)
+            canopy.material_override = _material("#4a7557" if i % 2 == 0 else "#638a5d")
+            edge.add_child(canopy)
+    for side in [-1.0, 1.0]:
+        _box(edge, "FarRidge", Vector3(center.x + side * (half_x + 35.0), 4.5, center.z), Vector3(65.0, 9.0, shape.size.z + 180.0), "#668467")
+    for side in [-1.0, 1.0]:
+        _box(edge, "FarRidge", Vector3(center.x, 4.5, center.z + side * (half_z + 35.0)), Vector3(shape.size.x + 180.0, 9.0, 65.0), "#668467")
