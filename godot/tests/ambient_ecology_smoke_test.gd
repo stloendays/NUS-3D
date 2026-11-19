@@ -78,9 +78,17 @@ func _test() -> void:
         return
     player.movement_locked = false
     var settings: Dictionary = ambient.budgets()
-    if int(settings["birds"]) > ambient.MAX_BIRDS or int(settings["leaves"]) > ambient.MAX_LEAVES:
-        _fail("Performance budgets exceeded")
-        return
+    # Upper bounds are determined by the existing high-detail profile rather
+    # than obsolete MAX_BIRDS/MAX_LEAVES fields removed by ecology refactors.
+    for category in ["birds", "butterflies", "cats", "leaves", "chickens"]:
+        if not settings.has(category):
+            _fail("Missing ecology budget category: " + category)
+            return
+    var caps: Dictionary = {"birds": 14, "butterflies": 18, "cats": 3, "leaves": 64, "chickens": 9}
+    for category in caps:
+        if int(settings[category]) < 0 or int(settings[category]) > int(caps[category]):
+            _fail("Ecology performance budgets exceeded for " + str(category))
+            return
     print("PASS: M11 bounded tropical wildlife, weather/day-night/indoor gating, spatial original sound, no new collision or hotkeys")
     game.queue_free()
     quit(0)
