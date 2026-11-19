@@ -44,6 +44,17 @@ func _run() -> void:
             _fail("pool instances must share one mesh and one material")
             return
 
+    # Full integrated scene can bring previously completed local demo quests.
+    # Reset only in-memory source ledgers before testing isolated reward deltas.
+    # No underlying real account saves are rewritten by these resets.
+    tour.restart()
+    challenge.collected_ids.clear()
+    challenge.sprint_best_time = -1.0
+    campus.visited_activities.clear()
+    arcade.met_professors.clear()
+    arcade.student_wins = 0
+    coins.source_student_wins = 0
+
     # Avoid writing any real player coin/profile/mission save during testing.
     coins.save_path = "user://nus3d-coins-smoke-%d.cfg" % Time.get_ticks_usec()
     coins.load_progress()
