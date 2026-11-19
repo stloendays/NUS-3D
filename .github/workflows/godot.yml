@@ -74,6 +74,7 @@ jobs:
       - name: Validate integrated campaign, accounts and controls
         run: |
           set -eo pipefail
+          failure_count=0
           for test in \
             account_smoke_test.gd \
             language_smoke_test.gd \
@@ -94,14 +95,19 @@ jobs:
           do
             echo "Testing $test"
             log_file="$(mktemp)"
-            timeout 65s godot --headless --path godot --script "res://tests/$test" 2>&1 | tee "$log_file"
-            if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$log_file"; then
-              echo "Engine errors reported during $test"
-              rm -f "$log_file"
-              exit 1
+            if ! timeout 65s godot --headless --path godot --script "res://tests/$test" 2>&1 | tee "$log_file"; then
+              echo "FAIL: $test returned nonzero or timed out"
+              failure_count=$((failure_count + 1))
+            elif grep -Eq 'SCRIPT ERROR:|^ERROR:' "$log_file"; then
+              echo "FAIL: Godot engine errors during $test"
+              failure_count=$((failure_count + 1))
+            else
+              echo "PASS: $test"
             fi
             rm -f "$log_file"
           done
+          echo "Integrated smoke failure count: $failure_count"
+          test "$failure_count" -eq 0
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |
           sudo apt-get update -qq
