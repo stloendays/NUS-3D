@@ -170,6 +170,7 @@ func _button(value: String, action: Callable) -> Button:
     var b := Button.new()
     b.text = value
     b.custom_minimum_size.y = 42
+    NUS3DUISkin.button(b)
     b.pressed.connect(action)
     return b
 
@@ -177,7 +178,7 @@ func _build_ui() -> void:
     backdrop = ColorRect.new()
     backdrop.name = "PresentationModalBackdrop"
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    backdrop.color = Color(0.018, 0.036, 0.060, 0.94)
+    backdrop.color = NUS3DUISkin.BACKDROP
     backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
     backdrop.visible = false
     add_child(backdrop)
@@ -189,15 +190,7 @@ func _build_ui() -> void:
     page.name = "EnglishPresentationSheet"
     page.custom_minimum_size = Vector2(870, 620)
     page.mouse_filter = Control.MOUSE_FILTER_STOP
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color.html("#f6f5f0")
-    style.set_corner_radius_all(9)
-    style.set_border_width_all(2)
-    style.border_color = Color.html("#ced4d4")
-    style.content_margin_left = 28
-    style.content_margin_right = 28
-    style.content_margin_top = 22
-    style.content_margin_bottom = 22
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#A0BCC3"), 24, 27, true)
     page.add_theme_stylebox_override("panel", style)
     center.add_child(page)
     var content := VBoxContainer.new()
@@ -216,6 +209,7 @@ func _build_ui() -> void:
     major_selector.custom_minimum_size.y = 45
     major_selector.item_selected.connect(_selected_major)
     library_panel.add_child(major_selector)
+    NUS3DUISkin.button(major_selector)
     library_details = _text("", 16)
     library_details.custom_minimum_size.y = 190
     library_panel.add_child(library_details)

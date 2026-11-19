@@ -249,7 +249,7 @@ func _font_label(text_value: String, points: int, color: String) -> Label:
 func _build_ui() -> void:
     shade = ColorRect.new()
     shade.name = "EnglishExamBackdrop"
-    shade.color = Color(0.025, 0.037, 0.057, 0.95)
+    shade.color = NUS3DUISkin.BACKDROP
     shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     shade.mouse_filter = Control.MOUSE_FILTER_STOP
     shade.visible = false
@@ -262,15 +262,7 @@ func _build_ui() -> void:
     sheet.name = "PrintedExamPaper"
     sheet.custom_minimum_size = Vector2(880.0, 625.0)
     sheet.mouse_filter = Control.MOUSE_FILTER_STOP
-    var paper_style := StyleBoxFlat.new()
-    paper_style.bg_color = Color.html("#f8f6ef")
-    paper_style.set_corner_radius_all(8)
-    paper_style.border_color = Color.html("#c3bdab")
-    paper_style.set_border_width_all(2)
-    paper_style.content_margin_left = 30
-    paper_style.content_margin_right = 30
-    paper_style.content_margin_top = 22
-    paper_style.content_margin_bottom = 22
+    var paper_style: StyleBoxFlat = NUS3DUISkin.glass(Color("#C6B592"), 23, 28, true)
     sheet.add_theme_stylebox_override("panel", paper_style)
     middle.add_child(sheet)
     var frame := VBoxContainer.new()
@@ -292,6 +284,7 @@ func _build_ui() -> void:
     paper_selector.custom_minimum_size = Vector2(750.0, 44.0)
     paper_selector.item_selected.connect(_on_paper_choice)
     library_box.add_child(paper_selector)
+    NUS3DUISkin.button(paper_selector)
     summary_label = _font_label("", 17, "#25394a")
     summary_label.custom_minimum_size.y = 160
     library_box.add_child(summary_label)
@@ -305,11 +298,13 @@ func _build_ui() -> void:
     begin_button.custom_minimum_size = Vector2(260, 44)
     begin_button.pressed.connect(_begin_selected_exam)
     library_buttons.add_child(begin_button)
+    NUS3DUISkin.button(begin_button)
     var leave_library := Button.new()
     leave_library.text = "RETURN TO CAMPUS"
     leave_library.custom_minimum_size = Vector2(200, 44)
     leave_library.pressed.connect(close_exam)
     library_buttons.add_child(leave_library)
+    NUS3DUISkin.button(leave_library)
 
     exam_box = VBoxContainer.new()
     exam_box.name = "ExamInProgress"
