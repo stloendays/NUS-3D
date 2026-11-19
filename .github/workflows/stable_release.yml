@@ -1,0 +1,197 @@
+name: Publish verified NUS-3D stable Windows release
+
+# Maintainer bumps app_version.json, merges to main, then pushes matching vMAJOR.MINOR.PATCH.
+on:
+  push:
+    # Bootstrap v0.1.0 when this workflow first lands on main.
+    # Future releases still use manually pushed SemVer tags.
+    branches: ["main"]
+    tags: ["v*.*.*"]
+    paths: [".github/workflows/stable_release.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  build-stable:
+    name: Build stable Windows package from main
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    outputs:
+      release_tag: ${{ steps.release_meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pin release version and enforce main-ancestor source commit
+        id: release_meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v$(python -c 'from tools.package_windows_build import load_release_version; print(load_release_version())')"
+          [[ "$tag" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || exit 1
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            [[ "$GITHUB_REF_NAME" == "$tag" ]] || { echo "Tag/version mismatch"; exit 1; }
+          elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            # One-time bootstrap, not automatic tagging of later feature merges.
+            [[ "$tag" == "v0.1.0" ]] || { echo "Bootstrap is only for v0.1.0"; exit 1; }
+          else
+            echo "Unexpected release trigger: $GITHUB_REF"; exit 1
+          fi
+          git fetch origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
+            echo "Refusing release commit not on main"; exit 1;
+          }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Validated official NUS-3D release $tag at $GITHUB_SHA"
+      - name: Validate offline game content and archive contract
+        run: |
+          python tools/validate_utown_data.py
+          python tools/validate_osm_reference.py
+          python tools/validate_coursework_data.py
+          python -m unittest discover -s tools -t . -v
+      - name: Install pinned Godot 4.4.1 editor
+        run: |
+          curl -fLsS --retry 4 --retry-all-errors -o /tmp/godot.zip \
+            https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+      - name: Cache Windows export template
+        id: cache-template
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot/export_templates/4.4.1.stable
+          key: godot-4.4.1-stable-windows-x86_64-template-v1
+      - name: Fetch and hash-check official template
+        if: steps.cache-template.outputs.cache-hit != 'true'
+        run: |
+          curl -fL --retry 6 --retry-all-errors --retry-delay 10 \
+            -o /tmp/godot-templates.tpz \
+            https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          echo "7a8d14ade489fd4d22f178193021fe8a876a9e51068ed4dde26dac3ae4c59a88  /tmp/godot-templates.tpz" | sha256sum -c -
+          dest="$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          mkdir -p "$dest"
+          unzip -p /tmp/godot-templates.tpz templates/version.txt > "$dest/version.txt"
+          unzip -p /tmp/godot-templates.tpz templates/windows_release_x86_64.exe > "$dest/windows_release_x86_64.exe"
+      - name: Import game and test updater version policy
+        run: |
+          godot --headless --path godot --import --quit
+          godot --headless --path godot --script res://tests/smoke_test.gd
+          godot --headless --path godot --script res://tests/auto_update_smoke_test.gd
+      - name: Export and package stable Windows binary
+        run: |
+          mkdir -p build/windows release
+          godot --headless --path godot --export-release "Windows Desktop" "$GITHUB_WORKSPACE/build/windows/NUS3D-UTown.exe"
+          python tools/package_windows_build.py \
+            --directory build/windows \
+            --output release/NUS3D-UTown-Windows-Portable.zip \
+            --commit "$GITHUB_SHA" --godot-version 4.4.1 --stable-release
+          python tools/package_windows_build.py --verify release/NUS3D-UTown-Windows-Portable.zip
+          cd release
+          sha256sum NUS3D-UTown-Windows-Portable.zip > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nus3d-stable-release-candidate
+          path: release/
+          if-no-files-found: error
+          retention-days: 7
+
+  verify-windows:
+    name: Validate actual stable package and runtime on Windows
+    needs: build-stable
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: nus3d-stable-release-candidate
+          path: release
+      - name: Validate checksum and updater helper
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $archive = (Resolve-Path "release/NUS3D-UTown-Windows-Portable.zip").Path
+          $expected = ((Get-Content "release/SHA256SUMS.txt" -Raw).Split(' ')[0]).ToLowerInvariant()
+          $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($expected -ne $actual) { throw "Stable release checksum mismatch" }
+          $version = '${{ needs.build-stable.outputs.release_tag }}'.Substring(1)
+          & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "tools/windows_updater/NUS3D-Updater.ps1" -VerifyOnly -Package $archive -ExpectedSha256 $expected -ExpectedVersion $version
+          if ($LASTEXITCODE -ne 0) { throw "Updater rejected release archive" }
+          New-Item -ItemType Directory -Path "build/run" -Force | Out-Null
+          Expand-Archive -LiteralPath $archive -DestinationPath "build/run" -Force
+          $manifest = Get-Content "build/run/BUILD_MANIFEST.json" -Raw | ConvertFrom-Json
+          if ($manifest.distribution -ne "stable, unsigned, non-official") {
+            throw "Release manifest has unexpected channel"
+          }
+      - name: Run packaged EXE/PCK self-test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $runDir = (Resolve-Path "build/run").Path
+          $exe = Join-Path $runDir "NUS3D-UTown.exe"
+          $report = (Join-Path $runDir "release-smoke.json").Replace('\','/')
+          $args = @("--headless","--","--nus3d-self-test","--nus3d-self-test-report=$report")
+          $process = Start-Process -FilePath $exe -WorkingDirectory $runDir -PassThru -ArgumentList $args
+          if (-not $process.WaitForExit(90000)) {
+            Stop-Process -Id $process.Id -Force
+            throw "Stable game self-test timed out"
+          }
+          $process.Refresh()
+          if ($process.ExitCode -ne 0 -or -not (Test-Path $report)) {
+            throw "Stable game self-test failed"
+          }
+          if ((Get-Content $report -Raw | ConvertFrom-Json).result -ne "pass") {
+            throw "Stable game assets failed integrity self-test"
+          }
+
+  publish:
+    name: Publish GitHub release only after Windows verification
+    needs: [build-stable, verify-windows]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nus3d-stable-release-candidate
+          path: release
+      - name: Publish stable version and SHA256SUMS
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -s release/NUS3D-UTown-Windows-Portable.zip
+          test -s release/SHA256SUMS.txt
+          cat > /tmp/nus3d-release-notes.txt <<'EOF'
+          Community-made NUS-3D game release (not an official NUS product).
+
+          Windows x64 portable EXE/PCK with local updater. Profile data and
+          offline game saves are not included. New stable releases are checked
+          automatically; installation is offered after explicit restart consent.
+          SHA-256 checksums and BUILD_MANIFEST.json record release provenance.
+          EOF
+          tag="${{ needs.build-stable.outputs.release_tag }}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Refusing to overwrite existing Release $tag"
+            exit 1
+          fi
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            flags=(--verify-tag)
+          else
+            if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+              echo "Refusing to re-use existing tag $tag for bootstrap"
+              exit 1
+            fi
+            flags=(--target "$GITHUB_SHA")
+          fi
+          gh release create "$tag" \
+            "release/NUS3D-UTown-Windows-Portable.zip" \
+            "release/SHA256SUMS.txt" \
+            --repo "$GITHUB_REPOSITORY" "${flags[@]}" \
+            --title "NUS-3D $tag" \
+            --notes-file /tmp/nus3d-release-notes.txt --latest

@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "version": "0.1.0",
+  "channel": "stable",
+  "repository": "stloendays/NUS-3D",
+  "asset_name": "NUS3D-UTown-Windows-Portable.zip",
+  "minimum_windows": "10",
+  "check_on_launch": true,
+  "auto_download": true
+}
