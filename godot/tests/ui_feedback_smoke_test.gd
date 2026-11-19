@@ -7,6 +7,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+    print("NUS3D_UI_STAGE_1_START")
     var sound: NUS3DUISound = root.get_node_or_null("UISound") as NUS3DUISound
     if sound == null or sound._clips.size() != 6:
         _fail("Procedural audio autoload or cached sound clips are missing")
@@ -17,13 +18,17 @@ func _run() -> void:
             _fail("Malformed procedural sound: " + kind)
             return
 
+    print("NUS3D_UI_STAGE_2_AUDIO_OK")
     var shell_scene: PackedScene = load("res://scenes/game_shell.tscn") as PackedScene
     if shell_scene == null:
         _fail("Game shell scene is unavailable")
         return
     var shell: NUS3DGameShell = shell_scene.instantiate() as NUS3DGameShell
+    print("NUS3D_UI_STAGE_3_ATTACH_SHELL")
     root.add_child(shell)
+    print("NUS3D_UI_STAGE_4_WAIT_FRAME")
     await process_frame
+    print("NUS3D_UI_STAGE_5_FRAME_READY")
     if shell.game == null or shell.ui == null or not paused or not shell.login_cover.visible:
         _fail("Login shell no longer pauses the world")
         return
@@ -41,6 +46,7 @@ func _run() -> void:
     if button_style == null or button_style.shadow_size < 3:
         _fail("Tactile button styling was not applied to the account shell")
         return
+    print("NUS3D_UI_STAGE_6_SKIN_OK")
     var tile: PanelContainer = rail._tiles["discover"] as PanelContainer
     var event: InputEventKey = InputEventKey.new()
     event.keycode = KEY_E
@@ -79,6 +85,7 @@ func _run() -> void:
         _fail("F1 help overlay did not close")
         return
 
+    print("NUS3D_UI_STAGE_7_INPUT_OK")
     hud.call("_show_toast", "UI TEST")
     var toast_card: PanelContainer = hud.get_node("FeedbackToast") as PanelContainer
     var toast_label: Label = toast_card.get_child(0) as Label
@@ -90,6 +97,7 @@ func _run() -> void:
         _fail("Restored account progress should not retain a toast")
         return
 
+    print("NUS3D_UI_STAGE_8_TOAST_OK")
     var original_sound: bool = sound.enabled
     shell._toggle_ui_sound()
     if sound.enabled == original_sound:
