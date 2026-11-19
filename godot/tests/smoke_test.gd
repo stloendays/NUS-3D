@@ -312,13 +312,13 @@ func _smoke() -> void:
         push_error("five-mode weather controller is missing")
         quit(1)
         return
-    if world.weather_reactive_materials.size() != 2:
-        push_error("plaza and walkway materials are not weather-responsive")
+    if world.weather_reactive_materials.size() != 2 or world.weather_reactive_grass.size() != 2:
+        push_error("paving and original vegetation materials are not weather-responsive")
         quit(1)
         return
     var path_material: StandardMaterial3D = world.weather_reactive_materials[1]
     var dry_roughness: float = path_material.roughness
-    if weather.puddle_nodes.size() < 4 or weather.rain_streaks == null or weather.rain_multimesh.instance_count != 220:
+    if weather.puddle_nodes.size() < 8 or weather.rain_streaks == null or weather.rain_multimesh.instance_count != 220:
         push_error("weather puddles or the deterministic rain-streak MultiMesh were not generated")
         quit(1)
         return
