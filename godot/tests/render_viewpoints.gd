@@ -380,6 +380,14 @@ func _render() -> void:
         push_error("Could not select ERC facade review")
         quit(1)
         return
+    var erc_building: Node3D = world.get_node_or_null("BuildingMassing_Estimated/ERC") as Node3D
+    if erc_building == null:
+        push_error("Original ERC building proxy was not found")
+        quit(1)
+        return
+    player.global_position = erc_building.to_global(Vector3(-9.0, 0.18, 31.0))
+    player.look_at(erc_building.to_global(Vector3(-9.0, 5.5, -1.0)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
     if not await _capture_frame(output, "M3_5_ERC_FACADE_FINISH_DAY.png"):
         push_error("Cannot capture facade material enhancements")
         quit(1)
@@ -390,6 +398,26 @@ func _render() -> void:
         await process_frame
     if not await _capture_frame(output, "M3_5_ERC_FACADE_FINISH_EVENING.png"):
         push_error("Cannot capture facade evening accent lighting")
+        quit(1)
+        return
+    count += 1
+    world.set_lighting_mode(1)
+    if not review.select_view(3):
+        push_error("Could not select SRC facade review")
+        quit(1)
+        return
+    var src_building: Node3D = world.get_node_or_null("BuildingMassing_Estimated/SRC") as Node3D
+    if src_building == null:
+        push_error("Original SRC building proxy was not found")
+        quit(1)
+        return
+    player.global_position = src_building.to_global(Vector3(-14.0, 0.18, 25.0))
+    player.look_at(src_building.to_global(Vector3(-14.0, 5.8, -21.0)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    for src_light_frame in range(16):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_SRC_FACADE_GOLDEN_HOUR.png"):
+        push_error("Cannot capture SRC facade close-up")
         quit(1)
         return
     count += 1
@@ -409,7 +437,7 @@ func _render() -> void:
         "image_count": count,
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
-        "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening"],
+        "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
