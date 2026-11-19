@@ -13,6 +13,34 @@ func _smoke() -> void:
     var instance: Node3D = scene.instantiate() as Node3D
     root.add_child(instance)
     await process_frame
+    var intro: UTownIntro = instance.get_node_or_null("Intro") as UTownIntro
+    var opening_ui: UTownCourseworkUI = instance.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if intro == null or opening_ui == null or not intro.playing or intro.key_frames.size() != 6:
+        push_error("M3.7 animated intro or first-run UI could not initialize")
+        quit(1)
+        return
+    if not intro.cinematic_camera.current or not opening_ui.intro_blocked:
+        push_error("The flyover did not take camera control or pause faculty selection")
+        quit(1)
+        return
+    intro.seek_preview(7.8)
+    if intro.current_beat != 2 or intro.cinematic_camera.global_position.length() < 1.0:
+        push_error("Intro keyframe motion or third story beat did not work")
+        quit(1)
+        return
+    intro.finish_intro()
+    if intro.playing or not intro.opening_completed or intro.overlay.visible or not intro.player.camera.current:
+        push_error("Intro did not restore the normal first-person camera")
+        quit(1)
+        return
+    if opening_ui.intro_blocked or not opening_ui.modal_visible:
+        push_error("The first-run faculty selector did not open after the flyover")
+        quit(1)
+        return
+    if intro.skip_button == null or intro.progress == null or intro.progress.max_value != intro.DURATION_S:
+        push_error("Intro skip/timeline controls were not constructed")
+        quit(1)
+        return
     var world: UTownWorld = instance.get_node_or_null("World") as UTownWorld
     var player: CharacterBody3D = instance.get_node_or_null("Player") as CharacterBody3D
     if world == null or player == null:
