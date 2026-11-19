@@ -1,0 +1,621 @@
+{
+  "schema_version": 1,
+  "title": "NUS-3D Kent Ridge playable campus extension",
+  "status": "Game-only schematic; georeferenced anchors are indicative and not surveyed. NOT a campus navigator, official bus schedule, or NUS-approved 3D model.",
+  "sources": {
+    "official_map": "https://map.nus.edu.sg/",
+    "kent_ridge_campus_map": "https://map.nus.edu.sg/download/Kent-Ridge-Campus-Map.pdf",
+    "bus_network_effective_2026_01_05": "https://uci.nus.edu.sg/campus-life/campus-services/transportation/internal-shuttle-bus/",
+    "note": "2026 route names (D1/D2) are verified from UCI. In-game station choices and shortcut trips are intentionally simplified rather than accurate stop-by-stop route directions."
+  },
+  "districts": [
+    {
+      "id": "MUSEUM",
+      "name": "NUS Museum & UCC",
+      "lon": 103.77175,
+      "lat": 1.30242,
+      "size": [
+        180,
+        150
+      ],
+      "accent": "#88c0d0",
+      "joke": "The art exhibition is judging your GPA.",
+      "landmarks": [
+        {
+          "name": "NUS Museum",
+          "offset": [
+            -37,
+            17
+          ],
+          "size": [
+            35,
+            28,
+            16
+          ]
+        },
+        {
+          "name": "University Cultural Centre",
+          "offset": [
+            42,
+            22
+          ],
+          "size": [
+            44,
+            27,
+            17
+          ]
+        },
+        {
+          "name": "Conservatory Studio",
+          "offset": [
+            -4,
+            -43
+          ],
+          "size": [
+            32,
+            25,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGINEERING",
+      "name": "College of Design & Engineering",
+      "lon": 103.77085,
+      "lat": 1.29942,
+      "size": [
+        210,
+        175
+      ],
+      "accent": "#d5b58e",
+      "joke": "The printer has unionised against your deadlines.",
+      "landmarks": [
+        {
+          "name": "Engineering E1/E2",
+          "offset": [
+            -52,
+            19
+          ],
+          "size": [
+            43,
+            36,
+            21
+          ]
+        },
+        {
+          "name": "Engineering E3/E4",
+          "offset": [
+            44,
+            27
+          ],
+          "size": [
+            43,
+            34,
+            19
+          ]
+        },
+        {
+          "name": "Techno Edge",
+          "offset": [
+            -6,
+            -49
+          ],
+          "size": [
+            51,
+            23,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "id": "YIH",
+      "name": "Yusof Ishak House",
+      "lon": 103.7748909,
+      "lat": 1.298660133,
+      "size": [
+        140,
+        130
+      ],
+      "accent": "#adbd92",
+      "joke": "Your club meeting has become another group project.",
+      "landmarks": [
+        {
+          "name": "Yusof Ishak House",
+          "offset": [
+            -35,
+            24
+          ],
+          "size": [
+            38,
+            34,
+            14
+          ]
+        },
+        {
+          "name": "Campus Commons",
+          "offset": [
+            42,
+            -28
+          ],
+          "size": [
+            35,
+            22,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CLB",
+      "name": "Central Library & FASS",
+      "lon": 103.7730289,
+      "lat": 1.296261755,
+      "size": [
+        195,
+        165
+      ],
+      "accent": "#e5c48e",
+      "joke": "The last study room has just been booked.",
+      "landmarks": [
+        {
+          "name": "Central Library",
+          "offset": [
+            -43,
+            25
+          ],
+          "size": [
+            49,
+            40,
+            22
+          ]
+        },
+        {
+          "name": "Arts & Social Sciences",
+          "offset": [
+            43,
+            27
+          ],
+          "size": [
+            48,
+            30,
+            19
+          ]
+        },
+        {
+          "name": "Library Courtyard",
+          "offset": [
+            8,
+            -45
+          ],
+          "size": [
+            29,
+            16,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "COM3",
+      "name": "School of Computing",
+      "lon": 103.77478,
+      "lat": 1.29462,
+      "size": [
+        155,
+        145
+      ],
+      "accent": "#aeb0ec",
+      "joke": "COM3 has compiled an entirely new class of stress.",
+      "landmarks": [
+        {
+          "name": "COM3 / Computing",
+          "offset": [
+            -37,
+            27
+          ],
+          "size": [
+            46,
+            35,
+            27
+          ]
+        },
+        {
+          "name": "COM Innovation Block",
+          "offset": [
+            43,
+            -21
+          ],
+          "size": [
+            40,
+            32,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BIZ2",
+      "name": "NUS Business School",
+      "lon": 103.7749,
+      "lat": 1.29293,
+      "size": [
+        155,
+        140
+      ],
+      "accent": "#d7b89e",
+      "joke": "Market risk: buying a 7-dollar campus coffee.",
+      "landmarks": [
+        {
+          "name": "Business School BIZ2",
+          "offset": [
+            -37,
+            24
+          ],
+          "size": [
+            44,
+            34,
+            21
+          ]
+        },
+        {
+          "name": "Hon Sui Sen Centre",
+          "offset": [
+            44,
+            -25
+          ],
+          "size": [
+            37,
+            32,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UHC",
+      "name": "University Health Centre",
+      "lon": 103.7764982,
+      "lat": 1.298943865,
+      "size": [
+        150,
+        135
+      ],
+      "accent": "#94d4b7",
+      "joke": "Appointment available after the next semester.",
+      "landmarks": [
+        {
+          "name": "University Health Centre",
+          "offset": [
+            -32,
+            24
+          ],
+          "size": [
+            42,
+            34,
+            17
+          ]
+        },
+        {
+          "name": "University Hall",
+          "offset": [
+            43,
+            -24
+          ],
+          "size": [
+            38,
+            27,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SCIENCE",
+      "name": "Faculty of Science S16",
+      "lon": 103.78026,
+      "lat": 1.29682,
+      "size": [
+        185,
+        175
+      ],
+      "accent": "#9ed6b3",
+      "joke": "Lab report due in negative 12 minutes.",
+      "landmarks": [
+        {
+          "name": "S16 Science Building",
+          "offset": [
+            -43,
+            21
+          ],
+          "size": [
+            43,
+            38,
+            24
+          ]
+        },
+        {
+          "name": "Frontier Food Court",
+          "offset": [
+            43,
+            28
+          ],
+          "size": [
+            43,
+            27,
+            12
+          ]
+        },
+        {
+          "name": "Science S7 / S8",
+          "offset": [
+            3,
+            -43
+          ],
+          "size": [
+            43,
+            30,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "id": "KR_MRT",
+      "name": "Kent Ridge MRT & NUH",
+      "lon": 103.78392,
+      "lat": 1.29372,
+      "size": [
+        180,
+        155
+      ],
+      "accent": "#a8cfe2",
+      "joke": "You have finally reached public transport. DDL followed you.",
+      "landmarks": [
+        {
+          "name": "Kent Ridge MRT Exit",
+          "offset": [
+            -33,
+            24
+          ],
+          "size": [
+            30,
+            20,
+            9
+          ]
+        },
+        {
+          "name": "NUH Medical Centre",
+          "offset": [
+            45,
+            25
+          ],
+          "size": [
+            52,
+            41,
+            26
+          ]
+        },
+        {
+          "name": "Kent Ridge Piazza",
+          "offset": [
+            0,
+            -40
+          ],
+          "size": [
+            41,
+            22,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PGP",
+      "name": "Prince George's Park",
+      "lon": 103.78118,
+      "lat": 1.29078,
+      "size": [
+        185,
+        150
+      ],
+      "accent": "#cebb9a",
+      "joke": "Your residence has 200 doors and zero free laundry machines.",
+      "landmarks": [
+        {
+          "name": "PGP Residences",
+          "offset": [
+            -47,
+            23
+          ],
+          "size": [
+            40,
+            34,
+            25
+          ]
+        },
+        {
+          "name": "PGP House",
+          "offset": [
+            43,
+            25
+          ],
+          "size": [
+            39,
+            31,
+            17
+          ]
+        },
+        {
+          "name": "King Edward Hall",
+          "offset": [
+            0,
+            -45
+          ],
+          "size": [
+            43,
+            26,
+            14
+          ]
+        }
+      ]
+    }
+  ],
+  "stops": [
+    {
+      "id": "UTOWN",
+      "district": "UTOWN",
+      "name": "UTown / Town Plaza",
+      "lon": 103.77395,
+      "lat": 1.30434,
+      "tagline": "Start your inter-campus escape from the deadline."
+    },
+    {
+      "id": "MUSEUM",
+      "district": "MUSEUM",
+      "name": "Museum / UCC",
+      "lon": 103.77175,
+      "lat": 1.30242,
+      "tagline": "Art appreciation counts as procrastination."
+    },
+    {
+      "id": "ENGINEERING",
+      "district": "ENGINEERING",
+      "name": "Engineering / IT",
+      "lon": 103.77085,
+      "lat": 1.29942,
+      "tagline": "Engineering Drive: a design submission in progress."
+    },
+    {
+      "id": "YIH",
+      "district": "YIH",
+      "name": "Yusof Ishak House",
+      "lon": 103.7748909,
+      "lat": 1.298660133,
+      "tagline": "Find a seat before your group takes it."
+    },
+    {
+      "id": "CLB",
+      "district": "CLB",
+      "name": "Central Library",
+      "lon": 103.7730289,
+      "lat": 1.296261755,
+      "tagline": "Silence: everyone is panic-studying."
+    },
+    {
+      "id": "COM3",
+      "district": "COM3",
+      "name": "COM3 / Computing",
+      "lon": 103.77478,
+      "lat": 1.29462,
+      "tagline": "Compilation failed: sleep not found."
+    },
+    {
+      "id": "BIZ2",
+      "district": "BIZ2",
+      "name": "BIZ2 / Business",
+      "lon": 103.7749,
+      "lat": 1.29293,
+      "tagline": "Your GPA needs a bullish quarter."
+    },
+    {
+      "id": "UHC",
+      "district": "UHC",
+      "name": "UHC / University Hall",
+      "lon": 103.7764982,
+      "lat": 1.298943865,
+      "tagline": "Campus wellness has entered the chat."
+    },
+    {
+      "id": "SCIENCE",
+      "district": "SCIENCE",
+      "name": "Science / LT27",
+      "lon": 103.78026,
+      "lat": 1.29682,
+      "tagline": "You can smell the chromatography deadlines."
+    },
+    {
+      "id": "KR_MRT",
+      "district": "KR_MRT",
+      "name": "Kent Ridge MRT",
+      "lon": 103.78392,
+      "lat": 1.29372,
+      "tagline": "The train is faster than your dissertation."
+    },
+    {
+      "id": "PGP",
+      "district": "PGP",
+      "name": "PGP Residences",
+      "lon": 103.78118,
+      "lat": 1.29078,
+      "tagline": "Dormitory side-quests never end."
+    }
+  ],
+  "routes": {
+    "D1": [
+      "COM3",
+      "BIZ2",
+      "CLB",
+      "ENGINEERING",
+      "YIH",
+      "MUSEUM",
+      "UTOWN"
+    ],
+    "D2": [
+      "COM3",
+      "PGP",
+      "KR_MRT",
+      "SCIENCE",
+      "UHC",
+      "MUSEUM",
+      "UTOWN"
+    ]
+  },
+  "walk_connections": [
+    [
+      "UTOWN",
+      "MUSEUM"
+    ],
+    [
+      "MUSEUM",
+      "ENGINEERING"
+    ],
+    [
+      "ENGINEERING",
+      "YIH"
+    ],
+    [
+      "YIH",
+      "CLB"
+    ],
+    [
+      "CLB",
+      "COM3"
+    ],
+    [
+      "COM3",
+      "BIZ2"
+    ],
+    [
+      "MUSEUM",
+      "UHC"
+    ],
+    [
+      "UHC",
+      "SCIENCE"
+    ],
+    [
+      "SCIENCE",
+      "KR_MRT"
+    ],
+    [
+      "KR_MRT",
+      "PGP"
+    ],
+    [
+      "PGP",
+      "BIZ2"
+    ]
+  ]
+}
