@@ -22,7 +22,7 @@ var texture_cache: Dictionary = {}
 var cluster_count: int = 0
 var backdrop_count: int = 0
 var scrap_count: int = 0
-var placard_count: int = 0
+var placard_count: int = 0 # Retained for diagnostics: no waypoint billboards remain
 var shrub_count: int = 0
 var bloom_count: int = 0
 
@@ -34,7 +34,6 @@ func _ready() -> void:
         texture_cache[key] = load(MATERIAL_TEXTURES[key]) as Texture2D
     _build_path_details()
     _build_verge_details()
-    _build_story_signs()
     _build_distant_fictional_skyline()
 
 func _mat(color_hex: String, texture_key: String = "") -> StandardMaterial3D:
@@ -66,17 +65,6 @@ func _box(parent: Node3D, part_name: String, offset: Vector3, dims: Vector3, hex
     item.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
     parent.add_child(item)
     return item
-
-func _caption(parent: Node3D, text_value: String, at: Vector3, color_hex: String) -> void:
-    var text_node := Label3D.new()
-    text_node.text = text_value
-    text_node.position = at
-    text_node.font_size = 26
-    text_node.pixel_size = 0.015
-    text_node.outline_size = 6
-    text_node.modulate = Color.html(color_hex)
-    text_node.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    parent.add_child(text_node)
 
 func _clear_position(candidate: Vector3) -> bool:
     if not world.is_tree_position_clear(Vector2(candidate.x, candidate.z), 1.5):
@@ -147,12 +135,10 @@ func _street_prop(parent: Node3D, variant: int) -> void:
             _box(parent, "NoticePole", Vector3(0, 0.9, 0), Vector3(0.14, 1.8, 0.14), "#536274")
             _box(parent, "NoticeBoard", Vector3(0, 1.7, 0), Vector3(1.65, 1.13, 0.14), "#fff8e9", "poster")
             _box(parent, "Handout", Vector3(-0.26, 1.65, -0.09), Vector3(0.65, 0.86, 0.025), "#ffffff", "paper")
-            _caption(parent, ["DUE YESTERDAY", "PANIC CLUB", "NO MORE SLEEP"][cluster_count % 3], Vector3(0, 2.56, 0), "#fff0b9")
         2:
             _box(parent, "SnackMachine", Vector3(0, 1.1, 0), Vector3(1.18, 2.2, 0.75), "#e6eef3", "tile")
             _box(parent, "SnackWindow", Vector3(-0.13, 1.4, -0.39), Vector3(0.70, 1.15, 0.04), "#fffaf5", "poster")
             _box(parent, "Button", Vector3(0.40, 1.08, -0.40), Vector3(0.13, 0.27, 0.025), "#f0d175")
-            _caption(parent, "COFFEE +99", Vector3(0, 2.52, 0), "#ffde8d")
         3:
             _box(parent, "Planter", Vector3(0, 0.37, 0), Vector3(1.30, 0.74, 1.15), "#ffffff", "brick")
             for i in range(3):
@@ -162,7 +148,6 @@ func _street_prop(parent: Node3D, variant: int) -> void:
             _box(parent, "RecyclingBin", Vector3(0, 0.68, 0), Vector3(0.77, 1.36, 0.77), "#dceaf4", "tile")
             _box(parent, "Rim", Vector3(0, 1.40, 0), Vector3(0.84, 0.11, 0.84), "#fbd88b")
             _box(parent, "LostPen", Vector3(0.65, 0.12, -0.25), Vector3(0.09, 0.08, 0.92), "#fa7884")
-            _caption(parent, "RECYCLE EXCUSES", Vector3(0, 1.88, 0), "#fff6c9")
 
 func _paper_scraps(root: Node3D, transforms: Array[Transform3D], tints: Array[Color]) -> void:
     var scrap_mesh := BoxMesh.new()
@@ -270,21 +255,6 @@ func _build_verge_details() -> void:
         bloom_batch.set_instance_color(i, Color.html(["#fadd78", "#ffb88a", "#ffc9d4"][i % 3]))
     bloom_count = flowers.size()
 
-func _build_story_signs() -> void:
-    var labels := PackedStringArray(["YOUR LAST BRAIN CELL", "ACADEMIC APOCALYPSE", "COFFEE EMERGENCY", "UPLOAD OR PERISH"])
-    var points: Array = world.layout.get("loop", [])
-    for i in range(mini(4, points.size())):
-        var point: Dictionary = points[i]
-        var root := Node3D.new()
-        root.name = "ComicalBanner_%d" % i
-        root.position = world.lonlat_to_world(float(point["lon"]), float(point["lat"])) + Vector3(7.0, 0, 7.0)
-        add_child(root)
-        _box(root, "LeftPole", Vector3(-2, 1.8, 0), Vector3(0.16, 3.6, 0.16), "#647184")
-        _box(root, "RightPole", Vector3(2, 1.8, 0), Vector3(0.16, 3.6, 0.16), "#647184")
-        _box(root, "Canvas", Vector3(0, 3.40, 0), Vector3(4.32, 1.02, 0.20), "#ffffff", "poster")
-        _caption(root, labels[i], Vector3(0, 3.48, -0.18), "#313a53")
-        placard_count += 1
-
 func _build_distant_fictional_skyline() -> void:
     # Props are game fiction, NOT a representation of surrounding real NUS blocks.
     var backdrop := Node3D.new()
@@ -305,5 +275,4 @@ func _build_distant_fictional_skyline() -> void:
         _box(building, "Roof", Vector3(0, height_m + 0.27, 0), Vector3(width_m + 0.8, 0.54, 9.0), "#647590")
         _box(building, "ComicNeon", Vector3(0, height_m - 2.0, -4.35), Vector3(width_m - 1.8, 0.36, 0.16), "#ffcf81")
         if i % 3 == 0:
-            _caption(building, slogans[i / 3], Vector3(0, height_m + 1.9, -4.3), "#fff1b0")
         backdrop_count += 1

@@ -45,3 +45,8 @@ For visual QA, `godot/tests/render_viewpoints.gd` now adds **eleven M3.7 real-en
 ## Integration discipline
 
 M3.7 was branched from `feature/m3-5-campus-slapstick-20261119` instead of modifying active M3.6, M5 or M6 branches. Changes to existing files are confined to the weather cloud-image subscene, two new children and title/help copy in `main.tscn`, comedy labeling in the existing HUD and `project.godot`, and a CI test step. Gameplay systems and existing save schemas stay isolated.
+
+
+## M3.8 guidance redesign
+
+Persistent roof labels, waypoint spheres, roadside joke banners and hovering collectible text have been removed. The remaining logical waypoint coordinates are used by the existing map, tour and shuttle. A short P-key UI compass ping and a near-object H interaction prompt replace permanent route signage for DDL. The four oversized fictional task props remain in the world as objects, not directional signboards. F1 reveals the full control list on demand; F7 hides HUD-only navigation without removing scenery. A compass ping gives direct bearing, not a collision-aware or real NUS navigation route.

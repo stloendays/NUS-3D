@@ -71,8 +71,8 @@ func _smoke() -> void:
     if decor.texture_cache.size() != 4 or decor.cluster_count < 6 or decor.cluster_count > decor.MAX_CLUSTERS:
         _fail("four reusable textures or expected bounded props missing")
         return
-    if decor.backdrop_count != decor.BACKDROP_CAPACITY or decor.placard_count != 4:
-        _fail("distant skyline or comic waypoint signs missing")
+    if decor.backdrop_count != decor.BACKDROP_CAPACITY or decor.placard_count != 0:
+        _fail("skyline missing or legacy guide banners were reintroduced")
         return
     if decor.scrap_count > decor.SCRAP_CAPACITY or decor.scrap_count <= 0:
         _fail("decorative paper batching is not bounded")

@@ -186,3 +186,8 @@ This experimental branch turns the original approximate UTown into an exaggerate
 The playable four-act **DDL DOOM** quest starts near Town Green with **H** and continues to ERC, SRC and Town Plaza. A five-minute in-game timer, local retry/best-time save and first-time-only +80 XP reward are separate from other systems. The countdown and target distance are displayed in a larger HUD card with critical-time color warning, four independently built oversized task props (mail, printer, giant coffee, upload console) and a subtle objective pulse. **F7** photo mode hides the overlay and world markers.
 
 [Art, story, controls, evidence and safety limitations](docs/M3_7_DDL_DOOM_AND_STATIC_SKY.md). Linux Godot CI now tests cloud-texture loading, material tiling, decoration resource caps, mission persistence/replay and includes eleven original new-gameplay screenshot viewpoints. Visual performance still needs a Windows GPU check. This branch intentionally remains separate from M5/M6 account, language and interface branches until integration review.
+
+
+### M3.8: restrained mission navigation
+
+The permanent airborne campus labels, waypoint spheres, joke banner signposts and hovering collectible labels have been removed. DDL guidance uses a small objective tracker and minimap: **P** shows a temporary screen-space compass, while **H** only appears close to the interactive object. **F1** reveals controls on demand. Fictional game mapping is not for real-world directions.

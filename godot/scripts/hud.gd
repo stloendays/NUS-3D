@@ -24,7 +24,7 @@ extends CanvasLayer
 @onready var campus_card: PanelContainer = $CampusCard
 @onready var campus_message: Label = $CampusCard/Message
 
-var show_full_help: bool = true
+var show_full_help: bool = false
 var gis_metric_count: int = 0
 const FIT_BASELINE_PATH: String = "res://data/osm_fit_baseline.json"
 
@@ -83,6 +83,7 @@ func _ready() -> void:
     campus_card.add_theme_stylebox_override("panel", campus_style)
     campus_message.add_theme_color_override("font_color", Color.html("#edf3ef"))
     campus_message.add_theme_font_size_override("font_size", 13)
+    help_label.visible = false
     _load_osm_fit_summary()
 
 func _load_osm_fit_summary() -> void:
@@ -115,7 +116,7 @@ func _load_osm_fit_summary() -> void:
 
 func _process(_delta: float) -> void:
     gis_card.visible = world.osm_reference_visible and gis_metric_count == 2
-    hint_label.text = "COMEDY ARCADE  |  M2 %s [F2] | %s [T] | OSM %s [F6] | Notes [C] | Sprint [V] | DDL [H]" % ["ON" if world.m2_details_visible else "OFF", world.lighting_name(), "ON" if world.osm_reference_visible else "OFF"]
+    hint_label.text = "UTown  /  [P] Focus  /  [M] Map  /  [F1] Controls"
     if tour.completed:
         target_label.text = "Tour complete  |  %d/%d stops  [G replay]" % [tour.discovered_ids.size(), tour.stops.size()]
     elif not tour.current_stop().is_empty():

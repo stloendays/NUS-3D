@@ -120,16 +120,6 @@ func _make_item_marker(item_id: String) -> Node3D:
     ring.material_override = ring_material
     root.add_child(ring)
 
-    var label: Label3D = Label3D.new()
-    label.text = "FIELD NOTE"
-    label.font_size = 24
-    label.pixel_size = 0.012
-    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    label.no_depth_test = true
-    label.modulate = Color.html("#e7fff7")
-    label.outline_size = 5
-    label.position = Vector3(0.0, 0.95, 0.0)
-    root.add_child(label)
     return root
 
 func _build_sprint_route() -> void:
@@ -197,7 +187,7 @@ func can_collect_nearest() -> bool:
 func try_collect_nearest() -> bool:
     var index: int = nearest_item_index()
     if index < 0:
-        feedback_message = "No Field Note in reach. Look for a glowing marker."
+        feedback_message = "No scattered note nearby. Look for a small green-glowing collectible."
         feedback_remaining = 2.0
         return false
     var item: Dictionary = items[index]
