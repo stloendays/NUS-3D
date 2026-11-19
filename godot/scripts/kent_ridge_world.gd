@@ -396,6 +396,17 @@ func _build_sports_ground() -> void:
             _box(root_node, "FloodlightPole", Vector3(side * 83.0, 7.0, z), Vector3(0.42, 14.0, 0.42), "#a6b3b2")
             _box(root_node, "Floodlight", Vector3(side * 83.0, 14.2, z), Vector3(3.6, 1.1, 0.65), "#e8e6cf")
     _label(root_node, "CAMPUS SPORTS FIELD", Vector3(0, 5.2, -51), "#fff3db", 25)
+    var ball: MeshInstance3D = MeshInstance3D.new()
+    ball.name = "PracticeBall"
+    var ball_mesh: SphereMesh = SphereMesh.new()
+    ball_mesh.radius = 0.36
+    ball_mesh.height = 0.72
+    ball.mesh = ball_mesh
+    ball.position = Vector3(-6.0, 0.9, 0.0)
+    ball.material_override = _material("#f1eee0")
+    root_node.add_child(ball)
+    _build_sports_npcs(root_node)
+    _build_canteen_terrace()
 
 
 func _build_campus_edge() -> void:
@@ -443,3 +454,83 @@ func _build_campus_edge() -> void:
         _box(edge, "FarRidge", Vector3(center.x + side * (half_x + 35.0), 4.5, center.z), Vector3(65.0, 9.0, shape.size.z + 180.0), "#668467")
     for side in [-1.0, 1.0]:
         _box(edge, "FarRidge", Vector3(center.x, 4.5, center.z + side * (half_z + 35.0)), Vector3(shape.size.x + 180.0, 9.0, 65.0), "#668467")
+
+
+func _build_canteen_terrace() -> void:
+    var science: Dictionary = {}
+    for district in districts:
+        if str(district["id"]) == "SCIENCE":
+            science = district
+            break
+    if science.is_empty():
+        return
+    var terrace: Node3D = Node3D.new()
+    terrace.name = "FrontierCanteenTerrace"
+    terrace.position = science["position"] + Vector3(43.0, 0.0, -28.0)
+    add_child(terrace)
+    _box(terrace, "TerracePaving", Vector3(0, 0.09, 0), Vector3(55, 0.18, 42), "#c6c1ad")
+    _box(terrace, "Awning", Vector3(0, 4.2, 0), Vector3(48, 0.48, 27), "#e0d4bb")
+    for x in [-21.0, 21.0]:
+        for z in [-11.0, 11.0]:
+            _box(terrace, "AwningPost", Vector3(x, 2.1, z), Vector3(0.35, 4.2, 0.35), "#c8c2b4")
+    for row in range(3):
+        for col in range(4):
+            var x: float = -17.0 + float(col) * 11.0
+            var z: float = -7.0 + float(row) * 8.0
+            _box(terrace, "DiningTable", Vector3(x, 1.1, z), Vector3(4.0, 0.18, 2.5), "#a77c55")
+            for side in [-1.0, 1.0]:
+                _box(terrace, "DiningBench", Vector3(x, 0.55, z + side * 2.2), Vector3(3.7, 0.42, 0.55), "#6b776d")
+    for x in [-25.0, 25.0]:
+        _box(terrace, "Planter", Vector3(x, 0.45, 17.0), Vector3(3.2, 0.9, 3.2), "#9d8c70")
+        var plant: MeshInstance3D = MeshInstance3D.new()
+        var foliage: SphereMesh = SphereMesh.new()
+        foliage.radius = 1.8
+        foliage.height = 3.6
+        plant.mesh = foliage
+        plant.position = Vector3(x, 2.5, 17.0)
+        plant.material_override = _material("#5f936a")
+        terrace.add_child(plant)
+    _label(terrace, "FRONTIER CANTEEN", Vector3(0, 5.6, -15.0), "#fff0c8", 23)
+    for i in range(3):
+        var npc: Node3D = _make_campus_npc("CanteenStudent_%d" % i, Vector3(-12.0 + float(i) * 12.0, 0.0, 15.0), ["#d58a6d", "#7999b8", "#b7a074"][i])
+        terrace.add_child(npc)
+
+
+func _make_campus_npc(npc_name: String, at: Vector3, shirt: String) -> Node3D:
+    var person: Node3D = Node3D.new()
+    person.name = npc_name
+    person.position = at
+    var torso: MeshInstance3D = MeshInstance3D.new()
+    var capsule: CapsuleMesh = CapsuleMesh.new()
+    capsule.radius = 0.34
+    capsule.height = 1.0
+    torso.mesh = capsule
+    torso.position.y = 0.98
+    torso.material_override = _material(shirt)
+    person.add_child(torso)
+    var head: MeshInstance3D = MeshInstance3D.new()
+    var sphere: SphereMesh = SphereMesh.new()
+    sphere.radius = 0.25
+    head.mesh = sphere
+    head.position.y = 1.68
+    head.material_override = _material("#d7ad8d")
+    person.add_child(head)
+    var bag: MeshInstance3D = MeshInstance3D.new()
+    var bag_mesh: BoxMesh = BoxMesh.new()
+    bag_mesh.size = Vector3(0.5, 0.7, 0.22)
+    bag.mesh = bag_mesh
+    bag.position = Vector3(0.38, 1.0, 0.15)
+    bag.material_override = _material("#394c56")
+    person.add_child(bag)
+    return person
+
+
+func _build_sports_npcs(parent: Node3D) -> void:
+    for i in range(4):
+        var x: float = -26.0 + float(i) * 17.0
+        var z: float = -38.0 if i % 2 == 0 else 38.0
+        var npc: Node3D = _make_campus_npc("SportsStudent_%d" % i, Vector3(x, 0.0, z), ["#d58a6d", "#7999b8", "#b7a074", "#7da88c"][i])
+        parent.add_child(npc)
+    for x in [-57.0, 57.0]:
+        _box(parent, "WaterStation", Vector3(x, 1.1, 0.0), Vector3(1.8, 2.2, 1.5), "#77a8aa")
+        _box(parent, "Bench", Vector3(x, 0.55, 12.0), Vector3(4.5, 0.5, 1.2), "#9b8668")
