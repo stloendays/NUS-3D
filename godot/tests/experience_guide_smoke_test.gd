@@ -84,6 +84,17 @@ func _run() -> void:
     if str(delivery_goal.get("id", "")) != "lunch" or delivery_goal.get("position") != coins.delivery_destination:
         _fail("Active lunch delivery should replace the tour compass target")
         return
+    coins.delivery_time = 10.0
+    player.global_position = coins.delivery_origin + Vector3(0.0, 0.18, 0.0)
+    guide._update_goal(guide._goal_offer())
+    if not guide.objective_detail.text.begins_with("HURRY!"):
+        _fail("Lunch deadline warning should appear when time is low")
+        return
+    player.global_position = coins.delivery_destination + Vector3(0.0, 0.18, 0.0)
+    guide._update_goal(guide._goal_offer())
+    if guide.objective_arrow.text != "✓" or not guide.objective_detail.text.begins_with("IN RANGE"):
+        _fail("Compass should switch to arrival state within the finish radius")
+        return
     coins.delivery_active = false
 
     # Interior exploration must never point to an outdoor waypoint.
