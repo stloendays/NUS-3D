@@ -8,6 +8,8 @@ extends CanvasLayer
 @onready var challenge: UTownChallenge = $"../Challenge"
 @onready var weather: UTownWeather = $"../Weather"
 @onready var campus_life: UTownCampusLife = $"../CampusLife"
+@onready var coursework: UTownCoursework = $"../Coursework"
+@onready var coursework_ui: UTownCourseworkUI = $"../CourseworkUI"
 @onready var title_label: Label = $Info/VBox/Title
 @onready var hint_label: Label = $Info/VBox/Hint
 @onready var target_label: Label = $Info/VBox/Target
@@ -145,3 +147,5 @@ func _unhandled_input(event: InputEvent) -> void:
             visible = not visible
             world.set_navigation_markers_visible(visible)
             challenge.set_markers_visible(visible)
+            coursework.set_markers_visible(visible)
+            coursework_ui.set_hud_enabled(visible)
