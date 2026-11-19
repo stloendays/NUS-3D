@@ -100,11 +100,31 @@ func _smoke() -> void:
     if story.stage_points.size() != 4 or not story.enabled or story.countdown_label == null:
         _fail("four approximate campus checkpoints or enlarged timer display missing")
         return
+    if story.stage_roots.size() != 4:
+        _fail("all four DDL checkpoint art groups must exist")
+        return
+    for idx in range(4):
+        var checkpoint: Node3D = story.stage_roots[idx]
+        var prop: Node3D = checkpoint.get_node_or_null("ComicTaskProp_%d" % idx) as Node3D
+        if prop == null or prop.get_child_count() < 4:
+            _fail("missing giant cartoon mission prop at stage " + str(idx))
+            return
+        if checkpoint.find_children("*", "CollisionShape3D", true, false).size() > 0:
+            _fail("new quest props should never obstruct the shuttle or existing walkway")
+            return
+    story._process(0.25)
+    if not story.stage_roots[0].visible or story.stage_roots[1].visible:
+        _fail("only the next DDL stage must be marked on the map")
+        return
     story.save_path = "user://ddl-m37-test-%d.cfg" % Time.get_ticks_usec()
     story.load_progress()
     player.global_position = story.stage_points[0] + Vector3(0, 0.18, 0)
     if story.interact() != true or story.stage != 1 or not story.running:
         _fail("Town Green email should start a DDL countdown")
+        return
+    story._refresh()
+    if not story.display_label.text.contains("m") or not story.countdown_label.text.contains("05:00"):
+        _fail("mission target distance or legible clock is missing from HUD")
         return
     var remaining: float = story.deadline_left
     story._process(2.0)
