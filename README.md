@@ -181,11 +181,11 @@ See [M3.5 gameplay and QA contract](docs/M3_5_MATERIALS_INDOOR_LIFE.md); this re
 
 ## M3.7: DDL DOOM — comic campus and fixed illustrated sky (feature branch)
 
-This experimental branch turns the original approximate UTown into an exaggerated fictional campus game, not an official map. Three original SVG cloud textures form 33 stationary (camera-following, non-rotating) sprites and switch with **Y** weather presets; color/brightness also responds to time of day. Original tileable grass/paver SVG materials, 56-max reused small street furniture groups, bounded shrub/flower MultiMeshes, paper scraps, four joke signs and 12 **fictional** skyline silhouettes reduce empty space without adding physics blockers.
+This experimental branch turns the original approximate UTown into an exaggerated fictional campus game, not an official map. Three original SVG cloud textures form 33 stationary (camera-following, non-rotating) sprites and switch with **Y** weather presets; color/brightness also responds to time of day. Original tileable grass/paver SVG materials, 56-max reused small street furniture groups, bounded shrub/flower MultiMeshes, paper scraps, and 12 **fictional** skyline silhouettes reduce empty space without adding physics blockers.
 
 The playable four-act **DDL DOOM** quest starts near Town Green with **H** and continues to ERC, SRC and Town Plaza. A five-minute in-game timer, local retry/best-time save and first-time-only +80 XP reward are separate from other systems. The countdown and target distance are displayed in a larger HUD card with critical-time color warning, four independently built oversized task props (mail, printer, giant coffee, upload console) and a subtle objective pulse. **F7** photo mode hides the overlay and world markers.
 
-[Art, story, controls, evidence and safety limitations](docs/M3_7_DDL_DOOM_AND_STATIC_SKY.md). Linux Godot CI now tests cloud-texture loading, material tiling, decoration resource caps, mission persistence/replay and includes eleven original new-gameplay screenshot viewpoints. Visual performance still needs a Windows GPU check. This branch intentionally remains separate from M5/M6 account, language and interface branches until integration review.
+[Art, story, controls, evidence and safety limitations](docs/M3_7_DDL_DOOM_AND_STATIC_SKY.md). Linux Godot CI now tests cloud-texture loading, material tiling, decoration resource caps, mission persistence/replay and includes thirteen original M3.7–M3.8 game screenshot viewpoints. Visual performance still needs a Windows GPU check. This branch intentionally remains separate from M5/M6 account, language and interface branches until integration review.
 
 
 ### M3.8: restrained mission navigation

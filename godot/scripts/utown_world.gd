@@ -234,14 +234,12 @@ func _build_buildings() -> void:
         root.add_child(group)
         var wall: Material = _building_color(str(record.get("role", "")))
         var priority: String = str(record.get("priority", "P1"))
-        var max_height: float = 0.0
         for piece in record.get("parts", []):
             var dx: float = float(piece.get("dx", 0.0))
             var north: float = float(piece.get("dn", 0.0))
             var w: float = float(piece.get("w", 24.0))
             var d: float = float(piece.get("d", 24.0))
             var h: float = float(piece.get("h", 15.0))
-            max_height = maxf(max_height, h)
             var z: float = -north
             _add_box(group, Vector3(dx, h / 2.0, z), Vector3(w, h, d), wall, true)
             _add_box(group, Vector3(dx, h + 0.24, z), Vector3(w + 0.65, 0.48, d + 0.65), roof)

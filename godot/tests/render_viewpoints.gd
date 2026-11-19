@@ -510,6 +510,30 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    if not ddl_story.request_focus():
+        push_error("Cannot activate temporary P compass for navigation screenshot")
+        quit(1)
+        return
+    ddl_story._process(0.15)
+    if not await _capture_frame(output, "M3_8_TEMPORARY_COMPASS_FOCUS.png"):
+        push_error("Cannot capture temporary 2D compass pulse")
+        quit(1)
+        return
+    count += 1
+    # The same real world from a clean camera, no 3-D text or path beacon clutter.
+    ddl_story.ping_remaining = 0.0
+    hud.visible = false
+    if not review.select_view(0):
+        push_error("Cannot select clean-campus screenshot viewpoint")
+        quit(1)
+        return
+    for clean_frame in range(8):
+        await process_frame
+    if not await _capture_frame(output, "M3_8_CLEAN_CAMPUS_NO_SIGNPOSTS.png"):
+        push_error("Cannot capture sign-free world for QA")
+        quit(1)
+        return
+    count += 1
     # Four isolated prop close-ups: direct stage selection does not trigger rewards or save.
     hud.visible = false
     ddl_story.set_process(false)
@@ -551,6 +575,7 @@ func _render() -> void:
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
         "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
         "m37_showcase": ["sky_clear_static", "sky_overcast_static", "sky_storm_static", "street_furniture", "street_density", "tiled_lawn_and_shrubs", "ddl_quest_hud", "ddl_mail_prop", "ddl_printer_prop", "ddl_coffee_prop", "ddl_portal_prop"],
+        "m38_guidance": ["temporary_compass_focus", "sign_free_campus"],
         "m37_cloud_sprites": 33,
         "m37_street_clusters": streetscape.cluster_count,
         "m37_paper_instances": streetscape.scrap_count,

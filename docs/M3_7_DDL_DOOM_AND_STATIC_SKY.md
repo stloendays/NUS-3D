@@ -17,7 +17,7 @@ A deliberately exaggerated, low-stakes five-minute slapstick game: the campus sh
 
 - `UTownStreetscape` samples existing approximate walkways and checks clearance using existing building, tree and path data. Bounded at 56 small decor clusters.
 - Five sets of original 3D furniture props: benches with comically large coffees; paper notices and poster boards; snack/caffeine machines; tropical planter boxes; bins and lost pens.
-- Four comic route banners. Twelve distant *fictional*, non-colliding skyline shapes add horizon context; these are *not* real NUS buildings.
+- Twelve distant *fictional*, non-colliding skyline silhouettes add horizon context; these are *not* real NUS buildings. Oversized roadside route banners were deleted in the subsequent M3.8 navigation pass.
 - Four original 64px SVG prop tiles `comic_brick.svg`, `comic_paper.svg`, `comic_poster.svg`, `comic_tile.svg`. Two additional authored SVGs `comic_lawn.svg` and `comic_pavers.svg` now tile the large terrain, Town Green, walkways and plaza (world-space UVs on box geometry, explicit UVs on triangulated Town Green). All materials remain weather-responsive. Repeated prop meshes/materials are cached; scattered paper uses one MultiMesh (156 max).
 - Added one bounded MultiMesh for roadside shrubs (200 max) and one for colorful flowers (72 max), filtered against existing building/path/tree clearances. Props contain **no collision shapes**, so they cannot obstruct paths and existing NPC/shuttle routes. No external network requests, background threads or runtime scene spawning.
 
@@ -40,7 +40,7 @@ Successful first submission gives **80 arcade XP exactly once**. Replays are wel
 
 The CI workflow headlessly imports SVG textures and executes `res://tests/m3_7_smoke_test.gd`, in addition to all pre-existing Godot tests. This tests 33 fixed cloud sprites and readable scale, sky mode switches, indoor hide, all 6 authored textures including tiling checks, bounded scattered paper/shrub/flower MultiMeshes, absence of scenery collisions, all four story acts, timers, replay/save, first-completion XP guard and F7 photo mode.
 
-For visual QA, `godot/tests/render_viewpoints.gd` now adds **eleven M3.7 real-engine screenshots** to the existing review artifact: clear/overcast/thunder sky, street furniture, street density, tiled grass/shrubbery, the DDL quest HUD and four distinct giant checkpoint prop close-ups, with manifest counts. In Godot 4.4+, open `godot/project.godot`, use **Y** for weather and **H** near the DDL marker. Actual GPU frame pacing and crowd/cloud occlusion still require manual checks; automated Linux rendering is not a substitute for Windows GPU performance.
+For visual QA, `godot/tests/render_viewpoints.gd` now adds **thirteen M3.7–M3.8 real-engine screenshots** to the existing review artifact: clear/overcast/thunder sky, street furniture, street density, tiled grass/shrubbery, the DDL quest HUD and four distinct giant checkpoint prop close-ups, a P-key compass pulse and a sign-free world overview, with manifest counts. In Godot 4.4+, open `godot/project.godot`, use **Y** for weather and **H** near the DDL marker. Actual GPU frame pacing and crowd/cloud occlusion still require manual checks; automated Linux rendering is not a substitute for Windows GPU performance.
 
 ## Integration discipline
 

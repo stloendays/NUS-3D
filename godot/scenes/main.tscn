@@ -195,7 +195,7 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "1/2/3 toys   LMB/J throw   K teacher   WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   L lift floors   F indoor activity   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD   H DDL story"
+text = "1/2/3 toys   LMB/J throw   K teacher   WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   L lift floors   F indoor activity   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD   H nearby interact   P focus ping"
 
 [node name="Arcade" type="Node3D" parent="."]
 script = ExtResource("13")
