@@ -95,6 +95,47 @@ func _run() -> void:
     if shell.game == null or shell.game.process_mode != Node.PROCESS_MODE_PAUSABLE:
         _fail("Existing UTown game must remain a separate pausable scene")
         return
+    # Tutorial is bundled, accessible before login and keeps the world paused.
+    var tutorial: NUS3DTutorial = shell.tutorial
+    if tutorial == null or tutorial.get_parent() != shell.ui or tutorial.pages.size() != 6:
+        _fail("Startup tutorial file or guide viewer missing")
+        return
+    if not FileAccess.file_exists("res://data/startup_tutorial.json"):
+        _fail("Packaged beginner tutorial data missing")
+        return
+    shell._open_tutorial()
+    if not tutorial.visible or not shell.login_cover.visible or not paused or shell_accounts.is_logged_in():
+        _fail("Guide must open before login without resuming or authenticating")
+        return
+    if tutorial.current_page != 0 or tutorial.page_title_label.text.is_empty():
+        _fail("Guide did not display its opening page")
+        return
+    tutorial.previous_page()
+    if tutorial.current_page != 0:
+        _fail("Previous button must not cross first page")
+        return
+    tutorial.next_page()
+    if tutorial.current_page != 1 or tutorial.page_counter_label.text != "2 / 6":
+        _fail("Guide next-page navigation failed")
+        return
+    tutorial.previous_page()
+    if tutorial.current_page != 0:
+        _fail("Guide previous-page navigation failed")
+        return
+    for _index in range(tutorial.pages.size() - 1):
+        tutorial.next_page()
+    if tutorial.current_page != tutorial.pages.size() - 1 or tutorial.next_button.text.find("返回") == -1:
+        _fail("Guide final page or finish button missing")
+        return
+    tutorial.next_page()
+    if tutorial.visible or not shell.login_cover.visible or not paused:
+        _fail("Finishing guide must return to paused login")
+        return
+    shell._open_tutorial()
+    tutorial.close_guide()
+    if tutorial.visible or not paused or shell_accounts.is_logged_in():
+        _fail("Closing guide must not change login/game state")
+        return
     if shell_accounts.register("shell_tester", "game-test-123") != "":
         _fail("UI scene local account could not register")
         return
