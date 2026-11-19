@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M3.4 sheltered interiors/rain + M3.5 visual finishing + M3.6 choose faculty / Coursework: DDL Apocalypse + M4 alpha Windows portable build pipeline (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M3.4 sheltered interiors/rain + M3.5 visual finishing + M3.6 Coursework + M3.7 skippable cinematic entrance + M4 alpha Windows portable build pipeline (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M3.6 选择学院与 Coursework 任务](docs/M3_6_COURSEWORK_FACULTY.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M3.6 选择学院与 Coursework 任务](docs/M3_6_COURSEWORK_FACULTY.md) · [M3.7 入场动画](docs/M3_7_CINEMATIC_INTRO.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -184,3 +184,15 @@ Each faculty has an original, discipline-specific **3-chapter DDL comedy storyli
 - Windows native-runtime validation includes the JSON, all 13 picker options and 39 quest chapters. Godot CI additionally captures real in-engine screenshots of the faculty picker, DDL HUD and mission journal.
 
 See the [M3.6 coursework guide](docs/M3_6_COURSEWORK_FACULTY.md) for detailed gameplay, save rules and manual test limitations.
+
+
+## M3.7 — Skippable 3D entrance cinematic
+
+A **12-second Godot-rendered opening** now plays when launching the UTown game: a camera flies along the established conceptual Town Green → ERC → SRC → Plaza route while an original comedy storyline announces the looming Coursework DDL. Animated lettering, cinematic letterboxes, smoothly eased camera movement, four changing story captions, a progress bar and a skip control complete the intro. No pre-rendered footage or imported copyrighted assets are required.
+
+- Skip with **Space**, **Esc**, **Enter** or a mouse click / top-right skip button.
+- On first run, the cinematic ends on the faculty selector; on later runs it restores the saved faculty profile and normal first-person gameplay.
+- The intro never changes spawn, route progress, grades, weather or saved work. DDL timer and player movement are paused during playback.
+- Godot CI includes four actual viewport frames from the animated opening, plus tests for camera takeover, scripted beats, skipping and UI handoff.
+
+Read [M3.7 intro documentation](docs/M3_7_CINEMATIC_INTRO.md). This original intro is artistic/fictional and does not show surveyed campus navigation or actual NUS coursework.
