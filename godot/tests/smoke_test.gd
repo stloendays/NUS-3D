@@ -523,6 +523,119 @@ func _smoke() -> void:
         quit(1)
         return
     player.call("reset_player")
+    # M3.6 must not overwrite the user's actual local progress during smoke tests.
+    var coursework: UTownCoursework = instance.get_node_or_null("Coursework") as UTownCoursework
+    var course_ui: UTownCourseworkUI = instance.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if coursework == null or course_ui == null:
+        push_error("Coursework faculty controller or selection UI missing")
+        quit(1)
+        return
+    if coursework.faculty_options.size() != 13 or course_ui.faculty_picker.item_count != 13:
+        push_error("Thirteen fictional campus faculty choices were not loaded")
+        quit(1)
+        return
+    if coursework.current_quest().size() > 0 and coursework.current_faculty_id.is_empty():
+        push_error("Mission started before faculty selection")
+        quit(1)
+        return
+    coursework.save_path = "user://nus3d_coursework_smoke_temp.cfg"
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
+    coursework._load_progress()
+    course_ui.show_selector()
+    if not course_ui.modal_visible or not coursework.modal_open or not player.movement_locked:
+        push_error("Faculty picker did not capture input and freeze walking")
+        quit(1)
+        return
+    course_ui._confirm_faculty()
+    if coursework.current_faculty_id != "science" or coursework.active_stage != 0 or course_ui.modal_visible or player.movement_locked:
+        push_error("Science faculty selection did not start a clean playable profile")
+        quit(1)
+        return
+    var other_choice: bool = coursework.select_faculty("nonexistent")
+    if other_choice:
+        push_error("An invalid faculty selection was accepted")
+        quit(1)
+        return
+    if coursework.current_quest().is_empty() or coursework.marker == null or coursework.total_xp != 0:
+        push_error("First fictional coursework mission/marker did not initialize")
+        quit(1)
+        return
+    if coursework.interact_nearby() and player.global_position.distance_to(coursework.objective_position()) > 13.0:
+        push_error("Coursework brief could be taken outside the proximity radius")
+        quit(1)
+        return
+    player.global_position = coursework.objective_position() + Vector3(0.0, 0.18, 0.0)
+    if not coursework.interact_nearby() or coursework.active_stage != 1 or coursework.current_time_left < 150.0:
+        push_error("Coursework brief pickup or DDL start failed")
+        quit(1)
+        return
+    var before_pause: float = coursework.current_time_left
+    course_ui.show_journal()
+    coursework._process(0.9)
+    if not coursework.modal_open or coursework.current_time_left < before_pause - 0.001:
+        push_error("DDL countdown did not pause during the journal")
+        quit(1)
+        return
+    course_ui.hide_modal()
+    coursework._process(1.0)
+    if coursework.current_time_left >= before_pause:
+        push_error("DDL countdown failed to resume during actual play")
+        quit(1)
+        return
+    if not campus_life.enter_interior("ERC"):
+        push_error("ERC indoor coursework objective unavailable")
+        quit(1)
+        return
+    var science_activity: Dictionary = campus_life.activity_spots["ERC"][1]
+    player.global_position = (campus_life.interiors["ERC"] as Node3D).to_global(science_activity["position"])
+    if not campus_life.interact_nearby() or coursework.active_stage != 2:
+        push_error("Real ERC activity interaction did not advance the coursework mission")
+        quit(1)
+        return
+    var partner_npc: Node3D = indoor_npcs.actors[1]["node"]
+    player.global_position = partner_npc.global_position + Vector3(0.0, 0.18, 1.0)
+    if not campus_life.talk_to_nearest() or coursework.active_stage != 3:
+        push_error("Actual indoor Q dialogue did not advance the coursework partner step")
+        quit(1)
+        return
+    campus_life.exit_interior()
+    player.global_position = coursework.objective_position() + Vector3(0.0, 0.18, 0.0)
+    if not coursework.interact_nearby() or coursework.active_quest_index != 1 or coursework.total_xp <= 0 or coursework.credits <= 0:
+        push_error("Coursework submission did not reward XP/credits and unlock chapter two")
+        quit(1)
+        return
+    var xp_after_science: int = coursework.total_xp
+    if not coursework.select_faculty("computing") or coursework.active_quest_index != 0:
+        push_error("Switching to a different faculty did not load its own questline")
+        quit(1)
+        return
+    player.global_position = coursework.objective_position() + Vector3(0.0, 0.18, 0.0)
+    if not coursework.interact_nearby():
+        push_error("Second faculty brief could not start")
+        quit(1)
+        return
+    coursework.current_time_left = 0.0
+    if not coursework.notify_activity("ERC/mezzanine") or not coursework.notify_dialogue("ERC/Mei"):
+        push_error("Computer Science mission's activity and partner chain did not advance")
+        quit(1)
+        return
+    player.global_position = coursework.objective_position() + Vector3(0.0, 0.18, 0.0)
+    if not coursework.interact_nearby() or coursework.last_grade != "C (Late)" or coursework.total_xp <= xp_after_science:
+        push_error("Late coursework submission must still complete with reduced reward")
+        quit(1)
+        return
+    var after_both: int = coursework.total_xp
+    coursework._load_progress()
+    if coursework.current_faculty_id != "computing" or coursework.active_quest_index != 1 or coursework.total_xp != after_both:
+        push_error("Saved coursework faculty, XP or completion progress did not survive reload")
+        quit(1)
+        return
+    if not coursework.select_faculty("science") or coursework.active_quest_index != 1 or coursework.total_xp != after_both:
+        push_error("Per-faculty quest progress was lost on switching back")
+        quit(1)
+        return
+    player.call("reset_player")
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
     if trunks == null or canopies == null or trunks.multimesh == null or canopies.multimesh == null:
