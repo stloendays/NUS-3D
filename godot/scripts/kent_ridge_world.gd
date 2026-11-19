@@ -278,6 +278,8 @@ func nearest_stop(position_value: Vector3, radius_m: float = 18.0) -> Dictionary
     var best: Dictionary = {}
     var best_dist: float = radius_m
     for stop in stops:
+        if bool(stop.get("walk_only", false)):
+            continue
         var p: Vector3 = stop["position"]
         var distance_m: float = Vector2(position_value.x, position_value.z).distance_to(Vector2(p.x, p.z))
         if distance_m <= best_dist:
