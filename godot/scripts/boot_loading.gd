@@ -5,6 +5,9 @@ class_name NUS3DBootLoading
 ## Self-test executables bypass the UI to preserve the prior runtime contract.
 
 const WORLD_PATH: String = "res://scenes/main.tscn"
+# Preload world script on main thread before the startup loader parses the PackedScene.
+# Godot cold boot otherwise intermittently fails ExtResource("1") in main.tscn.
+const WORLD_SCRIPT_WARMUP = preload("res://scripts/utown_world.gd")
 const SHELL_PATH: String = "res://scenes/game_shell.tscn"
 const TIP_PATH: String = "res://data/loading_tips.json"
 const STAGE_IDLE: int = 0
@@ -60,7 +63,8 @@ func _ready() -> void:
         self_test_bypassed = true
         call_deferred("_bypass_self_test")
         return
-    start_loading()
+    # Defer threaded parse until autoload initialization and the first idle turn.
+    call_deferred("start_loading")
 
 func _read_tips() -> void:
     tips.clear()
@@ -366,4 +370,5 @@ func _enter_loaded_shell() -> void:
         _fail_load("Startup scene was removed.")
         return
     get_tree().current_scene = loaded_shell
+    print("NUS3D_BOOT_READY: game world and account login initialized")
     queue_free()
