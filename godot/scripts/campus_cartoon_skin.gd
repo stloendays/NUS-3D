@@ -38,11 +38,13 @@ static func button(control: Button, is_primary: bool = false) -> void:
     normal.set_border_width_all(2)
     normal.content_margin_left = 11
     normal.content_margin_right = 11
+    normal.shadow_size = 3
     normal.shadow_offset = Vector2(2, 3)
     var hover: StyleBoxFlat = panel(Color("#FFE29A") if is_primary else BLUE, 10, 7)
     hover.set_border_width_all(2)
     hover.content_margin_left = 11
     hover.content_margin_right = 11
+    hover.shadow_size = 3
     hover.shadow_offset = Vector2(2, 3)
     var pressed: StyleBoxFlat = panel(Color("#E9B847") if is_primary else Color("#D1E4E8"), 10, 7)
     pressed.set_border_width_all(2)
