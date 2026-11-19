@@ -66,6 +66,8 @@ jobs:
           godot --version
       - name: Import project headlessly
         run: godot --headless --path godot --import --quit
+      - name: Verify startup loading and gameplay tips handoff to original login
+        run: godot --headless --path godot --script res://tests/boot_loading_smoke_test.gd
       - name: Validate scene and geometry
         run: godot --headless --path godot --script res://tests/smoke_test.gd
       - name: Validate English exam catalog
