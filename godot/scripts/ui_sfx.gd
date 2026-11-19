@@ -54,6 +54,9 @@ func _synthesize(length: float, pitch: float, gain: float) -> AudioStreamWAV:
 func play_ui(effect: String = "press") -> void:
     if not enabled or _voices.is_empty() or not _clips.has(effect):
         return
+    # Headless smoke tests have no speakers; validate synthesis but skip playback.
+    if DisplayServer.get_name() == "headless":
+        return
     if effect == "press":
         var now_ms: int = Time.get_ticks_msec()
         if now_ms - _last_tap_ms < 65:
