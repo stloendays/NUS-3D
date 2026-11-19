@@ -82,6 +82,10 @@ func _add_tile(row: HBoxContainer, action: Dictionary) -> void:
     _captions[id] = caption
     _held[id] = false
 
+func _ui_sound_service() -> NUS3DUISound:
+    return get_node_or_null("/root/UISound") as NUS3DUISound
+
+
 func _input(event: InputEvent) -> void:
     if not (event is InputEventKey):
         return
@@ -94,11 +98,13 @@ func _input(event: InputEvent) -> void:
             if bool(_held.get(id, false)) != key.pressed:
                 _set_pressed(id, key.pressed)
                 if key.pressed:
+                    var audio: NUS3DUISound = _ui_sound_service()
                     if id == "audio":
-                        UISound.toggle_enabled()
+                        if audio != null:
+                            audio.toggle_enabled()
                         _refresh_audio_hint()
-                    elif id != "move" and id != "run":
-                        UISound.play_ui("press")
+                    elif id != "move" and id != "run" and audio != null:
+                        audio.play_ui("press")
 
 func _set_pressed(id: String, down: bool) -> void:
     _held[id] = down
@@ -121,7 +127,8 @@ func _notification(what: int) -> void:
 
 func _refresh_audio_hint() -> void:
     if _captions.has("audio"):
-        (_captions["audio"] as Label).text = "SOUND" if UISound.enabled else "MUTED"
+        var audio: NUS3DUISound = _ui_sound_service()
+        (_captions["audio"] as Label).text = "SOUND" if audio != null and audio.enabled else "MUTED"
 
 func key_count() -> int:
     return _tiles.size()
