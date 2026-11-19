@@ -80,7 +80,7 @@ jobs:
             green_dining_smoke_test.gd \
             coins_smoke_test.gd \
             experience_guide_smoke_test.gd \
-            integration_smoke_test.gd
+            integration_smoke_test.gd \
             campus_ai_smoke_test.gd
           do
             echo "Testing $test"
