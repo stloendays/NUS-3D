@@ -54,6 +54,7 @@ func _render() -> void:
             return
         count += 1
     intro.finish_intro()
+    hud.visible = false
     # Screenshot the genuine first-run faculty selector before selecting a profile.
     # Isolate CI saves so no actual user profile is modified.
     coursework.save_path = "user://nus3d_coursework_render_temp.cfg"
