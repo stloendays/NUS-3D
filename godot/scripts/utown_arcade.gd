@@ -320,10 +320,11 @@ func talk_to_professor() -> bool:
         return true
     met_professors.append(name)
     _award_xp(20)
-    _announce("%s：%s" % [name, _t(
-        "作业昨天就截止了。+20 XP！" if best_index == 0 else "开卷考试！书在另一个宇宙。+20 XP！",
-        str(info["line"]))] if language != null and language.is_chinese()
-        else "%s: %s" % [name, str(info["line"])], 4.6)
+    var professor_joke: String = str(info["line"])
+    if language != null and language.is_chinese():
+        professor_joke = "作业昨天就截止了。+20 XP！" if best_index == 0 else "开卷考试！书在另一个宇宙。+20 XP！"
+    _announce("%s：%s" % [name, professor_joke] if language != null and language.is_chinese()
+        else "%s: %s" % [name, professor_joke], 4.6)
     return true
 
 func _can_fire() -> bool:
