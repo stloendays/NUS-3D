@@ -402,6 +402,8 @@ func start_run() -> bool:
     held_weapon.hide()
     if arcade.held_toy != null:
         arcade.held_toy.hide()
+    if arcade.status_layer != null:
+        arcade.status_layer.hide()
     for i in range(phantoms.size()):
         var phantom: Dictionary = phantoms[i]
         var actor: Node3D = phantom["node"]
@@ -568,6 +570,20 @@ func _caught() -> void:
         _notify(_tr("被发现了！剩余机会：%d" % lives, "CAUGHT! Chances remaining: %d" % lives), 2.5)
 
 
+func _input(event: InputEvent) -> void:
+    if not active or not (event is InputEventKey):
+        return
+    var key: InputEventKey = event as InputEventKey
+    if not key.pressed or key.echo:
+        return
+    # Keep ordinary coursework, rides, weather, settings and teleport inputs
+    # out of the survival instance; the normal game never sees this gate.
+    if key.keycode in [KEY_B, KEY_X, KEY_I, KEY_R, KEY_Y, KEY_T,
+            KEY_F8, KEY_F11, KEY_F12, KEY_H, KEY_U, KEY_N,
+            KEY_K, KEY_P, KEY_O, KEY_TAB, KEY_Z]:
+        get_viewport().set_input_as_handled()
+
+
 func _physics_process(delta: float) -> void:
     if active:
         _move_phantoms(delta)
@@ -638,6 +654,8 @@ func finish_run(success: bool, reason: String) -> void:
     arcade.pending_shot = false
     if arcade.held_toy != null:
         arcade.held_toy.visible = hud.visible
+    if arcade.status_layer != null:
+        arcade.status_layer.visible = hud.visible
     for phantom in phantoms:
         (phantom["node"] as Node3D).hide()
     for marker in document_nodes:
