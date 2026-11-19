@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Minimal status panel with a conceptual walking loop, labels and a toggleable map.
+## Beveled campus HUD with tactile key hints and lightweight milestone notifications.
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: CharacterBody3D = $"../Player"
@@ -27,63 +27,146 @@ extends CanvasLayer
 var show_full_help: bool = true
 var gis_metric_count: int = 0
 const FIT_BASELINE_PATH: String = "res://data/osm_fit_baseline.json"
+var key_rail: NUS3DKeyRail
+var help_backdrop: PanelContainer
+var toast_card: PanelContainer
+var toast_label: Label
+var toast_remaining: float = 0.0
+var _toast_tween: Tween
+var _seen_tour_stops: int = 0
+var _seen_notes: int = 0
+var _seen_activities: int = 0
+var _seen_sprint_time: float = -1.0
 
 func _ready() -> void:
-    var panel: PanelContainer = $Info
-    var style: StyleBoxFlat = StyleBoxFlat.new()
-    style.bg_color = Color(0.08, 0.12, 0.15, 0.86)
-    style.set_corner_radius_all(9)
-    style.content_margin_left = 15.0
-    style.content_margin_right = 15.0
-    style.content_margin_top = 12.0
-    style.content_margin_bottom = 12.0
-    panel.add_theme_stylebox_override("panel", style)
+    _skin_card($Info, Color(0.055, 0.12, 0.16, 0.94), Color("#80d5d4"), 13, 15)
+    _skin_card(gis_card, Color(0.07, 0.15, 0.19, 0.96), Color("#d6aa74"), 12, 13)
+    _skin_card(tour_card, Color(0.065, 0.16, 0.17, 0.95), Color("#85dec2"), 12, 14)
+    _skin_card(challenge_card, Color(0.13, 0.12, 0.2, 0.95), Color("#c9a3f9"), 12, 13)
+    _skin_card(campus_card, Color(0.07, 0.13, 0.18, 0.93), Color("#8bbcd8"), 12, 13)
     for item in [title_label, hint_label, target_label, nearest_label, perf_label]:
-        item.add_theme_color_override("font_color", Color.html("#f0f2ed"))
+        item.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     title_label.add_theme_font_size_override("font_size", 20)
+    title_label.add_theme_color_override("font_color", Color("#d6f8f7"))
     hint_label.add_theme_font_size_override("font_size", 12)
+    hint_label.add_theme_color_override("font_color", NUS3DUISkin.DIM)
     target_label.add_theme_font_size_override("font_size", 17)
+    target_label.add_theme_color_override("font_color", Color("#f4dfaa"))
     nearest_label.add_theme_font_size_override("font_size", 14)
     perf_label.add_theme_font_size_override("font_size", 13)
-    help_label.add_theme_color_override("font_color", Color.html("#283b43"))
-    var gis_style: StyleBoxFlat = StyleBoxFlat.new()
-    gis_style.bg_color = Color(0.09, 0.16, 0.21, 0.92)
-    gis_style.set_corner_radius_all(10)
-    gis_style.content_margin_left = 13.0
-    gis_style.content_margin_top = 12.0
-    gis_style.content_margin_right = 13.0
-    gis_style.content_margin_bottom = 12.0
-    gis_card.add_theme_stylebox_override("panel", gis_style)
-    var tour_style: StyleBoxFlat = StyleBoxFlat.new()
-    tour_style.bg_color = Color(0.08, 0.16, 0.18, 0.93)
-    tour_style.set_corner_radius_all(10)
-    tour_style.content_margin_left = 16.0
-    tour_style.content_margin_right = 16.0
-    tour_style.content_margin_top = 13.0
-    tour_style.content_margin_bottom = 13.0
-    tour_card.add_theme_stylebox_override("panel", tour_style)
-    tour_message.add_theme_color_override("font_color", Color.html("#f3f1e8"))
-    var challenge_style: StyleBoxFlat = StyleBoxFlat.new()
-    challenge_style.bg_color = Color(0.12, 0.12, 0.19, 0.94)
-    challenge_style.set_corner_radius_all(10)
-    challenge_style.content_margin_left = 14.0
-    challenge_style.content_margin_right = 14.0
-    challenge_style.content_margin_top = 11.0
-    challenge_style.content_margin_bottom = 11.0
-    challenge_card.add_theme_stylebox_override("panel", challenge_style)
-    challenge_message.add_theme_color_override("font_color", Color.html("#eeeaf7"))
+    for label in [gis_summary, tour_message, challenge_message, campus_message]:
+        label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     challenge_message.add_theme_font_size_override("font_size", 14)
-    var campus_style: StyleBoxFlat = StyleBoxFlat.new()
-    campus_style.bg_color = Color(0.08, 0.14, 0.18, 0.92)
-    campus_style.set_corner_radius_all(10)
-    campus_style.content_margin_left = 13.0
-    campus_style.content_margin_right = 13.0
-    campus_style.content_margin_top = 10.0
-    campus_style.content_margin_bottom = 10.0
-    campus_card.add_theme_stylebox_override("panel", campus_style)
-    campus_message.add_theme_color_override("font_color", Color.html("#edf3ef"))
     campus_message.add_theme_font_size_override("font_size", 13)
+    _make_help_overlay()
+    _make_key_rail()
+    _make_toast()
     _load_osm_fit_summary()
+    _seen_tour_stops = tour.discovered_ids.size()
+    _seen_notes = challenge.collected_ids.size()
+    _seen_activities = campus_life.visited_activities.size()
+    _seen_sprint_time = challenge.sprint_last_time
+
+
+func _skin_card(card: PanelContainer, background: Color, accent: Color, radius: int, padding: int) -> void:
+    card.add_theme_stylebox_override("panel", NUS3DUISkin.panel(background, accent, radius, padding))
+
+
+func _make_help_overlay() -> void:
+    # Keep the original HUD/Help path for existing scenes and tests.
+    help_backdrop = PanelContainer.new()
+    help_backdrop.name = "HelpBackdrop"
+    help_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    help_backdrop.anchor_left = 0.16
+    help_backdrop.anchor_right = 0.84
+    help_backdrop.anchor_top = 1.0
+    help_backdrop.anchor_bottom = 1.0
+    help_backdrop.offset_top = -257.0
+    help_backdrop.offset_bottom = -64.0
+    help_backdrop.add_theme_stylebox_override("panel", NUS3DUISkin.panel(Color(0.045, 0.10, 0.135, 0.97), Color("#89e3d4"), 16, 14))
+    add_child(help_backdrop)
+    move_child(help_backdrop, help_label.get_index())
+    help_label.anchor_left = 0.18
+    help_label.anchor_right = 0.82
+    help_label.anchor_top = 1.0
+    help_label.anchor_bottom = 1.0
+    help_label.offset_left = 0.0
+    help_label.offset_top = -245.0
+    help_label.offset_right = 0.0
+    help_label.offset_bottom = -76.0
+    help_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    help_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    help_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
+    help_label.add_theme_font_size_override("font_size", 15)
+    show_full_help = false
+    help_label.visible = false
+    help_backdrop.visible = false
+
+
+func _make_key_rail() -> void:
+    key_rail = NUS3DKeyRail.new()
+    add_child(key_rail)
+
+
+func _make_toast() -> void:
+    toast_card = PanelContainer.new()
+    toast_card.name = "FeedbackToast"
+    toast_card.anchor_left = 0.5
+    toast_card.anchor_right = 0.5
+    toast_card.offset_left = -265.0
+    toast_card.offset_right = 265.0
+    toast_card.offset_top = 82.0
+    toast_card.offset_bottom = 132.0
+    toast_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    toast_card.add_theme_stylebox_override("panel", NUS3DUISkin.panel(Color("#17494c"), Color("#9bf2d2"), 14, 10))
+    add_child(toast_card)
+    toast_label = Label.new()
+    toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    toast_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    toast_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    toast_label.add_theme_font_size_override("font_size", 17)
+    toast_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
+    toast_card.add_child(toast_label)
+    toast_card.hide()
+
+
+func _show_toast(message: String, effect: String = "confirm") -> void:
+    toast_label.text = message
+    toast_remaining = 2.7
+    if _toast_tween != null and _toast_tween.is_running():
+        _toast_tween.kill()
+    toast_card.show()
+    toast_card.modulate.a = 0.0
+    toast_card.scale = Vector2(0.96, 0.96)
+    toast_card.pivot_offset = toast_card.size * 0.5
+    _toast_tween = create_tween()
+    _toast_tween.set_parallel(true)
+    _toast_tween.tween_property(toast_card, "modulate:a", 1.0, 0.14)
+    _toast_tween.tween_property(toast_card, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+    UISound.play_ui(effect)
+
+
+func _update_notices(delta: float) -> void:
+    if toast_remaining > 0.0:
+        toast_remaining -= delta
+        if toast_remaining <= 0.0:
+            toast_card.hide()
+    var stops: int = tour.discovered_ids.size()
+    if stops > _seen_tour_stops:
+        _show_toast("Waypoint discovered  |  %d / %d" % [stops, tour.stops.size()])
+    _seen_tour_stops = stops
+    var notes: int = challenge.collected_ids.size()
+    if notes > _seen_notes:
+        _show_toast("Field note collected  |  %d / %d" % [notes, challenge.items.size()], "reward")
+    _seen_notes = notes
+    var activities: int = campus_life.visited_activities.size()
+    if activities > _seen_activities:
+        _show_toast("Campus activity completed", "confirm")
+    _seen_activities = activities
+    if challenge.sprint_last_time >= 0.0 and challenge.sprint_last_time != _seen_sprint_time:
+        _show_toast("Campus Sprint finished  |  " + challenge.sprint_medal, "reward")
+    _seen_sprint_time = challenge.sprint_last_time
+
 
 func _load_osm_fit_summary() -> void:
     if not FileAccess.file_exists(FIT_BASELINE_PATH):
@@ -113,7 +196,7 @@ func _load_osm_fit_summary() -> void:
     lines.append("OpenStreetMap contributors  |  ODbL")
     gis_summary.text = "\n".join(lines)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
     gis_card.visible = world.osm_reference_visible and gis_metric_count == 2
     hint_label.text = "M2 %s [F2] | %s [T] | OSM %s [F6] | Notes [C] | Sprint [V]" % ["ON" if world.m2_details_visible else "OFF", world.lighting_name(), "ON" if world.osm_reference_visible else "OFF"]
     if tour.completed:
@@ -133,6 +216,7 @@ func _process(_delta: float) -> void:
     challenge_card.visible = not challenge_message.text.is_empty()
     campus_message.text = weather.status_text() + "\n" + campus_life.status_text()
     campus_card.visible = true
+    _update_notices(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
@@ -141,6 +225,7 @@ func _unhandled_input(event: InputEvent) -> void:
         elif event.keycode == KEY_F1:
             show_full_help = not show_full_help
             help_label.visible = show_full_help
+            help_backdrop.visible = show_full_help
         elif event.keycode == KEY_F7:
             visible = not visible
             world.set_navigation_markers_visible(visible)
