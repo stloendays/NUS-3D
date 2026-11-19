@@ -97,6 +97,12 @@
           "body": "Shift+H 打开六条支线的剧情任务手册，按任务目标完成互动并选择做法，影响人缘、诚信和压力。完成至少三条支线开启 DDL 终章，获得不同好、坏或隐藏结局。通关后可重开周目，已有的账号经验、收集与结局图鉴不会清空。",
           "heading_en": "Side quests and endings / Shift+H",
           "body_en": "Press Shift+H to view six optional side stories. Complete objectives and choose your actions to influence relationships, integrity and stress. Three completed side quests unlock the DDL finale and six good, bad or secret endings. Replay without wiping account XP or the ending gallery."
+        },
+        {
+          "heading": "模拟专业考试 / F8",
+          "body": "选择学院后按 F8 打开 32 套原创英文专业试卷，包含化学、化工等学科。每套限时答题，首次合格获得经验和学园积分，重考不会重复领取。",
+          "heading_en": "English major exams / F8",
+          "body_en": "Choose a faculty and press F8 for 32 fictional English-language papers, including Chemistry and Chemical Engineering. Timed five-question papers include answer review and replay-proof rewards on the first passing result."
         }
       ],
       "title_en": "03  Exploration & Quests",

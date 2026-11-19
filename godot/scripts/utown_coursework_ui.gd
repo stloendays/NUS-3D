@@ -131,6 +131,12 @@ func _build_modal() -> void:
     journal_text = _label("", 15, Color.html("#e7ede9"))
     journal_text.custom_minimum_size = Vector2(520, 210)
     journal_box.add_child(journal_text)
+    var exam_button := Button.new()
+    exam_button.name = "OpenEnglishMajorExams"
+    exam_button.text = "模拟专业考试 / ENGLISH MAJOR EXAMS [F8]"
+    exam_button.custom_minimum_size.y = 43.0
+    exam_button.pressed.connect(_open_major_exams)
+    journal_box.add_child(exam_button)
     var switch_button := Button.new()
     switch_button.text = "切换学院 / CHANGE FACULTY"
     switch_button.custom_minimum_size.y = 37.0
@@ -197,6 +203,15 @@ func _confirm_faculty() -> void:
     if coursework.select_faculty(faculty_id):
         hide_modal()
 
+func _open_major_exams() -> void:
+    if coursework.current_faculty_id.is_empty():
+        return
+    hide_modal()
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    if exams != null:
+        exams.call("open_library")
+
+
 func show_journal() -> void:
     if coursework.current_faculty_id.is_empty():
         show_selector()
@@ -252,6 +267,9 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    if exams != null and bool(exams.get("is_open")):
+        return
     if intro_blocked:
         return
     var leisure_ui: Node = get_parent().get_node_or_null("LeisureUI")

@@ -12,6 +12,7 @@
 | P / Shift+P / K | Coursework journal, faculty choice, task pickup/submit |
 | Tab | Post-Course Club, unlocked after any full three-chapter faculty arc |
 | Mouse-left / 1–3 / U | Cartoon toy throwing, switching toys and professor interaction |
+| F8 | Fictional English major exams (first-pass-only XP and credits) |
 | H / Shift+H | DDL world prop / directional pulse; six-quest branching campaign, endings archive |
 | Z / O / N | Coin pickup, game-only shop and fictional lunch delivery |
 | J | Local account mailbox (never the assignment journal or weapon firing) |

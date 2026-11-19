@@ -441,6 +441,11 @@ func _logout() -> void:
     var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
         coursework._save_progress()
+    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
+    if exams != null and exams.is_open:
+        exams.close_exam()
+    if exams != null:
+        exams._save_progress()
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
         coins.save_progress()
@@ -581,12 +586,19 @@ func _restore_game_features() -> void:
     var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
     if ui_course != null:
         if intro != null and intro.playing:
-            # The cinematic owns the screen until it calls end_intro().
+            if coursework != null and not coursework.current_faculty_id.is_empty():
+                ui_course.modal_visible = false
+                ui_course.selection_visible = false
             ui_course.begin_intro()
         elif coursework != null and coursework.current_faculty_id.is_empty():
             ui_course.show_selector()
         elif ui_course.modal_visible:
             ui_course.hide_modal()
+    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
+    if exams != null:
+        exams.save_path = accounts.feature_save_path("english_exams")
+        exams.load_progress()
+        exams._restore_missing_awards()
     var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
     if arcade != null:
         arcade.save_path = accounts.feature_save_path("arcade")
@@ -622,6 +634,8 @@ func _scan_source_rewards() -> void:
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coursework == null or coins == null:
         return
+    for exam_id in coursework.exam_reward_ids:
+        coins.reward_once(str(exam_id), 25, "Major exam pass")
     for faculty_id in coursework.faculty_progress.keys():
         if not coursework.faculty_by_id.has(faculty_id):
             continue
