@@ -1,14 +1,14 @@
 extends Node
 class_name NUS3DRelationships
 ## Account-scoped, offline NPC affinity. No network RPC or progression rewards.
+## Only three authored characters have persistent personality and relationship arcs.
+## Other pedestrians remain lightweight ambient NPCs for low-spec machines.
 const PROFILES: Dictionary = {
     "Maya": {"trait":"chaotic", "zh":"热情、戏精、DDL恐慌", "en":"Outgoing, dramatic, deadline-panicked"},
     "Ethan": {"trait":"reserved", "zh":"内向、认真、慢热", "en":"Reserved, studious, slow to trust"},
-    "Aisha": {"trait":"competitive", "zh":"好胜、直爽、热爱挑战", "en":"Competitive, candid, adventurous"},
-    "Lucas": {"trait":"energetic", "zh":"运动狂热、乐观、健忘", "en":"Energetic, optimistic, forgetful"},
-    "Mei": {"trait":"curious", "zh":"好奇、理工脑、咖啡控", "en":"Curious, analytical, coffee obsessed"},
-    "Daniel": {"trait":"philosophical", "zh":"冷幽默、哲学、爱吐槽", "en":"Dry-witted, philosophical, sarcastic"}
+    "Mei": {"trait":"curious", "zh":"好奇、理工脑、咖啡控", "en":"Curious, analytical, coffee obsessed"}
 }
+
 const COOLDOWN_SECONDS: int = 45
 const MAX_AFFINITY: int = 100
 var save_path: String = ""
@@ -55,6 +55,9 @@ func _save() -> void:
     if cfg.save(save_path) != OK:
         push_warning("Unable to save NPC relationships")
 
+
+func is_story_character(name: String) -> bool:
+    return PROFILES.has(name)
 
 func affinity(name: String) -> int:
     return clampi(int(scores.get(name, 0)), 0, MAX_AFFINITY)
@@ -106,7 +109,25 @@ func conversation(name: String, chinese: bool) -> String:
     return result
 
 
+func invitation(name: String, chinese: bool) -> String:
+    if not PROFILES.has(name) or tier(name) < 2:
+        return ""
+    var zh: Dictionary = {
+        "Maya": "支线邀请：一起去食堂制定反 DDL 作战计划。",
+        "Ethan": "支线邀请：一起去图书馆安静自习。",
+        "Mei": "支线邀请：一起去咖啡厅研究神秘配方。"
+    }
+    var en: Dictionary = {
+        "Maya": "Side activity: plan a deadline survival strategy at the canteen.",
+        "Ethan": "Side activity: study quietly together at the library.",
+        "Mei": "Side activity: investigate a mysterious coffee recipe."
+    }
+    return str((zh if chinese else en).get(name, ""))
+
+
 func contextual_line(name: String, chinese: bool) -> String:
+    if not PROFILES.has(name):
+        return ""
     var value: int = tier(name)
     if value == 0:
         return ""

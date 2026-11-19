@@ -231,11 +231,14 @@ func talk_to_nearest() -> bool:
     var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
     var affinity_line: String = ""
     var affinity_status: String = ""
-    if relationships != null:
+    if relationships != null and relationships.is_story_character(speaker):
         var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
         var chinese: bool = language != null and language.is_chinese()
         affinity_status = relationships.conversation(speaker, chinese)
         affinity_line = relationships.contextual_line(speaker, chinese)
+        var invitation: String = relationships.invitation(speaker, chinese)
+        if not invitation.is_empty():
+            affinity_line += "\n" + invitation
     life.message = "%s / %s\n%s" % [speaker, role, line]
     if not affinity_line.is_empty():
         life.message += "\n" + affinity_line
