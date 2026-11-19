@@ -22,6 +22,10 @@ var clock: float = 0.0
 var tick: float = 0.0
 var last_position := Vector3.ZERO
 var stride_distance: float = 0.0
+var cluck_wait: float = 3.0
+var bird_wait: float = 4.0
+var chicken_cluck_count: int = 0
+var chicken_flee_count: int = 0
 var step_player: AudioStreamPlayer
 var bird_player: AudioStreamPlayer3D
 var chicken_player: AudioStreamPlayer3D
@@ -102,7 +106,9 @@ func _make_animals() -> void:
             var phase := rng.randf_range(0, TAU)
             var state: Dictionary = {"node": animal, "base": base, "phase": phase,
                 "flight": 0.0, "alert": 0.0, "heading": rng.randf_range(-PI, PI),
-                "panic": i == 0, "peck": 0.0}
+                "panic": i == 0, "peck": 0.0, "target": base,
+                "walk_timer": rng.randf_range(1.5, 4.0), "flee_timer": 0.0,
+                "cooldown": 0.0, "moving": false}
             animal.position = base
             if kind == "birds":
                 _part(animal, "Body", _sphere(0.16), Vector3(0, 0.19, 0), Color("#41464b"))
@@ -201,7 +207,7 @@ func _advance_footsteps() -> void:
     var current: Vector3 = player.global_position
     var moved: float = Vector2(current.x - last_position.x, current.z - last_position.z).length()
     last_position = current
-    if moved > 1.7 or player.movement_locked or life.on_shuttle or not player.is_on_floor():
+    if moved > 1.7 or player.movement_locked or life.on_shuttle or player.bicycle_mode or not player.is_on_floor():
         stride_distance = 0
         return
     stride_distance += moved
@@ -225,6 +231,7 @@ func _process(delta: float) -> void:
     var night: bool = world.lighting_mode >= 2
     _update_animals(elapsed, indoor, rain, night)
     _update_leaves(indoor, rain)
+    _tick_calls(elapsed, indoor, rain, night)
 
 func _update_animals(delta: float, indoor: bool, rain: bool, night: bool) -> void:
     for kind in ["birds", "butterflies", "cats", "chickens"]:
@@ -253,26 +260,93 @@ func _update_animals(delta: float, indoor: bool, rain: bool, night: bool) -> voi
                 node.visible = node.visible and (not rain or i == 0)
                 node.position = base + Vector3(0, sin(clock * 1.5 + float(state["phase"])) * 0.012, 0)
             else:
-                node.visible = node.visible and (not rain or i == 0)
-                var alert: float = maxf(0, float(state["alert"]) - delta)
-                if distance < 4.0 and alert == 0 and not rain:
-                    alert = 3.0
-                    state["heading"] = atan2(base.x - player.global_position.x,
-                        base.z - player.global_position.z)
-                    if _sound_enabled() and DisplayServer.get_name() != "headless":
-                        chicken_player.global_position = base
-                        chicken_player.stream = sound_clips["panic_cluck"]
-                        chicken_player.play()
-                state["alert"] = alert
-                var pace: float = 3.4 if alert > 0 else 0.22
-                var direction := Vector3(sin(float(state["heading"])), 0,
-                    cos(float(state["heading"])))
-                var roam: float = sin(clock * 0.5 + float(state["phase"])) * pace
-                node.position = base + direction * roam
-                node.rotation.y = float(state["heading"])
-                node.get_node("Head").rotation.x = sin(clock * 3.0 + float(state["phase"])) * (0.2 if alert == 0 else 0.04)
-                node.get_node("LeftWing").rotation.z = sin(clock * 16.0) * (0.6 if alert > 0 else 0.04)
-                node.get_node("RightWing").rotation.z = -sin(clock * 16.0) * (0.6 if alert > 0 else 0.04)
+                _tick_chicken(state, delta, indoor, rain, night)
+
+func _safe_chicken_point(candidate: Vector3) -> bool:
+    var p := Vector2(candidate.x, candidate.z)
+    return Geometry2D.is_point_in_polygon(p, lawn) and (dining == null or dining.is_clear_lawn_point(p, 1.2))
+
+func _tick_chicken(state: Dictionary, delta: float, indoor: bool, rain: bool, night: bool) -> void:
+    var chicken: Node3D = state["node"]
+    var pos: Vector3 = chicken.position
+    var distance: float = Vector2(player.global_position.x - pos.x, player.global_position.z - pos.z).length()
+    chicken.visible = not indoor and not rain and not night and distance < 75.0
+    if not chicken.visible:
+        return
+    var cooldown: float = maxf(0.0, float(state["cooldown"]) - delta)
+    var flee_timer: float = maxf(0.0, float(state["flee_timer"]) - delta)
+    if distance < 3.8 and cooldown <= 0.0 and flee_timer <= 0.0:
+        flee_timer = 2.2
+        cooldown = 5.0
+        chicken_flee_count += 1
+        var away: Vector3 = pos - player.global_position
+        away.y = 0.0
+        if away.length_squared() < 0.01:
+            away = Vector3.FORWARD
+        var destination: Vector3 = pos + away.normalized() * (7.0 if bool(state["panic"]) else 4.5)
+        if _safe_chicken_point(destination):
+            state["target"] = destination
+        else:
+            state["target"] = state["base"]
+        _play_chicken_call(pos, true)
+    state["cooldown"] = cooldown
+    state["flee_timer"] = flee_timer
+    var walk_timer: float = float(state["walk_timer"]) - delta
+    if walk_timer <= 0.0 and flee_timer <= 0.0:
+        walk_timer = rng.randf_range(2.0, 5.0)
+        var target: Vector3 = state["base"] + Vector3(
+            rng.randf_range(-4.0, 4.0), 0.0, rng.randf_range(-4.0, 4.0))
+        if _safe_chicken_point(target):
+            state["target"] = target
+    state["walk_timer"] = walk_timer
+    var diff: Vector3 = state["target"] - pos
+    diff.y = 0.0
+    var speed: float = 4.4 if flee_timer > 0.0 else 0.55
+    if diff.length() > 0.15:
+        var step: Vector3 = diff.normalized() * minf(diff.length(), speed * delta)
+        if _safe_chicken_point(pos + step):
+            chicken.position += step
+            chicken.rotation.y = lerp_angle(chicken.rotation.y, atan2(-diff.x, -diff.z), minf(1.0, delta * 7.0))
+        state["moving"] = true
+    else:
+        state["moving"] = false
+    var peck: float = maxf(0.0, sin(clock * 2.9 + float(state["phase"])))
+    chicken.get_node("Head").rotation.x = peck * 0.34 if flee_timer <= 0.0 else 0.0
+    var flap: float = sin(clock * 22.0 + float(state["phase"])) * 0.65 if flee_timer > 0.0 else 0.035
+    chicken.get_node("LeftWing").rotation.z = flap
+    chicken.get_node("RightWing").rotation.z = -flap
+    chicken.position.y = absf(sin(clock * 13.0)) * 0.065 if flee_timer > 0.0 else 0.0
+
+func _play_chicken_call(position: Vector3, panic: bool = false) -> void:
+    chicken_cluck_count += 1
+    if not _sound_enabled() or DisplayServer.get_name() == "headless":
+        return
+    chicken_player.global_position = position
+    chicken_player.stream = sound_clips["panic_cluck" if panic else "cluck"]
+    chicken_player.pitch_scale = rng.randf_range(0.9, 1.12)
+    chicken_player.play()
+
+func _tick_calls(delta: float, indoor: bool, rain: bool, night: bool) -> void:
+    cluck_wait -= delta
+    bird_wait -= delta
+    if indoor or rain or night:
+        return
+    if cluck_wait <= 0.0:
+        cluck_wait = rng.randf_range(5.0, 11.0)
+        for state in chickens:
+            var chicken: Node3D = state["node"]
+            if chicken.visible and chicken.global_position.distance_to(player.global_position) < 35.0:
+                _play_chicken_call(chicken.global_position)
+                break
+    if bird_wait <= 0.0:
+        bird_wait = rng.randf_range(6.0, 12.0)
+        for state in birds:
+            var bird: Node3D = state["node"]
+            if bird.visible and bird.global_position.distance_to(player.global_position) < 40.0:
+                if _sound_enabled() and DisplayServer.get_name() != "headless":
+                    bird_player.global_position = bird.global_position
+                    bird_player.play()
+                break
 
 func _update_leaves(indoor: bool, rain: bool) -> void:
     leaf_batch.visible = not indoor and not rain and player.global_position.length() < 220
