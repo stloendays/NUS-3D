@@ -20,6 +20,7 @@ const DELIVERY_COOLDOWN_SECONDS: float = 32.0
 @onready var challenge: UTownChallenge = $"../Challenge"
 @onready var campus_life: UTownCampusLife = $"../CampusLife"
 @onready var arcade: UTownArcade = $"../Arcade"
+@onready var coursework: UTownCoursework = $"../Coursework"
 @onready var green_dining: UTownGreenDining = $"../GreenDining"
 @onready var hud: CanvasLayer = $"../HUD"
 
@@ -56,6 +57,9 @@ var shop_panel: PanelContainer
 var shop_status: Label
 var shop_open: bool = false
 var capture_mouse_before_shop: bool = false
+var previous_shop_mouse_mode: int = Input.MOUSE_MODE_CAPTURED
+var previous_shop_player_lock: bool = false
+var previous_shop_coursework_modal: bool = false
 var known_hud_visibility: bool = true
 
 func _ready() -> void:
@@ -272,7 +276,7 @@ func _horizontal_distance(a: Vector3, b: Vector3) -> float:
     return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
 
 func _can_interact() -> bool:
-    return hud.visible and not shop_open and not campus_life.interior_active and not campus_life.on_shuttle and not player.movement_locked
+    return hud.visible and not shop_open and not campus_life.interior_active         and not campus_life.on_shuttle and not player.movement_locked and not coursework.modal_open
 
 func _drop_at(position: Vector3, amount: int) -> bool:
     if amount <= 0 or amount > 50:
@@ -429,20 +433,59 @@ func _close_shop() -> void:
         return
     shop_open = false
     shop_panel.visible = false
-    if capture_mouse_before_shop:
-        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+    # Restore the exact state that existed before the shop acquired the modal.
+    # Do not clear a lock introduced by a different overlay while this was open.
+    var course_ui: Node = get_parent().get_node_or_null("CourseworkUI")
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    var leisure: Node = get_parent().get_node_or_null("LeisureUI")
+    var another_modal: bool = (course_ui != null and bool(course_ui.get("modal_visible")))         or (exams != null and bool(exams.get("is_open")))         or (leisure != null and bool(leisure.get("is_open")))
+    coursework.modal_open = previous_shop_coursework_modal or another_modal
+    player.movement_locked = previous_shop_player_lock or coursework.modal_open or campus_life.on_shuttle
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if another_modal else previous_shop_mouse_mode
 
 func toggle_shop() -> void:
     if shop_open:
         _close_shop()
         return
-    if not hud.visible or campus_life.on_shuttle or campus_life.interior_active:
+    if not hud.visible or campus_life.on_shuttle or campus_life.interior_active         or player.bicycle_mode or player.movement_locked or coursework.modal_open:
         return
+    previous_shop_mouse_mode = Input.mouse_mode
+    previous_shop_player_lock = player.movement_locked
+    previous_shop_coursework_modal = coursework.modal_open
+    capture_mouse_before_shop = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
     shop_open = true
     shop_panel.visible = true
-    capture_mouse_before_shop = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+    coursework.modal_open = true
+    player.movement_locked = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     _refresh_display()
+
+## Session-only state may never follow a different local account. Keep wallet,
+## purchased buffs and claimed rewards in the account-specific ConfigFile.
+func reset_runtime_session() -> void:
+    _close_shop()
+    delivery_active = false
+    delivery_time = 0.0
+    delivery_cooldown = 0.0
+    source_student_wins = 0
+    reward_poll_timer = 0.0
+    drop_timer = 0.0
+    refresh_timer = 0.0
+    notice = ""
+    notice_time = 0.0
+    pickup_cursor = 0
+    for pickup in pickups:
+        pickup["active"] = false
+        pickup["life"] = 0.0
+        pickup["value"] = 0
+        var node: Node3D = pickup["node"]
+        node.visible = false
+    _refresh_display()
+
+func seed_session_drops() -> void:
+    # New accounts do not inherit the previous avatar's world pickups.
+    for i in range(5):
+        _spawn_random_coin(true)
 
 func _notify(value: String, seconds: float) -> void:
     notice = value
@@ -562,7 +605,19 @@ func _process(delta: float) -> void:
         refresh_timer = 0.0
         _refresh_display()
 
+func _input(event: InputEvent) -> void:
+    if not shop_open:
+        return
+    if event is InputEventKey:
+        var key: InputEventKey = event as InputEventKey
+        if key.pressed and not key.echo and key.keycode in [KEY_ESCAPE, KEY_O]:
+            _close_shop()
+        # While the modal is open no gameplay keys should reach other systems.
+        get_viewport().set_input_as_handled()
+
 func _unhandled_input(event: InputEvent) -> void:
+    if shop_open or player.movement_locked:
+        return
     if event is InputEventKey and event.pressed and not event.echo:
         match event.keycode:
             KEY_Z:
