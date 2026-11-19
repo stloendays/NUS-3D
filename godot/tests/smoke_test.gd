@@ -487,6 +487,25 @@ func _smoke() -> void:
         quit(1)
         return
     var indoor_guest: Node3D = indoor_npcs.actors[0]["node"]
+    if not indoor_guest.visible:
+        push_error("active room actor was not rendered")
+        quit(1)
+        return
+    var erc_room_lights: Array = polish.indoor_lamps["ERC"]
+    var src_room_lights: Array = polish.indoor_lamps["SRC"]
+    polish._process(0.25)
+    if not erc_room_lights[0].visible or src_room_lights[0].visible:
+        push_error("adaptive light fixtures did not isolate the active room")
+        quit(1)
+        return
+    var daytime_energy: float = erc_room_lights[0].light_energy
+    world.set_lighting_mode(3)
+    polish._process(1.0)
+    if erc_room_lights[0].light_energy <= daytime_energy:
+        push_error("interior accents did not brighten in artistic evening mode")
+        quit(1)
+        return
+    world.set_lighting_mode(0)
     player.global_position = indoor_guest.global_position + Vector3(0.0, 0.18, 1.6)
     if not campus_life.talk_to_nearest() or indoor_npcs.last_spoken.is_empty():
         push_error("Q did not redirect dialogue to indoor room NPC")
