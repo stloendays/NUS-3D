@@ -559,7 +559,9 @@ func finish_presentation(timed_out: bool) -> Dictionary:
         passed_ids.append(active_id)
     var saved: bool = _save_progress()
     if not saved and first_pass:
-        passed_ids.erase(active_id)
+        var passed_index: int = passed_ids.find(active_id)
+        if passed_index >= 0:
+            passed_ids.remove_at(passed_index)
     var rewarded: bool = false
     if saved and completed:
         rewarded = coursework.claim_exam_reward_once(active_id, rewards_xp, rewards_credits)
