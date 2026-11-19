@@ -51,3 +51,8 @@ The Windows exported-runtime JSON contract now requires 13 faculty options, 39 q
 
 ## M3.7 animated opening
 At each application launch, the offline Godot engine plays an approximately 12-second flyover of schematic UTown areas, overlaid with original comedy text about Coursework DDL. Press Space, Esc, Enter or left-click to skip. First-run players then see the faculty picker; existing saves transition to ordinary gameplay. This cinematic does not alter missions, score, user data or weather. The Linux graphical CI captures four actual intro scenes. Windows exported-runtime integrity checks confirm the 6 camera keys, 12-second timeline and skip UI. Manual GUI QA still required for smooth playback and Chinese text readability.
+
+
+## M3.8 post-course games
+
+Finishing a three-chapter faculty Coursework route unlocks the permanent P-key post-course clubhouse. This includes interactive 9x9 Gomoku versus a simple NPC, a five-round card comparison minigame with no money stakes, and an optional all-ages social lounge with nonalcoholic beverages. An adult-only fictional toast has no extra rewards and temporarily blocks travel controls; no age or drink history is persisted. The Windows exported-runtime self-test asserts 81 chess board cells, 5 card rounds, 81 UI buttons, social-age acknowledgement and decorative SRC club props. Headless checks are not substitutes for Windows keyboard and viewport QA.
