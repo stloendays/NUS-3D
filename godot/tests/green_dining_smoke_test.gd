@@ -44,7 +44,7 @@ func _test() -> void:
             multimesh.get_instance_transform(i).origin.x,
             multimesh.get_instance_transform(i).origin.z
         )):
-            _fail("grass tuft was placed outside lawn or on an existing walkway")
+            _fail("grass tuft %d was placed outside lawn or on an existing walkway" % i)
             return
     if environment.picnic_count < 2 or environment.picnic_count > environment.PICNIC_LIMIT:
         _fail("lawn picnic details missing or unbounded")
