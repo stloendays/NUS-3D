@@ -53,19 +53,21 @@ func _ready() -> void:
     _skin_card(campus_card, Color(0.07, 0.13, 0.18, 0.93), Color("#8bbcd8"), 12, 13)
     for item in [title_label, hint_label, target_label, nearest_label, perf_label]:
         item.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
-    title_label.add_theme_font_size_override("font_size", 20)
+    title_label.add_theme_font_size_override("font_size", 15)
     title_label.add_theme_color_override("font_color", Color("#d6f8f7"))
     hint_label.add_theme_font_size_override("font_size", 12)
     hint_label.add_theme_color_override("font_color", NUS3DUISkin.DIM)
-    target_label.add_theme_font_size_override("font_size", 17)
+    target_label.add_theme_font_size_override("font_size", 14)
     target_label.add_theme_color_override("font_color", Color("#f4dfaa"))
-    nearest_label.add_theme_font_size_override("font_size", 14)
+    nearest_label.add_theme_font_size_override("font_size", 11)
     perf_label.add_theme_font_size_override("font_size", 13)
     for label in [gis_summary, tour_message, challenge_message, campus_message]:
         label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     challenge_message.add_theme_font_size_override("font_size", 14)
-    campus_message.add_theme_font_size_override("font_size", 13)
+    campus_message.add_theme_font_size_override("font_size", 12)
     _make_help_overlay()
+    hint_label.visible = false
+    perf_label.visible = false
     _make_key_rail()
     _make_toast()
     _load_osm_fit_summary()
@@ -252,18 +254,38 @@ func _process(delta: float) -> void:
     var message: String = tour.card_text()
     tour_card.visible = not message.is_empty()
     tour_message.text = message
-    challenge_message.text = challenge.status_text()
-    challenge_card.visible = not challenge_message.text.is_empty()
-    campus_message.text = weather.status_text() + "\n" + campus_life.status_text()
-    campus_card.visible = true
-    if language_service.is_chinese():
+    var localized: bool = language_service.is_chinese()
+    if localized:
         hint_label.text = language_service.hud_hint(world)
         target_label.text = language_service.hud_target(tour)
         nearest_label.text = language_service.game_text(nearest_label.text)
         perf_label.text = language_service.game_text(perf_label.text)
         tour_message.text = language_service.tour_card(tour)
-        challenge_message.text = language_service.challenge_card(challenge)
-        campus_message.text = language_service.weather_card(weather) + "\n" + language_service.game_text(campus_life.status_text())
+    var nearby_note: bool = false
+    for index in range(challenge.items.size()):
+        var note_id: String = challenge.item_id(index)
+        if challenge.is_item_collected(note_id):
+            continue
+        if player.global_position.distance_to(challenge.item_world_position(index)) < 12.0:
+            nearby_note = true
+            break
+    # A compact contextual game HUD instead of always-on developer dashboards.
+    challenge_card.visible = show_full_help or challenge.sprint_active or challenge.feedback_remaining > 0.0 or nearby_note
+    var challenge_text: String = language_service.challenge_card(challenge) if localized else challenge.status_text()
+    if show_full_help:
+        challenge_message.text = challenge_text
+    elif nearby_note:
+        challenge_message.text = ("附近有校园笔记 [C] 收集" if localized else "FIELD NOTE nearby  [C] collect")
+    elif challenge.sprint_active:
+        challenge_message.text = challenge_text.get_slice("\n", 0)
+    else:
+        challenge_message.text = challenge.feedback_message
+    var weather_info: String = language_service.weather_card(weather) if localized else weather.status_text()
+    campus_message.text = weather_info.get_slice("\n", 0)
+    if show_full_help or (campus_life.message_time > 0.0 and not campus_life.message.is_empty()):
+        var life_info: String = language_service.game_text(campus_life.status_text()) if localized else campus_life.status_text()
+        campus_message.text += "\n" + life_info
+    campus_card.visible = true
     _update_notices(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -274,6 +296,8 @@ func _unhandled_input(event: InputEvent) -> void:
             show_full_help = not show_full_help
             help_label.visible = show_full_help
             help_backdrop.visible = show_full_help
+            hint_label.visible = show_full_help
+            perf_label.visible = show_full_help
         elif event.keycode == KEY_F7:
             visible = not visible
             world.set_navigation_markers_visible(visible)
