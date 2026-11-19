@@ -817,6 +817,9 @@ func interact_nearby() -> bool:
     var prefix: String = "DISCOVERED" if not was_visited else "REVISITED"
     message = "%s: %s  |  %s" % [prefix, str(activity["name"]), str(activity["text"])]
     message_time = 6.0
+    var coursework: UTownCoursework = get_parent().get_node_or_null("Coursework") as UTownCoursework
+    if coursework != null:
+        coursework.notify_activity(activity_id)
     return true
 
 func activity_progress_count() -> int:
