@@ -84,7 +84,7 @@ def load_release_version() -> str:
     return version
 
 
-def build_archive(directory: Path, output: Path, commit: str, godot_version: str) -> dict:
+def build_archive(directory: Path, output: Path, commit: str, godot_version: str, stable_release: bool = False) -> dict:
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("Commit must be a full, lowercase 40-character Git SHA")
     if not re.fullmatch(r"\d+\.\d+\.\d+", godot_version):
@@ -105,7 +105,7 @@ def build_archive(directory: Path, output: Path, commit: str, godot_version: str
         "commit": commit,
         "godot_version": godot_version,
         "platform": "Windows x86_64",
-        "distribution": "experimental, unsigned, non-official",
+        "distribution": "stable, unsigned, non-official" if stable_release else "experimental, unsigned, non-official",
         "spatial_data": "provisional, NOT a field survey",
         "files": {
             name: {"bytes": len(data), "sha256": sha256(data)}
@@ -117,7 +117,7 @@ def build_archive(directory: Path, output: Path, commit: str, godot_version: str
         for name, data in sources.items():
             archive.writestr(name, data)
         archive.writestr(MANIFEST_NAME, json.dumps(manifest, indent=2) + "\n")
-        archive.writestr(README_NAME, README)
+        archive.writestr(README_NAME, README.replace("experimental Windows preview", "stable Windows build") if stable_release else README)
     verify_archive(output)
     return manifest
 
@@ -159,6 +159,7 @@ def main() -> None:
     parser.add_argument("--commit", help="Exact source commit SHA")
     parser.add_argument("--godot-version", default="4.4.1")
     parser.add_argument("--verify", type=Path, help="Verify a completed ZIP instead of building")
+    parser.add_argument("--stable-release", action="store_true", help="Mark a verified tag build as the stable release")
     args = parser.parse_args()
     if args.verify:
         result = verify_archive(args.verify)
@@ -166,7 +167,7 @@ def main() -> None:
     else:
         if not args.directory or not args.output or not args.commit:
             parser.error("--directory, --output, --commit required when building")
-        result = build_archive(args.directory, args.output, args.commit, args.godot_version)
+        result = build_archive(args.directory, args.output, args.commit, args.godot_version, stable_release=args.stable_release)
         print(f"PASS: Windows portable bundle written to {args.output}")
     print(f"Project commit: {result['commit']} | Godot: {result['godot_version']}")
 
