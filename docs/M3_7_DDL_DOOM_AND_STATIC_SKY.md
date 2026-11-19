@@ -44,4 +44,4 @@ For manual QA in the Godot 4.4+ editor, select `godot/project.godot`, run main s
 
 ## Integration discipline
 
-M3.7 was branched from `feature/m3-5-campus-slapstick-20261119` instead of modifying active M3.6, M5 or M6 branches. The only modifications to existing game code are the weather cloud-image subscene, two new root children in `main.tscn`, a help shortcut, and a CI test step. Other modules stay isolated.
+M3.7 was branched from `feature/m3-5-campus-slapstick-20261119` instead of modifying active M3.6, M5 or M6 branches. Changes to existing files are confined to the weather cloud-image subscene, two new children and title/help copy in `main.tscn`, comedy labeling in the existing HUD and `project.godot`, and a CI test step. Gameplay systems and existing save schemas stay isolated.
