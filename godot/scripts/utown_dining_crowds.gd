@@ -32,6 +32,11 @@ func _ready() -> void:
     body_mesh.radial_segments = 8
     body_mesh.rings = 2
     var colors := [Color("#d48a78"), Color("#86a4c2"), Color("#b7a0c9"), Color("#8bbaa5")]
+    var shared_materials: Array[StandardMaterial3D] = []
+    for color in colors:
+        var shared := StandardMaterial3D.new()
+        shared.albedo_color = color
+        shared_materials.append(shared)
     for i in range(MAX_PEOPLE):
         var npc := Node3D.new()
         npc.name = "Diner_%02d" % i
@@ -39,9 +44,7 @@ func _ready() -> void:
         var mesh := MeshInstance3D.new()
         mesh.name = "StylizedDiner"
         mesh.mesh = body_mesh
-        var mat := StandardMaterial3D.new()
-        mat.albedo_color = colors[i % colors.size()]
-        mesh.material_override = mat
+        mesh.material_override = shared_materials[i % shared_materials.size()]
         mesh.position.y = 0.78
         mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
         npc.add_child(mesh)
@@ -84,8 +87,8 @@ func _process(delta: float) -> void:
     for i in range(people.size()):
         var state: Dictionary = people[i]
         var npc: Node3D = state["node"]
-        npc.visible = i < active_count and npc.global_position.distance_to(current) < 95.0
-        if i >= active_count:
+        npc.visible = i < active_count and npc.global_position.distance_squared_to(current) < 9025.0
+        if not npc.visible:
             continue
         var base: Vector3 = state["base"]
         var offset: Vector3 = state["offset"]
