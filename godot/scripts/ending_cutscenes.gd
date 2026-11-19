@@ -26,6 +26,8 @@ var actor_face: Label
 var stage: SubViewport
 var puppet: NUS3DCartoonActor
 var puppet_tween: Tween
+var camera_3d: Camera3D
+var previous_mouse_mode: int = Input.MOUSE_MODE_CAPTURED
 var headline: Label
 var subline: Label
 var skip: Button
@@ -79,11 +81,11 @@ func _ready() -> void:
     world.add_child(light)
     puppet = NUS3DCartoonActor.new()
     world.add_child(puppet)
-    var camera := Camera3D.new()
-    camera.position = Vector3(2.4, 1.6, 3.8)
-    world.add_child(camera)
-    camera.look_at(Vector3(0, 0.95, 0), Vector3.UP)
-    camera.current = true
+    camera_3d = Camera3D.new()
+    camera_3d.position = Vector3(2.4, 1.6, 3.8)
+    world.add_child(camera_3d)
+    camera_3d.look_at(Vector3(0, 0.95, 0), Vector3.UP)
+    camera_3d.current = true
     actor_face = Label.new()
     actor_face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     actor_face.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -114,6 +116,8 @@ func play(ending_id: String) -> void:
     curtain.color = Color.html(str(palette[0]))
     actor_face.add_theme_color_override("font_color", Color.html(str(palette[1])))
     headline.text = str(palette[3])
+    previous_mouse_mode = Input.mouse_mode
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     curtain.show()
     # Three small, readable beats; every sequence is skippable.
     var shots: Array = SHOTS[ending_id]
@@ -125,6 +129,12 @@ func play(ending_id: String) -> void:
         if puppet_tween != null and puppet_tween.is_running():
             puppet_tween.kill()
         puppet_tween = puppet.pose(ending_id, i, 0.48)
+        if camera_3d != null:
+            camera_3d.position = Vector3(2.4, 1.6, 3.8)
+            camera_3d.fov = 65.0
+            var zoom := create_tween().set_parallel(true)
+            zoom.tween_property(camera_3d, "position", Vector3(1.85, 1.5, 3.0), 0.9).set_trans(Tween.TRANS_SINE)
+            zoom.tween_property(camera_3d, "fov", 54.0, 0.9).set_trans(Tween.TRANS_SINE)
         actor.pivot_offset = actor.size * 0.5
         actor.scale = Vector2(0.82, 0.82)
         actor.rotation = -0.08 if i % 2 == 0 else 0.08
@@ -147,6 +157,7 @@ func stop() -> void:
     if puppet_tween != null and puppet_tween.is_running():
         puppet_tween.kill()
     curtain.hide()
+    Input.mouse_mode = previous_mouse_mode
     finished.emit()
 
 
