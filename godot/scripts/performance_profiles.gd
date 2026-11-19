@@ -5,7 +5,7 @@ class_name NUS3DGraphicsSettings
 signal preset_changed(preset: String)
 
 const SAVE_PATH: String = "user://nus3d_graphics.cfg"
-const ORDER: PackedStringArray = PackedStringArray(["low", "balanced", "high", "ultra"])
+const ORDER = ["low", "balanced", "high", "ultra"]
 const PROFILES: Dictionary = {
     "low": {"fps": 30, "scale": 0.70, "minimum": 0.60, "far": 280.0,
         "rain": 180, "streaks": 65, "shadows": false, "details": false},
