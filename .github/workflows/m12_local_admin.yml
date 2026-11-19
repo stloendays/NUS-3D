@@ -1,0 +1,39 @@
+name: M12 local admin console security smoke
+
+on:
+  push:
+    branches:
+      - feature/m12-local-admin-console-20261119
+  pull_request:
+    paths:
+      - godot/scripts/admin_authority.gd
+      - godot/scripts/admin_console.gd
+      - godot/scripts/game_shell.gd
+      - godot/scripts/hud.gd
+      - godot/tests/admin_console_smoke_test.gd
+      - docs/M12_LOCAL_ADMIN_CONSOLE.md
+      - .github/workflows/m12_local_admin.yml
+
+permissions:
+  contents: read
+
+jobs:
+  admin-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+      - name: Parse and import scripts
+        run: godot --headless --path godot --import --quit
+      - name: Existing account and game integration regression
+        run: |
+          timeout 90s godot --headless --path godot --script res://tests/account_smoke_test.gd
+          timeout 90s godot --headless --path godot --script res://tests/integration_smoke_test.gd
+      - name: Admin authorization, isolation and world editing smoke
+        run: timeout 90s godot --headless --path godot --script res://tests/admin_console_smoke_test.gd
