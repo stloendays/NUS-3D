@@ -500,37 +500,104 @@ func _render() -> void:
     count += 1
     course_ui.set_hud_enabled(false)
     coursework.set_markers_visible(false)
-    # M3.8: record genuine unlocked post-course games, using a temporary profile.
+    # M3.9: real gameplay snapshots, walking up to each unlocked SRC station.
     var leisure: UTownLeisure = instance.get_node_or_null("Leisure") as UTownLeisure
     var leisure_ui: UTownLeisureUI = instance.get_node_or_null("LeisureUI") as UTownLeisureUI
     if leisure == null or leisure_ui == null:
-        push_error("M3.8 leisure scene missing from visual review")
+        push_error("M3.9 game venue missing from original viewport captures")
         quit(1)
         return
+    leisure.save_path = "user://nus3d_leisure_review_temp.cfg"
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
     coursework.active_quest_index = 3
     coursework._store_active_state()
-    if not leisure.unlocked() or not leisure_ui.open_lounge():
-        push_error("Cannot present the unlocked post-course club")
+    if not leisure.unlocked():
+        push_error("Could not unlock SRC club using isolated coursework profile")
+        quit(1)
+        return
+    if campus_life.interior_active:
+        campus_life.exit_interior()
+    if not campus_life.enter_interior("SRC"):
+        push_error("Could not enter SRC for physical club screenshots")
+        quit(1)
+        return
+    var club_room: Node3D = campus_life.interiors["SRC"]
+    player.global_position = club_room.to_global(Vector3(2.65, 0.18, 0.25))
+    player.look_at(club_room.to_global(Vector3(3.2, 1.6, -5.7)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    for club_frame in range(16):
+        await process_frame
+    if not await _capture_frame(output, "M3_9_SRC_3D_CLUB_AND_SEATED_NPCS.png"):
+        push_error("Cannot capture physical chess and card tables with seated characters")
+        quit(1)
+        return
+    count += 1
+    player.global_position = leisure.station_global_position("chess")
+    if not leisure_ui.open_lounge() or leisure_ui.active_tab != "chess":
+        push_error("Cannot open unlocked game after approaching physical chess desk")
         quit(1)
         return
     if not await _capture_frame(output, "M3_8_GOMOKU_UNLOCKED.png"):
-        push_error("Cannot render playable 9x9 Gomoku board")
+        push_error("Cannot capture active Gomoku interface")
         quit(1)
         return
     count += 1
-    leisure_ui.switch_tab("cards")
-    if not await _capture_frame(output, "M3_8_CARD_DUEL_UNLOCKED.png"):
-        push_error("Cannot render five-round card game")
+    leisure.reset_chess()
+    for pre_stone in range(4):
+        leisure.chess_board[pre_stone] = 1
+        leisure.chess_moves += 1
+    if not leisure.play_chess(4, 0) or leisure_ui.fx_seconds <= 0.0:
+        push_error("Cannot demonstrate a genuine game-win celebration")
         quit(1)
         return
-    count += 1
-    leisure_ui.switch_tab("social")
-    if not await _capture_frame(output, "M3_8_AFTER_CLASS_SOCIAL.png"):
-        push_error("Cannot render post-course social and no-alcohol option")
+    if not await _capture_frame(output, "M3_9_GOMOKU_VICTORY_ANIMATION.png"):
+        push_error("Cannot capture winning chess move and UI confetti")
         quit(1)
         return
     count += 1
     leisure_ui.close_lounge()
+    player.global_position = club_room.to_global(Vector3(3.4, 0.18, -3.2))
+    player.look_at(club_room.to_global(Vector3(3.2, 1.4, -5.7)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_9_LIVE_3D_CHESS_PIECES.png"):
+        push_error("Cannot capture actual black pieces on the 3D chess table")
+        quit(1)
+        return
+    count += 1
+    player.global_position = leisure.station_global_position("cards")
+    if not leisure_ui.open_lounge() or leisure_ui.active_tab != "cards":
+        push_error("Cannot approach the physical card table")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_8_CARD_DUEL_UNLOCKED.png"):
+        push_error("Cannot capture five-round card gameplay")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.close_lounge()
+    player.global_position = leisure.station_global_position("social")
+    if not leisure_ui.open_lounge() or leisure_ui.active_tab != "social":
+        push_error("Cannot approach the physical social counter")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_8_AFTER_CLASS_SOCIAL.png"):
+        push_error("Cannot capture optional after-class social interaction")
+        quit(1)
+        return
+    count += 1
+    leisure.chess_wins = 2
+    leisure.card_wins = 1
+    leisure.social_visits = 1
+    leisure_ui._refresh()
+    leisure_ui._on_secret()
+    if not await _capture_frame(output, "M3_9_SECRET_CAMPUS_EPILOGUE.png"):
+        push_error("Cannot capture post-course repeat-play hidden story")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.close_lounge()
+    campus_life.exit_interior()
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
     DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
 
     hud.visible = false
@@ -552,6 +619,7 @@ func _render() -> void:
         "m36_showcase": ["faculty_selection", "coursework_hud", "coursework_journal", "ddl_countdown"],
         "m37_intro": ["arrival", "group_project", "ddl_warning", "faculty_handoff"],
         "m38_leisure": ["gomoku", "five_round_cards", "social_mocktails"],
+        "m39_club_scene": ["walk_to_3d_room", "chess_victory", "real_board_stones", "hidden_story"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
