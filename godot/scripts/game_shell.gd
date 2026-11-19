@@ -29,6 +29,7 @@ var _shown_level: int = 0
 var login_error_source: String = ""
 var mail_status_source: String = ""
 var tutorial: NUS3DTutorial
+var session_overlay: NUS3DSessionOverlay
 var registering: bool = false
 var mail_list: ItemList
 var mail_heading: Label
@@ -74,6 +75,10 @@ func _ready() -> void:
     _build_profile_card()
     _build_mail()
     _build_tutorial()
+    session_overlay = NUS3DSessionOverlay.new()
+    session_overlay.name = "MultiplayerAndGraphics"
+    add_child(session_overlay)
+    session_overlay.setup(self, game)
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
@@ -425,6 +430,8 @@ func _logout() -> void:
     if not accounts.is_logged_in():
         return
     challenge.sprint_active = false
+    if session_overlay != null:
+        session_overlay.network.leave_room()
     var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
         coursework._save_progress()
