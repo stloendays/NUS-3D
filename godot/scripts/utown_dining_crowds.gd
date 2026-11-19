@@ -18,6 +18,7 @@ var congestion: float = 0.0
 var tick: float = 0.0
 var hud: Label
 var crowd_root: Node3D
+var player_slowdown: float = 1.0
 
 func _ready() -> void:
     rng.seed = 20261120
@@ -113,11 +114,9 @@ func _process(delta: float) -> void:
         state["offset"] = offset
         state["push"] = push.limit_length(1.65)
         npc.global_position = base + offset + state["push"]
-    if blocked and speed < 5.5 and not player.bicycle_mode:
-        # Mild friction gives a crowding sensation, but the player can always
-        # push through using movement/sprint; no CharacterBody collision layer.
-        player.velocity.x *= 0.78
-        player.velocity.z *= 0.78
+    # Controller reads this factor before its own movement integration.
+    # Walking into a crowd feels slower; sprinting always clears the lane.
+    player_slowdown = 0.55 if blocked and speed < 5.5 and not player.bicycle_mode else 1.0
     if hud != null:
         hud.text = "%s  |  %s" % [clock.formatted_time(),
             "LUNCH RUSH · PUSH THROUGH" if congestion > 0.7 else
