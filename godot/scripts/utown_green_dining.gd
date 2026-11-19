@@ -161,7 +161,8 @@ func _build_lawn_tufts() -> void:
     mat.roughness = 0.97
     # Weather was initialized earlier: register the new material without resetting
     # existing rain state or replacing any existing grass/shader material.
-    world.weather_reactive_grass.append(mat)
+    # This decorative turf registers with Weather only: do not alter the two
+    # canonical World grass materials relied on by existing scene contracts.
     weather.wet_materials.append({
         "material": mat, "color": mat.albedo_color, "roughness": mat.roughness,
         "metallic": mat.metallic, "kind": "vegetation"
