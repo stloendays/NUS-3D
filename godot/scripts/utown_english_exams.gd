@@ -7,6 +7,19 @@ const DATA_PATH: String = "res://data/english_exam_papers.json"
 const DEFAULT_SAVE_PATH: String = "user://nus3d_english_exams.cfg"
 const DATA_SCHEMA: String = "nus3d-english-exams-v1"
 
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+const CHROME_ZH: Dictionary = {
+    "UTOWN EXAMINATION OFFICE  /  FICTIONAL GAME ASSESSMENT": "虚构校园考试",
+    "ENGLISH MAJOR EXAM PAPERS": "专业模拟试卷",
+    "Choose a major within your selected faculty. Five questions, three minutes, 60% to pass. Retakes are allowed; each major pays its XP bonus only once.":
+        "选择学院下的专业。五道题，三分钟，60% 及格。可重考，每专业只奖励一次。",
+    "All questions and answers are in English. These are original game papers, not official NUS assessments.":
+        "题目与答案按玩法要求保留英文。试卷为游戏原创，不是官方考试。",
+    "START EXAM": "开始考试", "RETURN TO CAMPUS": "返回校园",
+    "PREVIOUS": "上一题", "NEXT QUESTION": "下一题", "SUBMIT PAPER": "提交试卷",
+    "LEAVE (DISCARD)": "退出并放弃", "OTHER MAJORS / RETAKE": "换专业或重考"
+}
+
 @onready var coursework: UTownCoursework = $"../Coursework"
 @onready var course_ui: UTownCourseworkUI = $"../CourseworkUI"
 @onready var player: UTownPlayer = $"../Player"
@@ -64,6 +77,9 @@ func _ready() -> void:
     layer = 27
     _load_papers()
     _build_ui()
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
+    _on_language_changed(language.locale if language != null else "en")
     # The login shell selects the account's save before any rewards are read.
 
 func _load_papers() -> void:
@@ -193,6 +209,34 @@ func _save_progress() -> bool:
     if error != OK:
         push_warning("Could not write the standalone English exam record")
     return error == OK
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _on_language_changed(_code: String) -> void:
+    _refresh_static_chrome(self)
+    if page == "library" and paper_selector != null:
+        _on_paper_choice(paper_selector.selected)
+    elif page == "question":
+        previous_second = -1
+        _refresh_timer()
+        _refresh_question_counter()
+    elif page == "result" and not latest_result.is_empty() and papers.has(active_paper_id):
+        _refresh_result(papers[active_paper_id], latest_result)
+
+
+func _refresh_static_chrome(node: Node) -> void:
+    if node is Label or node is Button:
+        var original: String = str(node.get_meta("i18n_chrome", ""))
+        if original.is_empty() and CHROME_ZH.has(node.get("text")):
+            original = str(node.get("text"))
+            node.set_meta("i18n_chrome", original)
+        if not original.is_empty():
+            node.set("text", _t(str(CHROME_ZH.get(original, original)), original))
+    for child in node.get_children():
+        _refresh_static_chrome(child)
+
 
 func _font_label(text_value: String, points: int, color: String) -> Label:
     var label := Label.new()
@@ -412,18 +456,18 @@ func _refresh_library() -> void:
 
 func _on_paper_choice(index: int) -> void:
     if index < 0 or index >= paper_selector.item_count:
-        summary_label.text = "No exam papers are available for this faculty."
+        summary_label.text = _t("此学院暂无模拟试卷。", "No exam papers are available for this faculty.")
         return
     var paper_id: String = str(paper_selector.get_item_metadata(index))
     var paper: Dictionary = papers[paper_id]
-    var best: String = "%d%%" % int(best_scores[paper_id]) if best_scores.has(paper_id) else "Not attempted"
-    var certified: String = "PASSED" if passed_ids.has(paper_id) else "NOT YET PASSED"
-    summary_label.text = "FACULTY: %s\nMAJOR: %s\nPAPER: %s\n\nBEST SCORE: %s   |   ATTEMPTS: %d\nCERTIFICATION: %s\n\nFirst passing attempt: +%d XP and +%d coursework credits." % [
-        str(coursework.faculty_by_id[coursework.current_faculty_id]["name"]),
-        str(paper["major"]), str(paper["title"]),
-        best, int(attempts.get(paper_id, 0)), certified,
-        first_pass_xp, first_pass_credits
-    ]
+    var best: String = "%d%%" % int(best_scores[paper_id]) if best_scores.has(paper_id) else _t("尚未参加", "Not attempted")
+    var certified: String = _t("已通过", "PASSED") if passed_ids.has(paper_id) else _t("尚未通过", "NOT YET PASSED")
+    var faculty_name: String = coursework.faculty_name()
+    summary_label.text = _t(
+        "学院：%s\n专业：%s\n试卷：%s\n\n最佳分数：%s | 次数：%d\n认证：%s\n\n首次及格奖励：%d XP 和 %d 课程积分。",
+        "FACULTY: %s\nMAJOR: %s\nPAPER: %s\n\nBEST SCORE: %s | ATTEMPTS: %d\nCERTIFICATION: %s\n\nFirst pass: +%d XP and +%d coursework credits."
+    ) % [faculty_name, str(paper["major"]), str(paper["title"]),
+        best, int(attempts.get(paper_id, 0)), certified, first_pass_xp, first_pass_credits]
 
 func _begin_selected_exam() -> void:
     if paper_selector.selected < 0:
@@ -472,13 +516,14 @@ func _refresh_timer() -> void:
     if whole_seconds == previous_second:
         return
     previous_second = whole_seconds
-    timer_label.text = "%02d:%02d LEFT" % [whole_seconds / 60, whole_seconds % 60]
+    timer_label.text = _t("剩余 %02d:%02d", "%02d:%02d LEFT") % [whole_seconds / 60, whole_seconds % 60]
 
 func _refresh_question_counter() -> void:
     if page != "question" or active_paper_id.is_empty():
         return
     var total: int = papers[active_paper_id]["questions"].size()
-    question_counter.text = "QUESTION %d OF %d   |   ANSWERED %d / %d   |   PASS: 60%%" % [
+    question_counter.text = _t("第 %d/%d 题 | 已答 %d/%d | 及格线：60%%",
+        "QUESTION %d OF %d | ANSWERED %d/%d | PASS: 60%%") % [
         question_number + 1, total, answers.size(), total
     ]
     progress_bar.max_value = total
@@ -544,26 +589,28 @@ func submit_exam() -> Dictionary:
 func _refresh_result(paper: Dictionary, result: Dictionary) -> void:
     var grade: String = str(result["grade"])
     var passed: bool = bool(result["passed"])
-    result_title.text = "GRADE %s  |  %d%%  |  %s" % [
-        grade, int(result["score"]), "PASSED" if passed else "RETAKE ADVISED"
-    ]
-    result_summary.text = "%s\n%d correct out of %d questions  |  %d unanswered\n%s" % [
-        str(paper["major"]), int(result["correct"]), int(result["total"]), int(result["unanswered"]),
-        "First-pass reward: +%d XP, +%d credits." % [first_pass_xp, first_pass_credits] if bool(result["rewarded"])
-        else "No additional XP this attempt. Passing rewards are available once per major."
-    ]
+    result_title.text = _t("成绩 %s | %d%% | %s", "GRADE %s | %d%% | %s") % [
+        grade, int(result["score"]), _t("通过", "PASSED") if passed else _t("建议重考", "RETAKE ADVISED")]
+    var reward_text: String = _t("首次通过奖励：%d XP，%d 积分。",
+        "First-pass reward: +%d XP, +%d credits.") % [first_pass_xp, first_pass_credits]         if bool(result["rewarded"]) else _t(
+            "本次无额外经验。每专业只有一次通过奖励。",
+            "No additional XP this attempt. One passing reward per major.")
+    result_summary.text = _t("%s\n答对 %d/%d 题 | 未答 %d 题\n%s",
+        "%s\n%d correct out of %d | %d unanswered\n%s") % [
+        str(paper["major"]), int(result["correct"]), int(result["total"]),
+        int(result["unanswered"]), reward_text]
     var lines := PackedStringArray()
-    lines.append("ANSWER REVIEW   /   MODEL ANSWERS")
+    lines.append(_t("答案回顾", "ANSWER REVIEW"))
     for index in range(paper["questions"].size()):
         var q: Dictionary = paper["questions"][index]
         var id: String = str(q["id"])
         var choice: int = int(answers.get(id, -1))
         var correct: int = int(q["correct_index"])
-        var mark: String = "CORRECT" if choice == correct else "NOT CORRECT"
+        var mark: String = _t("正确", "CORRECT") if choice == correct else _t("不正确", "INCORRECT")
         lines.append("\n%d. %s" % [index + 1, str(q["prompt"])])
-        lines.append("YOUR ANSWER: " + (str(q["options"][choice]) if choice >= 0 and choice < 4 else "No answer"))
-        lines.append("EXPECTED: " + str(q["options"][correct]))
-        lines.append("RESULT: %s   |   %s" % [mark, str(q["explanation"])])
+        lines.append(_t("你的答案：", "YOUR ANSWER: ") + (str(q["options"][choice]) if choice >= 0 and choice < 4 else _t("未作答", "No answer")))
+        lines.append(_t("正确答案：", "EXPECTED: ") + str(q["options"][correct]))
+        lines.append(_t("判定：%s | 说明：%s", "RESULT: %s | EXPLANATION: %s") % [mark, str(q["explanation"])])
     result_review.text = "\n".join(lines)
 
 func _process(delta: float) -> void:
