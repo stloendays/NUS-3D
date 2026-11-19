@@ -12,6 +12,9 @@ GameLanguage="*res://scripts/game_language.gd"
 DialogueBank="*res://scripts/game_dialogue.gd"
 UISound="*res://scripts/ui_sfx.gd"
 
+[audio]
+driver/enable_input=true
+
 [display]
 window/size/viewport_width=1280
 window/size/viewport_height=720
