@@ -68,6 +68,8 @@ jobs:
         run: godot --headless --path godot --script res://tests/green_dining_smoke_test.gd
       - name: Test independent coins, quest rewards, 3D icons and bounded drops
         run: godot --headless --path godot --script res://tests/coins_smoke_test.gd
+      - name: Validate contextual exploration HUD and read-only mission compass
+        run: timeout 60s godot --headless --path godot --script res://tests/experience_guide_smoke_test.gd
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |
           sudo apt-get update -qq
