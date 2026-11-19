@@ -70,6 +70,8 @@ jobs:
         run: godot --headless --path godot --script res://tests/coins_smoke_test.gd
       - name: Validate contextual exploration HUD and read-only mission compass
         run: timeout 60s godot --headless --path godot --script res://tests/experience_guide_smoke_test.gd
+      - name: Validate expanded Kent Ridge map, bus boarding and destination travel
+        run: timeout 90s godot --headless --path godot --script res://tests/kent_ridge_expansion_smoke_test.gd
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |
           sudo apt-get update -qq
