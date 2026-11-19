@@ -54,9 +54,8 @@ func is_unlocked() -> bool:
 
 
 func lock() -> void:
+    # Closing/reopening the panel must NOT reset failed-login throttling.
     unlocked_account_id = ""
-    failed_attempts = 0
-    lock_until_ms = 0
 
 
 func bootstrap_owner(secret: String) -> String:
