@@ -1,15 +1,24 @@
 extends RefCounted
 class_name NUS3DUISkin
-## Reusable low-cost beveled HUD, dialog and keycap styling. No texture assets.
+## Soft-light system for NUS-3D: original iOS-inspired visual language, not
+## Apple UI assets. StyleBoxFlat only; no backbuffer blur or shader passes.
+## Readable dark type, translucent white surfaces, restrained blue/teal accents.
 
-const TEXT: Color = Color("#eff9fc")
-const DIM: Color = Color("#a2bdc8")
-const ACCENT: Color = Color("#79e3dc")
+const TEXT: Color = Color("#233746")
+const DIM: Color = Color("#627785")
+const ACCENT: Color = Color("#268CA9")
+const TEAL: Color = Color("#248A80")
+const WARM: Color = Color("#D59650")
+const SURFACE: Color = Color(0.974, 0.991, 1.0, 0.93)
+const SURFACE_SOLID: Color = Color("#F7FAFC")
+const SURFACE_MUTED: Color = Color("#EAF1F5")
+const HAIRLINE: Color = Color(0.61, 0.74, 0.78, 0.52)
+const BACKDROP: Color = Color(0.70, 0.79, 0.84, 0.48)
 
-static func panel(background: Color, accent: Color = ACCENT, radius: int = 13, margin: int = 13) -> StyleBoxFlat:
+static func panel(background: Color, accent: Color = ACCENT, radius: int = 20, margin: int = 14) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
     style.bg_color = background
-    style.border_color = accent.darkened(0.35)
+    style.border_color = accent.lightened(0.61).with_alpha(0.68)
     style.set_border_width_all(1)
     style.border_width_top = 2
     style.set_corner_radius_all(radius)
@@ -17,61 +26,74 @@ static func panel(background: Color, accent: Color = ACCENT, radius: int = 13, m
     style.content_margin_right = margin
     style.content_margin_top = margin
     style.content_margin_bottom = margin
-    style.shadow_color = Color(0.01, 0.035, 0.055, 0.63)
-    style.shadow_size = 10
-    style.shadow_offset = Vector2(0, 5)
+    style.shadow_color = Color(0.11, 0.22, 0.29, 0.15)
+    style.shadow_size = 11
+    style.shadow_offset = Vector2(0, 4)
     style.anti_aliasing = true
     return style
 
+static func glass(accent: Color = ACCENT, radius: int = 23, margin: int = 17,
+        dense: bool = false) -> StyleBoxFlat:
+    # Slightly more opaque than real iOS glass, for contrast over moving 3D.
+    return panel(Color(0.97, 0.987, 1.0, 0.96 if dense else 0.88),
+        accent, radius, margin)
+
 static func keycap(pressed: bool = false, highlighted: bool = false) -> StyleBoxFlat:
-    var s: StyleBoxFlat = StyleBoxFlat.new()
-    s.bg_color = Color("#356474") if pressed else Color("#294451") if highlighted else Color("#1e333f")
-    s.border_color = Color("#8ef4e6") if pressed else Color("#7da9b5")
-    s.border_width_left = 1
-    s.border_width_right = 1
-    s.border_width_top = 2 if not pressed else 1
-    s.border_width_bottom = 3 if not pressed else 1
-    s.set_corner_radius_all(7)
-    s.shadow_color = Color(0.015, 0.04, 0.055, 0.78)
-    s.shadow_size = 3 if pressed else 5
-    s.shadow_offset = Vector2(0, 1 if pressed else 4)
-    s.content_margin_left = 5
-    s.content_margin_right = 5
-    s.content_margin_top = 2
-    s.content_margin_bottom = 2
-    return s
+    var style: StyleBoxFlat = StyleBoxFlat.new()
+    style.bg_color = (Color("#CFE9F2") if pressed else
+        Color("#F9FCFF") if highlighted else Color("#E8F3F7"))
+    style.border_color = (Color("#75C1D2") if pressed else
+        Color("#DAEEF2") if highlighted else Color("#C8DEE5"))
+    style.set_border_width_all(1)
+    style.border_width_top = 2 if not pressed else 1
+    style.border_width_bottom = 3 if not pressed else 1
+    style.set_corner_radius_all(12)
+    style.shadow_color = Color(0.14, 0.32, 0.42, 0.15)
+    style.shadow_size = 3 if pressed else 6
+    style.shadow_offset = Vector2(0, 1 if pressed else 4)
+    style.content_margin_left = 7
+    style.content_margin_right = 7
+    style.content_margin_top = 3
+    style.content_margin_bottom = 3
+    style.anti_aliasing = true
+    return style
 
 static func button(control: Button) -> void:
     control.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-    control.custom_minimum_size.y = maxf(control.custom_minimum_size.y, 39.0)
-    var base: StyleBoxFlat = keycap()
-    base.content_margin_left = 13
-    base.content_margin_right = 13
+    control.custom_minimum_size.y = maxf(control.custom_minimum_size.y, 40.0)
+    var normal: StyleBoxFlat = keycap()
+    normal.content_margin_left = 14
+    normal.content_margin_right = 14
     var hover: StyleBoxFlat = keycap(false, true)
-    hover.content_margin_left = 13
-    hover.content_margin_right = 13
+    hover.content_margin_left = 14
+    hover.content_margin_right = 14
     var down: StyleBoxFlat = keycap(true)
-    down.content_margin_left = 13
-    down.content_margin_right = 13
-    control.add_theme_stylebox_override("normal", base)
+    down.content_margin_left = 14
+    down.content_margin_right = 14
+    control.add_theme_stylebox_override("normal", normal)
     control.add_theme_stylebox_override("hover", hover)
     control.add_theme_stylebox_override("pressed", down)
     control.add_theme_stylebox_override("hover_pressed", down)
-    control.add_theme_stylebox_override("focus", panel(Color.TRANSPARENT, ACCENT, 8, 0))
-    control.add_theme_stylebox_override("disabled", panel(Color("#18242b"), Color("#40525b"), 8, 8))
+    var focus: StyleBoxFlat = panel(Color.TRANSPARENT, ACCENT, 13, 0)
+    focus.shadow_size = 0
+    control.add_theme_stylebox_override("focus", focus)
+    var disabled: StyleBoxFlat = panel(Color("#E6EAED"), Color("#C2C9CC"), 13, 9)
+    disabled.shadow_size = 0
+    control.add_theme_stylebox_override("disabled", disabled)
     control.add_theme_color_override("font_color", TEXT)
-    control.add_theme_color_override("font_hover_color", Color.WHITE)
-    control.add_theme_color_override("font_pressed_color", Color("#d4fff6"))
-    control.add_theme_color_override("font_disabled_color", Color("#6f8590"))
+    control.add_theme_color_override("font_hover_color", Color("#126B8A"))
+    control.add_theme_color_override("font_pressed_color", Color("#145B70"))
+    control.add_theme_color_override("font_disabled_color", Color("#8F9FA8"))
     control.add_theme_font_size_override("font_size", 14)
 
 static func field(control: Control) -> void:
-    var base: StyleBoxFlat = panel(Color("#132a35"), Color("#63838d"), 8, 9)
+    var base: StyleBoxFlat = panel(Color("#F2F8FA"), Color("#B4CCD4"), 13, 11)
     base.shadow_size = 2
-    base.shadow_offset = Vector2(0, 2)
-    var focused: StyleBoxFlat = panel(Color("#163441"), ACCENT, 8, 9)
+    base.shadow_offset = Vector2(0, 1)
+    var focused: StyleBoxFlat = panel(Color("#FFFFFF"), ACCENT, 13, 11)
     focused.border_width_top = 2
-    focused.shadow_size = 4
+    focused.shadow_size = 5
+    focused.shadow_color = Color(0.12, 0.43, 0.52, 0.12)
     control.add_theme_stylebox_override("normal", base)
     control.add_theme_stylebox_override("focus", focused)
     control.add_theme_stylebox_override("read_only", base)
@@ -79,4 +101,4 @@ static func field(control: Control) -> void:
     control.add_theme_color_override("font_placeholder_color", DIM)
     control.add_theme_color_override("caret_color", ACCENT)
     if control is LineEdit:
-        control.custom_minimum_size.y = maxf(control.custom_minimum_size.y, 40.0)
+        control.custom_minimum_size.y = maxf(control.custom_minimum_size.y, 41.0)
