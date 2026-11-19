@@ -221,6 +221,9 @@ func talk_to_nearest() -> bool:
         return false
     actor["talk_left"] = 5.0
     last_spoken = str(actor["name"])
+    var coursework: UTownCoursework = get_parent().get_node_or_null("Coursework") as UTownCoursework
+    if coursework != null:
+        coursework.notify_dialogue(str(actor["id"]))
     life.message = "%s / %s  |  %s" % [str(actor["name"]), str(actor["role"]), str(actor["dialogue"])]
     life.message_time = 5.0
     return true
