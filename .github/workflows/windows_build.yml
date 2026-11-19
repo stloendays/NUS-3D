@@ -1,5 +1,9 @@
 name: Windows x64 portable preview (unsigned)
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: ["main", "feature/**"]
