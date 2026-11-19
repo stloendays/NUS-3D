@@ -19,6 +19,7 @@ var tick: float = 0.0
 var hud: Label
 var crowd_root: Node3D
 var player_slowdown: float = 1.0
+var camera: Camera3D
 
 func _ready() -> void:
     rng.seed = 20261120
@@ -32,6 +33,11 @@ func _ready() -> void:
     body_mesh.radial_segments = 8
     body_mesh.rings = 2
     var colors := [Color("#d48a78"), Color("#86a4c2"), Color("#b7a0c9"), Color("#8bbaa5")]
+    var shared_materials: Array[StandardMaterial3D] = []
+    for color in colors:
+        var shared := StandardMaterial3D.new()
+        shared.albedo_color = color
+        shared_materials.append(shared)
     for i in range(MAX_PEOPLE):
         var npc := Node3D.new()
         npc.name = "Diner_%02d" % i
@@ -39,9 +45,7 @@ func _ready() -> void:
         var mesh := MeshInstance3D.new()
         mesh.name = "StylizedDiner"
         mesh.mesh = body_mesh
-        var mat := StandardMaterial3D.new()
-        mat.albedo_color = colors[i % colors.size()]
-        mesh.material_override = mat
+        mesh.material_override = shared_materials[i % shared_materials.size()]
         mesh.position.y = 0.78
         mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
         npc.add_child(mesh)
@@ -72,6 +76,8 @@ func _process(delta: float) -> void:
     var elapsed: float = tick
     tick = 0.0
     congestion = clock.dining_intensity()
+    if not is_instance_valid(camera) or not camera.is_current():
+        camera = get_viewport().get_camera_3d()
     var active_count: int = int(round(lerpf(4.0, float(MAX_PEOPLE), congestion)))
     if life.interior_active:
         active_count = 0
@@ -84,8 +90,14 @@ func _process(delta: float) -> void:
     for i in range(people.size()):
         var state: Dictionary = people[i]
         var npc: Node3D = state["node"]
-        npc.visible = i < active_count and npc.global_position.distance_to(current) < 95.0
+        npc.visible = i < active_count and npc.global_position.distance_squared_to(current) < 9025.0
+        if npc.visible and camera != null:
+            npc.visible = camera.is_position_in_frustum(npc.global_position + Vector3.UP)
         if i >= active_count:
+            continue
+        # Nearby pedestrians still affect movement even when behind the camera.
+        var near_player: bool = npc.global_position.distance_squared_to(current) < 9.0
+        if not npc.visible and not near_player:
             continue
         var base: Vector3 = state["base"]
         var offset: Vector3 = state["offset"]
@@ -98,7 +110,7 @@ func _process(delta: float) -> void:
         var away: Vector3 = pos - current
         away.y = 0
         var distance: float = away.length()
-        if npc.visible and distance < SHOVE_RADIUS and not player.movement_locked and not life.on_shuttle:
+        if (npc.visible or near_player) and distance < SHOVE_RADIUS and not player.movement_locked and not life.on_shuttle:
             var direction: Vector3 = away.normalized() if distance > 0.01 else Vector3.RIGHT
             var bike: bool = player.bicycle_mode
             var running: bool = speed > 5.5

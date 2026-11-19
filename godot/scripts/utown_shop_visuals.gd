@@ -6,12 +6,22 @@ class_name UTownShopVisuals
 var stand: Node3D
 var previews: Dictionary = {}
 var spin_time: float = 0.0
+var visibility_tick: float = 0.0
+var active_display: bool = false
+var camera: Camera3D
+var _material_cache: Dictionary = {}
+var _box_cache: Dictionary = {}
+var _cylinder_cache: Dictionary = {}
 
 func _material(hex: String, metallic: float = 0.0) -> StandardMaterial3D:
+    var key: String = hex + ":" + str(metallic)
+    if _material_cache.has(key):
+        return _material_cache[key]
     var m := StandardMaterial3D.new()
     m.albedo_color = Color.html(hex)
     m.roughness = 0.67
     m.metallic = metallic
+    _material_cache[key] = m
     return m
 
 func _mesh(parent: Node3D, name: String, mesh: Mesh, pos: Vector3, color: String, metal: float = 0.0) -> MeshInstance3D:
@@ -25,16 +35,23 @@ func _mesh(parent: Node3D, name: String, mesh: Mesh, pos: Vector3, color: String
     return item
 
 func _cylinder(radius: float, height: float) -> CylinderMesh:
+    var key: Vector2 = Vector2(radius, height)
+    if _cylinder_cache.has(key):
+        return _cylinder_cache[key]
     var mesh := CylinderMesh.new()
     mesh.top_radius = radius
     mesh.bottom_radius = radius
     mesh.height = height
     mesh.radial_segments = 12
+    _cylinder_cache[key] = mesh
     return mesh
 
 func _box(size: Vector3) -> BoxMesh:
+    if _box_cache.has(size):
+        return _box_cache[size]
     var mesh := BoxMesh.new()
     mesh.size = size
+    _box_cache[size] = mesh
     return mesh
 
 func _label(parent: Node3D, words: String, pos: Vector3, scale_value: float = 0.007) -> void:
@@ -103,11 +120,18 @@ func _umbrella(root: Node3D) -> void:
 func _process(delta: float) -> void:
     if stand == null:
         return
-    var near: bool = stand.global_position.distance_to(coins.player.global_position) < 65.0
-    stand.visible = near and not coins.campus_life.interior_active
-    if not stand.visible:
+    visibility_tick += delta
+    if visibility_tick >= 0.2:
+        visibility_tick = 0.0
+        if not is_instance_valid(camera) or not camera.is_current():
+            camera = get_viewport().get_camera_3d()
+        var near: bool = stand.global_position.distance_squared_to(coins.player.global_position) < 4225.0
+        var in_view: bool = camera == null or camera.is_position_in_frustum(stand.global_position + Vector3.UP)
+        active_display = near and in_view and not coins.campus_life.interior_active
+        stand.visible = active_display
+    if not active_display:
         return
     spin_time += delta
-    for item in previews.keys():
-        var root: Node3D = previews[item]
-        root.rotation.y = sin(spin_time * 0.7 + float(["coffee", "snack", "umbrella"].find(item))) * 0.16
+    for i in range(3):
+        var root: Node3D = previews[["coffee", "snack", "umbrella"][i]]
+        root.rotation.y = sin(spin_time * 0.7 + float(i)) * 0.16
