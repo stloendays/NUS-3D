@@ -165,7 +165,7 @@ func _save_progress() -> bool:
         return false
     return true
 
-## The award ledger and existing XP/credits are persisted in ONE coursework save.
+## The reward ledger and existing XP/credits are persisted in ONE coursework save.
 ## Repeating or restoring an exam cannot grant this bonus more than once.
 func claim_exam_reward_once(paper_id: String, gained_xp: int, gained_credits: int) -> bool:
     if paper_id.is_empty() or paper_id.length() > 90 or gained_xp < 0 or gained_credits < 0:
@@ -300,7 +300,7 @@ func status_text() -> String:
     var current: Dictionary = current_quest()
     var header: String = "%s  |  Lv.%d  XP %d  $%d" % [faculty_name(), level(), total_xp, credits]
     if current.is_empty():
-        return "COURSEWORK  |  " + header + "\n学院任务全部完成！[J] 查看成绩  [O] 切换学院"
+        return "COURSEWORK  |  " + header + "\n学院任务已完成！[P] 五子棋/打牌/聚会  [O] 切换学院"
     return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[J] 任务手册  [O] 切换学院" % [
         active_quest_index + 1, header, str(current["title"]), format_ddl(), objective_description()
     ]
@@ -456,6 +456,10 @@ func _complete_quest() -> void:
     active_quest_index += 1
     active_stage = STAGE_BRIEF
     current_time_left = 0.0
+    var chapters: Array = faculty_by_id[current_faculty_id]["quests"]
+    if active_quest_index >= chapters.size():
+        feedback += "\n解锁：下课后社团 [P] — 五子棋、牌局和聚会！"
+        feedback_left = 9.0
     _save_progress()
     _refresh_marker()
 
