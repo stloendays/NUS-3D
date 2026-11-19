@@ -275,6 +275,7 @@ func _update_cinematic_visuals() -> void:
         cinematic_camera.look_at(focus, Vector3.UP)
     current_beat = mini(BEAT_COUNT - 1, int(elapsed / (DURATION_S / float(BEAT_COUNT))))
     badge_label.text = BADGES[current_beat]
+    badge_label.add_theme_color_override("font_color", Color.html("#ff7971" if current_beat == 2 else "#ffc46c"))
     subtitle_label.text = TAGLINES[current_beat]
     alert_label.text = SUBTITLES[current_beat]
     progress.value = elapsed
@@ -288,6 +289,11 @@ func _update_cinematic_visuals() -> void:
     var sub_alpha: float = clampf(beat_elapsed * 3.0, 0.0, 1.0)
     subtitle_label.modulate.a = sub_alpha
     alert_label.modulate.a = clampf((beat_elapsed - 0.2) * 2.1, 0.0, 1.0)
+    title_label.modulate.a = clampf(elapsed * 1.65, 0.0, 1.0)
+    # A restrained scale ease makes the original title feel like an entrance,
+    # not a static text overlay.
+    var title_zoom: float = 1.0 + 0.10 * pow(1.0 - clampf(elapsed / 2.0, 0.0, 1.0), 2.0)
+    title_label.scale = Vector2.ONE * title_zoom
 
 func _process(delta: float) -> void:
     if not playing or preview_frozen:
@@ -333,6 +339,13 @@ func _input(event: InputEvent) -> void:
     if event is InputEventKey:
         var key: InputEventKey = event as InputEventKey
         if key.pressed and not key.echo and key.keycode in [KEY_SPACE, KEY_ESCAPE, KEY_ENTER, KEY_KP_ENTER]:
+            skip_intro()
+        get_viewport().set_input_as_handled()
+    elif event is InputEventMouseButton:
+        # A click anywhere can skip; crucially it must not steal the cursor
+        # into player mouse-look before a user can reach the skip button.
+        var click: InputEventMouseButton = event as InputEventMouseButton
+        if click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
             skip_intro()
         get_viewport().set_input_as_handled()
     elif event is InputEventMouseMotion:
