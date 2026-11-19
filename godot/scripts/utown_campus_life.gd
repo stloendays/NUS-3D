@@ -98,7 +98,7 @@ func _sample_route(route: Array[Vector3], distance: float) -> Dictionary:
 func npc_ground_position(current: Vector3, desired: Vector3, delta: float) -> Vector3:
     # Probe from near the NPC feet to avoid snapping onto overhead roofs.
     # Only static walkable surfaces; reject steep slopes and large height jumps.
-    var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+    var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
     var from: Vector3 = desired + Vector3.UP * (NPC_STEP_HEIGHT + 0.15)
     var to: Vector3 = desired + Vector3.DOWN * 1.6
     var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
