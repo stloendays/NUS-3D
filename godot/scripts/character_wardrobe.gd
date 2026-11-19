@@ -176,9 +176,9 @@ func _build_preview() -> void:
     world.add_child(character)
     var camera := Camera3D.new()
     camera.position = Vector3(2.4, 1.5, 3.8)
+    world.add_child(camera)
     camera.look_at(Vector3(0, 0.95, 0), Vector3.UP)
     camera.current = true
-    world.add_child(camera)
 
 
 func _refresh() -> void:
