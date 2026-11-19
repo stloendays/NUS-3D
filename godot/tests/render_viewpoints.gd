@@ -522,9 +522,9 @@ func _render() -> void:
         quit(1)
         return
     var club_room: Node3D = campus_life.interiors["SRC"]
-    player.global_position = club_room.to_global(Vector3(2.65, 0.18, 0.25))
-    player.look_at(club_room.to_global(Vector3(3.2, 1.6, -5.7)), Vector3.UP)
-    player.head.rotation = Vector3.ZERO
+    player.global_position = club_room.to_global(Vector3(5.0, 0.18, 0.30))
+    player.rotation = Vector3.ZERO
+    player.head.rotation = Vector3(-0.12, 0.0, 0.0)
     for club_frame in range(16):
         await process_frame
     if not await _capture_frame(output, "M3_9_SRC_3D_CLUB_AND_SEATED_NPCS.png"):
@@ -550,15 +550,16 @@ func _render() -> void:
         push_error("Cannot demonstrate a genuine game-win celebration")
         quit(1)
         return
+    leisure_ui._refresh()
     if not await _capture_frame(output, "M3_9_GOMOKU_VICTORY_ANIMATION.png"):
         push_error("Cannot capture winning chess move and UI confetti")
         quit(1)
         return
     count += 1
     leisure_ui.close_lounge()
-    player.global_position = club_room.to_global(Vector3(3.4, 0.18, -3.2))
-    player.look_at(club_room.to_global(Vector3(3.2, 1.4, -5.7)), Vector3.UP)
-    player.head.rotation = Vector3.ZERO
+    player.global_position = club_room.to_global(Vector3(3.2, 0.18, -3.1))
+    player.rotation = Vector3.ZERO
+    player.head.rotation = Vector3(-0.42, 0.0, 0.0)
     if not await _capture_frame(output, "M3_9_LIVE_3D_CHESS_PIECES.png"):
         push_error("Cannot capture actual black pieces on the 3D chess table")
         quit(1)
