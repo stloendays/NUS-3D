@@ -18,6 +18,7 @@ func _run() -> void:
     var game: Node3D = packed.instantiate() as Node3D
     root.add_child(game)
     await process_frame
+    NUS3DServices.enter_test_playmode(game)
     for node_name in ["World", "Player", "HUD", "Coursework", "CourseworkUI", "Intro",
             "Arcade", "Streetscape", "DDLStory", "GreenDining", "Coins", "ExperienceGuide"]:
         if game.get_node_or_null(node_name) == null:

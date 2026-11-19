@@ -71,8 +71,8 @@ func _ready() -> void:
     ui.process_mode = Node.PROCESS_MODE_ALWAYS
     add_child(ui)
     _build_login()
-    _build_mail()
     _build_profile_card()
+    _build_mail()
     _build_tutorial()
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)

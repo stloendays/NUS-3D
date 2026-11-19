@@ -15,6 +15,7 @@ func _smoke() -> void:
     var scene: Node3D = packed.instantiate() as Node3D
     root.add_child(scene)
     await process_frame
+    NUS3DServices.enter_test_playmode(scene)
     var sky: UTownWeather = scene.get_node_or_null("Weather") as UTownWeather
     var decor: UTownStreetscape = scene.get_node_or_null("Streetscape") as UTownStreetscape
     var story: UTownDDLStory = scene.get_node_or_null("DDLStory") as UTownDDLStory

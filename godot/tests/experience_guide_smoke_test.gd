@@ -22,6 +22,7 @@ func _run() -> void:
         return
     root.add_child(game)
     await process_frame
+    NUS3DServices.enter_test_playmode(game)
 
     var guide: UTownExperienceGuide = game.get_node_or_null("ExperienceGuide") as UTownExperienceGuide
     var player: UTownPlayer = game.get_node("Player") as UTownPlayer

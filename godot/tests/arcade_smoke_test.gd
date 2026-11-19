@@ -16,6 +16,7 @@ func _smoke() -> void:
     var instance: Node3D = scene.instantiate() as Node3D
     root.add_child(instance)
     await process_frame
+    NUS3DServices.enter_test_playmode(instance)
     var arcade: UTownArcade = instance.get_node_or_null("Arcade") as UTownArcade
     var campus: UTownCampusLife = instance.get_node_or_null("CampusLife") as UTownCampusLife
     var player: UTownPlayer = instance.get_node_or_null("Player") as UTownPlayer

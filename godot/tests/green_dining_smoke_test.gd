@@ -16,6 +16,7 @@ func _test() -> void:
     var instance: Node3D = scene.instantiate() as Node3D
     root.add_child(instance)
     await process_frame
+    NUS3DServices.enter_test_playmode(instance)
     var environment: UTownGreenDining = instance.get_node_or_null("GreenDining") as UTownGreenDining
     var world: UTownWorld = instance.get_node_or_null("World") as UTownWorld
     var weather: UTownWeather = instance.get_node_or_null("Weather") as UTownWeather

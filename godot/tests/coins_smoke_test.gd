@@ -16,6 +16,7 @@ func _run() -> void:
     var scene: Node3D = source.instantiate() as Node3D
     root.add_child(scene)
     await process_frame
+    NUS3DServices.enter_test_playmode(scene)
     var coins: UTownCoins = scene.get_node_or_null("Coins") as UTownCoins
     var world: UTownWorld = scene.get_node_or_null("World") as UTownWorld
     var challenge: UTownChallenge = scene.get_node_or_null("Challenge") as UTownChallenge
