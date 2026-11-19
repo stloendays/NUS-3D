@@ -57,6 +57,7 @@ func _ready() -> void:
     add_child(bus_root)
     _build_road_links()
     _build_districts()
+    _build_faculty_amenities()
     _build_sports_ground()
     _build_campus_edge()
     _build_stations()
@@ -538,3 +539,76 @@ func _build_sports_npcs(parent: Node3D) -> void:
     for x in [-57.0, 57.0]:
         _box(parent, "WaterStation", Vector3(x, 1.1, 0.0), Vector3(1.8, 2.2, 1.5), "#77a8aa")
         _box(parent, "Bench", Vector3(x, 0.55, 12.0), Vector3(4.5, 0.5, 1.2), "#9b8668")
+
+
+# Campus amenities are original, low-poly interpretations, not surveyed interiors.
+# Each district has its own reason to visit instead of repeating generic benches.
+func _build_faculty_amenities() -> void:
+    var specs: Dictionary = {
+        "ENGINEERING": ["MAKER", "DINING", "WORKSHOP"],
+        "CLB": ["READING", "STUDY", "PRINT"],
+        "COM3": ["COMPUTER", "PROJECT", "LOUNGE"],
+        "BIZ2": ["DISCUSSION", "PRESENT", "COFFEE"],
+        "MUSEUM": ["EXHIBIT", "ART", "SEATING"],
+        "YIH": ["COMMONS", "NOTICE", "SEATING"],
+        "UHC": ["WAITING", "WATER", "SEATING"],
+        "PGP": ["LAUNDRY", "COMMONS", "SEATING"],
+        "KR_MRT": ["WAITING", "WATER", "SEATING"]
+    }
+    for district in districts:
+        var district_id: String = str(district["id"])
+        if not specs.has(district_id):
+            continue
+        var root_node: Node3D = district_root.get_node_or_null(district_id) as Node3D
+        if root_node == null:
+            continue
+        var amenities: Node3D = Node3D.new()
+        amenities.name = "FacultyAmenities"
+        amenities.position = Vector3(0, 0, -26)
+        root_node.add_child(amenities)
+        var activities: Array = specs[district_id]
+        for index in range(activities.size()):
+            var kind: String = str(activities[index])
+            var zone: Node3D = Node3D.new()
+            zone.name = kind + "_Zone"
+            zone.position = Vector3(-31.0 + float(index) * 31.0, 0, 0)
+            amenities.add_child(zone)
+            _build_amenity_zone(zone, kind)
+
+
+func _build_amenity_zone(zone: Node3D, kind: String) -> void:
+    _box(zone, "Paving", Vector3(0, 0.12, 0), Vector3(22, 0.18, 18), "#d9d3c5")
+    if kind in ["MAKER", "WORKSHOP", "PROJECT", "COMPUTER"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            _box(zone, "WorkBench_%d" % i, Vector3(x, 0.9, 0), Vector3(4.4, 0.24, 2.2), "#b99b79")
+            _box(zone, "Monitor_%d" % i, Vector3(x, 1.6, -0.5), Vector3(1.6, 1.1, 0.2), "#5c8190")
+            _box(zone, "Keyboard_%d" % i, Vector3(x, 1.08, 0.5), Vector3(1.4, 0.08, 0.45), "#d7dbd5")
+    elif kind in ["READING", "STUDY", "DISCUSSION", "PRESENT"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            _box(zone, "StudyDesk_%d" % i, Vector3(x, 1.0, 0), Vector3(4.0, 0.2, 2.5), "#c0a27e")
+            _box(zone, "Chair_%d" % i, Vector3(x, 0.55, 2.3), Vector3(1.2, 0.65, 1.2), "#738c91")
+        if kind == "PRESENT":
+            _box(zone, "PresentationScreen", Vector3(0, 2.5, -7.8), Vector3(10.0, 4.2, 0.3), "#e8ece8")
+    elif kind in ["DINING", "COFFEE", "COMMONS", "LOUNGE", "SEATING", "WAITING"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            _box(zone, "CafeTable_%d" % i, Vector3(x, 0.95, 0), Vector3(2.8, 0.18, 2.2), "#b69a78")
+            _box(zone, "CafeSeat_%d" % i, Vector3(x, 0.48, 2.0), Vector3(2.6, 0.35, 0.7), "#7b9788")
+        if kind in ["DINING", "COFFEE"]:
+            _box(zone, "FoodCounter", Vector3(0, 1.25, -7), Vector3(15, 2.5, 1.5), "#d6b68d")
+    elif kind in ["EXHIBIT", "ART"]:
+        for i in range(3):
+            var x: float = -7.0 + float(i) * 7.0
+            _box(zone, "ExhibitPlinth_%d" % i, Vector3(x, 0.85, 0), Vector3(2.5, 1.7, 2.5), "#d6d1c6")
+            _box(zone, "Sculpture_%d" % i, Vector3(x, 2.3, 0), Vector3(1.1, 1.5 + float(i), 1.1), "#a7b7ad")
+    elif kind == "PRINT":
+        for i in range(3):
+            _box(zone, "Printer_%d" % i, Vector3(-6 + i * 6, 1.05, 0), Vector3(2.8, 2.1, 2.3), "#d8dfdc")
+    elif kind == "LAUNDRY":
+        for i in range(4):
+            _box(zone, "Washer_%d" % i, Vector3(-7.5 + i * 5, 1.1, 0), Vector3(3.1, 2.2, 2.9), "#b9cbd0")
+    elif kind in ["WATER", "NOTICE"]:
+        _box(zone, "CampusFixture", Vector3(0, 1.25, 0), Vector3(3.0, 2.5, 1.4), "#80aaa9")
+    _label(zone, kind.replace("_", " "), Vector3(0, 3.6, -7), "#f8f2e4", 17)
