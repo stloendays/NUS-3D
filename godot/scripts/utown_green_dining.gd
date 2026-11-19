@@ -10,6 +10,18 @@ const PICNIC_ATTEMPTS: int = 500
 const LAWN_EDGE_MARGIN: float = 2.2
 const PATH_CLEARANCE: float = 1.2
 
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+const SIGN_ZH: Dictionary = {
+    "FINE FOOD  |  TOWN PLAZA": "美食广场 · 中央广场",
+    "RICE + NOODLES": "米饭与面食",
+    "LOCAL BITES": "本地风味",
+    "DRINKS + DESSERT": "饮品与甜点",
+    "SEATS  |  LUNCH BREAK": "座位区 · 午餐休息",
+    "FLAVOURS @ UTOWN\nFOOD COURT INSIDE SRC": "大学城美食\n食堂位于室内",
+    "FOOD + DRINKS": "美食与饮品",
+    "ERC LEARNING CAFE": "学习咖啡角"
+}
+
 @onready var world: UTownWorld = $"../World"
 @onready var weather: UTownWeather = $"../Weather"
 @onready var hud: CanvasLayer = $"../HUD"
@@ -36,6 +48,22 @@ func _ready() -> void:
     _build_fine_food()
     _build_flavours()
     _build_erc_cafe_label()
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
+    _on_language_changed(language.locale if language != null else "en")
+
+
+func _sign_text(source: String) -> String:
+    if language != null and language.is_chinese():
+        return str(SIGN_ZH.get(source, source))
+    return source
+
+
+func _on_language_changed(_code: String) -> void:
+    for sign in signs:
+        if sign != null and is_instance_valid(sign):
+            sign.text = _sign_text(str(sign.get_meta("source_sign", sign.text)))
+
 
 func _material(hex: String) -> StandardMaterial3D:
     if not material_cache.has(hex):
@@ -66,7 +94,8 @@ func _box(parent_node: Node3D, label: String, at: Vector3, size: Vector3, hex: S
 func _sign(parent_node: Node3D, message: String, at: Vector3, color: String, font_size: int = 26) -> Label3D:
     var label := Label3D.new()
     label.name = "AmenityLabel"
-    label.text = message
+    label.text = _sign_text(message)
+    label.set_meta("source_sign", message)
     label.position = at
     label.font_size = font_size
     label.pixel_size = 0.012
