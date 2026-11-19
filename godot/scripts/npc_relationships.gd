@@ -34,6 +34,7 @@ func load_account(path: String) -> void:
     for name in PROFILES:
         scores[name] = clampi(int(cfg.get_value("affinity", name, 0)), 0, MAX_AFFINITY)
         talk_counts[name] = maxi(0, int(cfg.get_value("conversations", name, 0)))
+        last_talk[name] = int(cfg.get_value("last_talk", name, 0))
 
 
 func clear_account() -> void:
@@ -50,6 +51,7 @@ func _save() -> void:
     for name in PROFILES:
         cfg.set_value("affinity", name, affinity(name))
         cfg.set_value("conversations", name, int(talk_counts.get(name, 0)))
+        cfg.set_value("last_talk", name, int(last_talk.get(name, 0)))
     if cfg.save(save_path) != OK:
         push_warning("Unable to save NPC relationships")
 
