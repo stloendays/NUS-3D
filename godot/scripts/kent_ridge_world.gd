@@ -40,6 +40,9 @@ func _ready() -> void:
     for item in data.get("stops", []):
         var stop: Dictionary = item.duplicate(true)
         stop["position"] = utown.lonlat_to_world(float(item["lon"]), float(item["lat"]))
+        var stop_position: Vector3 = stop["position"]
+        stop_position.y = _surface_elevation(stop_position)
+        stop["position"] = stop_position
         stops.append(stop)
         _stops_by_id[str(stop["id"])] = stop
     _build_extended_ground()
@@ -105,6 +108,34 @@ func _label(parent: Node3D, label_text: String, position_value: Vector3, color_h
     return label
 
 
+func _surface_elevation(point: Vector3) -> float:
+    # Smoothly blend the nearest two district elevations into the UTown datum.
+    # This is a schematic visual approximation, not a surveyed terrain surface.
+    var weighted: float = 0.0
+    var total_weight: float = 0.0
+    for district in districts:
+        var center: Vector3 = district["position"]
+        var distance_m: float = Vector2(point.x - center.x, point.z - center.z).length()
+        var weight: float = pow(maxf(0.0, 1.0 - distance_m / 220.0), 2.0)
+        weighted += weight * float(district.get("elevation_m", 0.0))
+        total_weight += weight
+    return weighted / total_weight if total_weight > 0.001 else 0.0
+
+
+func _graded_strip(parent: Node3D, name_value: String, start: Vector3, finish: Vector3, width_value: float, color: String) -> void:
+    var delta: Vector3 = finish - start
+    var length_value: float = delta.length()
+    if length_value < 0.1:
+        return
+    var axis := Node3D.new()
+    axis.name = name_value
+    axis.position = (start + finish) * 0.5
+    axis.rotation.y = atan2(delta.x, delta.z)
+    axis.rotation.x = -atan2(delta.y, Vector2(delta.x, delta.z).length())
+    parent.add_child(axis)
+    _box(axis, "GradedSurface", Vector3.ZERO, Vector3(width_value, 0.11, length_value), color)
+
+
 func _build_extended_ground() -> void:
     var min_x: float = -320.0
     var max_x: float = 320.0
@@ -134,17 +165,16 @@ func _build_road_links() -> void:
             continue
         var start: Vector3 = left["position"]
         var finish: Vector3 = right["position"]
-        var delta: Vector3 = finish - start
-        if delta.length() < 0.1:
-            continue
-        var axis: Node3D = Node3D.new()
-        axis.name = "WalkLink_" + str(connection[0]) + "_" + str(connection[1])
-        axis.position = (start + finish) * 0.5
-        axis.rotation.y = atan2(delta.x, delta.z)
-        roads_root.add_child(axis)
-        _box(axis, "SharedPath_Schematic", Vector3(0.0, 0.045, 0.0), Vector3(7.8, 0.065, delta.length()), "#91918a")
-        _box(axis, "Footpath", Vector3(-5.0, 0.075, 0.0), Vector3(2.3, 0.09, delta.length()), "#c2c6b7")
-        _box(axis, "CycleLane", Vector3(5.0, 0.067, 0.0), Vector3(2.0, 0.06, delta.length()), "#b3aa83")
+        _graded_strip(roads_root, "WalkLink_" + str(connection[0]) + "_" + str(connection[1]),
+            start + Vector3(0, 0.08, 0), finish + Vector3(0, 0.08, 0), 7.8, "#91918a")
+        var flat_delta: Vector3 = finish - start
+        var side: Vector3 = Vector3(flat_delta.z, 0, -flat_delta.x).normalized()
+        _graded_strip(roads_root, "Footpath_" + str(connection[0]) + "_" + str(connection[1]),
+            start - side * 5.0 + Vector3(0, 0.16, 0),
+            finish - side * 5.0 + Vector3(0, 0.16, 0), 2.3, "#c2c6b7")
+        _graded_strip(roads_root, "CycleLane_" + str(connection[0]) + "_" + str(connection[1]),
+            start + side * 5.0 + Vector3(0, 0.12, 0),
+            finish + side * 5.0 + Vector3(0, 0.12, 0), 2.0, "#b3aa83")
 
 
 func _build_districts() -> void:
