@@ -273,11 +273,13 @@ func _update_cinematic_visuals() -> void:
     var focus: Vector3 = (previous["look"] as Vector3).lerp(upcoming["look"], fraction)
     if cinematic_camera.global_position.distance_to(focus) > 0.25:
         cinematic_camera.look_at(focus, Vector3.UP)
-    current_beat = mini(BEAT_COUNT - 1, int(elapsed / (DURATION_S / float(BEAT_COUNT))))
-    badge_label.text = BADGES[current_beat]
-    badge_label.add_theme_color_override("font_color", Color.html("#ff7971" if current_beat == 2 else "#ffc46c"))
-    subtitle_label.text = TAGLINES[current_beat]
-    alert_label.text = SUBTITLES[current_beat]
+    var upcoming_beat: int = mini(BEAT_COUNT - 1, int(elapsed / (DURATION_S / float(BEAT_COUNT))))
+    if upcoming_beat != current_beat:
+        current_beat = upcoming_beat
+        badge_label.text = BADGES[current_beat]
+        badge_label.add_theme_color_override("font_color", Color.html("#ff7971" if current_beat == 2 else "#ffc46c"))
+        subtitle_label.text = TAGLINES[current_beat]
+        alert_label.text = SUBTITLES[current_beat]
     progress.value = elapsed
     # Soft cinematic fade-in/out, with no disorienting instant camera cuts.
     var intro_alpha: float = 1.0 - clampf(elapsed / 1.0, 0.0, 1.0)
