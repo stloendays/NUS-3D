@@ -85,6 +85,16 @@ func _physics_process(delta: float) -> void:
         reset_player()
 
 func reset_player() -> void:
+    # Restore campus-life state before respawning, otherwise R can leave
+    # the player physically outside while UI/weather still think they are indoors.
+    var life: UTownCampusLife = get_parent().get_node_or_null("CampusLife") as UTownCampusLife
+    if life != null:
+        if life.on_shuttle:
+            life.alight_shuttle()
+        if life.interior_active:
+            life.exit_interior()
+        if life.bicycle_enabled:
+            life.set_bicycle(false)
     global_position = SPAWN
     velocity = Vector3.ZERO
     rotation = Vector3.ZERO
