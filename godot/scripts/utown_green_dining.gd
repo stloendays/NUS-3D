@@ -23,6 +23,7 @@ var food_stall_count: int = 0
 var dining_areas: Dictionary = {}
 var signs: Array[Label3D] = []
 var tuft_batch: MultiMeshInstance3D
+var tuft_positions: PackedVector2Array = PackedVector2Array()
 var mesh_cache: Dictionary = {}
 var material_cache: Dictionary = {}
 var label_visibility: bool = true
@@ -148,6 +149,9 @@ func _build_lawn_tufts() -> void:
         if is_clear_lawn_point(candidate, 0.6):
             positions.append(candidate)
     generated_tuft_count = positions.size()
+    tuft_positions.clear()
+    for candidate in positions:
+        tuft_positions.append(candidate)
     if generated_tuft_count == 0:
         return
     var blades := MultiMesh.new()

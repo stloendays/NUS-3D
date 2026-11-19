@@ -97,6 +97,12 @@
           "body": "Shift+H 打开六条支线的剧情任务手册，按任务目标完成互动并选择做法，影响人缘、诚信和压力。完成至少三条支线开启 DDL 终章，获得不同好、坏或隐藏结局。通关后可重开周目，已有的账号经验、收集与结局图鉴不会清空。",
           "heading_en": "Side quests and endings / Shift+H",
           "body_en": "Press Shift+H to view six optional side stories. Complete objectives and choose your actions to influence relationships, integrity and stress. Three completed side quests unlock the DDL finale and six good, bad or secret endings. Replay without wiping account XP or the ending gallery."
+        },
+        {
+          "heading": "模拟专业考试 / F8",
+          "body": "选择学院后按 F8 打开 32 套原创英文专业试卷，包含化学、化工等学科。每套限时答题，首次合格获得经验和学园积分，重考不会重复领取。",
+          "heading_en": "English major exams / F8",
+          "body_en": "Choose a faculty and press F8 for 32 fictional English-language papers, including Chemistry and Chemical Engineering. Timed five-question papers include answer review and replay-proof rewards on the first passing result."
         }
       ],
       "title_en": "03  Exploration & Quests",
@@ -202,6 +208,12 @@
           "body": "F1 查看完整帮助；F9 开关程序化反馈音效；F10 切换中英文。HUD 中的按键帽会响应实际按键，F7 仍可隐藏 HUD。视角与楼体为非官方示意，不能作为实地寻路依据。",
           "heading_en": "HUD, sound & languages",
           "body_en": "F1 toggles detailed controls, F9 switches synthesized UI sounds, and F10 changes between Chinese and English. On-screen keycaps animate on input; F7 still hides the HUD. This remains an unofficial schematic campus world."
+        },
+        {
+          "heading": "可选局域网与低配画质 / F11",
+          "body": "F11 打开局域网多人和设备画质面板，低/中/高/超高设置为本机独立偏好。联网仅限主动选择的局域网或直连 IP；不启用公网匹配、不上传账号密码，任务和金币仍保留在各自账号。",
+          "heading_en": "Optional LAN and graphics / F11",
+          "body_en": "Press F11 for optional LAN/direct-IP co-op and low/balanced/high/ultra quality settings. Network access only occurs when you explicitly host or join. Accounts, quests and coin saves remain local; no matchmaking or remote credentials."
         }
       ],
       "title_en": "06  Extra Controls & Notes",

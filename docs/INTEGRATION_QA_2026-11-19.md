@@ -12,6 +12,8 @@
 | P / Shift+P / K | Coursework journal, faculty choice, task pickup/submit |
 | Tab | Post-Course Club, unlocked after any full three-chapter faculty arc |
 | Mouse-left / 1–3 / U | Cartoon toy throwing, switching toys and professor interaction |
+| F11 | Optional LAN/direct-IP and graphics presets; offline by default |
+| F8 | Fictional English major exams (first-pass-only XP and credits) |
 | H / Shift+H | DDL world prop / directional pulse; six-quest branching campaign, endings archive |
 | Z / O / N | Coin pickup, game-only shop and fictional lunch delivery |
 | J | Local account mailbox (never the assignment journal or weapon firing) |
@@ -49,3 +51,8 @@ The CI job also runs separate accounts, localization, tactile UI, arcade, DDL, d
 ## Extended story and wildlife
 - Shift+H opens the independent, per-account branching campaign. Six authored side quests and six outcomes are local fiction, not real NUS events. Gameplay-specific rewards must never replay after changing accounts.
 - M11 original audio and wildlife are ambient only, are bounded in scene count, and create no collision bodies. F9 mutes both tactile UI and ambience.
+
+## Optional LAN and graphics gate
+- No sockets are created by default. Hosting and connecting require an explicit click, and logout leaves rooms.
+- F11 never shares F8's English exams. Low-spec profile conserves rain particles, render scale, shadows, and details; long-range campus camera distances remain >=520m when culling.
+- Headless smoke validates state, pose sanitization and presets without actually creating a LAN peer. Two real machines are needed to validate actual network transport and frame pacing.

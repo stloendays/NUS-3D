@@ -10,6 +10,7 @@ var game: Node3D
 var tour: UTownTour
 var challenge: UTownChallenge
 var story_director: NUS3DStoryDirector
+var session_overlay: NUS3DSessionOverlay
 var ui: CanvasLayer
 var login_cover: Control
 var mail_cover: Control
@@ -79,6 +80,10 @@ func _ready() -> void:
     story_director.name = "StoryCampaign"
     story_director.configure(accounts, game)
     add_child(story_director)
+    session_overlay = NUS3DSessionOverlay.new()
+    session_overlay.name = "MultiplayerAndGraphics"
+    add_child(session_overlay)
+    session_overlay.setup(self, game)
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
@@ -112,7 +117,6 @@ func _refresh_sound_buttons() -> void:
         profile_sound_button.text = "Sound ON" if active else "Sound OFF"
     if mail_sound_button != null:
         mail_sound_button.text = "Sound ON" if active else "Sound OFF"
-
 
 
 func _panel_style(background: Color) -> StyleBoxFlat:
@@ -246,7 +250,6 @@ func _open_tutorial() -> void:
     # Opening the guide never signs in, changes a save, or resumes gameplay.
     if tutorial != null and login_cover.visible:
         tutorial.open_guide()
-
 
 
 func _build_profile_card() -> void:
@@ -462,9 +465,18 @@ func _logout() -> void:
     challenge.sprint_active = false
     if story_director != null:
         story_director.on_logout()
+    if session_overlay != null:
+        if session_overlay.is_open:
+            session_overlay.toggle()
+        session_overlay.network.leave_room()
     var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
         coursework._save_progress()
+    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
+    if exams != null and exams.is_open:
+        exams.close_exam()
+    if exams != null:
+        exams._save_progress()
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
         coins.save_progress()
@@ -605,12 +617,19 @@ func _restore_game_features() -> void:
     var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
     if ui_course != null:
         if intro != null and intro.playing:
-            # The cinematic owns the screen until it calls end_intro().
+            if coursework != null and not coursework.current_faculty_id.is_empty():
+                ui_course.modal_visible = false
+                ui_course.selection_visible = false
             ui_course.begin_intro()
         elif coursework != null and coursework.current_faculty_id.is_empty():
             ui_course.show_selector()
         elif ui_course.modal_visible:
             ui_course.hide_modal()
+    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
+    if exams != null:
+        exams.save_path = accounts.feature_save_path("english_exams")
+        exams.load_progress()
+        exams._restore_missing_awards()
     var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
     if arcade != null:
         arcade.save_path = accounts.feature_save_path("arcade")
@@ -646,6 +665,8 @@ func _scan_source_rewards() -> void:
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coursework == null or coins == null:
         return
+    for exam_id in coursework.exam_reward_ids:
+        coins.reward_once(str(exam_id), 25, "Major exam pass")
     for faculty_id in coursework.faculty_progress.keys():
         if not coursework.faculty_by_id.has(faculty_id):
             continue
