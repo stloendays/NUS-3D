@@ -101,7 +101,70 @@ func _build_markers() -> void:
         marker.modulate = Color.html("#fff6c8")
         marker.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         beacon.add_child(marker)
+        _build_stage_prop(beacon, i)
         stage_roots.append(beacon)
+
+func _prop_part(parent: Node3D, name_value: String, at: Vector3, dims: Vector3, color_hex: String, with_glow: bool = false) -> MeshInstance3D:
+    # Bounded lightweight meshes: one comic silhouette per mission stage, no physics.
+    var visual := MeshInstance3D.new()
+    visual.name = name_value
+    var mesh := BoxMesh.new()
+    mesh.size = dims
+    visual.mesh = mesh
+    visual.position = at
+    var mat := StandardMaterial3D.new()
+    mat.albedo_color = Color.html(color_hex)
+    mat.roughness = 0.72
+    if with_glow:
+        mat.emission_enabled = true
+        mat.emission = mat.albedo_color
+        mat.emission_energy_multiplier = 0.6
+    visual.material_override = mat
+    visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+    parent.add_child(visual)
+    return visual
+
+func _prop_text(parent: Node3D, words: String, at: Vector3, hex: String) -> void:
+    var label := Label3D.new()
+    label.text = words
+    label.position = at
+    label.font_size = 28
+    label.pixel_size = 0.012
+    label.outline_size = 7
+    label.modulate = Color.html(hex)
+    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+    parent.add_child(label)
+
+func _build_stage_prop(beacon: Node3D, i: int) -> void:
+    # Move decorative props off the center of the walkway. They remain intangible.
+    var prop := Node3D.new()
+    prop.name = "ComicTaskProp_%d" % i
+    prop.position = Vector3(3.0 if i % 2 == 0 else -3.0, -0.4, -1.1)
+    beacon.add_child(prop)
+    match i:
+        0:
+            _prop_part(prop, "MailEnvelope", Vector3(0, 1.65, 0), Vector3(2.5, 1.55, 0.25), "#fff4db")
+            _prop_part(prop, "EnvelopeFold", Vector3(0, 1.50, -0.17), Vector3(2.10, 0.12, 0.04), "#fba0a5")
+            _prop_part(prop, "EmergencyStamp", Vector3(0.8, 2.02, -0.18), Vector3(0.50, 0.42, 0.05), "#e97c80")
+            _prop_text(prop, "02:00 AM\nDUE YESTERDAY", Vector3(0, 3.01, 0), "#ffe8ac")
+        1:
+            _prop_part(prop, "PrinterHousing", Vector3(0, 1.02, 0), Vector3(2.25, 1.24, 1.05), "#91a8b8")
+            _prop_part(prop, "PrinterFeed", Vector3(0, 1.74, 0.05), Vector3(1.58, 0.3, 0.84), "#e2e9df")
+            _prop_part(prop, "StuckPages", Vector3(0, 2.22, -0.09), Vector3(1.27, 0.8, 0.07), "#fff9e9")
+            _prop_part(prop, "RedErrorLight", Vector3(0.83, 1.2, -0.55), Vector3(0.25, 0.24, 0.06), "#ff666a", true)
+            _prop_text(prop, "PAPER JAM!\nET AL. x37", Vector3(0, 3.25, 0), "#ffcdbd")
+        2:
+            _prop_part(prop, "CoffeeGiantCup", Vector3(0, 1.37, 0), Vector3(1.65, 2.35, 1.45), "#f7c46d")
+            _prop_part(prop, "CoffeeCupSleeve", Vector3(0, 1.55, -0.77), Vector3(1.45, 0.73, 0.09), "#e5eef4")
+            _prop_part(prop, "CoffeeLid", Vector3(0, 2.62, 0), Vector3(1.89, 0.25, 1.70), "#ffffff")
+            _prop_part(prop, "CartoonSteam", Vector3(0.22, 3.15, 0), Vector3(0.25, 0.72, 0.20), "#fff7c6")
+            _prop_text(prop, "CAFFEINE +99\nSLEEP -999", Vector3(0, 4.04, 0), "#ffe5ac")
+        3:
+            _prop_part(prop, "UploadComputer", Vector3(0, 1.56, 0), Vector3(2.25, 1.72, 0.40), "#3e566e")
+            _prop_part(prop, "PortalScreen", Vector3(0, 1.61, -0.23), Vector3(1.94, 1.38, 0.06), "#a7ecd9", true)
+            _prop_part(prop, "PortalFoot", Vector3(0, 0.53, 0), Vector3(0.30, 0.57, 0.26), "#8b9eab")
+            _prop_part(prop, "PortalBase", Vector3(0, 0.20, 0), Vector3(1.14, 0.14, 0.71), "#566a78")
+            _prop_text(prop, "UPLOAD FAILED\nRETRY? [H]", Vector3(0, 3.10, 0), "#a9ffdd")
 
 func _build_ui() -> void:
     display_layer = CanvasLayer.new()
