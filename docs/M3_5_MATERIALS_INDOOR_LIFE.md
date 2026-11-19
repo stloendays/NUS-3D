@@ -31,7 +31,7 @@ All roles, names, appearance and dialogue are original fictional game elements, 
 - Entrance accents brighten during artistic evening and storm presets.
 - ERC and SRC use warm/cool localized lights; boost intensity at night/in storm modes. Their lights are not left active in the remote room.
 - No real-time ray tracing, screen-space reflections, imported texture maps or HDRI assets. Quality is limited by the Godot OpenGL 3.3 Compatibility renderer and platform drivers.
-- CI smoke checks count layers and rooms, while viewport screenshots show NPC activity and day/evening light differences.
+- CI smoke checks count layers and rooms, while viewport screenshots show NPC activity and day/evening light differences. Daylight sun/ambient energy and the original building palette were tuned down to reduce washed-out white façades; these are artistic adjustments, not calibrated photometry.
 - **Manual GPU GUI playtesting** is still required to assess dynamic shadow performance, light bleed, view angle, indoor NPC intersections with furniture, frame pacing and color balance.
 
 ## Files
@@ -43,3 +43,16 @@ All roles, names, appearance and dialogue are original fictional game elements, 
 - godot/tests/smoke_test.gd — facade, NPC, dialogue, light registry regressions
 - godot/scripts/export_self_test.gd — exported-Windows checks
 - godot/tests/render_viewpoints.gd — new original M3.5 screenshots
+
+
+## M3.5 visual QA screenshot names
+
+- M3_5_ERC_CAFE_OCCUPANTS.png — occupied ERC cafe in daylight
+- M3_5_ERC_DIALOGUE_HUD.png — Q interaction and indoor navigation HUD
+- M3_5_ERC_EVENING_INTERIOR.png — adaptive lamp intensity in evening
+- M3_5_SRC_ACTIVE_CHARACTERS.png — exercising SRC NPC
+- M3_5_ERC_FACADE_FINISH_DAY.png — nearby ERC facade study during the day
+- M3_5_ERC_FACADE_FINISH_EVENING.png — same nearby ERC study in evening lighting
+- M3_5_SRC_FACADE_GOLDEN_HOUR.png — SRC conceptual facade close-up
+
+Viewports are from Godot/Linux Xvfb; Windows GPU visuals and frame rate require manual desktop testing. These are not real campus photographs.
