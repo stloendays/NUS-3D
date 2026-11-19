@@ -140,7 +140,7 @@ func translate_world_name(name: String) -> String:
     return localized
 
 
-func refresh_world_labels(world: UTownWorld) -> void:
+func refresh_world_labels(world)) -> void:
     if world == null:
         return
     for sign in world.navigation_labels:
@@ -149,7 +149,7 @@ func refresh_world_labels(world: UTownWorld) -> void:
         sign.text = translate_world_name(str(sign.get_meta("i18n_english")))
 
 
-func tour_card(tour: UTownTour) -> String:
+func tour_card(tour)) -> String:
     if not is_chinese():
         return tour.card_text()
     if tour.last_discovered_index >= 0 and tour.toast_remaining > 0.0:
@@ -173,11 +173,11 @@ func tour_card(tour: UTownTour) -> String:
     return ""
 
 
-func challenge_card(challenge: UTownChallenge) -> String:
+func challenge_card(challenge)) -> String:
     return game_text(challenge.status_text())
 
 
-func weather_card(weather: UTownWeather) -> String:
+func weather_card(weather)) -> String:
     if not is_chinese():
         return weather.status_text()
     var condition: String = "路面逐渐变干" if weather.mode < 3 and weather.wetness > 0.07 \
@@ -186,7 +186,7 @@ func weather_card(weather: UTownWeather) -> String:
     return "天气 %s | %s | [Y] 切换" % [weather_names[clampi(weather.mode, 0, 4)], condition]
 
 
-func hud_hint(world: UTownWorld) -> String:
+func hud_hint(world)) -> String:
     if not is_chinese():
         return "M2 %s [F2] | %s [T] | OSM %s [F6] | Notes [C] | Sprint [V]" % [
             "ON" if world.m2_details_visible else "OFF", world.lighting_name(),
@@ -198,7 +198,7 @@ func hud_hint(world: UTownWorld) -> String:
     ]
 
 
-func hud_target(tour: UTownTour) -> String:
+func hud_target(tour)) -> String:
     if not is_chinese():
         if tour.completed:
             return "Tour complete  |  %d/%d stops  [G replay]" % [tour.discovered_ids.size(), tour.stops.size()]
