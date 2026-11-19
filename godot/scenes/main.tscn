@@ -30,6 +30,7 @@
 [ext_resource type="Script" path="res://scripts/utown_english_exams.gd" id="28"]
 
 [ext_resource type="Script" path="res://scripts/npc_relations.gd" id="29"]
+[ext_resource type="Script" path="res://scripts/npc_navigation.gd" id="30"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
