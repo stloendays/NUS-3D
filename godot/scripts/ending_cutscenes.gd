@@ -23,6 +23,9 @@ const SHOTS := {
 var curtain: ColorRect
 var actor: Control
 var actor_face: Label
+var stage: SubViewport
+var puppet: NUS3DCartoonActor
+var puppet_tween: Tween
 var headline: Label
 var subline: Label
 var skip: Button
@@ -53,11 +56,40 @@ func _ready() -> void:
     actor = Control.new()
     actor.custom_minimum_size = Vector2(320, 155)
     column.add_child(actor)
+    var viewport_box := SubViewportContainer.new()
+    viewport_box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    viewport_box.stretch = true
+    actor.add_child(viewport_box)
+    stage = SubViewport.new()
+    stage.size = Vector2i(420, 210)
+    stage.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+    viewport_box.add_child(stage)
+    var world := Node3D.new()
+    stage.add_child(world)
+    var environment := WorldEnvironment.new()
+    var settings := Environment.new()
+    settings.background_mode = Environment.BG_COLOR
+    settings.background_color = Color.html("#dce5e4")
+    settings.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+    settings.ambient_light_color = Color.WHITE
+    environment.environment = settings
+    world.add_child(environment)
+    var light := DirectionalLight3D.new()
+    light.rotation_degrees = Vector3(-30, -30, 0)
+    world.add_child(light)
+    puppet = NUS3DCartoonActor.new()
+    world.add_child(puppet)
+    var camera := Camera3D.new()
+    camera.position = Vector3(2.4, 1.6, 3.8)
+    world.add_child(camera)
+    camera.look_at(Vector3(0, 0.95, 0), Vector3.UP)
+    camera.current = true
     actor_face = Label.new()
     actor_face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     actor_face.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     actor_face.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    actor_face.add_theme_font_size_override("font_size", 65)
+    actor_face.add_theme_font_size_override("font_size", 24)
+    actor_face.add_theme_color_override("font_color", Color.html("#243543"))
     actor.add_child(actor_face)
     subline = Label.new()
     subline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -89,7 +121,10 @@ func play(ending_id: String) -> void:
         if not active or generation != current:
             return
         subline.text = str(shots[i])
-        actor_face.text = str(palette[2]) if i == 2 else ("..." if i == 0 else "!")
+        actor_face.text = str(palette[2]) if i == 2 else ""
+        if puppet_tween != null and puppet_tween.is_running():
+            puppet_tween.kill()
+        puppet_tween = puppet.pose(ending_id, i, 0.48)
         actor.pivot_offset = actor.size * 0.5
         actor.scale = Vector2(0.82, 0.82)
         actor.rotation = -0.08 if i % 2 == 0 else 0.08
@@ -109,6 +144,8 @@ func stop() -> void:
     generation += 1
     if timeline != null and timeline.is_running():
         timeline.kill()
+    if puppet_tween != null and puppet_tween.is_running():
+        puppet_tween.kill()
     curtain.hide()
     finished.emit()
 
