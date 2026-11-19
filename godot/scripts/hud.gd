@@ -46,19 +46,19 @@ func _ready() -> void:
     var font_theme: Theme = UI_FONT_KIT.make_theme()
     for root_control in [$Info, $GISCard, $TourCard, $ChallengeCard, $CampusCard, $Help]:
         root_control.theme = font_theme
-    _skin_card($Info, Color(0.055, 0.12, 0.16, 0.94), Color("#80d5d4"), 13, 15)
-    _skin_card(gis_card, Color(0.07, 0.15, 0.19, 0.96), Color("#d6aa74"), 12, 13)
-    _skin_card(tour_card, Color(0.065, 0.16, 0.17, 0.95), Color("#85dec2"), 12, 14)
-    _skin_card(challenge_card, Color(0.13, 0.12, 0.2, 0.95), Color("#c9a3f9"), 12, 13)
-    _skin_card(campus_card, Color(0.07, 0.13, 0.18, 0.93), Color("#8bbcd8"), 12, 13)
+    _skin_card($Info, NUS3DUISkin.SURFACE, Color("#369DB8"), 21, 15)
+    _skin_card(gis_card, NUS3DUISkin.SURFACE, Color("#C89956"), 19, 13)
+    _skin_card(tour_card, NUS3DUISkin.SURFACE, Color("#319B90"), 21, 14)
+    _skin_card(challenge_card, NUS3DUISkin.SURFACE, Color("#847AB9"), 19, 13)
+    _skin_card(campus_card, NUS3DUISkin.SURFACE, Color("#6A9BC1"), 19, 13)
     for item in [title_label, hint_label, target_label, nearest_label, perf_label]:
         item.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     title_label.add_theme_font_size_override("font_size", 15)
-    title_label.add_theme_color_override("font_color", Color("#d6f8f7"))
+    title_label.add_theme_color_override("font_color", Color("#286C86"))
     hint_label.add_theme_font_size_override("font_size", 12)
     hint_label.add_theme_color_override("font_color", NUS3DUISkin.DIM)
     target_label.add_theme_font_size_override("font_size", 14)
-    target_label.add_theme_color_override("font_color", Color("#f4dfaa"))
+    target_label.add_theme_color_override("font_color", Color("#8B6428"))
     nearest_label.add_theme_font_size_override("font_size", 11)
     perf_label.add_theme_font_size_override("font_size", 13)
     for label in [gis_summary, tour_message, challenge_message, campus_message]:
@@ -103,7 +103,9 @@ func sync_feedback_state() -> void:
 
 
 func _skin_card(card: PanelContainer, background: Color, accent: Color, radius: int, padding: int) -> void:
-    card.add_theme_stylebox_override("panel", NUS3DUISkin.panel(background, accent, radius, padding))
+    # All HUD cards share the lighter glass surface even when legacy callers
+    # still provide old dark-color arguments.
+    card.add_theme_stylebox_override("panel", NUS3DUISkin.glass(accent, maxi(radius, 19), padding))
 
 
 func _make_help_overlay() -> void:
@@ -117,7 +119,7 @@ func _make_help_overlay() -> void:
     help_backdrop.anchor_bottom = 1.0
     help_backdrop.offset_top = -257.0
     help_backdrop.offset_bottom = -64.0
-    help_backdrop.add_theme_stylebox_override("panel", NUS3DUISkin.panel(Color(0.045, 0.10, 0.135, 0.97), Color("#89e3d4"), 16, 14))
+    help_backdrop.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#67AABC"), 24, 16, true))
     add_child(help_backdrop)
     move_child(help_backdrop, help_label.get_index())
     help_label.anchor_left = 0.18
@@ -153,7 +155,7 @@ func _make_toast() -> void:
     toast_card.offset_top = 306.0
     toast_card.offset_bottom = 358.0
     toast_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    toast_card.add_theme_stylebox_override("panel", NUS3DUISkin.panel(Color("#17494c"), Color("#9bf2d2"), 14, 10))
+    toast_card.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#54AFA0"), 20, 11, true))
     add_child(toast_card)
     toast_label = Label.new()
     toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

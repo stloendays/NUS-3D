@@ -15,23 +15,29 @@ const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
 const FOLLOW_START_METRES: float = 180.0
 const MAX_NPC_DOTS: int = 14
-const C_BACKGROUND: Color = Color("#152B2C")
-const C_PANEL: Color = Color("#1C3838")
-const C_GRID: Color = Color("#355453")
-const C_GREEN: Color = Color("#567F67")
-const C_PALE_GREEN: Color = Color("#84AB80")
-const C_PAVEMENT: Color = Color("#DED7C5")
-const C_DARK_ROAD: Color = Color("#5F7872")
-const C_BUILDING: Color = Color("#B5C4BE")
-const C_BUILDING_KEY: Color = Color("#E7DCC4")
-const C_TEXT: Color = Color("#EDF3E5")
-const C_MUTED: Color = Color("#A2BAB1")
-const C_GOLD: Color = Color("#FFCF75")
-const C_PLAYER: Color = Color("#72D9DD")
+const C_BACKGROUND: Color = Color("#F0F5F1")
+const C_PANEL: Color = Color("#EBF2F4")
+const C_GRID: Color = Color("#D7E3E2")
+const C_GREEN: Color = Color("#B0D2AC")
+const C_PALE_GREEN: Color = Color("#81AD89")
+const C_PAVEMENT: Color = Color("#FFF6E7")
+const C_DARK_ROAD: Color = Color("#CBDCD5")
+const C_BUILDING: Color = Color("#CFDDE2")
+const C_BUILDING_KEY: Color = Color("#FEF5DE")
+const C_TEXT: Color = Color("#29424A")
+const C_MUTED: Color = Color("#627D80")
+const C_GOLD: Color = Color("#C89137")
+const C_PLAYER: Color = Color("#218FA8")
 
 var map_focus: Vector3 = Vector3.ZERO
+var _map_glass: StyleBoxFlat
+var _map_outline: StyleBoxFlat
 
 func _ready() -> void:
+    _map_glass = NUS3DUISkin.glass(Color("#78A8B6"), 20, 0, true)
+    _map_glass.shadow_size = 5
+    _map_outline = NUS3DUISkin.panel(Color.TRANSPARENT, Color("#78A8B6"), 20, 0)
+    _map_outline.shadow_size = 0
     clip_contents = true
     mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -55,7 +61,7 @@ func _visible(p: Vector2, margin: float = 5.0) -> bool:
     return p.x >= margin and p.y >= 31.0 and p.x <= MAP_SIZE - margin and p.y <= MAP_SIZE - 29.0
 
 func _draw() -> void:
-    draw_rect(Rect2(Vector2.ZERO, Vector2.ONE * MAP_SIZE), C_BACKGROUND, true)
+    draw_style_box(_map_glass, Rect2(Vector2.ZERO, Vector2.ONE * MAP_SIZE))
     for i in range(1, 7):
         var px: float = float(i) * 32.0
         draw_line(Vector2(px, 29), Vector2(px, 196), Color(C_GRID, 0.22), 1.0)
@@ -72,8 +78,8 @@ func _draw() -> void:
         _draw_player(_to_map(player.global_position))
 
     # Top/bottom editorial strips act as occlusion masks for crowded map detail.
-    draw_rect(Rect2(0, 0, MAP_SIZE, 29), Color("#203B3B"), true)
-    draw_line(Vector2(0, 29), Vector2(MAP_SIZE, 29), Color("#66877C"), 1.0)
+    draw_rect(Rect2(3, 3, MAP_SIZE - 6, 26), Color("#E4F0F5", 0.95), true)
+    draw_line(Vector2(5, 29), Vector2(MAP_SIZE - 5, 29), Color("#B4D0D5"), 1.0)
     var zone: String = "UTOWN"
     if campus_life.interior_active:
         zone = str(campus_life.active_interior).to_upper()
@@ -81,11 +87,11 @@ func _draw() -> void:
         zone = "KENT RIDGE"
     draw_string(ThemeDB.fallback_font, Vector2(12, 20), "NUS-3D  /  " + zone,
         HORIZONTAL_ALIGNMENT_LEFT, -1.0, 12, C_TEXT)
-    draw_circle(Vector2(201, 14), 9.0, Color("#345754"), true)
+    draw_circle(Vector2(201, 14), 9.0, Color("#DAEAE9"), true)
     draw_string(ThemeDB.fallback_font, Vector2(197, 19), "N",
         HORIZONTAL_ALIGNMENT_LEFT, -1, 11, C_GOLD)
-    draw_rect(Rect2(0, MAP_SIZE - 26, MAP_SIZE, 26), Color("#203B3B"), true)
-    draw_line(Vector2(0, MAP_SIZE - 26), Vector2(MAP_SIZE, MAP_SIZE - 26), Color("#66877C"), 1.0)
+    draw_rect(Rect2(3, MAP_SIZE - 26, MAP_SIZE - 6, 23), Color("#E4F0F5", 0.95), true)
+    draw_line(Vector2(5, MAP_SIZE - 26), Vector2(MAP_SIZE - 5, MAP_SIZE - 26), Color("#B4D0D5"), 1.0)
     draw_circle(Vector2(13, MAP_SIZE - 13), 3.3, C_PLAYER)
     draw_string(ThemeDB.fallback_font, Vector2(23, MAP_SIZE - 9),
         "YOU", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_TEXT)
@@ -94,8 +100,8 @@ func _draw() -> void:
         "GOAL", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_TEXT)
     draw_string(ThemeDB.fallback_font, Vector2(148, MAP_SIZE - 9),
         "GAME MAP", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_MUTED)
-    draw_rect(Rect2(0.5, 0.5, MAP_SIZE - 1.0, MAP_SIZE - 1.0),
-        Color("#9CB6A8"), false, 1.0)
+    # Thin rounded frame without an expensive backbuffer blur pass.
+    draw_style_box(_map_outline, Rect2(Vector2.ZERO, Vector2.ONE * MAP_SIZE))
 
 func _draw_districts() -> void:
     if campus_expansion == null:
@@ -107,8 +113,8 @@ func _draw_districts() -> void:
             continue
         var dims: Array = district.get("size", [120, 120])
         var extent: Vector2 = Vector2(float(dims[0]), float(dims[1])) * SCALE
-        draw_rect(Rect2(center - extent * 0.5, extent), Color("#60836F", 0.38), true)
-        draw_rect(Rect2(center - extent * 0.5, extent), Color("#A8C3A0", 0.17), false, 1.0)
+        draw_rect(Rect2(center - extent * 0.5, extent), Color("#BAD8B2", 0.44), true)
+        draw_rect(Rect2(center - extent * 0.5, extent), Color("#9EBAA4", 0.27), false, 1.0)
         for landmark in district.get("landmarks", []):
             var offset: Array = landmark.get("offset", [0, 0])
             var size_values: Array = landmark.get("size", [30, 25, 14])
@@ -116,7 +122,7 @@ func _draw_districts() -> void:
                 float(offset[0]), 0.0, -float(offset[1])))
             var dims2: Vector2 = Vector2(float(size_values[0]), float(size_values[1])) * SCALE
             draw_rect(Rect2(at - dims2 * 0.5, dims2), Color(C_BUILDING, 0.79), true)
-            draw_rect(Rect2(at - dims2 * 0.5, dims2), Color("#466565"), false, 1.0)
+            draw_rect(Rect2(at - dims2 * 0.5, dims2), Color("#9DB8B9"), false, 1.0)
     # Paths are visual-only schematic links, not real walking or bus directions.
     for connection in campus_expansion.walk_connections:
         if connection.size() < 2:
@@ -169,7 +175,7 @@ func _draw_building_footprints() -> void:
                     0.0, -si * x + co * z)))
             draw_colored_polygon(outline, C_BUILDING_KEY if main else C_BUILDING)
             outline.append(outline[0])
-            draw_polyline(outline, Color("#526D68"), 1.25, true)
+            draw_polyline(outline, Color("#8AA9AF"), 1.25, true)
         if main:
             var label_at: Vector2 = _to_map(origin)
             if _visible(label_at, 18.0):
@@ -267,7 +273,7 @@ func _draw_player(p: Vector2) -> void:
     facing = facing.normalized()
     var side: Vector2 = Vector2(-facing.y, facing.x)
     draw_circle(p, 10.5, Color(C_PLAYER, 0.16))
-    draw_circle(p, 6.3, Color("#1C4245"))
+    draw_circle(p, 6.3, Color("#ECFAFB"))
     draw_colored_polygon(PackedVector2Array([
         p + facing * 9.0, p - facing * 4.2 + side * 4.5,
         p - facing * 4.2 - side * 4.5
@@ -282,16 +288,16 @@ func _draw_interior_plan() -> void:
     var room: Node3D = campus_life.interiors[campus_life.active_interior]
     var level: int = campus_life.interior_floor
     var outline: Rect2 = Rect2(Vector2(15, 42), Vector2(192, 137))
-    draw_rect(outline, Color("#294744"), true)
-    draw_rect(outline, Color("#8FAEA3"), false, 1.3)
+    draw_rect(outline, Color("#D5E5E3"), true)
+    draw_rect(outline, Color("#89B6B5"), false, 1.3)
     if level == 1:
-        draw_rect(Rect2(17, 44, 188, 39), Color("#66897D"), true)
+        draw_rect(Rect2(17, 44, 188, 39), Color("#B5D8CC"), true)
         draw_line(Vector2(18, 82), Vector2(203, 82), C_PAVEMENT, 1.8)
     else:
-        draw_rect(Rect2(102, 44, 18, 133), Color("#557A75"), true)
+        draw_rect(Rect2(102, 44, 18, 133), Color("#BDD4D5"), true)
         for x in [45.0, 74.0, 147.0, 175.0]:
             for y in [95.0, 122.0]:
-                draw_rect(Rect2(x - 7.0, y - 4.0, 14, 8), Color("#C7BDA5"), true)
+                draw_rect(Rect2(x - 7.0, y - 4.0, 14, 8), Color("#F6E8CA"), true)
     draw_rect(Rect2(_interior_map(Vector3(9.25, 0, -3.9)), Vector2(12, 48)),
         C_GOLD, false, 1.8)
     for activity in campus_life.activity_spots.get(campus_life.active_interior, []):

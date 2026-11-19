@@ -82,6 +82,7 @@ jobs:
             account_smoke_test.gd \
             language_smoke_test.gd \
             ui_feedback_smoke_test.gd \
+            soft_glass_ui_smoke_test.gd \
             arcade_smoke_test.gd \
             m3_7_smoke_test.gd \
             green_dining_smoke_test.gd \

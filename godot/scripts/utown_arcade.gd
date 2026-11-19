@@ -159,29 +159,23 @@ func _build_status_panel() -> void:
     add_child(status_layer)
     var card := PanelContainer.new()
     card.name = "ArcadeCard"
-    # Keep combat stats below the weather card, above the tour card. Never
-    # cover the account strip, mission tracker or top-right campus map.
+    # Keep combat stats in their own left rail slot. The previous 352–453px
+    # position exactly overlapped the zone-discovery postcard (354–430px).
     card.anchor_left = 0.0
     card.anchor_right = 0.0
     card.offset_left = 18.0
     card.offset_right = 430.0
-    card.offset_top = 352.0
-    card.offset_bottom = 453.0
+    card.offset_top = 194.0
+    card.offset_bottom = 294.0
     card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.18, 0.14, 0.25, 0.92)
-    style.set_corner_radius_all(10)
-    style.content_margin_left = 14.0
-    style.content_margin_right = 14.0
-    style.content_margin_top = 10.0
-    style.content_margin_bottom = 10.0
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#9991B9"), 20, 12)
     card.add_theme_stylebox_override("panel", style)
     status_layer.add_child(card)
     status_label = Label.new()
     status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     status_label.add_theme_font_size_override("font_size", 13)
-    status_label.add_theme_color_override("font_color", Color.html("#fffaef"))
+    status_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     card.add_child(status_label)
 
 func _build_held_toy() -> void:

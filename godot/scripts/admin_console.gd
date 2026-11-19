@@ -55,6 +55,7 @@ func _label(value: String, font_size: int = 14) -> Label:
     result.text = value
     result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     result.add_theme_font_size_override("font_size", font_size)
+    result.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     return result
 
 
@@ -62,6 +63,7 @@ func _button(value: String, action: Callable) -> Button:
     var result: Button = Button.new()
     result.text = value
     result.custom_minimum_size.y = 37
+    NUS3DUISkin.button(result)
     result.pressed.connect(action)
     return result
 
@@ -69,7 +71,7 @@ func _button(value: String, action: Callable) -> Button:
 func _build() -> void:
     var backdrop: ColorRect = ColorRect.new()
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    backdrop.color = Color(0.018, 0.033, 0.05, 0.92)
+    backdrop.color = NUS3DUISkin.BACKDROP
     backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
     add_child(backdrop)
 
@@ -78,12 +80,7 @@ func _build() -> void:
     add_child(center)
     var panel: PanelContainer = PanelContainer.new()
     panel.custom_minimum_size = Vector2(850, 620)
-    var skin: StyleBoxFlat = StyleBoxFlat.new()
-    skin.bg_color = Color("#16232c")
-    skin.border_color = Color("#a5b4bf")
-    skin.set_border_width_all(1)
-    skin.set_corner_radius_all(14)
-    skin.set_content_margin_all(22)
+    var skin: StyleBoxFlat = NUS3DUISkin.glass(Color("#9CB3C4"), 25, 22, true)
     panel.add_theme_stylebox_override("panel", skin)
     center.add_child(panel)
 
@@ -109,6 +106,7 @@ func _build() -> void:
     password_field.placeholder_text = "Local owner password (12+ characters)"
     password_field.text_submitted.connect(func(_text: String) -> void: _authenticate())
     login_box.add_child(password_field)
+    NUS3DUISkin.field(password_field)
     auth_button = _button("Unlock", _authenticate)
     login_box.add_child(auth_button)
     auth_message = _label("", 13)
@@ -129,6 +127,7 @@ func _build() -> void:
     for name in ["Clear", "Cloudy", "Overcast", "Rain", "Storm"]:
         weather_picker.add_item(name)
     environment.add_child(weather_picker)
+    NUS3DUISkin.button(weather_picker)
     environment.add_child(_button("Apply weather", func() -> void: _perform("weather", weather_picker.selected)))
     environment.add_child(_label("LIGHTING", 15))
     light_picker = OptionButton.new()

@@ -187,13 +187,7 @@ func _build_interface() -> void:
     card.offset_top = 259.0
     card.offset_bottom = 344.0
     card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var card_style := StyleBoxFlat.new()
-    card_style.bg_color = Color(0.14, 0.16, 0.21, 0.88)
-    card_style.set_corner_radius_all(12)
-    card_style.content_margin_left = 11.0
-    card_style.content_margin_right = 11.0
-    card_style.content_margin_top = 7.0
-    card_style.content_margin_bottom = 7.0
+    var card_style: StyleBoxFlat = NUS3DUISkin.glass(Color("#D7AE74"), 21, 10)
     card.add_theme_stylebox_override("panel", card_style)
     interface.add_child(card)
     var row := HBoxContainer.new()
@@ -210,7 +204,7 @@ func _build_interface() -> void:
     wallet_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     wallet_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     wallet_label.add_theme_font_size_override("font_size", 13)
-    wallet_label.add_theme_color_override("font_color", Color.html("#ffe9bb"))
+    wallet_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     wallet_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     row.add_child(wallet_label)
 
@@ -220,6 +214,7 @@ func _shop_button(parent_node: Node, title: String, callback: Callable) -> Butto
     button.set_meta("shop_original", title)
     shop_buttons.append(button)
     button.custom_minimum_size.y = 40.0
+    NUS3DUISkin.button(button)
     button.pressed.connect(callback)
     parent_node.add_child(button)
     return button
@@ -237,13 +232,7 @@ func _build_shop() -> void:
     shop_panel.offset_bottom = 206.0
     shop_panel.visible = false
     shop_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.13, 0.19, 0.22, 0.96)
-    style.set_corner_radius_all(14)
-    style.content_margin_left = 18.0
-    style.content_margin_right = 18.0
-    style.content_margin_top = 15.0
-    style.content_margin_bottom = 15.0
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#D8B67F"), 25, 18, true)
     shop_panel.add_theme_stylebox_override("panel", style)
     interface.add_child(shop_panel)
     var contents := VBoxContainer.new()
@@ -252,9 +241,11 @@ func _build_shop() -> void:
     shop_heading = Label.new()
     shop_heading.text = _t("校园金币商店 | 全天营业", "CAMPUS COIN SHOP | OPEN 24/7")
     shop_heading.add_theme_font_size_override("font_size", 20)
+    shop_heading.add_theme_color_override("font_color", Color("#866020"))
     contents.add_child(shop_heading)
     shop_status = Label.new()
     shop_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    shop_status.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     contents.add_child(shop_status)
     _shop_button(contents, "Lucky Badge - 35 C  |  Double next 5 coin pickups", _purchase_lucky)
     _shop_button(contents, "Lunch Time Pass - 28 C  |  +35 seconds on next delivery", _purchase_lunch)

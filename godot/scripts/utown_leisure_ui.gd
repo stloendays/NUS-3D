@@ -108,7 +108,9 @@ func _label(content: String, size: int = 16, color_hex: String = "#e9ede7") -> L
         label.set_meta("i18n_source_key", content)
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.add_theme_font_size_override("font_size", size)
-    label.add_theme_color_override("font_color", _palette(color_hex))
+    var original: Color = _palette(color_hex)
+    label.add_theme_color_override("font_color",
+        NUS3DUISkin.TEXT if original.get_luminance() > 0.58 else original)
     return label
 
 func _button(title: String, width: float = 150.0) -> Button:
@@ -117,20 +119,13 @@ func _button(title: String, width: float = 150.0) -> Button:
     if STATIC_LANGUAGE.has(title):
         result.set_meta("i18n_source_key", title)
     result.custom_minimum_size = Vector2(width, 38.0)
+    NUS3DUISkin.button(result)
     result.add_theme_font_size_override("font_size", 15)
     return result
 
-func _style_panel(panel: PanelContainer, color_hex: String) -> void:
-    var style := StyleBoxFlat.new()
-    style.bg_color = _palette(color_hex)
-    style.set_corner_radius_all(12)
-    style.set_border_width_all(1)
-    style.border_color = _palette("#52636c")
-    style.content_margin_left = 18.0
-    style.content_margin_right = 18.0
-    style.content_margin_top = 13.0
-    style.content_margin_bottom = 13.0
-    panel.add_theme_stylebox_override("panel", style)
+func _style_panel(panel: PanelContainer, _legacy_color: String) -> void:
+    panel.add_theme_stylebox_override("panel",
+        NUS3DUISkin.glass(Color("#8EAEC4"), 25, 18, true))
 
 func _build() -> void:
     status_chip = _label("", 15, "#ffd591")
@@ -149,7 +144,7 @@ func _build() -> void:
 
     backdrop = ColorRect.new()
     backdrop.name = "LeisureOverlay"
-    backdrop.color = Color(0.025, 0.04, 0.06, 0.92)
+    backdrop.color = NUS3DUISkin.BACKDROP
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
     backdrop.visible = false

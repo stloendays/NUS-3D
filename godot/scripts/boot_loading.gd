@@ -98,7 +98,9 @@ func _label(value: String, size: int, color: String) -> Label:
     var label := Label.new()
     label.text = value
     label.add_theme_font_size_override("font_size", size)
-    label.add_theme_color_override("font_color", Color.html(color))
+    var tint: Color = Color.html(color)
+    label.add_theme_color_override("font_color",
+        NUS3DUISkin.TEXT if tint.get_luminance() > 0.58 else tint)
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     return label
@@ -114,21 +116,21 @@ func _build_ui() -> void:
     # No images or shaders: this intro renders even on the lowest-spec profile.
     var background := ColorRect.new()
     background.name = "FlatCampusBackdrop"
-    background.color = Color.html("#172a31")
+    background.color = Color.html("#BEDFEB")
     background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     background.mouse_filter = Control.MOUSE_FILTER_STOP
     root_control.add_child(background)
 
     var canopy := ColorRect.new()
     canopy.name = "AbstractSkyBand"
-    canopy.color = Color.html("#2e4b4e")
+    canopy.color = Color.html("#D9ECF2")
     canopy.anchor_right = 1.0
     canopy.anchor_bottom = 0.44
     canopy.mouse_filter = Control.MOUSE_FILTER_IGNORE
     background.add_child(canopy)
     var earth := ColorRect.new()
     earth.name = "CampusGroundBand"
-    earth.color = Color.html("#294236")
+    earth.color = Color.html("#B6D5BA")
     earth.anchor_top = 0.80
     earth.anchor_bottom = 1.0
     earth.anchor_right = 1.0
@@ -143,15 +145,7 @@ func _build_ui() -> void:
     card = PanelContainer.new()
     card.name = "LoadingCard"
     card.mouse_filter = Control.MOUSE_FILTER_STOP
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color.html("#192a32")
-    style.border_color = Color.html("#56716c")
-    style.set_border_width_all(1)
-    style.set_corner_radius_all(14)
-    style.content_margin_left = 27.0
-    style.content_margin_right = 27.0
-    style.content_margin_top = 23.0
-    style.content_margin_bottom = 23.0
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#91B9BD"), 28, 26, true)
     card.add_theme_stylebox_override("panel", style)
     centered.add_child(card)
 
@@ -181,11 +175,11 @@ func _build_ui() -> void:
     progress_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
     var track := StyleBoxFlat.new()
-    track.bg_color = Color.html("#43595b")
+    track.bg_color = Color.html("#D8E7E9")
     track.set_corner_radius_all(5)
     progress_bar.add_theme_stylebox_override("background", track)
     var fill := StyleBoxFlat.new()
-    fill.bg_color = Color.html("#f5c46a")
+    fill.bg_color = Color.html("#59B6B3")
     fill.set_corner_radius_all(5)
     progress_bar.add_theme_stylebox_override("fill", fill)
     progress_row.add_child(progress_bar)

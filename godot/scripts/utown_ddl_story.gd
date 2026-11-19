@@ -189,13 +189,7 @@ func _build_ui() -> void:
     tracker.offset_top = 120.0
     tracker.offset_bottom = 188.0
     tracker.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.075, 0.09, 0.13, 0.81)
-    style.set_corner_radius_all(12)
-    style.content_margin_left = 15.0
-    style.content_margin_right = 15.0
-    style.content_margin_top = 8.0
-    style.content_margin_bottom = 7.0
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#DAA66A"), 21, 10)
     tracker.add_theme_stylebox_override("panel", style)
     display_layer.add_child(tracker)
     var column := VBoxContainer.new()
@@ -204,12 +198,12 @@ func _build_ui() -> void:
     countdown_label = Label.new()
     countdown_label.name = "Deadline"
     countdown_label.add_theme_font_size_override("font_size", 18)
-    countdown_label.add_theme_color_override("font_color", Color.html("#ffdf9b"))
+    countdown_label.add_theme_color_override("font_color", Color("#976722"))
     column.add_child(countdown_label)
     display_label = Label.new()
     display_label.name = "Objective"
     display_label.add_theme_font_size_override("font_size", 13)
-    display_label.add_theme_color_override("font_color", Color.html("#d3e4e6"))
+    display_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     display_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     column.add_child(display_label)
 
@@ -238,20 +232,14 @@ func _build_ui() -> void:
     near_prompt_panel.offset_top = -112.0
     near_prompt_panel.offset_bottom = -75.0
     near_prompt_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var prompt_style := StyleBoxFlat.new()
-    prompt_style.bg_color = Color(0.10, 0.15, 0.18, 0.91)
-    prompt_style.set_corner_radius_all(10)
-    prompt_style.content_margin_left = 10.0
-    prompt_style.content_margin_right = 10.0
-    prompt_style.content_margin_top = 6.0
-    prompt_style.content_margin_bottom = 6.0
+    var prompt_style: StyleBoxFlat = NUS3DUISkin.glass(Color("#81B8AF"), 20, 9)
     near_prompt_panel.add_theme_stylebox_override("panel", prompt_style)
     display_layer.add_child(near_prompt_panel)
     near_prompt_label = Label.new()
     near_prompt_label.name = "ContextAction"
     near_prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     near_prompt_label.add_theme_font_size_override("font_size", 15)
-    near_prompt_label.add_theme_color_override("font_color", Color.html("#f3f4eb"))
+    near_prompt_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     near_prompt_panel.add_child(near_prompt_label)
     near_prompt_panel.visible = false
 
@@ -267,13 +255,7 @@ func _build_ui() -> void:
     toast_panel.offset_top = -218.0
     toast_panel.offset_bottom = -126.0
     toast_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var toast_style := StyleBoxFlat.new()
-    toast_style.bg_color = Color(0.10, 0.10, 0.12, 0.88)
-    toast_style.set_corner_radius_all(10)
-    toast_style.content_margin_left = 14.0
-    toast_style.content_margin_right = 14.0
-    toast_style.content_margin_top = 10.0
-    toast_style.content_margin_bottom = 10.0
+    var toast_style: StyleBoxFlat = NUS3DUISkin.glass(Color("#A7B7C4"), 21, 14)
     toast_panel.add_theme_stylebox_override("panel", toast_style)
     display_layer.add_child(toast_panel)
     toast_label = Label.new()
@@ -281,7 +263,7 @@ func _build_ui() -> void:
     toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     toast_label.add_theme_font_size_override("font_size", 14)
-    toast_label.add_theme_color_override("font_color", Color.html("#fcefcf"))
+    toast_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     toast_panel.add_child(toast_label)
     toast_panel.visible = false
 
@@ -415,11 +397,12 @@ func _refresh() -> void:
     var seconds: int = total_seconds % 60
     var clock: String = "%02d:%02d" % [minutes, seconds]
     countdown_label.text = _t("截止 %s", "DDL %s") % clock if running         else _t("已提交", "DDL SUBMITTED") if completed else _t("任务待领取", "DDL READY")
-    var timer_color: Color = Color.html("#ffe5a3")
+    # Reserve amber/pink pastels for borders, not small text over white glass.
+    var timer_color: Color = Color.html("#8E6129")
     if running and deadline_left <= 20.0:
-        timer_color = Color.html("#ff6569") if int(marker_time * 3.0) % 2 == 0 else Color.html("#ffe5a3")
+        timer_color = Color.html("#BF4050") if int(marker_time * 3.0) % 2 == 0 else Color.html("#8E6129")
     elif running and deadline_left <= 60.0:
-        timer_color = Color.html("#ffad78")
+        timer_color = Color.html("#AB612F")
     countdown_label.add_theme_color_override("font_color", timer_color)
     var goal_index: int = _current_goal_index()
     var distance: float = _distance_to(stage_points[goal_index])
