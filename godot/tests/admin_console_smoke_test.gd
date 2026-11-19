@@ -38,6 +38,10 @@ func _run() -> void:
         _fail("Cannot create owner profile")
         return
     shell._enter_game()
+    # The current main now plays a mandatory opening film before faculty choice.
+    var intro: UTownIntro = shell.game.get_node_or_null("Intro") as UTownIntro
+    if intro != null and intro.playing:
+        intro.skip_intro()
     var modal: UTownCourseworkUI = shell.game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if modal != null and modal.modal_visible:
         var first_faculty: UTownCoursework = shell.game.get_node("Coursework") as UTownCoursework
@@ -150,6 +154,22 @@ func _run() -> void:
     if int(accounts.level_progress()["total"]) != 0:
         _fail("Owner XP leaked to second profile")
         return
+
+    # Connected LAN clients and hosts cannot use local game admin mutations.
+    accounts.sign_out()
+    if accounts.sign_in("owner_test", "user-login-password-2026") != "":
+        _fail("Owner could not log back in")
+        return
+    if admin.unlock(TEST_SECRET) != "":
+        _fail("Owner could not unlock after switching profiles")
+        return
+    var network: NUS3DNetworkSession = shell.session_overlay.network
+    network.state = NUS3DNetworkSession.State.CONNECTING
+    if admin.apply("grant_xp", 20).is_empty() or admin.apply("weather", 1).is_empty():
+        _fail("Admin mutation was allowed while LAN was connecting")
+        return
+    network.state = NUS3DNetworkSession.State.OFFLINE
+    admin.lock()
 
     print("PASS: explicit owner enrollment, F12 modal, bounded adjustments, audit, logout and isolation")
     shell.queue_free()
