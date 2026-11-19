@@ -7,23 +7,26 @@ class_name UTownIntro
 const DURATION_S: float = 12.0
 const BEAT_COUNT: int = 4
 const TAGLINES: Array[String] = [
-    "欢迎来到 UTown  /  WELCOME TO CAMPUS",
-    "COURSEWORK  /  组员说他马上到",
-    "DDL WARNING  /  23:59 正在逼近",
-    "选择学院，开始这场荒诞的校园冒险"
+    "欢迎来到校园", "小组作业：队友说他马上到", "截止时间警报：23:59", "选择学院，开始你的校园冒险"
+]
+const EN_TAGLINES: Array[String] = [
+    "WELCOME TO CAMPUS", "GROUP PROJECT: YOUR TEAMMATE IS ALMOST HERE",
+    "DEADLINE WARNING: 23:59", "PICK A FACULTY AND BEGIN YOUR ADVENTURE"
 ]
 const SUBTITLES: Array[String] = [
-    "阳光，草坪，食堂……一切看起来都很平静。",
-    "最后编辑时间：3天前。队友状态：仍在路上。",
-    "提交网站：ERROR 502。教授：『记得按时交。』",
-    "跑步、骑车、做作业，当然也可以……先摸鱼。"
+    "阳光、草坪、食堂……看起来风平浪静。",
+    "文件最后编辑于三天前。队友还在路上。",
+    "提交系统报错。教授提醒：记得按时交。",
+    "跑步、骑车、赶作业，当然也可以先休息。"
 ]
-const BADGES: Array[String] = [
-    "01 / ARRIVAL",
-    "02 / GROUP PROJECT",
-    "03 / APOCALYPSE",
-    "04 / NEW SEMESTER"
+const EN_SUBTITLES: Array[String] = [
+    "Sunshine, lawns, food courts... everything looks peaceful.",
+    "Last edit: three days ago. Teammate: still on the way.",
+    "The upload failed. Your professor says: submit on time.",
+    "Run, cycle, submit coursework... or take a break first."
 ]
+const BADGES: Array[String] = ["01 / 到达", "02 / 小组任务", "03 / 截止危机", "04 / 新学期"]
+const EN_BADGES: Array[String] = ["01 / ARRIVAL", "02 / GROUP PROJECT", "03 / DEADLINE", "04 / NEW SEMESTER"]
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
@@ -31,6 +34,7 @@ const BADGES: Array[String] = [
 @onready var coursework: UTownCoursework = $"../Coursework"
 @onready var coursework_ui: UTownCourseworkUI = $"../CourseworkUI"
 @onready var hud: CanvasLayer = $"../HUD"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var playing: bool = false
 var elapsed: float = 0.0
@@ -56,6 +60,9 @@ var opening_completed: bool = false
 func _ready() -> void:
     _build_camera()
     _build_overlay()
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
+        _on_language_changed(language.locale)
     # The packaged Windows self-test only verifies scene integrity and never
     # needs a cinematic. Dedicated Godot smoke tests exercise it explicitly.
     if OS.get_cmdline_user_args().has("--nus3d-self-test"):
@@ -63,6 +70,23 @@ func _ready() -> void:
         overlay.visible = false
         return
     start_intro()
+
+func _on_language_changed(_code: String) -> void:
+    eyebrow_label.text = _t("原创非官方校园冒险", "ORIGINAL UNOFFICIAL CAMPUS ADVENTURE")
+    skip_button.text = _t("跳过 [空格 / Esc]", "SKIP [SPACE / ESC]")
+    _refresh_story_text()
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _refresh_story_text() -> void:
+    var use_zh: bool = language != null and language.is_chinese()
+    badge_label.text = BADGES[current_beat] if use_zh else EN_BADGES[current_beat]
+    subtitle_label.text = TAGLINES[current_beat] if use_zh else EN_TAGLINES[current_beat]
+    alert_label.text = SUBTITLES[current_beat] if use_zh else EN_SUBTITLES[current_beat]
+
 
 func _build_camera() -> void:
     cinematic_camera = Camera3D.new()
@@ -162,7 +186,7 @@ func _build_overlay() -> void:
 
     badge_label = Label.new()
     badge_label.name = "CinematicBeat"
-    badge_label.text = BADGES[0]
+    badge_label.text = EN_BADGES[0]
     badge_label.anchor_left = 0.08
     badge_label.anchor_top = 0.355
     badge_label.anchor_right = 0.73
@@ -172,7 +196,7 @@ func _build_overlay() -> void:
 
     subtitle_label = Label.new()
     subtitle_label.name = "OpeningSubtitle"
-    subtitle_label.text = TAGLINES[0]
+    subtitle_label.text = EN_TAGLINES[0]
     subtitle_label.anchor_left = 0.08
     subtitle_label.anchor_top = 0.405
     subtitle_label.anchor_right = 0.90
@@ -183,7 +207,7 @@ func _build_overlay() -> void:
 
     alert_label = Label.new()
     alert_label.name = "CourseworkComedyCaption"
-    alert_label.text = SUBTITLES[0]
+    alert_label.text = EN_SUBTITLES[0]
     alert_label.anchor_left = 0.065
     alert_label.anchor_top = 1.0
     alert_label.anchor_right = 0.75
@@ -276,10 +300,8 @@ func _update_cinematic_visuals() -> void:
     var upcoming_beat: int = mini(BEAT_COUNT - 1, int(elapsed / (DURATION_S / float(BEAT_COUNT))))
     if upcoming_beat != current_beat:
         current_beat = upcoming_beat
-        badge_label.text = BADGES[current_beat]
+        _refresh_story_text()
         badge_label.add_theme_color_override("font_color", Color.html("#ff7971" if current_beat == 2 else "#ffc46c"))
-        subtitle_label.text = TAGLINES[current_beat]
-        alert_label.text = SUBTITLES[current_beat]
     progress.value = elapsed
     # Soft cinematic fade-in/out, with no disorienting instant camera cuts.
     var intro_alpha: float = 1.0 - clampf(elapsed / 1.0, 0.0, 1.0)
