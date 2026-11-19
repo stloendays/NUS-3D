@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M4 alpha Windows portable build pipeline (2026-11-18)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M3.4 sheltered interiors and rainy-paving response + M4 alpha Windows portable build pipeline (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -17,7 +17,7 @@
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **C** to collect Field Notes, **V** to start/cancel Campus Sprint, **Y** to cycle weather, **Q** to talk to fictional NPCs, **I** to enter/exit illustrative ERC/SRC interiors, **L** to use the interior mezzanine lift, **B** to ride a bicycle, **X** to board/alight the moving shuttle, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **C** to collect Field Notes, **V** to start/cancel Campus Sprint, **Y** to cycle weather, **Q** to talk to fictional NPCs, **I** to enter/exit illustrative ERC/SRC interiors, **L** to use the interior mezzanine lift, **F** to discover six indoor activity spots, **B** to ride a bicycle, **X** to board/alight the moving shuttle, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1/M2 milestone, or a Windows installer.**
 
@@ -147,3 +147,16 @@ Eight glowing Field Notes are interpolated along existing schematic walkway segm
 - The minimap shows pedestrian and shuttle positions. All NPCs, interiors, vehicle geometry, weather and dialogue are offline and procedurally generated. No accounts, telemetry or network services are used.
 
 See [M3.3 implementation and limitations](docs/M3_3_CAMPUS_LIFE_WEATHER.md). The current rooms and shuttle use isolated/estimated game-space positions; visual GUI testing and route/placement review remain necessary.
+
+
+## M3.4: sheltered rooms, activities and wet-weather response
+
+This original gameplay extension builds on M3.3 without claiming measured NUS interiors or real meteorology:
+
+- ERC and SRC gain opaque sheltering roofs, warm/cool soffit lighting, ceiling diffusers, planters, room zoning, furniture and signs. ERC includes a cafe corner and reading nook; SRC includes a water refill counter, sports equipment wall and spectator lounge.
+- A continuous sloped collision ramp now supports visible mezzanine stair treads; **L** remains a convenient lift shortcut. The indoor minimap shows an illustrative plan for each floor.
+- Discover three fictional activity stations in each room using **F** at close range. Local progress persists in user://nus3d_campus_activities.cfg (no cloud accounts or telemetry).
+- The conceptual plaza and pedestrian paths share two registered materials with rain-responsive roughness, metallic and darkening. In rain these change smoothly; after rain they dry gradually while puddles temporarily remain visible. Clouds, sun and fog also transition.
+- Linux CI captures original in-engine M3.4 indoor and rain-state screenshots, not measurements or performance benchmarks.
+
+See [M3.4 guide and QA limits](docs/M3_4_INTERIOR_WEATHER_POLISH.md). These are separate teleport-accessible game pockets, not reconstructed building floors. Stairs, collision feel and frame rate require a manual 3D GUI playtest.
