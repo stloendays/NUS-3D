@@ -9,6 +9,7 @@ param(
     [string]$InstallDir = "",
     [int]$WaitPid = 0,
     [switch]$VerifyOnly,
+    [switch]$NoLaunch,
     [string]$StatusFile = ""
 )
 $ErrorActionPreference = "Stop"
@@ -98,7 +99,11 @@ function Extract-Verified([string]$zipPath, [string]$destination, $manifest) {
     $exe = Join-Path $destination $ExeName
     $pck = Join-Path $destination $PackName
     Assert-Input ((Get-Item -LiteralPath $exe).Length -ge 1000000) "Executable is implausibly small."
-    Assert-Input (([System.IO.File]::ReadAllBytes($exe)[0..1] -join ',') -ceq '77,90') "Executable PE signature is invalid."
+    $exeHandle = [System.IO.File]::OpenRead($exe)
+    try {
+        $exeHeader = New-Object byte[] 2
+        Assert-Input ($exeHandle.Read($exeHeader,0,2) -eq 2 -and $exeHeader[0] -eq 77 -and $exeHeader[1] -eq 90) "Executable PE signature is invalid."
+    } finally { $exeHandle.Dispose() }
     $fs = [System.IO.File]::OpenRead($pck)
     try {
         $header = New-Object byte[] 4
@@ -160,15 +165,23 @@ try {
     foreach ($name in @($ExeName,$PackName,$HelperName)) {
         Move-Item -LiteralPath (Join-Path $Staging $name) -Destination (Join-Path $root $name) -Force
     }
+    # If relaunch fails, the previous files can still be restored from Backup.
+    # -NoLaunch is a CI-only acceptance test; the game updater never uses it.
+    if (-not $NoLaunch) {
+        Start-Process -FilePath (Join-Path $root $ExeName) -WorkingDirectory $root -ErrorAction Stop
+    }
     $OldMoved = $false
     $previousBackup = Join-Path $root ".nus3d-previous"
-    if (Test-Path -LiteralPath $previousBackup) {
-        Remove-Item -LiteralPath $previousBackup -Recurse -Force
+    try {
+        if (Test-Path -LiteralPath $previousBackup) {
+            Remove-Item -LiteralPath $previousBackup -Recurse -Force
+        }
+        Move-Item -LiteralPath $Backup -Destination $previousBackup -Force
+        $Backup = ""
+    } catch {
+        Write-Warning "Update installed, but the prior backup could not be rotated: $_"
     }
-    Move-Item -LiteralPath $Backup -Destination $previousBackup -Force
-    $Backup = ""
-    Write-UpdateStatus "installed" "Updated to version $ExpectedVersion. Previous files retained in .nus3d-previous."
-    Start-Process -FilePath (Join-Path $root $ExeName) -WorkingDirectory $root
+    Write-UpdateStatus "installed" "Updated to version $ExpectedVersion. Previous files retained for manual rollback."
     Write-Output "NUS3D_UPDATE_INSTALLED $ExpectedVersion"
     exit 0
 } catch {
