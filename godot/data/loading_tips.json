@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "language_support": [
+    "en",
+    "zh"
+  ],
+  "source": "NUS-3D fictional gameplay controls; nonofficial campus guide",
+  "tip_rotate_seconds": 4.2,
+  "tips": [
+    {
+      "id": "movement",
+      "keys": "WASD  /  SHIFT",
+      "en_title": "Late for class?",
+      "en_body": "Use WASD to move and hold Shift to run. The deadline is not slowing down.",
+      "zh_title": "上课要迟到了？",
+      "zh_body": "WASD 移动，按住 Shift 奔跑。DDL 可不会等你。"
+    },
+    {
+      "id": "campus_map",
+      "keys": "M  /  F1",
+      "en_title": "Lost on campus?",
+      "en_body": "Press M for the campus map or F1 to review the controls. No ugly arrow signs required.",
+      "zh_title": "在校园里迷路了？",
+      "zh_body": "按 M 打开地图，按 F1 查看操作。我们不靠土味指路牌。"
+    },
+    {
+      "id": "faculty",
+      "keys": "O  /  J",
+      "en_title": "Choose your academic destiny",
+      "en_body": "Pick a faculty with O and open the Coursework Journal with J. The group project awaits.",
+      "zh_title": "选择你的学院",
+      "zh_body": "按 O 选择学院，按 J 查看 Coursework Journal。组队作业已经在等你。"
+    },
+    {
+      "id": "transport",
+      "keys": "B  /  X",
+      "en_title": "Travel, not teleport",
+      "en_body": "Press B for the bicycle and X near the shuttle stop. Explore beyond the first plaza.",
+      "zh_title": "骑车或者坐校车",
+      "zh_body": "按 B 使用自行车，在校车站附近按 X 乘车。别只在广场转圈。"
+    },
+    {
+      "id": "interiors",
+      "keys": "I  /  F",
+      "en_title": "The campus has an inside",
+      "en_body": "Explore ERC and SRC with I. Look for activity zones and use F to interact.",
+      "zh_title": "建筑里也有戏",
+      "zh_body": "按 I 进入 ERC 或 SRC 室内，在活动区域按 F 参与互动。"
+    },
+    {
+      "id": "notes",
+      "keys": "C  /  V",
+      "en_title": "Study hard, sprint harder",
+      "en_body": "Find Field Notes with C and try the campus sprint with V. Your best run counts.",
+      "zh_title": "学习与冲刺两不误",
+      "zh_body": "按 C 收集 Field Notes，按 V 参加校园冲刺。试着刷新成绩。"
+    },
+    {
+      "id": "coins",
+      "keys": "Z  /  N",
+      "en_title": "Lunch money is serious business",
+      "en_body": "Press Z to pick up coins. Collect a lunch order at Fine Food and deliver it with N.",
+      "zh_title": "食堂外卖也是正经事",
+      "zh_body": "按 Z 捡金币，在 Fine Food 接午餐订单，用 N 送到指定地点。"
+    },
+    {
+      "id": "arcade",
+      "keys": "1 / 2 / 3",
+      "en_title": "Rubber chicken supremacy",
+      "en_body": "Equip cartoon toys with 1, 2 or 3. Student NPCs take snack breaks in silly duels.",
+      "zh_title": "橡皮鸡大战！",
+      "zh_body": "按 1、2、3 切换搞笑玩具。学生 NPC 在滑稽对决后会去吃零食休息。"
+    },
+    {
+      "id": "exams",
+      "keys": "F8",
+      "en_title": "Five questions. Three minutes.",
+      "en_body": "Open English major exam papers with F8. Pass the quiz to earn coursework rewards.",
+      "zh_title": "五道题，三分钟",
+      "zh_body": "按 F8 打开英文专业试卷，完成测验可获得课程奖励。"
+    },
+    {
+      "id": "weather",
+      "keys": "Y  /  F7",
+      "en_title": "Weather report: DDL incoming",
+      "en_body": "Use Y to change the weather and F7 to hide the HUD for campus photos.",
+      "zh_title": "天气预报：DDL 来袭",
+      "zh_body": "按 Y 切换天气，按 F7 隐藏 HUD，拍一张不带界面的校园照片。"
+    },
+    {
+      "id": "leisure",
+      "keys": "P",
+      "en_title": "Survive first. Relax later.",
+      "en_body": "Finish enough coursework to unlock the lounge: chess, cards and other ways to avoid work.",
+      "zh_title": "先交作业，再摸鱼",
+      "zh_body": "完成一定数量的 Coursework 后解锁休闲区，下棋、打牌都安排上。"
+    }
+  ]
+}
