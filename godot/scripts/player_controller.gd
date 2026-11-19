@@ -67,6 +67,9 @@ func _physics_process(delta: float) -> void:
     var crowds: UTownDiningCrowds = get_parent().get_node_or_null("DiningCrowds") as UTownDiningCrowds
     if crowds != null and not bicycle_mode and not Input.is_key_pressed(KEY_SHIFT):
         speed *= crowds.player_slowdown
+    var coins: UTownCoins = get_parent().get_node_or_null("Coins") as UTownCoins
+    if coins != null and coins.sprint_boost_seconds > 0.0 and Input.is_key_pressed(KEY_SHIFT) and not bicycle_mode:
+        speed *= 1.35
     var target_x: float = direction.x * speed
     var target_z: float = direction.z * speed
     if bicycle_mode:
