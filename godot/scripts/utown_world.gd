@@ -20,6 +20,7 @@ var generated_tree_count: int = 0
 var generated_tree_positions: Array[Vector3] = []
 var generated_path_count: int = 0
 var weather_reactive_materials: Array[StandardMaterial3D] = []
+var weather_reactive_grass: Array[StandardMaterial3D] = []
 var m2_profiles: Dictionary = {}
 var m2_detail_nodes: Array[Node3D] = []
 var generated_facade_count: int = 0
@@ -122,7 +123,9 @@ func _build_ground() -> void:
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), _mat("#819e7a"), true)
+    var terrain_material: StandardMaterial3D = _mat("#819e7a")
+    weather_reactive_grass.append(terrain_material)
+    _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), terrain_material, true)
 
 func _build_green() -> void:
     var poly: PackedVector2Array = PackedVector2Array()
@@ -145,6 +148,7 @@ func _build_green() -> void:
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
     var grass_mat: StandardMaterial3D = _mat("#8aba75")
+    weather_reactive_grass.append(grass_mat)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
     grass.material_override = grass_mat
     add_child(grass)
