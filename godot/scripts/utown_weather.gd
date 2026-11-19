@@ -23,6 +23,17 @@ var clouds: Node3D
 var puddle_root: Node3D
 var puddle_nodes: Array[Node3D] = []
 var puddle_ripples: Array[MeshInstance3D] = []
+var wet_materials: Array[Dictionary] = []
+var puddle_water_material: StandardMaterial3D
+var puddle_ripple_material: StandardMaterial3D
+var wetness: float = 0.0
+var target_wetness: float = 0.0
+var target_sky: Color = Color("#c6d8df")
+var target_ambient: Color = Color("#e8edf0")
+var target_sun: float = 1.0
+var target_ambient_energy: float = 0.78
+var target_fog: float = 0.0
+var atmosphere_ready: bool = false
 var flash: OmniLight3D
 var flash_wait: float = 8.0
 var flash_time: float = 0.0
@@ -31,6 +42,7 @@ var applied_lighting: int = -1
 func _ready() -> void:
     _build_effects()
     _build_puddles()
+    _register_wet_surfaces()
     _apply()
 
 func mode_count() -> int:
@@ -40,6 +52,7 @@ func set_mode(value: int) -> bool:
     if value < 0 or value >= MODE_COUNT:
         return false
     mode = value
+    target_wetness = 1.0 if mode >= 3 else 0.0
     flash_wait = randf_range(5.0, 11.0)
     flash_time = 0.0
     _apply()
@@ -51,6 +64,46 @@ func cycle() -> void:
 func set_indoor(value: bool) -> void:
     indoor = value
     _refresh_effects()
+
+func _register_wet_surfaces() -> void:
+    wet_materials.clear()
+    for material in world.weather_reactive_materials:
+        wet_materials.append({
+            "material": material,
+            "color": material.albedo_color,
+            "roughness": material.roughness,
+            "metallic": material.metallic
+        })
+
+func _advance_atmosphere(delta: float) -> void:
+    var blend: float = clampf(delta * 1.35, 0.0, 1.0)
+    world.sky_environment.background_color = world.sky_environment.background_color.lerp(target_sky, blend)
+    world.sky_environment.ambient_light_color = world.sky_environment.ambient_light_color.lerp(target_ambient, blend)
+    world.sky_environment.ambient_light_energy = lerpf(world.sky_environment.ambient_light_energy, target_ambient_energy, blend)
+    world.sunlight.light_energy = lerpf(world.sunlight.light_energy, target_sun, blend)
+    var current_fog: float = world.sky_environment.fog_density
+    world.sky_environment.fog_density = lerpf(current_fog, target_fog, blend)
+    world.sky_environment.fog_enabled = target_fog > 0.0001 or world.sky_environment.fog_density > 0.0001
+
+    # Drying is intentionally slower than wetting; rain-darkened paving
+    # gradually returns to the original project materials after a shower.
+    var wetting_speed: float = 0.68 if target_wetness > wetness else 0.18
+    wetness = move_toward(wetness, target_wetness, wetting_speed * delta)
+    for reference in wet_materials:
+        var material: StandardMaterial3D = reference["material"]
+        var base_color: Color = reference["color"]
+        material.albedo_color = base_color.lerp(Color("#566f7c"), wetness * 0.42)
+        material.roughness = lerpf(float(reference["roughness"]), 0.22, wetness)
+        material.metallic = lerpf(float(reference["metallic"]), 0.12, wetness)
+    if puddle_water_material != null:
+        var water_color: Color = puddle_water_material.albedo_color
+        water_color.a = 0.12 + wetness * 0.35
+        puddle_water_material.albedo_color = water_color
+    if puddle_ripple_material != null:
+        var ripple_color: Color = puddle_ripple_material.albedo_color
+        ripple_color.a = 0.08 + wetness * 0.38
+        puddle_ripple_material.albedo_color = ripple_color
+    puddle_root.visible = (mode >= 3 or wetness > 0.07) and not indoor
 
 func _build_effects() -> void:
     clouds = Node3D.new()
@@ -138,12 +191,14 @@ func _build_puddles() -> void:
     add_child(puddle_root)
     var water := StandardMaterial3D.new()
     water.albedo_color = Color(0.48, 0.67, 0.75, 0.46)
+    puddle_water_material = water
     water.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
     water.metallic = 0.68
     water.roughness = 0.12
     water.specular_mode = BaseMaterial3D.SPECULAR_SCHLICK_GGX
     var ripple_material := StandardMaterial3D.new()
     ripple_material.albedo_color = Color(0.78, 0.9, 0.95, 0.48)
+    puddle_ripple_material = ripple_material
     ripple_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
     ripple_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
     ripple_material.roughness = 0.16
@@ -192,6 +247,9 @@ func _build_puddles() -> void:
 func _process(delta: float) -> void:
     if world.lighting_mode != applied_lighting:
         _apply()
+    _advance_atmosphere(delta)
+    if clouds != null:
+        clouds.rotation.y += delta * 0.0018
     clouds.global_position = Vector3(player.global_position.x, 0.0, player.global_position.z)
     for i in range(puddle_ripples.size()):
         var ripple: MeshInstance3D = puddle_ripples[i]
@@ -253,20 +311,26 @@ func _apply() -> void:
             ambient = ambient.lerp(Color("#788b9d"), 0.62)
             sun_energy *= 0.28
             ambient_energy *= 0.66
-    world.sky_environment.background_color = sky
-    world.sky_environment.ambient_light_color = ambient
-    world.sky_environment.ambient_light_energy = ambient_energy
-    world.sky_environment.fog_enabled = mode >= 2
+    target_sky = sky
+    target_ambient = ambient
+    target_sun = sun_energy
+    target_ambient_energy = ambient_energy
+    target_fog = 0.0015 if mode == 2 else 0.0025 if mode >= 3 else 0.0
+    if not atmosphere_ready:
+        world.sky_environment.background_color = target_sky
+        world.sky_environment.ambient_light_color = target_ambient
+        world.sky_environment.ambient_light_energy = target_ambient_energy
+        world.sky_environment.fog_density = target_fog
+        world.sunlight.light_energy = target_sun
+        atmosphere_ready = true
     world.sky_environment.fog_light_color = sky
-    world.sky_environment.fog_density = 0.0015 if mode == 2 else 0.0025 if mode >= 3 else 0.0
-    world.sunlight.light_energy = sun_energy
     _refresh_effects()
 
 func _refresh_effects() -> void:
     if clouds == null or rain == null:
         return
     clouds.visible = mode >= 1 and not indoor
-    puddle_root.visible = mode >= 3 and not indoor
+    puddle_root.visible = (mode >= 3 or wetness > 0.07) and not indoor
     rain.visible = mode >= 3 and not indoor
     rain.emitting = mode >= 3 and not indoor
     rain_streaks.visible = mode >= 3 and not indoor
@@ -274,7 +338,7 @@ func _refresh_effects() -> void:
         flash.light_energy = 0.0
 
 func status_text() -> String:
-    var condition: String = "Dry" if mode <= 2 else "Rain active" if mode == 3 else "Lightning possible"
+    var condition: String = "Drying pavement" if mode < 3 and wetness > 0.07 else "Dry" if mode <= 2 else "Rain / wet ground" if mode == 3 else "Storm / wet ground"
     return "WEATHER  %s  |  %s  |  [Y] change" % [str(names[mode]).to_upper(), condition]
 
 func _unhandled_input(event: InputEvent) -> void:
