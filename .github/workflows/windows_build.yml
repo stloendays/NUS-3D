@@ -36,6 +36,7 @@ jobs:
           python tools/validate_m2_profiles.py
           python tools/validate_viewpoints.py
           python tools/validate_discovery_tour.py
+          python tools/validate_coursework_data.py
           python -m unittest discover -s tools -t . -v
       - name: Install exact Godot editor version
         run: |
