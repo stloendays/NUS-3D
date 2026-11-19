@@ -82,6 +82,7 @@ jobs:
             campus_time_crowd_smoke_test.gd \
             campus_shop_smoke_test.gd \
             shop_visuals_smoke_test.gd \
+            model_overrides_smoke_test.gd \
             coins_smoke_test.gd \
             experience_guide_smoke_test.gd \
             building_accuracy_smoke_test.gd \
