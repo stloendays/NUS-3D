@@ -58,6 +58,8 @@ jobs:
         run: python tools/validate_discovery_tour.py
       - name: Validate fictional coursework options and mission stages
         run: python tools/validate_coursework_data.py
+      - name: Validate English major exam data, original questions and scoring
+        run: python tools/validate_english_exams.py
       - name: Install Godot 4.4.1
         run: |
           curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
@@ -68,6 +70,8 @@ jobs:
         run: godot --headless --path godot --import --quit
       - name: Validate scene and geometry
         run: godot --headless --path godot --script res://tests/smoke_test.gd
+      - name: Check English exam UI, grading, reward ledger and 13-faculty isolation
+        run: godot --headless --path godot --script res://tests/english_exams_smoke_test.gd -- --nus3d-self-test
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |
           sudo apt-get update -qq
