@@ -276,7 +276,9 @@ func _horizontal_distance(a: Vector3, b: Vector3) -> float:
     return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
 
 func _can_interact() -> bool:
-    return hud.visible and not shop_open and not campus_life.interior_active         and not campus_life.on_shuttle and not player.movement_locked and not coursework.modal_open
+    return (hud.visible and not shop_open and not campus_life.interior_active
+        and not campus_life.on_shuttle and not player.movement_locked
+        and not coursework.modal_open)
 
 func _drop_at(position: Vector3, amount: int) -> bool:
     if amount <= 0 or amount > 50:
@@ -438,7 +440,11 @@ func _close_shop() -> void:
     var course_ui: Node = get_parent().get_node_or_null("CourseworkUI")
     var exams: Node = get_parent().get_node_or_null("EnglishExams")
     var leisure: Node = get_parent().get_node_or_null("LeisureUI")
-    var another_modal: bool = (course_ui != null and bool(course_ui.get("modal_visible")))         or (exams != null and bool(exams.get("is_open")))         or (leisure != null and bool(leisure.get("is_open")))
+    var another_modal: bool = (
+        (course_ui != null and bool(course_ui.get("modal_visible")))
+        or (exams != null and bool(exams.get("is_open")))
+        or (leisure != null and bool(leisure.get("is_open")))
+    )
     coursework.modal_open = previous_shop_coursework_modal or another_modal
     player.movement_locked = previous_shop_player_lock or coursework.modal_open or campus_life.on_shuttle
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if another_modal else previous_shop_mouse_mode
@@ -447,7 +453,8 @@ func toggle_shop() -> void:
     if shop_open:
         _close_shop()
         return
-    if not hud.visible or campus_life.on_shuttle or campus_life.interior_active         or player.bicycle_mode or player.movement_locked or coursework.modal_open:
+    if (not hud.visible or campus_life.on_shuttle or campus_life.interior_active
+        or player.bicycle_mode or player.movement_locked or coursework.modal_open):
         return
     previous_shop_mouse_mode = Input.mouse_mode
     previous_shop_player_lock = player.movement_locked
