@@ -419,7 +419,11 @@ func _refresh_auth_text() -> void:
 
 
 func _show_login() -> void:
+    # Signing out always returns to the sign-in form; the previous session's
+    # register-mode flag must not carry over to a new login/language choice.
     language_service.end_session()
+    registering = false
+    _refresh_auth_text()
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     login_cover.show()
