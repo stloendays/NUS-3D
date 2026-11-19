@@ -8,6 +8,14 @@ const DEADLINE_SECONDS: float = 300.0
 const INTERACT_RADIUS_M: float = 10.0
 const FOCUS_RADIUS_M: float = 20.0
 const ACTIONS = ["Read overdue email", "Retrieve jammed pages", "Drink emergency coffee", "Upload coursework"]
+const ZH_ACTIONS: Array[String] = ["阅读逾期邮件", "取出卡住的纸张", "补充应急咖啡", "提交课程作业"]
+const ZH_NAMES: Array[String] = ["厄运邮件", "闹鬼打印机", "咖啡仪式", "提交门户"]
+const ZH_DIALOGUES: Array[String] = [
+    "收件箱：惊喜！昨天就截止了。恭喜你，还有五分钟可以慌张。",
+    "打印机：错误！找不到脑细胞。它却打印了三十七页参考文献。",
+    "自动售货机：咖啡 +99，睡眠 -999。你的论文长了腿逃走了。",
+    "上传门户：文件太大。使用橡皮鸡压缩……通过！成绩：恐慌大师。"
+]
 const EPISODES = [
     {
         "id": "GREEN", "name": "THE EMAIL OF DOOM",
@@ -35,6 +43,7 @@ const EPISODES = [
 @onready var campus_life: UTownCampusLife = $"../CampusLife"
 @onready var arcade: UTownArcade = $"../Arcade"
 @onready var hud: CanvasLayer = $"../HUD"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var save_path: String = SAVE_PATH
 var stage: int = 0
@@ -80,7 +89,26 @@ func _ready() -> void:
     _build_markers()
     _build_ui()
     load_progress()
+    if language != null:
+        language.language_changed.connect(func(_code: String) -> void: _refresh())
     _refresh()
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _story_name(index: int) -> String:
+    return ZH_NAMES[index] if language != null and language.is_chinese()         else str(EPISODES[index]["name"])
+
+
+func _story_action(index: int) -> String:
+    return ZH_ACTIONS[index] if language != null and language.is_chinese()         else str(ACTIONS[index])
+
+
+func _story_dialogue(index: int) -> String:
+    return ZH_DIALOGUES[index] if language != null and language.is_chinese()         else str(EPISODES[index]["dialogue"])
+
 
 func _build_markers() -> void:
     # The four big cartoon machines ARE the discoverable landmarks; no labels or beacons.
@@ -297,7 +325,7 @@ func reset_episode() -> void:
     deadline_left = DEADLINE_SECONDS
     panic_notified = false
     final_warning_notified = false
-    latest_line = "You have new coursework mail."
+    latest_line = _t("你收到一封新的课程邮件。", "You have new coursework mail.")
     toast_remaining = 0.0
     ping_remaining = 0.0
     _refresh()
@@ -312,7 +340,7 @@ func interact() -> bool:
     if stage >= EPISODES.size() or player.global_position.distance_to(stage_points[stage]) > INTERACT_RADIUS_M:
         return false
     var event: Dictionary = EPISODES[stage]
-    _notify_story(str(event["dialogue"]))
+    _notify_story(_story_dialogue(stage))
     if stage == 0:
         running = true
         deadline_left = DEADLINE_SECONDS
@@ -326,9 +354,9 @@ func interact() -> bool:
         if not rewarded:
             arcade._award_xp(80)
             rewarded = true
-            _notify_story(latest_line + " +80 XP for first submission.")
+            _notify_story(latest_line + _t(" 首次提交奖励 +80 XP。", " +80 XP for first submission."))
         else:
-            _notify_story(latest_line + " Replay complete.")
+            _notify_story(latest_line + _t(" 重玩完成。", " Replay complete."))
     ping_remaining = 2.5 if not completed else 0.0
     _save_progress()
     _refresh()
@@ -354,16 +382,19 @@ func _process(delta: float) -> void:
     if running:
         deadline_left = maxf(0.0, deadline_left - delta)
         if deadline_left < 150.0 and not panic_notified:
-            _notify_story("Prof. Deadline: 'Any progress?' Your keyboard begins sweating.")
+            _notify_story(_t("截止时间教授：有进展吗？键盘开始冒汗。",
+                "Prof. Deadline: 'Any progress?' Your keyboard begins sweating."))
             panic_notified = true
         if deadline_left < 60.0 and not final_warning_notified:
-            _notify_story("ONE MINUTE! The PDF has become a 400 MB potato.")
+            _notify_story(_t("只剩一分钟！文档变成了四百兆的土豆。",
+                "ONE MINUTE! The PDF has become a 400 MB potato."))
             final_warning_notified = true
         if deadline_left <= 0.0:
             running = false
             fail_count += 1
             stage = 0
-            _notify_story("DDL EXPIRED. The upload portal explodes into confetti. Retry at Town Green.")
+            _notify_story(_t("截止时间已过！上传页面变成彩纸。回中央草坪重试。",
+                "DDL EXPIRED. The upload portal explodes into confetti. Retry at Town Green."))
             _save_progress()
     if toast_panel != null:
         toast_panel.visible = toast_remaining > 0.0 and hud.visible
@@ -383,7 +414,7 @@ func _refresh() -> void:
     var minutes: int = floori(float(total_seconds) / 60.0)
     var seconds: int = total_seconds % 60
     var clock: String = "%02d:%02d" % [minutes, seconds]
-    countdown_label.text = "DDL   %s" % clock if running else "DDL   SUBMITTED" if completed else "DDL   READY"
+    countdown_label.text = _t("截止 %s", "DDL %s") % clock if running         else _t("已提交", "DDL SUBMITTED") if completed else _t("任务待领取", "DDL READY")
     var timer_color: Color = Color.html("#ffe5a3")
     if running and deadline_left <= 20.0:
         timer_color = Color.html("#ff6569") if int(marker_time * 3.0) % 2 == 0 else Color.html("#ffe5a3")
@@ -393,15 +424,18 @@ func _refresh() -> void:
     var goal_index: int = _current_goal_index()
     var distance: float = _distance_to(stage_points[goal_index])
     if completed:
-        display_label.text = "Submitted  ·  %.0f m to replay  ·  H focus" % distance
+        display_label.text = _t("已提交 | %.0f 米后可重玩 | H 定位",
+            "Submitted | %.0f m to replay | H focus") % distance
     else:
-        display_label.text = "%s  ·  %.0f m  ·  H focus" % [str(EPISODES[goal_index]["name"]), distance]
+        display_label.text = _t("%s | %.0f 米 | H 定位",
+            "%s | %.0f m | H focus") % [_story_name(goal_index), distance]
     near_prompt_panel.visible = (
         hud.visible and not campus_life.interior_active and not campus_life.on_shuttle
         and not player.movement_locked and distance <= INTERACT_RADIUS_M
     )
     if near_prompt_panel.visible:
-        near_prompt_label.text = "H   %s" % ("Replay DDL" if completed else ACTIONS[goal_index])
+        near_prompt_label.text = "H  %s" % (
+            _t("重玩截止时间挑战", "Replay DDL") if completed else _story_action(goal_index))
     if toast_panel != null:
         toast_panel.visible = toast_remaining > 0.0 and hud.visible
 
