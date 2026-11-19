@@ -51,9 +51,18 @@ func _run() -> void:
         _fail("Smoke test account could not register")
         return
     shell._enter_game()
-    var coursework: UTownCourseworkUI = shell.game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
-    if coursework != null and coursework.modal_visible:
-        coursework.hide_modal()
+    # Honor the integrated mandatory intro/faculty gate before opening optional F11.
+    var intro: UTownIntro = shell.game.get_node_or_null("Intro") as UTownIntro
+    if intro != null and intro.playing:
+        intro.skip_intro()
+    var course_ui: UTownCourseworkUI = shell.game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    var course_state: UTownCoursework = shell.game.get_node_or_null("Coursework") as UTownCoursework
+    if course_state != null and course_state.current_faculty_id.is_empty():
+        if not course_state.select_faculty(str(course_state.faculty_options[0]["id"])):
+            _fail("Cannot select the required first-run faculty")
+            return
+    if course_ui != null and course_ui.modal_visible:
+        course_ui.hide_modal()
 
     shell._open_campus_hub()
     if not ai.visible or not paused or shell.profile_card.visible:
