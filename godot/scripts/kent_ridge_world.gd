@@ -23,6 +23,8 @@ var building_count: int = 0
 var shelter_count: int = 0
 var _stops_by_id: Dictionary = {}
 var _materials: Dictionary = {}
+var _box_meshes: Dictionary = {}
+var _sphere_meshes: Dictionary = {}
 var _bus_mesh: BoxMesh
 
 func _ready() -> void:
@@ -78,9 +80,12 @@ func _box(parent: Node3D, name_value: String, position_value: Vector3, size_valu
     var mesh: MeshInstance3D = MeshInstance3D.new()
     mesh.name = name_value
     mesh.position = position_value
-    var shape: BoxMesh = BoxMesh.new()
-    shape.size = size_value
-    mesh.mesh = shape
+    var mesh_key: Vector3 = size_value
+    if not _box_meshes.has(mesh_key):
+        var shape: BoxMesh = BoxMesh.new()
+        shape.size = size_value
+        _box_meshes[mesh_key] = shape
+    mesh.mesh = _box_meshes[mesh_key]
     mesh.material_override = _material(color_hex)
     parent.add_child(mesh)
     if solid:
@@ -180,7 +185,7 @@ func _build_districts() -> void:
             building.name = str(info["name"]).replace(" ", "_").replace("/", "_")
             building.position = Vector3(at.x, 0.0, at.z)
             root.add_child(building)
-            _box(building, "OriginalMass", Vector3(0.0, height_value * 0.5, 0.0), Vector3(width_value, height_value, depth_value), str(district["accent"]), true)
+            _box(building, "OriginalMass", Vector3(0.0, height_value * 0.5, 0.0), Vector3(width_value, height_value, depth_value), str(info.get("facade", district["accent"])), true)
             _box(building, "Roof", Vector3(0.0, height_value + 0.22, 0.0), Vector3(width_value + 1.4, 0.45, depth_value + 1.4), "#e5e5dc")
             _box(building, "Entrance", Vector3(0.0, 2.4, depth_value * 0.5 + 0.07), Vector3(minf(width_value * 0.42, 14.0), 4.6, 0.16), "#638b9a")
             for level in range(mini(int(height_value / 4.6), 6)):
@@ -259,9 +264,26 @@ func _build_buses() -> void:
         _box(bus, "Body", Vector3(0, 1.0, 0), Vector3(2.45, 1.45, 5.4), str(route_colors[route_name]))
         _box(bus, "WindowBand", Vector3(0, 1.63, 0), Vector3(2.51, 0.56, 4.4), "#5c8492")
         _box(bus, "Roof", Vector3(0, 2.02, 0), Vector3(2.5, 0.23, 5.1), "#eff2dd")
+        _box(bus, "Windshield", Vector3(0, 1.58, -2.72), Vector3(2.12, 0.72, 0.10), "#7bb7c3")
+        _box(bus, "RearWindow", Vector3(0, 1.58, 2.72), Vector3(2.08, 0.65, 0.10), "#7bb7c3")
+        _box(bus, "FrontBumper", Vector3(0, 0.59, -2.78), Vector3(2.28, 0.27, 0.18), "#e9e8dc")
+        _box(bus, "RearBumper", Vector3(0, 0.59, 2.78), Vector3(2.28, 0.27, 0.18), "#e9e8dc")
+        _box(bus, "DoorPanel", Vector3(1.26, 1.04, -0.8), Vector3(0.08, 1.42, 1.05), "#e5e7d9")
         for side in [-1.0, 1.0]:
-            for z in [-1.6, 1.6]:
-                _box(bus, "Wheel", Vector3(side * 1.15, 0.49, z), Vector3(0.26, 0.75, 0.72), "#27303c")
+            for z in [-1.65, 1.65]:
+                var wheel: MeshInstance3D = MeshInstance3D.new()
+                wheel.name = "Wheel_%d_%d" % [int(side), int(z * 10.0)]
+                var tire: CylinderMesh = CylinderMesh.new()
+                tire.top_radius = 0.43
+                tire.bottom_radius = 0.43
+                tire.height = 0.24
+                tire.radial_segments = 10
+                wheel.mesh = tire
+                wheel.rotation.z = PI * 0.5
+                wheel.position = Vector3(side * 1.27, 0.48, z)
+                wheel.material_override = _material("#343b41")
+                bus.add_child(wheel)
+                _box(bus, "WheelHub", Vector3(side * 1.41, 0.48, z), Vector3(0.06, 0.25, 0.25), "#c7d1d0")
         _label(bus, "NUS GAME SHUTTLE  " + route_name, Vector3(0, 2.75, 0), "#fff9e6", 19)
         bus_states.append({"node": bus, "points": points, "index": 0, "wait": 0.5})
 
