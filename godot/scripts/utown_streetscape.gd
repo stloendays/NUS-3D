@@ -274,5 +274,4 @@ func _build_distant_fictional_skyline() -> void:
         _box(building, "TexturedWall", Vector3(0, height_m * 0.5, 0), Vector3(width_m, height_m, 8.5), "#ffffff", "brick")
         _box(building, "Roof", Vector3(0, height_m + 0.27, 0), Vector3(width_m + 0.8, 0.54, 9.0), "#647590")
         _box(building, "ComicNeon", Vector3(0, height_m - 2.0, -4.35), Vector3(width_m - 1.8, 0.36, 0.16), "#ffcf81")
-        if i % 3 == 0:
         backdrop_count += 1
