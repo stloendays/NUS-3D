@@ -28,8 +28,9 @@ First-time discovery counts progress. The minimap marker turns amber to green. U
 ## Weather and material response
 
 Five offline presets remain on **Y**; **T** controls artistic time-of-day. M3.4 adds:
-- Two shared StandardMaterial3D instances registered for the conceptual walkway and plaza paving.
+- Two shared StandardMaterial3D instances registered for the conceptual walkway and plaza paving; two original terrain/green surface materials also react by darkening in rain.
 - Wetness grows during rain, darkening pavement and decreasing roughness; rain stopping triggers slower drying and restores each material's original color, roughness and metallic values.
+- Two visible shallow pools are placed per existing path entry, slightly above the 0.113 m walkway surface to avoid z-fighting and accidental burial. Their rings lie horizontally in the XZ plane.
 - Puddles temporarily remain visible after rain; ripple transparency follows wetness.
 - Sky color, sunlight, ambient light and fog density transition smoothly.
 - Existing GPU rain particles and 220 MultiMesh rain streaks remain.
@@ -58,6 +59,6 @@ Original E/G/C/V challenges, Q dialogues, B bicycle and X shuttle remain.
 - godot/scripts/utown_weather.gd — smooth lighting and reversible pavement wetness
 - godot/tests/smoke_test.gd — roofs, stairs, activity and wet/dry checks
 - godot/scripts/export_self_test.gd — Windows exported-runtime integrity contract
-- godot/tests/render_viewpoints.gd — five new Godot screenshots in CI artifact
+- godot/tests/render_viewpoints.gd — seven new Godot screenshots in CI artifact (including wet-pavement closeup and indoor minimap)
 
 **Manual desktop GUI playtesting remains necessary** for stair ascent/descent, furnished-room collision, rain look on physical GPUs, indoor lighting comfort, 1080p frame rates and small-window HUD. Automated smoke tests and software-rendered screenshots cannot establish those qualities. All geography and indoor layouts are unofficial and schematic.
