@@ -89,6 +89,12 @@ func _ready() -> void:
     language_service.language_changed.connect(_on_language_changed)
     _on_language_changed(language_service.locale)
     _show_login()
+    # The updater does not own gameplay input and is inert in editor/headless CI.
+    # A newer stable release is downloaded asynchronously and installed only
+    # after explicit player confirmation.
+    var release_updater := NUS3DAutoUpdater.new()
+    release_updater.name = "StableReleaseUpdater"
+    add_child(release_updater)
 
 
 func _ui_sound_service() -> NUS3DUISound:
