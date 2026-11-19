@@ -24,16 +24,16 @@ func _test() -> void:
     if ambient == null or weather == null or life == null or player == null:
         _fail("A required scene node is missing")
         return
-    if ambient.birds.size() != 10 or ambient.butterflies.size() != 12 or ambient.cats.size() != 2:
+    if ambient.birds.size() != 10 or ambient.butterflies.size() != 12 or ambient.cats.size() != 2 or ambient.chickens.size() != 6:
         _fail("Normal detail wildlife budgets are wrong")
         return
     if ambient.leaf_batch == null or ambient.leaf_batch.multimesh.instance_count != 40:
         _fail("Near-field leaves must share a bounded MultiMesh")
         return
-    if ambient.sound_clips.size() != 4:
+    if ambient.sound_clips.size() != 6:
         _fail("Original procedural ambience clips are missing")
         return
-    for kind in ["grass", "paving", "interior", "chirp"]:
+    for kind in ["grass", "paving", "interior", "chirp", "cluck", "panic_cluck"]:
         var clip: AudioStreamWAV = ambient.sound_clips.get(kind) as AudioStreamWAV
         if clip == null or clip.data.size() < 500:
             _fail("Audio clip missing or empty: " + kind)
