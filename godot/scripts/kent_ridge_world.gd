@@ -205,7 +205,11 @@ func _build_stations() -> void:
             _box(stand, "ShelterPost", Vector3(x_offset, 1.62, -3), Vector3(0.18, 3.12, 0.18), "#283943")
         _box(stand, "RoutePanel", Vector3(5.3, 1.58, 0), Vector3(1.5, 2.5, 0.24), "#f2d387")
         _label(stand, str(stop["name"]), Vector3(0, 4.2, 0), "#e5f8f6", 19)
-        _label(stand, "D1 / D2  •  GAME ROUTES", Vector3(5.3, 3.2, 0), "#ffd78d", 14)
+        var available_lines: PackedStringArray = PackedStringArray()
+        for line_id in ["D1", "D2"]:
+            if route_serves(line_id, str(stop["id"])):
+                available_lines.append(line_id)
+        _label(stand, " / ".join(available_lines) + "  •  GAME LINE", Vector3(5.3, 3.2, 0), "#ffd78d", 14)
         shelter_count += 1
     # Visible starting-area guide: the authentic UTown shuttle access is near
     # Town Plaza, not through residential-college lawns.
