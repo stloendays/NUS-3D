@@ -111,17 +111,8 @@ func _label(parent: Node3D, label_text: String, position_value: Vector3, color_h
 
 
 func _surface_elevation(point: Vector3) -> float:
-    # Smoothly blend the nearest two district elevations into the UTown datum.
-    # This is a schematic visual approximation, not a surveyed terrain surface.
-    var weighted: float = 0.0
-    var total_weight: float = 0.0
-    for district in districts:
-        var center: Vector3 = district["position"]
-        var distance_m: float = Vector2(point.x - center.x, point.z - center.z).length()
-        var weight: float = pow(maxf(0.0, 1.0 - distance_m / 220.0), 2.0)
-        weighted += weight * float(district.get("elevation_m", 0.0))
-        total_weight += weight
-    return weighted / total_weight if total_weight > 0.001 else 0.0
+    # Single authoritative sampler for terrain and bus stop positions.
+    return TERRAIN_MESH.height_at(Vector2(point.x, point.z), districts)
 
 
 func _graded_strip(parent: Node3D, name_value: String, start: Vector3, finish: Vector3, width_value: float, color: String) -> void:
