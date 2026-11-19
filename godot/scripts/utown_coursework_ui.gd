@@ -254,6 +254,9 @@ func _process(_delta: float) -> void:
 func _input(event: InputEvent) -> void:
     if intro_blocked:
         return
+    var club: UTownLeisureUI = get_parent().get_node_or_null("LeisureUI") as UTownLeisureUI
+    if club != null and club.is_open:
+        return  # Do not stack faculty/journal modal on top of the leisure menu.
     if not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
