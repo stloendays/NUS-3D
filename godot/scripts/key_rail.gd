@@ -44,8 +44,8 @@ func _ready() -> void:
     var panel: PanelContainer = PanelContainer.new()
     panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var bed: StyleBoxFlat = NUS3DUISkin.panel(Color(0.055, 0.11, 0.14, 0.94), Color("#558d95"), 11, 4)
-    bed.shadow_size = 7
+    var bed: StyleBoxFlat = NUS3DUISkin.glass(Color("#7DAFBA"), 23, 5)
+    bed.shadow_size = 8
     panel.add_theme_stylebox_override("panel", bed)
     add_child(panel)
     var row: HBoxContainer = HBoxContainer.new()

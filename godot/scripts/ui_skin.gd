@@ -18,7 +18,7 @@ const BACKDROP: Color = Color(0.70, 0.79, 0.84, 0.48)
 static func panel(background: Color, accent: Color = ACCENT, radius: int = 20, margin: int = 14) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
     style.bg_color = background
-    style.border_color = accent.lightened(0.61).with_alpha(0.68)
+    style.border_color = Color(accent.lightened(0.61), 0.68)
     style.set_border_width_all(1)
     style.border_width_top = 2
     style.set_corner_radius_all(radius)
