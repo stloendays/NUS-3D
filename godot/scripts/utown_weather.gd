@@ -121,24 +121,42 @@ func _advance_atmosphere(delta: float) -> void:
     puddle_root.visible = (mode >= 3 or wetness > 0.07) and not indoor
 
 func _build_effects() -> void:
+    # Three authored SVGs are imported by Godot as real, fixed 2D textures.
+    # Billboard sprites make a distant sky canopy without volumetric simulation.
     clouds = Node3D.new()
-    clouds.name = "ProceduralClouds"
+    clouds.name = "FixedIllustratedCloudTextures"
     add_child(clouds)
-    var cloud_material := StandardMaterial3D.new()
-    cloud_material.albedo_color = Color(0.78, 0.82, 0.84, 0.34)
-    cloud_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    cloud_material.roughness = 1.0
-    for i in range(9):
-        var cloud := MeshInstance3D.new()
-        var sphere := SphereMesh.new()
-        sphere.radius = 1.0
-        sphere.height = 2.0
-        cloud.mesh = sphere
-        cloud.material_override = cloud_material
-        cloud.scale = Vector3(8.0 + float(i % 3) * 2.0, 1.35, 4.5 + float(i % 2))
-        cloud.position = Vector3(float((i % 3) - 1) * 28.0, 28.0 + float(i % 2) * 2.0, float((i / 3) - 1) * 24.0)
-        cloud.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-        clouds.add_child(cloud)
+    var cloud_paths := PackedStringArray([
+        "res://assets/sky/cloud_wisps.svg",
+        "res://assets/sky/cloud_cumulus.svg",
+        "res://assets/sky/cloud_storm.svg"
+    ])
+    for layer_index in range(cloud_paths.size()):
+        var layer := Node3D.new()
+        layer.name = ["ClearClouds", "OvercastClouds", "ThunderClouds"][layer_index]
+        clouds.add_child(layer)
+        var cloud_texture: Texture2D = load(cloud_paths[layer_index]) as Texture2D
+        if cloud_texture == null:
+            push_warning("Fixed cloud SVG texture missing: " + cloud_paths[layer_index])
+            continue
+        for j in range(11):
+            var sprite := Sprite3D.new()
+            sprite.name = "StaticSkyPatch_%02d" % j
+            sprite.texture = cloud_texture
+            sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+            sprite.shaded = false
+            sprite.double_sided = true
+            sprite.pixel_size = 0.24 if layer_index == 2 else 0.20
+            var angle: float = TAU * (float(j) + float(layer_index) * 0.37) / 11.0
+            var radius: float = 118.0 + float(j % 3) * 14.0
+            sprite.position = Vector3(
+                cos(angle) * radius,
+                64.0 + float(j % 4) * 9.0 + float(layer_index) * 3.0,
+                sin(angle) * radius
+            )
+            sprite.modulate = Color(1.0, 1.0, 1.0, 0.83 if layer_index == 0 else 0.95)
+            sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+            layer.add_child(sprite)
 
     rain = GPUParticles3D.new()
     rain.name = "RainParticles"
@@ -274,8 +292,7 @@ func _process(delta: float) -> void:
     if world.lighting_mode != applied_lighting:
         _apply()
     _advance_atmosphere(delta)
-    if clouds != null:
-        clouds.rotation.y += delta * 0.0018
+    # Cloud textures have intentionally fixed orientation, without rotation updates.
     clouds.global_position = Vector3(player.global_position.x, 0.0, player.global_position.z)
     for i in range(puddle_ripples.size()):
         var ripple: MeshInstance3D = puddle_ripples[i]
@@ -355,7 +372,15 @@ func _apply() -> void:
 func _refresh_effects() -> void:
     if clouds == null or rain == null:
         return
-    clouds.visible = mode >= 1 and not indoor
+    clouds.visible = not indoor
+    # Clear skies still retain thin white clouds; storm modes select dark illustrated shapes.
+    var layer_visibility := [
+        mode <= 1,
+        mode == 1 or mode == 2 or mode == 3,
+        mode >= 3
+    ]
+    for i in range(clouds.get_child_count()):
+        clouds.get_child(i).visible = layer_visibility[i]
     puddle_root.visible = (mode >= 3 or wetness > 0.07) and not indoor
     rain.visible = mode >= 3 and not indoor
     rain.emitting = mode >= 3 and not indoor
