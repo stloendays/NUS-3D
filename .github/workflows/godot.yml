@@ -90,6 +90,7 @@ jobs:
             story_smoke_test.gd \
             leisure_smoke_test.gd \
             integration_smoke_test.gd
+            campus_ai_smoke_test.gd
           do
             echo "Testing $test"
             log_file="$(mktemp)"
