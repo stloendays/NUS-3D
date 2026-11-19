@@ -61,6 +61,12 @@ func _ready() -> void:
         push_error("NUS-3D main world scene is unavailable.")
         return
     game = scene.instantiate() as Node3D
+    # Add a small account-scoped NPC relationship service at runtime.
+    # Avoid modifying the packed campus map: art and wardrobe PRs can evolve independently.
+    if game.get_node_or_null("Relationships") == null:
+        var relationships_controller: NUS3DRelationships = NUS3DRelationships.new()
+        relationships_controller.name = "Relationships"
+        game.add_child(relationships_controller)
     game.process_mode = Node.PROCESS_MODE_PAUSABLE
     add_child(game)
     tour = game.get_node("Tour") as UTownTour
