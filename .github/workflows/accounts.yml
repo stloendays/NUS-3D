@@ -1,0 +1,34 @@
+name: M5 offline accounts and mailbox
+
+on:
+  push:
+    branches: ["feature/m5-local-accounts-levels-inbox"]
+  pull_request:
+    paths:
+      - "godot/scripts/account_store.gd"
+      - "godot/scripts/game_shell.gd"
+      - "godot/scenes/game_shell.tscn"
+      - "godot/tests/account_smoke_test.gd"
+      - ".github/workflows/accounts.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  account-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+      - name: Import project with new startup scene
+        run: godot --headless --path godot --import --quit
+      - name: Validate accounts, XP, mail and game pause/resume
+        run: godot --headless --path godot --script res://tests/account_smoke_test.gd
+      - name: Validate original UTown game without UI mutation
+        run: godot --headless --path godot --script res://tests/smoke_test.gd
