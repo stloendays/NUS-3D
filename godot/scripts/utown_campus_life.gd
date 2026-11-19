@@ -674,8 +674,20 @@ func talk_to_nearest() -> bool:
     var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
     var role: String = bank.role_for("outdoor", speaker) if bank != null else "Student"
     var line: String = bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"])
+    var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
+    var affinity_line: String = ""
+    var affinity_status: String = ""
+    if relationships != null:
+        var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+        var chinese: bool = language != null and language.is_chinese()
+        affinity_status = relationships.conversation(speaker, chinese)
+        affinity_line = relationships.contextual_line(speaker, chinese)
     message = "%s · %s\n%s" % [speaker, role, line]
-    message_time = 6.0
+    if not affinity_line.is_empty():
+        message += "\n" + affinity_line
+    if not affinity_status.is_empty():
+        message += "\n♥ " + affinity_status
+    message_time = 7.0
     return true
 
 func enter_interior(id: String) -> bool:
