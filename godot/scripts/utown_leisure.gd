@@ -329,9 +329,16 @@ func celebrate(kind: String, adult_confirmed: bool = false) -> bool:
     social_visits += 1
     if kind == "adult":
         adult_toast_cooldown = SOCIAL_COOLDOWN
-    var drink: String = _t("无酒精特调", "Mocktail") if kind == "mocktail"         else _t("茶饮", "Tea") if kind == "tea" else _t("成年人的小酌", "Adult toast")
+    var drink: String = ""
+    match kind:
+        "mocktail":
+            drink = _t("无酒精特调", "Mocktail")
+        "tea":
+            drink = _t("茶饮", "Tea")
+        "adult":
+            drink = _t("成年人小酌", "Adult toast")
     var index: int = (celebration_counter - 1) % SOCIAL_LINES.size()
-    var line: String = SOCIAL_LINES[index] if language != null and language.is_chinese()         else SOCIAL_LINES_EN[index]
+    var line: String = SOCIAL_LINES[index] if language != null and language.is_chinese() else SOCIAL_LINES_EN[index]
     social_message = _t("%s：干杯！\n%s\n饮品选择不会增加经验或解锁额外剧情。",
         "%s: Cheers!\n%s\nYour drink choice does not grant XP or unlock extra stories.") % [drink, line]
     _save_stats()
