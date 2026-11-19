@@ -117,7 +117,7 @@ func _build_ui() -> void:
     panel_title = _label("CAMPUS AI  /  ONLINE TOOLS", 25)
     panel_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     head.add_child(panel_title)
-    close_button = _button("Close [F8]", close_panel)
+    close_button = _button("Close [F8]", _request_close)
     head.add_child(close_button)
     privacy_note = _label("", 12)
     vertical.add_child(privacy_note)
@@ -386,6 +386,10 @@ func open_panel() -> void:
     show()
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+
+func _request_close() -> void:
+    close_panel()
 
 
 func close_panel() -> void:
