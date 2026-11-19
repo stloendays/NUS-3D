@@ -47,6 +47,14 @@ func _run() -> void:
         if amenity_root == null or amenity_root.get_child_count() < 3:
             _fail("Missing distinct amenity zones in faculty district: " + faculty_id)
             return
+    var models_root: Node3D = extension.get_node_or_null("KentRidgeDistricts_Schematic/COM3/FacultyAmenities/COMPUTER_Zone") as Node3D
+    if models_root == null or models_root.get_node_or_null("Screen_0") == null:
+        _fail("Computing desk models did not initialize")
+        return
+    var laundry_root: Node3D = extension.get_node_or_null("KentRidgeDistricts_Schematic/PGP/FacultyAmenities/LAUNDRY_Zone") as Node3D
+    if laundry_root == null or laundry_root.get_node_or_null("WasherDoor_0") == null:
+        _fail("Residence washer model detail is missing")
+        return
     if extension.get_node_or_null("ScienceSportsGround/FootballGrass") == null or extension.get_node_or_null("ScienceSportsGround/TrackBed") == null:
         _fail("Science-side sports pitch and running track are missing")
         return
