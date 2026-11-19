@@ -12,19 +12,22 @@ func _fail(reason: String) -> void:
 
 
 func _run() -> void:
+    NUS3DTestAutoloadBootstrap.ensure(self)
+    var language: NUS3DGameLanguage = root.get_node("GameLanguage") as NUS3DGameLanguage
+    var dialogue: NUS3DDialogueBank = root.get_node("DialogueBank") as NUS3DDialogueBank
     # Never modify the player's real language setting during a smoke test.
-    GameLanguage.save_path = "user://nus3d-locale-smoke-%d.cfg" % Time.get_ticks_usec()
+    language.save_path = "user://nus3d-locale-smoke-%d.cfg" % Time.get_ticks_usec()
 
-    if GameLanguage.catalog.is_empty() or DialogueBank.count() != 14:
+    if language.catalog.is_empty() or dialogue.count() != 14:
         _fail("Missing bilingual catalogue or 14 fictional NPC entries")
         return
-    if GameLanguage.set_locale("fr") or GameLanguage.locale == "fr":
+    if language.set_locale("fr") or language.locale == "fr":
         _fail("Unsupported locales must not be accepted")
         return
-    if not GameLanguage.set_locale("zh") or GameLanguage.ui_text("Log out") != "退出登录":
+    if not language.set_locale("zh") or language.ui_text("Log out") != "退出登录":
         _fail("Chinese UI catalogue failed")
         return
-    if not GameLanguage.is_chinese():
+    if not language.is_chinese():
         _fail("Chinese selection was not applied")
         return
 
@@ -43,44 +46,44 @@ func _run() -> void:
                 return
 
     # Ambient chatter must not consume the fixed introduction on the first Q press.
-    DialogueBank.reset_session()
-    var ambient_line: String = DialogueBank.next_line("outdoor", "Maya", 0, true)
+    dialogue.reset_session()
+    var ambient_line: String = dialogue.next_line("outdoor", "Maya", 0, true)
     if ambient_line.is_empty():
         _fail("Ambient chatter needs a usable random line")
         return
-    var outdoor_intro: String = DialogueBank.next_line("outdoor", "Maya")
+    var outdoor_intro: String = dialogue.next_line("outdoor", "Maya")
     if not outdoor_intro.contains("DDL"):
         _fail("First outdoor NPC introduction must be the fixed Chinese DDL joke")
         return
-    var second_intro: String = DialogueBank.next_line("outdoor", "Maya")
+    var second_intro: String = dialogue.next_line("outdoor", "Maya")
     if second_intro == outdoor_intro:
         _fail("Fixed NPC introductions did not advance")
         return
 
-    var random_one: String = DialogueBank.next_line("outdoor", "Maya", 0, true)
+    var random_one: String = dialogue.next_line("outdoor", "Maya", 0, true)
     for _i in range(8):
-        var random_two: String = DialogueBank.next_line("outdoor", "Maya", 0, true)
+        var random_two: String = dialogue.next_line("outdoor", "Maya", 0, true)
         if random_two == random_one:
             _fail("Same NPC repeated an identical random line consecutively")
             return
         random_one = random_two
 
-    if DialogueBank.role_for("outdoor", "Maya") != "DDL幸存者":
+    if dialogue.role_for("outdoor", "Maya") != "DDL幸存者":
         _fail("Chinese NPC role missing")
         return
-    if not DialogueBank.has_character("professor", "Prof. Deadline") \
-        or not DialogueBank.has_character("indoor", "Daniel"):
+    if not dialogue.has_character("professor", "Prof. Deadline") \
+        or not dialogue.has_character("indoor", "Daniel"):
         _fail("Indoor or fictional professor dialogue missing")
         return
 
-    if not GameLanguage.set_locale("en") or GameLanguage.ui_text("Log out") != "Log out":
+    if not language.set_locale("en") or language.ui_text("Log out") != "Log out":
         _fail("Switching to English failed")
         return
-    DialogueBank.reset_session()
-    if not DialogueBank.next_line("outdoor", "Maya").contains("I'm Maya"):
+    dialogue.reset_session()
+    if not dialogue.next_line("outdoor", "Maya").contains("I'm Maya"):
         _fail("English fixed introduction missing")
         return
-    if DialogueBank.role_for("outdoor", "Maya") != "Deadline survivor":
+    if dialogue.role_for("outdoor", "Maya") != "Deadline survivor":
         _fail("English NPC role missing")
         return
 
@@ -106,7 +109,7 @@ func _run() -> void:
         _fail("English tutorial page missing")
         return
     shell._toggle_language()
-    if not GameLanguage.is_chinese() or shell.login_title.text != "登录":
+    if not language.is_chinese() or shell.login_title.text != "登录":
         _fail("Login language toggle did not update Chinese text")
         return
     if shell.tutorial.page_title_label.text != "01  开始游戏":
@@ -123,15 +126,15 @@ func _run() -> void:
     var npc: Node3D = life.pedestrians[0]["node"]
     var player: UTownPlayer = shell.game.get_node("Player") as UTownPlayer
     player.global_position = npc.global_position + Vector3(0.0, 0.18, 0.0)
-    DialogueBank.reset_session()
+    dialogue.reset_session()
     if not life.talk_to_nearest() or not life.message.contains("DDL"):
         _fail("Outdoor Q dialogue did not use Chinese fixed NPC text")
         return
     if not life.message.contains("Maya"):
         _fail("NPC name must remain stable across language switches")
         return
-    GameLanguage.set_locale("en")
-    DialogueBank.reset_session()
+    language.set_locale("en")
+    dialogue.reset_session()
     if not life.talk_to_nearest() or not life.message.contains("I'm Maya"):
         _fail("Outdoor Q dialogue did not switch to English")
         return
@@ -141,17 +144,17 @@ func _run() -> void:
     var hud: CanvasLayer = shell.game.get_node("HUD") as CanvasLayer
     var help: Label = hud.get_node("Help") as Label
     var weather: UTownWeather = shell.game.get_node("Weather") as UTownWeather
-    GameLanguage.set_locale("zh")
+    language.set_locale("zh")
     hud.call("_process", 0.0)
-    if not help.text.contains("移动") or not GameLanguage.weather_card(weather).contains("天气"):
+    if not help.text.contains("移动") or not language.weather_card(weather).contains("天气"):
         _fail("HUD/help/weather did not switch to Chinese")
         return
     if not (hud.get_node("TourCard/Message") as Label).text.contains("打卡点"):
         _fail("Four-stop discovery UI did not switch to Chinese")
         return
-    GameLanguage.set_locale("en")
+    language.set_locale("en")
     hud.call("_process", 0.0)
-    if not help.text.contains("WASD move") or not GameLanguage.weather_card(weather).contains("WEATHER"):
+    if not help.text.contains("WASD move") or not language.weather_card(weather).contains("WEATHER"):
         _fail("Switching back to English did not restore original HUD")
         return
 
