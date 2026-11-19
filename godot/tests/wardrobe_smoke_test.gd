@@ -9,6 +9,7 @@ func _fail(why: String) -> void:
     quit(1)
 
 func _run() -> void:
+    NUS3DServices.ensure_scene_services(self)
     var packed: PackedScene = load("res://scenes/main.tscn") as PackedScene
     if packed == null:
         _fail("main scene missing")
@@ -32,6 +33,27 @@ func _run() -> void:
     if wardrobe.get("is_open") == true or panel.visible:
         _fail("wardrobe unexpectedly active on game start")
         return
+    var language: NUS3DGameLanguage = root.get_node_or_null("GameLanguage") as NUS3DGameLanguage
+    var title: Label = panel.find_child("WardrobeTitle", true, false) as Label
+    var hat_label: Label = panel.find_child("hatLabel", true, false) as Label
+    var save_button: Button = panel.find_child("WardrobeSave", true, false) as Button
+    if language == null or title == null or hat_label == null or save_button == null:
+        _fail("language service or wardrobe translation widgets missing")
+        return
+    var previous_locale: String = language.locale
+    language.locale = "zh"
+    language.language_changed.emit("zh")
+    if not title.text.contains("校园衣橱") or not hat_label.text.contains("帽子") or save_button.text != "保存并返回":
+        _fail("Chinese session still shows English-authored wardrobe chrome")
+        return
+    language.locale = "en"
+    language.language_changed.emit("en")
+    if not title.text.contains("CAMPUS WARDROBE") or not hat_label.text.contains("Headwear") or save_button.text != "SAVE & RETURN":
+        _fail("English session still shows Chinese wardrobe chrome")
+        return
+    language.locale = previous_locale
+    language.language_changed.emit(previous_locale)
+
     # F6 still controls the pre-existing OSM geometry view; wardrobe must ignore it.
     var gis_key := InputEventKey.new()
     gis_key.keycode = KEY_F6
