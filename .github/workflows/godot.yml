@@ -120,5 +120,20 @@ jobs:
           name: nus3d-visual-review-and-m3-showcase
           path: godot/review_previews/
           if-no-files-found: error
-      - name: Run the main scene for 40 frames
-        run: godot --headless --path godot --quit-after 40
+      - name: Cold-launch the real entry scene; reject silent Godot parser errors
+        shell: bash
+        run: |
+          set -euo pipefail
+          log_file="$(mktemp)"
+          # Launch the project's default scene, not a SceneTree smoke script.
+          # Godot can exit 0 even after emitting a PackedScene parser error.
+          timeout 85s godot --headless --path godot --quit-after 900 2>&1 | tee "$log_file"
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$log_file"; then
+            echo "Cold launcher emitted Godot engine errors"
+            exit 1
+          fi
+          if ! grep -q 'NUS3D_BOOT_READY:' "$log_file"; then
+            echo "Cold launcher did not reach the real login scene"
+            exit 1
+          fi
+          rm -f "$log_file"
