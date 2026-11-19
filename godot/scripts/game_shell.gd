@@ -1,4 +1,5 @@
 extends Node
+class_name NUS3DGameShell
 ## Application shell: a separate login, profile and mailbox layer around main.tscn.
 ## The original 3D world and its hotkeys remain in their own scene.
 
