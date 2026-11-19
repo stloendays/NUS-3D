@@ -33,7 +33,7 @@ func _run() -> void:
     if world == null or extension == null or bus == null or player == null or minimap == null or hud == null:
         _fail("Existing world or new travel scene nodes are absent")
         return
-    if extension.districts.size() != 11 or extension.stops.size() != 11:
+    if extension.districts.size() != 11 or extension.stops.size() != 12:
         _fail("Expected 11 extended districts and 11 shuttle stop anchors")
         return
     if extension.shelter_count != 11 or extension.building_count < 24:
@@ -44,6 +44,16 @@ func _run() -> void:
         return
     if extension.get_node_or_null("ScienceSportsGround/FootballGrass") == null or extension.get_node_or_null("ScienceSportsGround/TrackBed") == null:
         _fail("Science-side sports pitch and running track are missing")
+        return
+    if extension.get_node_or_null("FrontierCanteenTerrace/DiningTable") == null:
+        _fail("Frontier Canteen tables are missing")
+        return
+    if extension.get_node_or_null("ScienceSportsGround/PracticeBall") == null:
+        _fail("Science sports activity ball is missing")
+        return
+    var activities: NUSScienceCampusActivities = scene.get_node_or_null("ScienceCampusActivities") as NUSScienceCampusActivities
+    if activities == null or activities.panel == null:
+        _fail("Mouse-only Science activity UI is missing")
         return
     if extension.get_node_or_null("WoodedCampusBoundary") == null:
         _fail("Natural wooded campus boundary is missing")
