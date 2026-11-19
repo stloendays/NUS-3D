@@ -1,10 +1,10 @@
 # M12 — Local Admin Console / 本机管理员控制台
 
-**Development status:** isolated branch and draft PR. Not merged into the released game or certified on Windows GUI.
+**Integration status:** developed against current `main`, subject to GitHub Actions and Windows GUI acceptance before deployment. This guide describes a local offline owner function, not remote server administration.
 
 ## Player-facing control
 
-Sign into a local NUS-3D game profile and open **F12 / Admin** (or press the account-strip Admin button). Other game buttons and the Campus AI panel do not grant admin permissions. The player must enter the separate admin-owner password each time this panel opens.
+Sign into a local NUS-3D game profile and open **F12 / Admin** (or press the account-strip Admin button). Other game buttons, the LAN/settings panel, and GPT responses do not grant admin permissions. The player must enter the separate admin-owner password each time this panel opens.
 
 The console includes:
 - **Weather**: choose one of the 5 existing weather modes. Changes are in-game effects, not a real-time weather service.
@@ -16,7 +16,7 @@ The console includes:
 - **Audit trail**: inspect the latest 100 local administration actions (UTC timestamp, owner account ID, action, before/after and scope).
 - **Session lock**: closing the console, switching accounts or logging out revokes the administrator session.
 
-**Optional GPT proposal-only control:** after unlocking F12, you may type a short natural-language change request and press **Suggest with GPT**. The game sends **only your typed request** (not user identities, XP, mail, saves or password) through the existing user-operated local bridge. A separate `admin_plan` prompt constrains GPT to proposing a JSON object with one allowlisted action and integer value. The Godot client parses and bounds that result independently. A **second, explicit in-game confirmation is mandatory** before the already-authorized `AdminAuthority.apply()` is invoked. GPT cannot execute an operation by itself. Invalid, unrecognized, out-of-bounds and unsupported proposals are rejected without any changes. This path needs a locally configured OpenAI API key, may be billed separately, and can fail offline; all manual buttons continue working.
+**Optional GPT proposal-only control:** after unlocking F12, you may type a short natural-language change request and press **Suggest with GPT**. The game sends **only your typed request** (not user identities, XP, mail, saves or password) through the optional locally started Python bridge (`python tools/campus_ai_bridge.py`). A separate `admin_plan` prompt constrains GPT to proposing a JSON object with one allowlisted action and integer value. The Godot client parses and bounds that result independently. A **second, explicit in-game confirmation is mandatory** before the already-authorized `AdminAuthority.apply()` is invoked. GPT cannot execute an operation by itself. Invalid, unrecognized, out-of-bounds and unsupported proposals are rejected without any changes. This path needs a locally configured OpenAI API key, may be billed separately, and can fail offline; all manual buttons continue working.
 
 No arbitrary GDScript, shell command, game asset modification, API call, NUS SSO access, NPC identity editing, changing other players' saves or network-side administration is exposed. The game remains an unofficial comedy title.
 
@@ -49,12 +49,12 @@ After one-time enrollment, only the selected local profile can unlock the panel 
 
 ## Dependency, testing and release criteria
 
-This branch is built from the work-in-progress **PR #30 Campus AI**, which itself depends on **PR #20 integration**. It does not merge those PRs into `main`.
+The integration was ported explicitly to the latest `main`. The separate Campus AI PR #30 and older PR #36 are **not merged or overwritten** by this change. The optional GPT proposal runs through the local bridge script included here; the standalone Campus AI chat screen remains separate work.
 
 - Offline smoke test: `godot --headless --path godot --script res://tests/admin_console_smoke_test.gd`.
 - Verify explicit enrollment, no default owner, incorrect password rejection, per-profile isolation, refusal of unknown actions and out-of-range numbers, persistence of XP/coins, weather/lighting, audit, modal pause/resume and logout revocation.
 - Validate real Windows 1280×720 UI, Focus, Escape/F12 and touchscreen/gamepad edge cases before acceptance. Godot headless tests cannot certify the GPU/GUI experience.
-- Integrate safely alongside other active branches: multiplayer's **F8**, oral presentation's **F9**, Campus AI's **F11**, administrator's **F12**. Do not reuse key bindings.
+- Integrate safely alongside other active branches: professional exams **F8**, UI sound **F9**, multiplayer/graphics **F11**, administrator **F12**. Do not reuse key bindings.
 - Do not put real passwords into GitHub files, issues, CI logs or samples.
 
-**Sources:** [NUS-3D GitHub](https://github.com/stloendays/NUS-3D) · [Accounts PR #10](https://github.com/stloendays/NUS-3D/pull/10) · [Integration PR #20](https://github.com/stloendays/NUS-3D/pull/20) · [Campus AI PR #30](https://github.com/stloendays/NUS-3D/pull/30) · [LAN PR #26](https://github.com/stloendays/NUS-3D/pull/26).
+**Sources:** [NUS-3D main](https://github.com/stloendays/NUS-3D/tree/main) · [prior owner draft PR #36](https://github.com/stloendays/NUS-3D/pull/36) · [Campus AI PR #30](https://github.com/stloendays/NUS-3D/pull/30).
