@@ -444,8 +444,8 @@ func _rms_of_samples(samples: PackedVector2Array) -> float:
         return 0.0
     var total: float = 0.0
     for stereo in samples:
-        var mono: float = (stereo.x + stereo.y) * 0.5
-        total += mono * mono
+        # Compute channel power separately so inverted stereo phases cannot cancel.
+        total += 0.5 * (stereo.x * stereo.x + stereo.y * stereo.y)
     return sqrt(total / float(samples.size()))
 
 func _credit_audio_window(rms: float, seconds: float, from_hardware: bool) -> void:
