@@ -305,6 +305,95 @@ func _render() -> void:
         return
     count += 1
 
+    # M3.5 architectural materials, adaptive interior lighting and lived-in rooms.
+    var indoor_npcs: UTownIndoorNPCs = instance.get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+    var polish: UTownVisualPolish = instance.get_node_or_null("VisualPolish") as UTownVisualPolish
+    if indoor_npcs == null or polish == null or polish.facade_groups.size() != 2:
+        push_error("M3.5 gameplay/finish systems are unavailable during screenshot review")
+        quit(1)
+        return
+    hud.visible = false
+    world.set_lighting_mode(0)
+    weather.set_mode(0)
+    if not campus_life.enter_interior("ERC"):
+        push_error("M3.5 ERC study-lounge could not open")
+        quit(1)
+        return
+    var erc_lounge: Node3D = campus_life.interiors["ERC"]
+    player.global_position = erc_lounge.to_global(Vector3(-2.2, 0.18, 5.6))
+    player.rotation = Vector3(0, PI * 0.5, 0)
+    player.head.rotation = Vector3.ZERO
+    for occupied_frame in range(16):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_ERC_CAFE_OCCUPANTS.png"):
+        push_error("Cannot capture populated ERC cafe")
+        quit(1)
+        return
+    count += 1
+    var barista: Node3D = indoor_npcs.actors[0]["node"]
+    player.global_position = barista.global_position + Vector3(0.0, 0.18, -1.8)
+    if not campus_life.talk_to_nearest():
+        push_error("Cannot capture indoor NPC dialogue scenario")
+        quit(1)
+        return
+    hud.visible = true
+    if not await _capture_frame(output, "M3_5_ERC_DIALOGUE_HUD.png"):
+        push_error("Cannot capture actual indoor NPC dialogue HUD")
+        quit(1)
+        return
+    count += 1
+    hud.visible = false
+    world.set_lighting_mode(3)
+    for light_frame in range(28):
+        await process_frame
+    player.global_position = erc_lounge.to_global(Vector3(-2.2, 0.18, 5.6))
+    player.rotation = Vector3(0, PI * 0.5, 0)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_5_ERC_EVENING_INTERIOR.png"):
+        push_error("Cannot capture evening room with adaptive accent lighting")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+    world.set_lighting_mode(0)
+    if not campus_life.enter_interior("SRC"):
+        push_error("M3.5 SRC recreation hall could not open")
+        quit(1)
+        return
+    var src_hall: Node3D = campus_life.interiors["SRC"]
+    player.global_position = src_hall.to_global(Vector3(3.3, 0.18, 5.0))
+    var athlete_position: Vector3 = src_hall.to_global(Vector3(1.2, 1.3, -2.2))
+    player.look_at(athlete_position, Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    for athlete_frame in range(12):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_SRC_ACTIVE_CHARACTERS.png"):
+        push_error("Cannot capture active SRC indoor characters")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+    weather.set_mode(0)
+    world.set_m2_details_visible(true)
+    world.set_lighting_mode(0)
+    if not review.select_view(2):
+        push_error("Could not select ERC facade review")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_5_ERC_FACADE_FINISH_DAY.png"):
+        push_error("Cannot capture facade material enhancements")
+        quit(1)
+        return
+    count += 1
+    world.set_lighting_mode(3)
+    for evening_frame in range(40):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_ERC_FACADE_FINISH_EVENING.png"):
+        push_error("Cannot capture facade evening accent lighting")
+        quit(1)
+        return
+    count += 1
+
     hud.visible = false
     world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
@@ -320,6 +409,7 @@ func _render() -> void:
         "image_count": count,
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
+        "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
