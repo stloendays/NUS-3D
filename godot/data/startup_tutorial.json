@@ -10,9 +10,9 @@
       "sections": [
         {
           "heading": "登录与注册",
-          "body": "首次进入，请选择“Create a new local account”注册游戏账号：用户名使用 3–20 位英文字母、数字或下划线；密码为 8–128 位。之后可在登录页使用同一账号继续游玩。",
+          "body": "首次进入，请选择“Create a new local account”注册游戏账号：用户名使用 3–20 位英文字母、数字或下划线；密码为 8–128 位。之后可在登录页使用同一账号继续游玩。 点击登录页的语言按钮或按 F10，可随时切换简体中文 / English。",
           "heading_en": "Sign-in & registration",
-          "body_en": "First-time players should choose Create a new local account. Use 3–20 letters, numbers or underscores for a username, and a password of 8–128 characters. Sign in later with the same details to continue."
+          "body_en": "First-time players should choose Create a new local account. Use 3–20 letters, numbers or underscores for a username, and a password of 8–128 characters. Sign in later with the same details to continue. Use the language button on the sign-in screen, or press F10, to switch between Simplified Chinese and English at any time."
         },
         {
           "heading": "独立存档",
@@ -91,9 +91,9 @@
       "sections": [
         {
           "heading": "人物与场景",
-          "body": "靠近校园 NPC 后按 Q 对话；到 ERC 或 SRC 附近按 I 进入室内，室内按 I 离开；按 L 使用室内的楼层切换，按 F 与附近活动设施交互。",
+          "body": "靠近校园 NPC 后按 Q 对话；到 ERC 或 SRC 附近按 I 进入室内，室内按 I 离开；按 L 使用室内的楼层切换，按 F 与附近活动设施交互。 每个 NPC 都有自己的固定开场白和随机搞笑台词，雨天还有特别对话。",
           "heading_en": "Characters & interiors",
-          "body_en": "Approach NPCs and press Q to chat. Enter ERC or SRC concept interiors with I near their entrances; press I again to leave. Press L to change floors and F to interact with nearby facilities."
+          "body_en": "Approach NPCs and press Q to chat. Enter ERC or SRC concept interiors with I near their entrances; press I again to leave. Press L to change floors and F to interact with nearby facilities. Every NPC has fixed introductory lines and a pool of random jokes, including occasional rain-specific dialogue."
         },
         {
           "heading": "骑行与校车",
