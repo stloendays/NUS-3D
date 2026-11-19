@@ -28,9 +28,14 @@ func _run() -> void:
     if relation.affinity("Maya") != 4:
         _fail("conversation cooldown did not prevent repeated farming")
         return
-    if relation.contextual_line("Maya", true).is_empty():
-        _fail("relationship dialogue unlock missing")
+    if not relation.contextual_line("Maya", true).is_empty():
+        _fail("contextual dialogue unlocked before first friendship tier")
         return
+    relation.scores["Maya"] = 10
+    if relation.contextual_line("Maya", true).is_empty():
+        _fail("relationship dialogue did not unlock at friendship tier one")
+        return
+    relation.scores["Maya"] = 4
     relation.conversation("Ethan", true)
     if relation.affinity("Ethan") != 2:
         _fail("reserved personality should gain affinity more slowly")
