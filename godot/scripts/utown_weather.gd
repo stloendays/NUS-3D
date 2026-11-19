@@ -146,14 +146,16 @@ func _build_effects() -> void:
             sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
             sprite.shaded = false
             sprite.double_sided = true
-            sprite.pixel_size = 0.24 if layer_index == 2 else 0.20
+            sprite.pixel_size = 0.52 if layer_index == 2 else 0.43 if layer_index == 1 else 0.36
             var angle: float = TAU * (float(j) + float(layer_index) * 0.37) / 11.0
             var radius: float = 118.0 + float(j % 3) * 14.0
             sprite.position = Vector3(
                 cos(angle) * radius,
-                64.0 + float(j % 4) * 9.0 + float(layer_index) * 3.0,
+                69.0 + float(j % 4) * 11.0 + float(layer_index) * 2.0,
                 sin(angle) * radius
             )
+            # Distinct authored static shapes, sized to be readable behind buildings.
+            sprite.scale = Vector3(0.86 + float(j % 4) * 0.13, 0.82 + float((j + 1) % 3) * 0.10, 1.0)
             sprite.modulate = Color(1.0, 1.0, 1.0, 0.83 if layer_index == 0 else 0.95)
             sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
             layer.add_child(sprite)
@@ -367,6 +369,17 @@ func _apply() -> void:
         world.sunlight.light_energy = target_sun
         atmosphere_ready = true
     world.sky_environment.fog_light_color = sky
+    # Sprite3D uses unshaded illustrated artwork; tint once per weather/time change.
+    # Prevent bright white cloud decals glowing unnaturally during blue hour/night.
+    var daylight: float = [1.0, 0.91, 0.66, 0.44][t]
+    for group_index in range(clouds.get_child_count()):
+        var cloud_group: Node3D = clouds.get_child(group_index) as Node3D
+        for child in cloud_group.get_children():
+            var sprite: Sprite3D = child as Sprite3D
+            if sprite == null:
+                continue
+            var shade: float = daylight * (0.85 if group_index == 2 else 1.0)
+            sprite.modulate = Color(shade, shade, shade, 0.86 if group_index == 0 else 0.95)
     _refresh_effects()
 
 func _refresh_effects() -> void:
