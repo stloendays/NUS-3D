@@ -8,14 +8,14 @@ const BOARD_SIZE: int = 9
 const WIN_LENGTH: int = 5
 const CARD_ROUNDS: int = 5
 const SOCIAL_COOLDOWN: float = 75.0
-const SUITS: PackedStringArray = PackedStringArray(["S", "H", "D", "C"])
-const SOCIAL_LINES: PackedStringArray = PackedStringArray([
+const SUITS: Array[String] = ["S", "H", "D", "C"]
+const SOCIAL_LINES: Array[String] = [
     "Maya：终于不用追着队友要 Google Docs 编辑权限了。",
     "Ethan：今天阅读的唯一文献，是饮料菜单。",
     "Aisha：你以为通关了？别忘了下学期还有 DDL。",
     "Daniel：干杯！不管喝什么，课程总算提交成功了。",
     "Mei：这一杯献给凌晨 3 点的备份文件。"
-])
+]
 
 @onready var coursework: UTownCoursework = $"../Coursework"
 @onready var life: UTownCampusLife = $"../CampusLife"
