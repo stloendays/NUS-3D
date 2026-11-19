@@ -481,6 +481,25 @@
           "floors": 5,
           "roof_style": "terrace",
           "canopy": true
+        },
+        {
+          "name": "MD1 Tahir Foundation Building",
+          "offset": [
+            68,
+            -43
+          ],
+          "size": [
+            29,
+            32,
+            46
+          ],
+          "kind": "md1_research",
+          "facade": "#d5d5cf",
+          "floors": 12,
+          "roof_style": "flat",
+          "canopy": true,
+          "reference_address": "12 Science Drive 2, Singapore 117549",
+          "position_accuracy": "schematic; not surveyed"
         }
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
