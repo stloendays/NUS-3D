@@ -6,6 +6,7 @@ extends Control
 @onready var tour: UTownTour = get_parent().get_parent().get_node("Tour")
 @onready var challenge: UTownChallenge = get_parent().get_parent().get_node("Challenge")
 @onready var campus_life: UTownCampusLife = get_parent().get_parent().get_node("CampusLife")
+@onready var coursework: UTownCoursework = get_parent().get_parent().get_node("Coursework")
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
@@ -79,6 +80,11 @@ func _draw() -> void:
         draw_circle(_to_map(npc.global_position), 2.2, Color.html("#e8a17c"))
     if campus_life.shuttle != null:
         draw_rect(Rect2(_to_map(campus_life.shuttle.global_position) - Vector2(4.0, 3.0), Vector2(8.0, 6.0)), Color.html("#f2a85d"), true)
+    # A bright mission pin uses only existing schematic waypoint coordinates.
+    if not coursework.current_quest().is_empty() and coursework.marker_preference:
+        var quest_point: Vector2 = _to_map(coursework.objective_position())
+        draw_circle(quest_point, 9.0, Color.html("#ffd16f"), false, 2.4)
+        draw_circle(quest_point, 3.7, Color.html("#f4b94a"))
     var pp: Vector2 = _to_map(player.global_position)
     draw_circle(pp, 5.0, Color.html("#52a6e0"))
     draw_circle(pp, 5.0, Color.WHITE, false, 1.1)
@@ -119,6 +125,17 @@ func _draw_interior_plan() -> void:
         var item_id: String = "%s/%s" % [campus_life.active_interior, str(activity["id"])]
         draw_circle(marker, 4.3, Color.html("#83d2ac") if campus_life.visited_activities.has(item_id) else Color.html("#e8c27a"))
         draw_circle(marker, 4.3, Color.html("#ecf2e9"), false, 1.0)
+        if coursework.active_stage == coursework.STAGE_ACTIVITY and not coursework.current_quest().is_empty():
+            if str(coursework.current_quest()["activity"]) == item_id:
+                draw_circle(marker, 8.0, Color.html("#ffc06e"), false, 2.0)
+    if coursework.active_stage == coursework.STAGE_PARTNER and not coursework.current_quest().is_empty():
+        var npc_ref: String = str(coursework.current_quest()["partner"])
+        var indoor_npcs: UTownIndoorNPCs = get_parent().get_parent().get_node("IndoorNPCs") as UTownIndoorNPCs
+        for actor in indoor_npcs.actors:
+            if str(actor["id"]) == npc_ref:
+                var actor_node: Node3D = actor["node"]
+                draw_circle(_interior_map(room.to_local(actor_node.global_position)), 7.0, Color.html("#f2c870"), false, 2.0)
+                break
     var local_player: Vector3 = room.to_local(player.global_position)
     var pos: Vector2 = _interior_map(local_player)
     draw_circle(pos, 5.0, Color.html("#55b2ef"))
