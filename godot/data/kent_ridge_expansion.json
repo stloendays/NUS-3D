@@ -6,7 +6,7 @@
     "official_map": "https://map.nus.edu.sg/",
     "kent_ridge_campus_map": "https://map.nus.edu.sg/download/Kent-Ridge-Campus-Map.pdf",
     "bus_network_effective_2026_01_05": "https://uci.nus.edu.sg/campus-life/campus-services/transportation/internal-shuttle-bus/",
-    "note": "2026 route names (D1/D2) are verified from UCI. In-game station choices and shortcut trips are intentionally simplified rather than accurate stop-by-stop route directions."
+    "note": "Official NUS campus map and UCI D1/D2 route descriptions are reference points; game stop coordinates are approximate proxy anchors, not official survey positions or a validated route order."
   },
   "districts": [
     {
@@ -466,9 +466,9 @@
     {
       "id": "UTOWN",
       "district": "UTOWN",
-      "name": "UTown / Town Plaza",
-      "lon": 103.77395,
-      "lat": 1.30434,
+      "name": "UTown / Town Green (game stop)",
+      "lon": 103.7732,
+      "lat": 1.305045,
       "tagline": "Start your inter-campus escape from the deadline."
     },
     {
