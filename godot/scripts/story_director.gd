@@ -143,8 +143,8 @@ func _build_ui() -> void:
     frame.add_child(HSeparator.new())
     var tabs: HBoxContainer = HBoxContainer.new()
     frame.add_child(tabs)
-    tabs.add_child(_btn("任务", func() -> void: _set_mode("quests")))
-    tabs.add_child(_btn("结局图鉴", func() -> void: _set_mode("endings")))
+    tabs.add_child(_btn(_local({"zh": "任务", "en": "Quests"}), func() -> void: _set_mode("quests")))
+    tabs.add_child(_btn(_local({"zh": "结局图鉴", "en": "Endings"}), func() -> void: _set_mode("endings")))
     subtitle = _label("", 13, Color.html("#9bd6db"))
     subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     tabs.add_child(subtitle)
