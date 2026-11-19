@@ -64,6 +64,8 @@ jobs:
         run: godot --headless --path godot --script res://tests/smoke_test.gd
       - name: Run independent M3.6 arcade progression and bounded-memory regression
         run: godot --headless --path godot --script res://tests/arcade_smoke_test.gd
+      - name: Test Town Green lawn and anchored food-court scenery
+        run: godot --headless --path godot --script res://tests/green_dining_smoke_test.gd
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |
           sudo apt-get update -qq
