@@ -72,8 +72,8 @@ func _smoke() -> void:
     if decor.texture_cache.size() != 4 or decor.cluster_count < 6 or decor.cluster_count > decor.MAX_CLUSTERS:
         _fail("four reusable textures or expected bounded props missing")
         return
-    if decor.backdrop_count != decor.BACKDROP_CAPACITY or decor.placard_count != 4:
-        _fail("distant skyline or comic waypoint signs missing")
+    if decor.backdrop_count != decor.BACKDROP_CAPACITY or decor.placard_count != 0:
+        _fail("skyline missing or legacy guide banners were reintroduced")
         return
     if decor.scrap_count > decor.SCRAP_CAPACITY or decor.scrap_count <= 0:
         _fail("decorative paper batching is not bounded")
@@ -101,11 +101,58 @@ func _smoke() -> void:
     if story.stage_points.size() != 4 or not story.enabled or story.countdown_label == null:
         _fail("four approximate campus checkpoints or enlarged timer display missing")
         return
+    if story.stage_roots.size() != 4:
+        _fail("all four DDL checkpoint art groups must exist")
+        return
+    for idx in range(4):
+        var checkpoint: Node3D = story.stage_roots[idx]
+        var prop: Node3D = checkpoint.get_node_or_null("ComicTaskProp_%d" % idx) as Node3D
+        if prop == null or prop.get_child_count() < 4:
+            _fail("missing giant cartoon mission prop at stage " + str(idx))
+            return
+        if not prop.find_children("*", "Label3D", true, false).is_empty():
+            _fail("task props must never include floating 3D text signposts")
+            return
+        if checkpoint.find_children("*", "CollisionShape3D", true, false).size() > 0:
+            _fail("new quest props should never obstruct the shuttle or existing walkway")
+            return
+    # Isolate a unique temporary save before evaluating any starting-state markers.
     story.save_path = "user://ddl-m37-test-%d.cfg" % Time.get_ticks_usec()
     story.load_progress()
+    story._process(0.25)
+    if not story.stage_roots[0].visible or not story.stage_roots[1].visible:
+        _fail("four stage props should be natural persistent scenery, not hidden markers")
+        return
+    if story.focus_accents.size() != 4 or story.compass_control == null:
+        _fail("context highlights or optional compass pulse missing")
+        return
+    if not story.request_focus() or story.ping_remaining < 2.9:
+        _fail("Focus action must request a short focus ping")
+        return
+    story._process(0.1)
+    if not story.compass_control.visible:
+        _fail("direction pulse not displayed")
+        return
+    story._process(4.0)
+    if story.compass_control.visible:
+        _fail("direction pulse did not fade out")
+        return
     player.global_position = story.stage_points[0] + Vector3(0, 0.18, 0)
     if story.interact() != true or story.stage != 1 or not story.running:
         _fail("Town Green email should start a DDL countdown")
+        return
+    story._refresh()
+    if not story.display_label.text.contains("m") or not story.countdown_label.text.contains("05:00"):
+        _fail("mission target distance or legible clock is missing from HUD")
+        return
+    story._process(0.05)
+    if story.near_prompt_panel.visible:
+        _fail("H prompt must not show far from the active mission object")
+        return
+    player.global_position = story.stage_points[1] + Vector3(0.0, 0.18, 0.0)
+    story._refresh()
+    if not story.near_prompt_panel.visible or not story.near_prompt_label.text.contains("H"):
+        _fail("close-range H action should appear only at target")
         return
     var remaining: float = story.deadline_left
     story._process(2.0)
@@ -154,6 +201,9 @@ func _smoke() -> void:
     story._process(0.3)
     if story.display_layer.visible:
         _fail("F7 clean-photo mode should hide DDL overlay")
+        return
+    if not story.stage_roots[0].visible:
+        _fail("F7 must hide UI, not delete mission scene objects")
         return
     print("PASS M3.7: 33 readable fixed clouds, 6 textures, %d prop scenes, %d paper scraps, %d shrubs + %d blooms, 4 DDL acts, no duplicate XP" % [decor.cluster_count, decor.scrap_count, decor.shrub_count, decor.bloom_count])
     scene.queue_free()

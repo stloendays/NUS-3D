@@ -245,7 +245,7 @@ func _build_buildings() -> void:
             var z: float = -north
             _add_box(group, Vector3(dx, h / 2.0, z), Vector3(w, h, d), wall, true)
             _add_box(group, Vector3(dx, h + 0.24, z), Vector3(w + 0.65, 0.48, d + 0.65), roof)
-            var bands: int = mini(int(h / 3.6), 11)
+            var bands: int = 0 if priority != "P0" and record.has("confirmed_storeys") else mini(int(h / 3.6), 11)
             for floor_index in range(bands):
                 var yf: float = 2.4 + 3.5 * float(floor_index)
                 if yf + 0.7 >= h:
@@ -259,7 +259,7 @@ func _build_buildings() -> void:
             m2_detail_nodes.append(detail)
             generated_facade_count += 1
         generated_building_count += 1
-        _add_sign(group, str(record.get("name", group.name)), Vector3(0.0, max_height + 6.0, 0.0), "#fbfbf8")
+        # Building identities belong in the minimap, not floating above roofs.
 
 func _build_osm_reference() -> void:
     var overlay: UTownOSMReference = OSM_KIT.new()
@@ -278,12 +278,10 @@ func set_m2_details_visible(enabled: bool) -> void:
     for detail in m2_detail_nodes:
         detail.visible = enabled
 
-func set_navigation_markers_visible(enabled: bool) -> void:
-    # Clean photo mode hides source-generated labels and waypoint spheres as well as HUD.
-    for label in navigation_labels:
-        label.visible = enabled
+func set_navigation_markers_visible(_enabled: bool) -> void:
+    # Keep the F7-compatible callable API but never reactivate removed overhead signs.
     if route_marker_root != null:
-        route_marker_root.visible = enabled
+        route_marker_root.visible = false
 
 func lighting_name() -> String:
     return str(LIGHTING_NAMES[lighting_mode])
@@ -335,19 +333,6 @@ func _unhandled_input(event: InputEvent) -> void:
             set_osm_reference_visible(not osm_reference_visible)
         elif event.keycode == KEY_T:
             set_lighting_mode((lighting_mode + 1) % LIGHTING_NAMES.size())
-
-func _add_sign(parent: Node3D, title: String, at: Vector3, color_hex: String) -> void:
-    var sign: Label3D = Label3D.new()
-    sign.text = title
-    sign.font_size = 34
-    sign.pixel_size = 0.025
-    sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    sign.no_depth_test = true
-    sign.modulate = Color.html(color_hex)
-    sign.outline_size = 5
-    sign.position = at
-    parent.add_child(sign)
-    navigation_labels.append(sign)
 
 func _distance_to_segment(point: Vector2, start: Vector2, finish: Vector2) -> float:
     var segment: Vector2 = finish - start
@@ -492,20 +477,13 @@ func _build_waypoints() -> void:
     root.name = "RouteBeacons_Conceptual"
     add_child(root)
     route_marker_root = root
-    var tint: Material = _mat("#e7ca75", 0.38)
-    var ball: SphereMesh = SphereMesh.new()
-    ball.radius = 0.7
-    ball.height = 1.4
+    # Keep all four logical waypoints for the map, tour, shuttle and gameplay.
+    # Do not add world-space spheres, labels or signposts.
     for stop in layout.get("loop", []):
         var p: Vector3 = lonlat_to_world(float(stop["lon"]), float(stop["lat"]))
         route_points.append(p)
         route_names.append(str(stop["name"]))
-        var marker: MeshInstance3D = MeshInstance3D.new()
-        marker.mesh = ball
-        marker.material_override = tint
-        marker.position = p + Vector3(0.0, 0.9, 0.0)
-        root.add_child(marker)
-        _add_sign(root, str(stop["name"]), p + Vector3(0.0, 3.1, 0.0), "#fff4c4")
+    root.visible = false
 
 func nearest_landmark(position_m: Vector3) -> Dictionary:
     var answer: Dictionary = {"name": "Town Green", "distance": 0.0}

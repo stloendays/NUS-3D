@@ -7,6 +7,7 @@ extends Control
 @onready var challenge: UTownChallenge = get_parent().get_parent().get_node("Challenge")
 @onready var campus_life: UTownCampusLife = get_parent().get_parent().get_node("CampusLife")
 @onready var coursework: UTownCoursework = get_parent().get_parent().get_node("Coursework")
+@onready var ddl_story: UTownDDLStory = get_parent().get_parent().get_node_or_null("DDLStory") as UTownDDLStory
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
@@ -75,6 +76,10 @@ func _draw() -> void:
     if challenge.sprint_active and challenge.sprint_next_index < challenge.sprint_route.size():
         var sprint_target: Vector2 = _to_map(challenge.sprint_route[challenge.sprint_next_index])
         draw_circle(sprint_target, 8.5, Color.html("#f2a8df"), false, 2.0)
+    if ddl_story != null and ddl_story.enabled and ddl_story.stage_points.size() == 4 and not ddl_story.completed:
+        var goal: Vector2 = _to_map(ddl_story.stage_points[clampi(ddl_story.stage, 0, 3)])
+        draw_circle(goal, 6.1, Color.html("#fff0ba"), false, 1.8)
+        draw_circle(goal, 2.0, Color.html("#fff0ba"))
     for state in campus_life.pedestrians:
         var npc: Node3D = state["node"]
         draw_circle(_to_map(npc.global_position), 2.2, Color.html("#e8a17c"))
