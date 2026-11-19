@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -27,6 +27,7 @@
 [ext_resource type="Script" path="res://scripts/utown_ambient_ecology.gd" id="25"]
 [ext_resource type="Script" path="res://scripts/utown_campus_clock.gd" id="26"]
 [ext_resource type="Script" path="res://scripts/utown_dining_crowds.gd" id="27"]
+[ext_resource type="Script" path="res://scripts/utown_shop_visuals.gd" id="28"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -238,6 +239,9 @@ script = ExtResource("27")
 
 [node name="AmbientEcology" type="Node3D" parent="."]
 script = ExtResource("25")
+
+[node name="ShopVisuals" type="Node3D" parent="."]
+script = ExtResource("28")
 
 [node name="Coins" type="Node3D" parent="."]
 script = ExtResource("20")
