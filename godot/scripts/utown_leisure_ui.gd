@@ -10,6 +10,31 @@ class_name UTownLeisureUI
 @onready var course_ui: UTownCourseworkUI = $"../CourseworkUI"
 @onready var intro: UTownIntro = $"../Intro"
 @onready var hud: CanvasLayer = $"../HUD"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+
+# Literal UI sources only. Player-authored content is never translated.
+const STATIC_LANGUAGE: Dictionary = {
+    "POST-COURSE CLUB  /  下课后才是真正的游戏": ["课后社团", "POST-COURSE CLUB"],
+    "×  关闭 [P]": ["关闭 [Tab]", "Close [Tab]"],
+    "完成任意学院全部 3 章 Coursework 后永久开放。": ["完成任意学院三个任务后永久解锁。", "Permanently unlocked after three quests in any faculty."],
+    "五子棋  GOMOKU": ["五子棋", "Gomoku"],
+    "打牌  CARDS": ["纸牌对战", "Cards"],
+    "聚会  CHEERS": ["社团聚会", "Social"],
+    "重新开局 / REMATCH": ["重新开局", "Rematch"],
+    "五轮纸牌比大小，不下注、不需要充值。选择手里的一张牌。": ["五轮纸牌比大小，不下注。选择手里的牌。", "Five-round high-card duel. No wagers. Choose a card."],
+    "你的手牌（点数 2 至 A，同点数平局）": ["你的手牌（2 至 A，同点数平局）", "Your hand (ranks 2 to A; equal ranks tie)"],
+    "重新洗牌 / NEW MATCH": ["重新洗牌", "New Match"],
+    "对手的牌是隐藏的；五轮后比总得分。赢牌只获得娱乐战绩，不赢取金币。": ["对手牌面隐藏，五轮后计分。不涉及金币。", "Opponent cards are hidden. Scores are compared after five rounds. No coin stakes."],
+    "虚构的下课后社团聚会  /  ORIGINAL SOCIAL SCENE": ["下课后社团聚会", "AFTER-CLASS SOCIAL"],
+    "同 NPC 庆祝完成课程：所有饮品都能触发一样的搞笑对话，没有酒精专属奖励。": ["与朋友庆祝课程完成。饮品不影响奖励或剧情。", "Celebrate with friends. Drink choices never affect rewards or stories."],
+    "无酒精特调": ["无酒精特调", "Mocktail"],
+    "茶饮 / JUICE": ["茶饮", "Tea / Juice"],
+    "成年人小酌": ["成年人小酌", "Adult Toast"],
+    "喝酒不是任务条件。不提供饮酒奖励或现实行为建议；小酌情节后需等待才能骑车或乘车。":
+        ["饮酒不是任务条件，也没有额外奖励。小酌剧情后需等待才能骑行或乘车。",
+        "Drinking is optional and grants no rewards. The adult toast triggers a temporary travel cooldown."],
+    "本局结束，可重新洗牌再玩。": ["本局结束，重新洗牌再玩。", "Match over. Shuffle for a rematch."]
+}
 
 var is_open: bool = false
 var active_tab: String = "chess"
@@ -37,14 +62,50 @@ var tab_social: Button
 func _ready() -> void:
     layer = 18
     _build()
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
+        _on_language_changed(language.locale)
     _refresh()
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _static_text(source: String) -> String:
+    if not STATIC_LANGUAGE.has(source):
+        return source
+    var pair: Array = STATIC_LANGUAGE[source]
+    return _t(str(pair[0]), str(pair[1]))
+
+
+func _on_language_changed(_value: String) -> void:
+    _refresh_static_tree(self)
+    if chess_score != null:
+        _refresh()
+
+
+func _refresh_static_tree(node: Node) -> void:
+    if node.has_meta("i18n_source_key"):
+        var key: String = str(node.get_meta("i18n_source_key"))
+        if key == "age_gate" and node is Button:
+            (node as Button).text = _t("我已达到所在地法定饮酒年龄（仅开启虚构小酌选项）",
+                "I meet the legal drinking age where I live (optional fictional adult toast)")
+        elif node is Label:
+            (node as Label).text = _static_text(key)
+        elif node is Button:
+            (node as Button).text = _static_text(key)
+    for child in node.get_children():
+        _refresh_static_tree(child)
 
 func _palette(hex_value: String) -> Color:
     return Color.html(hex_value)
 
 func _label(content: String, size: int = 16, color_hex: String = "#e9ede7") -> Label:
     var label := Label.new()
-    label.text = content
+    label.text = _static_text(content)
+    if STATIC_LANGUAGE.has(content):
+        label.set_meta("i18n_source_key", content)
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.add_theme_font_size_override("font_size", size)
     label.add_theme_color_override("font_color", _palette(color_hex))
@@ -52,7 +113,9 @@ func _label(content: String, size: int = 16, color_hex: String = "#e9ede7") -> L
 
 func _button(title: String, width: float = 150.0) -> Button:
     var result := Button.new()
-    result.text = title
+    result.text = _static_text(title)
+    if STATIC_LANGUAGE.has(title):
+        result.set_meta("i18n_source_key", title)
     result.custom_minimum_size = Vector2(width, 38.0)
     result.add_theme_font_size_override("font_size", 15)
     return result
@@ -211,7 +274,9 @@ func _build() -> void:
     adult_button.pressed.connect(_on_drink.bind("adult"))
     drinks.add_child(adult_button)
     adult_confirm = CheckBox.new()
-    adult_confirm.text = "我已达到所在地法定饮酒年龄（仅启用可选的虚构小酌情节）"
+    adult_confirm.set_meta("i18n_source_key", "age_gate")
+    adult_confirm.text = _t("我已达到所在地法定饮酒年龄（仅开启虚构小酌选项）",
+        "I meet the legal drinking age where I live (optional fictional adult toast)")
     adult_confirm.add_theme_font_size_override("font_size", 14)
     adult_confirm.toggled.connect(_on_age_confirm)
     social_panel.add_child(adult_confirm)
@@ -228,7 +293,8 @@ func open_lounge() -> bool:
     if is_open:
         return true
     if not leisure.unlocked():
-        life.message = "完成任一学院全部 3 个 Coursework 任务后解锁棋牌与聚会。"
+        life.message = _t("完成任意学院三个课程任务，即可解锁棋牌和聚会。",
+            "Complete three quests in any faculty to unlock the club.")
         life.message_time = 4.0
         return false
     var voice: Node = get_parent().get_node_or_null("VoicePresentation")
@@ -237,7 +303,8 @@ func open_lounge() -> bool:
     if intro.playing or course_ui.modal_visible or course_ui.intro_blocked or coursework.current_faculty_id.is_empty():
         return false
     if life.on_shuttle or life.bicycle_enabled:
-        life.message = "先下车或停好自行车，再去下课后社团活动。"
+        life.message = _t("请先停好自行车或下车，再参加社团活动。",
+            "Park your bicycle or leave the shuttle before joining the club.")
         life.message_time = 3.5
         return false
     is_open = true
@@ -291,14 +358,16 @@ func _on_drink(kind: String) -> void:
 func _refresh() -> void:
     if chess_score == null:
         return
-    header_label.text = "POST-COURSE CLUB  /  下课后才是真正的游戏"
+    header_label.text = _static_text("POST-COURSE CLUB  /  下课后才是真正的游戏")
     var count: int = coursework.total_completed()
-    caption_label.text = "本机累计 Coursework：%d/39   |   棋胜 %d/%d   牌胜 %d/%d   聚会 %d 次" % [
+    caption_label.text = _t("本机课程进度 %d/39 | 棋胜 %d/%d | 牌胜 %d/%d | 聚会 %d 次",
+        "Coursework %d/39 | Gomoku wins %d/%d | Card wins %d/%d | Social visits %d") % [
         count, leisure.chess_wins, leisure.chess_games, leisure.card_wins, leisure.card_games, leisure.social_visits
     ]
     if leisure.grand_master_unlocked():
-        caption_label.text += "   |   全院系通关：校园休闲大师"
-    chess_score.text = "你执黑 ●  |  NPC 执白 ○  |  连五获胜  |  棋盘 9 × 9"
+        caption_label.text += _t(" | 全院系通关：校园休闲大师", " | All faculties complete: Campus Club Master")
+    chess_score.text = _t("你执黑棋 ● | 对手执白棋 ○ | 五子连线获胜 | 9×9",
+        "You: black ● | NPC: white ○ | Five in a row wins | 9×9")
     for y in range(leisure.BOARD_SIZE):
         for x in range(leisure.BOARD_SIZE):
             var index: int = y * leisure.BOARD_SIZE + x
@@ -308,7 +377,8 @@ func _refresh() -> void:
             cell.add_theme_color_override("font_color", _palette("#202c30" if value == 1 else "#ffffff" if value == 2 else "#745b38"))
             cell.disabled = value != 0 or leisure.chess_over
     chess_message.text = leisure.chess_last_message
-    card_score.text = "第 %d/%d 轮  |  玩家 %d : %d NPC" % [
+    card_score.text = _t("第 %d/%d 轮 | 你 %d : %d 对手",
+        "Round %d/%d | You %d : %d NPC") % [
         leisure.card_round, leisure.CARD_ROUNDS, leisure.card_player_points, leisure.card_npc_points
     ]
     card_message.text = leisure.card_message
@@ -316,7 +386,7 @@ func _refresh() -> void:
         card_hand_row.remove_child(child)
         child.queue_free()
     if leisure.card_over:
-        card_hand_row.add_child(_label("本局结束，可重新洗牌再玩。", 16))
+        card_hand_row.add_child(_label(_static_text("本局结束，可重新洗牌再玩。"), 16))
     else:
         for i in range(leisure.card_hand.size()):
             var card: Dictionary = leisure.card_hand[i]
@@ -333,7 +403,9 @@ func _process(_delta: float) -> void:
         return
     status_chip.visible = leisure.unlocked() and not is_open and hud.visible and not course_ui.modal_visible and not intro.playing
     if status_chip.visible:
-        status_chip.text = "POST-COURSE CLUB  [Tab]  |  五子棋 · 纸牌 · 聚会" + ("  |  39/39 MASTER" if leisure.grand_master_unlocked() else "")
+        status_chip.text = _t("课后社团 [Tab] | 五子棋 · 纸牌 · 聚会",
+            "POST-COURSE CLUB [Tab] | Gomoku · Cards · Social") + (
+            _t(" | 全院系通关", " | ALL FACULTIES COMPLETE") if leisure.grand_master_unlocked() else "")
 
 func _input(event: InputEvent) -> void:
     var voice: Node = get_parent().get_node_or_null("VoicePresentation")

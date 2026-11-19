@@ -675,7 +675,8 @@ func _build_amenity_zone(zone: Node3D, kind: String) -> void:
     elif kind in ["WATER", "NOTICE"]:
         _box(zone, "CampusFixture", Vector3(0, 1.25, 0), Vector3(3.0, 2.5, 1.4), "#80aaa9")
     _refine_amenity_models(zone, kind)
-    _label(zone, kind.replace("_", " "), Vector3(0, 3.6, -7), "#f8f2e4", 17)
+    # No generic English zone labels: preserve the account-selected single-language
+    # gameplay contract (#72) and avoid redundant floating signboards.
 
 
 # Second-pass geometry: readable silhouettes, actual functional parts and softer materials.

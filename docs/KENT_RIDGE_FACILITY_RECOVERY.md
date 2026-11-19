@@ -7,3 +7,5 @@ Nine schematic campus districts receive three recognizable activity zones each (
 **QA:** `godot --headless --path godot --script res://tests/kent_ridge_expansion_smoke_test.gd` checks the zones, model details, bus parts and shared mesh cache. Existing Godot, bus, bilingual, multiplayer and Windows CI must remain green before merge. In-game navigation, walkable offsets, GPU visual screenshots, RAM/draw-call/FPS profiling and collision checks are still unverified on real hardware. Geometry caching does not imply fewer draw calls.
 
 **Assets:** procedural original meshes, no downloaded or proprietary models or map tiles. No quests, NPC AI, accounts, input, network or save API changes.
+
+Locale/UX integration (after #72): the schematic props are recognizable by silhouette rather than generic English floating labels. This keeps the login-selected single-language presentation clean and saves 27 Label3D nodes.

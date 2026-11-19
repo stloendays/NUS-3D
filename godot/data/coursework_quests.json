@@ -22,7 +22,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "The Beaker Strikes Back: Missing Lab Report",
+          "story_en": "Urgent: The Beaker Strikes Back: Missing Lab Report. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -34,7 +36,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Where Did the Lab Data Go?",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Where Did the Lab Data Go?. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -46,9 +50,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "23:59: The PDF Refuses to Upload",
+          "story_en": "Final challenge: 23:59: The PDF Refuses to Upload. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "The centrifuge spins faster than your approaching deadline."
     },
     {
       "id": "cde",
@@ -67,7 +74,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "Design Review Before the Model Explodes",
+          "story_en": "Urgent: Design Review Before the Model Explodes. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -79,7 +88,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Thermodynamics Homework: The System Is Boiling",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Thermodynamics Homework: The System Is Boiling. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -91,9 +102,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "Final CAD: 99 Failed Exports",
+          "story_en": "Final challenge: Final CAD: 99 Failed Exports. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Your drawings are finally done, so the group changes the brief."
     },
     {
       "id": "computing",
@@ -112,7 +126,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "The Compiler Ate My Homework",
+          "story_en": "Urgent: The Compiler Ate My Homework. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -124,7 +140,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Git Merge Conflict: Teammate Missing",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Git Merge Conflict: Teammate Missing. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -136,9 +154,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "At 23:59 the Server Gives Up",
+          "story_en": "Final challenge: At 23:59 the Server Gives Up. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "The code has no bugs. The universe does."
     },
     {
       "id": "business",
@@ -157,7 +178,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "Business Plan: A Negative Budget",
+          "story_en": "Urgent: Business Plan: A Negative Budget. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -169,7 +192,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Two Hundred Slides and No Conclusion",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Two Hundred Slides and No Conclusion. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -181,9 +206,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "Investors Change Their Minds One Minute Before the Pitch",
+          "story_en": "Final challenge: Investors Change Their Minds One Minute Before the Pitch. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Your valuation is sky-high, but your coffee balance is not."
     },
     {
       "id": "fass",
@@ -202,7 +230,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "Field Notes Lost in the Rain",
+          "story_en": "Urgent: Field Notes Lost in the Rain. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -214,7 +244,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Why Are the References 87 Pages Long?",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Why Are the References 87 Pages Long?. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -226,9 +258,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "The 4,000-Word Essay: One Final Full Stop",
+          "story_en": "Final challenge: The 4,000-Word Essay: One Final Full Stop. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "One thesis title written; one literature review sunrise survived."
     },
     {
       "id": "chs",
@@ -247,7 +282,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "Interdisciplinary Group: Not My Department",
+          "story_en": "Urgent: Interdisciplinary Group: Not My Department. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -259,7 +296,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "When Data and Interviews Start Arguing",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. When Data and Interviews Start Arguing. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -271,9 +310,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "An Interdisciplinary Deadline Falls from the Sky",
+          "story_en": "Final challenge: An Interdisciplinary Deadline Falls from the Sky. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Science wants data, humanities wants stories, the team wants a holiday."
     },
     {
       "id": "medicine",
@@ -292,7 +334,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "The Great Escape of the Anatomy Flashcards",
+          "story_en": "Urgent: The Great Escape of the Anatomy Flashcards. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -304,7 +348,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Case Simulation: The Patient Is an Alarm Clock",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Case Simulation: The Patient Is an Alarm Clock. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -316,9 +362,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "Night Rounds vs. 23:59",
+          "story_en": "Final challenge: Night Rounds vs. 23:59. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Doctors need sleep. Coursework disagrees."
     },
     {
       "id": "law",
@@ -337,7 +386,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "A Mountain of Case Files",
+          "story_en": "Urgent: A Mountain of Case Files. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -349,7 +400,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Moot Court: Evidence in the Coffee Cup",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Moot Court: Evidence in the Coffee Cup. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -361,9 +414,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "Final Submission: Who Changed the Precedent?",
+          "story_en": "Final challenge: Final Submission: Who Changed the Precedent?. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Case law may argue back; a deadline will not hear your appeal."
     },
     {
       "id": "dentistry",
@@ -382,7 +438,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "The Stubborn Tooth Model",
+          "story_en": "Urgent: The Stubborn Tooth Model. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -394,7 +452,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Bite Simulation: The Model Refuses to Cooperate",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Bite Simulation: The Model Refuses to Cooperate. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -406,9 +466,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "Clinical Notes: The Last-Minute Rush",
+          "story_en": "Final challenge: Clinical Notes: The Last-Minute Rush. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "The dental model opens its mouth; your teammate says nothing."
     },
     {
       "id": "music",
@@ -427,7 +490,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "New Notes Appear on the Sheet Music",
+          "story_en": "Urgent: New Notes Appear on the Sheet Music. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -439,7 +504,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Ensemble Rehearsal: The Conductor Vanishes",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Ensemble Rehearsal: The Conductor Vanishes. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -451,9 +518,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "The Final Score, One Minute Before Showtime",
+          "story_en": "Final challenge: The Final Score, One Minute Before Showtime. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Five minutes tuning; two hours finding the ensemble."
     },
     {
       "id": "nusc",
@@ -472,7 +542,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "Intercollege Quest: Everybody Has a Different Answer",
+          "story_en": "Urgent: Intercollege Quest: Everybody Has a Different Answer. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -484,7 +556,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Inquiry Report: More Questions than Answers",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Inquiry Report: More Questions than Answers. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -496,9 +570,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "23:59: The Great Interdisciplinary Alliance",
+          "story_en": "Final challenge: 23:59: The Great Interdisciplinary Alliance. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Explore boldly, says the tutor. File too large, says the portal."
     },
     {
       "id": "public_health",
@@ -517,7 +594,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "Epidemic Curve or Roller Coaster?",
+          "story_en": "Urgent: Epidemic Curve or Roller Coaster?. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -529,7 +608,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Community Survey: Missing Questionnaires",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Community Survey: Missing Questionnaires. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -541,9 +622,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "Policy Brief: The Deadline Is Spreading",
+          "story_en": "Final challenge: Policy Brief: The Deadline Is Spreading. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "You are protecting your teammates from deadline burnout."
     },
     {
       "id": "public_policy",
@@ -562,7 +646,9 @@
           "submit": "PLAZA",
           "deadline_s": 210,
           "xp": 100,
-          "credits": 30
+          "credits": 30,
+          "title_en": "Policy Memo: The Printer Is on Strike",
+          "story_en": "Urgent: Policy Memo: The Printer Is on Strike. Your tutor says the missing materials are somewhere on campus, and the deadline is a coffee away."
         },
         {
           "id": "q2",
@@ -574,7 +660,9 @@
           "submit": "ERC",
           "deadline_s": 300,
           "xp": 175,
-          "credits": 50
+          "credits": 50,
+          "title_en": "Stakeholders Are Meeting Until Tomorrow",
+          "story_en": "Your teammate finally replies \"Almost there\" after three days. Stakeholders Are Meeting Until Tomorrow. Time to save the project yourself."
         },
         {
           "id": "q3",
@@ -586,9 +674,12 @@
           "submit": "GREEN",
           "deadline_s": 390,
           "xp": 250,
-          "credits": 70
+          "credits": 70,
+          "title_en": "Public Decisions: The Final 30 Seconds",
+          "story_en": "Final challenge: Public Decisions: The Final 30 Seconds. The submit button is smoking, and the campus deadline alarm is ringing."
         }
-      ]
+      ],
+      "flavor_en": "Everybody has an opinion except the deadline."
     }
   ]
 }

@@ -94,6 +94,27 @@ func _ready() -> void:
     language_service.language_changed.connect(_on_language_changed)
     _on_language_changed(language_service.locale)
     _show_login()
+    var release_updater := NUS3DAutoUpdater.new()
+    release_updater.name = "StableReleaseUpdater"
+    add_child(release_updater)
+
+
+## An update restart must flush the same account-specific ledgers as a normal
+## exit. Do not log the player out or replace the GameShell/active scene.
+func save_for_version_update() -> void:
+    if not accounts.is_logged_in():
+        return
+    _scan_rewards()
+    challenge._save_progress()
+    var names: Array[String] = ["Coursework", "EnglishExams", "VoicePresentation", "Arcade", "Coins", "Leisure", "CampusLife", "DDLStory"]
+    var methods: Array[String] = ["_save_progress", "_save_progress", "_save_progress", "_save_progress", "save_progress", "_save_stats", "_save_activities", "_save_progress"]
+    for i in range(names.size()):
+        var system: Node = game.get_node_or_null(names[i])
+        if system != null and system.has_method(methods[i]):
+            system.call(methods[i])
+    if story_director != null:
+        story_director._persist()
+    accounts._save_profile()
 
 
 func _ui_sound_service() -> NUS3DUISound:
@@ -117,11 +138,17 @@ func _refresh_sound_buttons() -> void:
     var sound: NUS3DUISound = _ui_sound_service()
     var active: bool = sound != null and sound.enabled
     if login_sound_button != null:
-        login_sound_button.text = "UI sound: ON  [F9]" if active else "UI sound: OFF  [F9]"
+        login_sound_button.text = language_service.choose(
+            "界面音效：开 [F9]" if active else "界面音效：关 [F9]",
+            "UI sound: ON [F9]" if active else "UI sound: OFF [F9]")
     if profile_sound_button != null:
-        profile_sound_button.text = "Sound ON" if active else "Sound OFF"
+        profile_sound_button.text = language_service.choose(
+            "音效：开" if active else "音效：关",
+            "Sound ON" if active else "Sound OFF")
     if mail_sound_button != null:
-        mail_sound_button.text = "Sound ON" if active else "Sound OFF"
+        mail_sound_button.text = language_service.choose(
+            "音效：开" if active else "音效：关",
+            "Sound ON" if active else "Sound OFF")
 
 
 func _panel_style(background: Color) -> StyleBoxFlat:
@@ -193,7 +220,7 @@ func _build_login() -> void:
     box.add_child(_label("NUS-3D", 42, Color.html("#e8f9ff")))
     box.add_child(_label("UTOWN EXPLORER  /  OFFLINE ALPHA", 14, Color.html("#75c8d6")))
     box.add_child(_label("Explore an original, unofficial campus world.", 15, Color.html("#cbdde0")))
-    language_login_button = _button("中文 / English", _toggle_language)
+    language_login_button = _button("Language: English", _toggle_language)
     box.add_child(language_login_button)
     var spacer: Control = Control.new()
     spacer.custom_minimum_size.y = 20
@@ -216,7 +243,7 @@ func _build_login() -> void:
     box.add_child(login_submit)
     login_toggle = _button("Create a new local account", _toggle_register)
     box.add_child(login_toggle)
-    box.add_child(_button("新手教程  /  HOW TO PLAY", _open_tutorial))
+    box.add_child(_button("How to play", _open_tutorial))
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
     box.add_child(login_sound_button)
     login_message = _label("", 13, Color.html("#efb8ad"))
@@ -349,8 +376,6 @@ func _build_profile_card() -> void:
     profile_label = _label("LV 1", 13, Color.html("#e4f5f6"))
     profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     row.add_child(profile_label)
-    language_game_button = _button("中文 / English", _toggle_language)
-    row.add_child(language_game_button)
     profile_sound_button = _button("Sound ON", _toggle_ui_sound)
     row.add_child(profile_sound_button)
     row.add_child(_button("Mail [J]", _open_mail))
@@ -435,6 +460,9 @@ func _build_mail() -> void:
 
 
 func _toggle_language() -> void:
+    if accounts.is_logged_in() or language_service.session_locked:
+        return
+    # Language is selected on the login screen, never swapped mid-game.
     language_service.set_locale("en" if language_service.is_chinese() else "zh")
 
 
@@ -444,9 +472,7 @@ func _on_language_changed(_language: String) -> void:
     language_service.apply_static_ui(profile_card)
     language_service.refresh_world_labels(game.get_node("World") as UTownWorld)
     _refresh_auth_text()
-    var button_text: String = "English / 中文" if language_service.is_chinese() else "中文 / English"
-    language_login_button.text = button_text
-    language_game_button.text = button_text
+    language_login_button.text = language_service.choose("语言：中文（点击切换）", "Language: English (click to change)")
     login_message.text = language_service.ui_text(login_error_source)
     mail_status.text = language_service.ui_text(mail_status_source)
     _refresh_profile()
@@ -462,6 +488,11 @@ func _refresh_auth_text() -> void:
 
 
 func _show_login() -> void:
+    # Signing out always returns to the sign-in form; the previous session's
+    # register-mode flag must not carry over to a new login/language choice.
+    language_service.end_session()
+    registering = false
+    _refresh_auth_text()
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     login_cover.show()
@@ -500,10 +531,12 @@ func _submit_login() -> void:
         login_error_source = error
         login_message.text = language_service.ui_text(error)
         return
+    accounts.set_ui_locale(language_service.locale)
     _enter_game()
 
 
 func _enter_game() -> void:
+    language_service.begin_session()
     if admin_authority != null:
         admin_authority.lock()
     challenge.sprint_active = false
@@ -808,7 +841,8 @@ func _unhandled_input(event: InputEvent) -> void:
         _toggle_ui_sound()
         get_viewport().set_input_as_handled()
         return
-    if key_event.keycode == KEY_F10:
+    # F10 is allowed only on the login screen. Gameplay language is fixed.
+    if key_event.keycode == KEY_F10 and not accounts.is_logged_in():
         _toggle_language()
         get_viewport().set_input_as_handled()
         return

@@ -13,6 +13,13 @@ func _smoke() -> void:
     var instance: Node3D = scene.instantiate() as Node3D
     root.add_child(instance)
     await process_frame
+    # Each CI process may inherit an anonymous Coursework save created by an
+    # earlier integration test. Isolate BEFORE checking the first-run selector.
+    var first_run_coursework: UTownCoursework = instance.get_node("Coursework") as UTownCoursework
+    first_run_coursework.save_path = "user://nus3d_coursework_smoke_temp.cfg"
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(first_run_coursework.save_path))
+    first_run_coursework._load_progress()
+    first_run_coursework._refresh_marker()
     var intro: UTownIntro = instance.get_node_or_null("Intro") as UTownIntro
     var opening_ui: UTownCourseworkUI = instance.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if intro == null or opening_ui == null or not intro.playing or intro.key_frames.size() != 6:

@@ -7,6 +7,14 @@ func _initialize() -> void:
     call_deferred("_run")
 
 
+func _contains_han(value: String) -> bool:
+    for i in range(value.length()):
+        var cp: int = value.unicode_at(i)
+        if (cp >= 0x3400 and cp <= 0x9fff) or (cp >= 0xf900 and cp <= 0xfaff):
+            return true
+    return false
+
+
 func _fail(reason: String) -> void:
     paused = false
     push_error("NUS3D i18n test failed: " + reason)
@@ -160,9 +168,81 @@ func _run() -> void:
         _fail("Switching back to English did not restore original HUD")
         return
 
+    # M18: one selected language, not two variants in the same game screen.
+    var coursework: UTownCoursework = shell.game.get_node("Coursework") as UTownCoursework
+    var course_ui: UTownCourseworkUI = shell.game.get_node("CourseworkUI") as UTownCourseworkUI
+    var leisure_ui: UTownLeisureUI = shell.game.get_node("LeisureUI") as UTownLeisureUI
+    var intro: UTownIntro = shell.game.get_node("Intro") as UTownIntro
+    var coursework_source: Dictionary = JSON.parse_string(
+        FileAccess.get_file_as_string("res://data/coursework_quests.json"))
+    var options: Array = coursework_source.get("faculty_options", [])
+    if options.size() != 13:
+        _fail("All 13 faculties must remain available for local-language selection")
+        return
+    for faculty in options:
+        if str(faculty.get("flavor_en", "")).is_empty():
+            _fail("Every faculty flavor requires an English variant")
+            return
+        for quest in faculty.get("quests", []):
+            if str(quest.get("title_en", "")).is_empty() or str(quest.get("story_en", "")).is_empty():
+                _fail("All 39 coursework chapters require English and Chinese narrative")
+                return
+    if not coursework.select_faculty("science"):
+        _fail("Cannot choose the science faculty")
+        return
+    language_service.set_locale("en")
+    course_ui._apply_language("en")
+    if _contains_han(coursework.status_text()) or _contains_han(coursework.quest_story(coursework.current_quest())):
+        _fail("English Coursework HUD or story contains Chinese")
+        return
+    if _contains_han(course_ui.faculty_picker.get_item_text(0)) or _contains_han(leisure_ui.tab_chess.text):
+        _fail("English faculty and leisure controls must not show Chinese labels")
+        return
+    if _contains_han(intro.subtitle_label.text) or _contains_han(intro.skip_button.text):
+        _fail("English introduction still contains Chinese overlays")
+        return
+    language_service.set_locale("zh")
+    course_ui._apply_language("zh")
+    if not coursework.status_text().contains("任务") or not coursework.quest_story(coursework.current_quest()).contains("紧急通知"):
+        _fail("Chinese Coursework story or dynamic HUD failed to select Chinese data")
+        return
+    if not course_ui.faculty_picker.get_item_text(0).contains("理学院") or leisure_ui.tab_chess.text != "五子棋":
+        _fail("Chinese controls must display only the selected Chinese faculty and game names")
+        return
+    if not intro.subtitle_label.text.contains("欢迎") or not intro.skip_button.text.contains("跳过"):
+        _fail("Chinese intro failed to update captions after login selection")
+        return
+    if shell.language_game_button != null or not shell.language_login_button.text.begins_with("语言"):
+        _fail("Language must be selected only at login, not in the player profile")
+        return
     shell.tutorial.close_guide()
     if not paused or profile_store.is_logged_in():
-        _fail("Bilingual guide must not alter pause/account state")
+        _fail("Tutorial and preview localization must not start a session")
+        return
+    # Exercise the REAL local-account registration button route.
+    shell._toggle_register()
+    shell.login_name.text = "locale_smoke"
+    shell.login_password.text = "local-pass-8899"
+    shell._submit_login()
+    if not profile_store.is_logged_in() or not language_service.session_locked:
+        _fail("Signing in did not freeze the chosen language for this session")
+        return
+    if profile_store.preferred_ui_locale() != "zh" or not profile_store.profile.has("ui_locale"):
+        _fail("Login language choice was not stored with this offline profile")
+        return
+    if language_service.set_locale("en") or not language_service.is_chinese():
+        _fail("Language could be changed after a successful login")
+        return
+    shell._toggle_language()
+    if not language_service.is_chinese():
+        _fail("The old in-game language shortcut still overrides login choice")
+        return
+    shell._logout()
+    if language_service.session_locked or not paused or not shell.login_cover.visible:
+        _fail("Logging out did not restore editable login language choice")
+        return
+    if not language_service.set_locale("en") or shell.login_title.text != "SIGN IN":
+        _fail("A new login session cannot choose English independently")
         return
     paused = false
     print("NUS3D_LANGUAGE_SMOKE_OK")

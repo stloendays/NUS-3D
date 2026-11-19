@@ -109,6 +109,15 @@ jobs:
           path: build/download
       - name: Check archive and source manifest again on Windows
         run: python tools/package_windows_build.py --verify build/download/NUS3D-UTown-Windows-Experimental.zip
+      - name: Validate bundled updater with stock Windows PowerShell before launching
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $archive = (Resolve-Path "build/download/NUS3D-UTown-Windows-Experimental.zip").Path
+          $digest = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          $version = (Get-Content "godot/data/app_version.json" -Raw | ConvertFrom-Json).version
+          & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "tools/windows_updater/NUS3D-Updater.ps1" -VerifyOnly -Package $archive -ExpectedSha256 $digest -ExpectedVersion $version
+          if ($LASTEXITCODE -ne 0) { throw "Updater refused a correctly packaged Windows release archive." }
       - name: Execute packaged runtime integrity test
         shell: pwsh
         run: |
@@ -132,6 +141,26 @@ jobs:
             throw "Exported game loaded incomplete assets: $(Get-Content $report -Raw)"
           }
           Get-Content -Path $report
+      - name: Test staged updater installation, candidate self-test and previous-version backup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $package = (Resolve-Path "build/download/NUS3D-UTown-Windows-Experimental.zip").Path
+          $gameDir = (Resolve-Path "build/run").Path
+          $hash = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant()
+          $version = (Get-Content "godot/data/app_version.json" -Raw | ConvertFrom-Json).version
+          & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "tools/windows_updater/NUS3D-Updater.ps1" -Package $package -ExpectedSha256 $hash -ExpectedVersion $version -InstallDir $gameDir -NoLaunch -StatusFile "$gameDir/update-result.json"
+          if ($LASTEXITCODE -ne 0) { throw "Post-exit updater integration test failed." }
+          if (-not (Test-Path "$gameDir/.nus3d-previous/NUS3D-UTown.exe")) {
+            throw "Previous-version executable not retained for rollback."
+          }
+          if (-not (Test-Path "$gameDir/.nus3d-previous/NUS3D-UTown.pck")) {
+            throw "Previous-version resource pack not retained for rollback."
+          }
+          $state = Get-Content "$gameDir/update-result.json" -Raw | ConvertFrom-Json
+          if ($state.result -ne "installed" -or $state.version -ne $version) {
+            throw "Updater did not report a successful staged install."
+          }
       - name: Preserve Windows executable runtime report
         if: always()
         uses: actions/upload-artifact@v4
