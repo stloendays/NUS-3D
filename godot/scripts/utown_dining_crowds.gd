@@ -110,7 +110,7 @@ func _process(delta: float) -> void:
         var away: Vector3 = pos - current
         away.y = 0
         var distance: float = away.length()
-        if npc.visible and distance < SHOVE_RADIUS and not player.movement_locked and not life.on_shuttle:
+        if (npc.visible or near_player) and distance < SHOVE_RADIUS and not player.movement_locked and not life.on_shuttle:
             var direction: Vector3 = away.normalized() if distance > 0.01 else Vector3.RIGHT
             var bike: bool = player.bicycle_mode
             var running: bool = speed > 5.5
