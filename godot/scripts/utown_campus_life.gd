@@ -258,6 +258,7 @@ func _build_room_shell(room: Node3D, id: String) -> void:
     exit_label.pixel_size = 0.016
     exit_label.modulate = Color.html("#f1d18a")
     exit_label.position = Vector3(0, 2.7, 8.55)
+    exit_label.rotation.y = PI
     room.add_child(exit_label)
 
 func _build_mezzanine(room: Node3D, id: String) -> void:
