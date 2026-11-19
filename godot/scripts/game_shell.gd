@@ -279,7 +279,7 @@ func _build_profile_card() -> void:
     profile_sound_button = _button("Sound ON", _toggle_ui_sound)
     row.add_child(profile_sound_button)
     row.add_child(_button("Mail [J]", _open_mail))
-    row.add_child(_button("Campus AI [F8]", _open_campus_hub))
+    row.add_child(_button("Campus AI [F11]", _open_campus_hub))
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
 
@@ -685,7 +685,7 @@ func _unhandled_input(event: InputEvent) -> void:
         return
     if not accounts.is_logged_in():
         return
-    if key_event.keycode == KEY_F8:
+    if key_event.keycode == KEY_F11:
         if campus_hub != null and campus_hub.visible:
             _close_campus_hub()
         elif not mail_cover.visible:
