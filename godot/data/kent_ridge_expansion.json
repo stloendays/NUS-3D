@@ -6,7 +6,9 @@
     "official_map": "https://map.nus.edu.sg/",
     "kent_ridge_campus_map": "https://map.nus.edu.sg/index.php/main/download_map",
     "bus_network_effective_2026_01_05": "https://uci.nus.edu.sg/campus-life/campus-services/transportation/internal-shuttle-bus/",
-    "note": "Official UCI 2026 shuttle service names D1/D2 and NUS campus map are reference points. All in-game station coordinates, bus travel order and straight-line walk links are schematic proxy anchors rather than surveyed stops or verified real travel directions."
+    "note": "Official UCI 2026 shuttle service names D1/D2 and NUS campus map are reference points. All in-game station coordinates, bus travel order and straight-line walk links are schematic proxy anchors rather than surveyed stops or verified real travel directions.",
+    "building_reference": "https://www.nus.edu.sg/oam/nus-experience/virtual-tour",
+    "google_maps_policy": "Use Google Maps only for manual location/shape comparison, no Google satellite tile, Street View screenshot or proprietary 3D mesh redistribution."
   },
   "districts": [
     {
@@ -31,7 +33,12 @@
             35,
             28,
             16
-          ]
+          ],
+          "kind": "museum",
+          "facade": "#e2d7c4",
+          "floors": 4,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "University Cultural Centre",
@@ -43,7 +50,12 @@
             44,
             27,
             17
-          ]
+          ],
+          "kind": "auditorium",
+          "facade": "#e6d5c2",
+          "floors": 3,
+          "roof_style": "parapet",
+          "canopy": true
         },
         {
           "name": "Conservatory Studio",
@@ -55,9 +67,17 @@
             32,
             25,
             13
-          ]
+          ],
+          "kind": "studio",
+          "facade": "#ddd4bc",
+          "floors": 3,
+          "roof_style": "terrace",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "ENGINEERING",
@@ -81,7 +101,12 @@
             43,
             36,
             21
-          ]
+          ],
+          "kind": "academic",
+          "facade": "#cbbba8",
+          "floors": 6,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "Engineering E3/E4",
@@ -93,7 +118,12 @@
             43,
             34,
             19
-          ]
+          ],
+          "kind": "academic",
+          "facade": "#bcb9ac",
+          "floors": 5,
+          "roof_style": "parapet",
+          "canopy": true
         },
         {
           "name": "Techno Edge",
@@ -105,9 +135,17 @@
             51,
             23,
             11
-          ]
+          ],
+          "kind": "canteen",
+          "facade": "#d9cfb8",
+          "floors": 2,
+          "roof_style": "terrace",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "YIH",
@@ -131,7 +169,12 @@
             38,
             34,
             14
-          ]
+          ],
+          "kind": "community",
+          "facade": "#e4d5bf",
+          "floors": 4,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "Campus Commons",
@@ -143,9 +186,17 @@
             35,
             22,
             12
-          ]
+          ],
+          "kind": "courtyard",
+          "facade": "#d8c9b4",
+          "floors": 2,
+          "roof_style": "parapet",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "CLB",
@@ -169,7 +220,12 @@
             49,
             40,
             22
-          ]
+          ],
+          "kind": "library",
+          "facade": "#d2c6b0",
+          "floors": 6,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "Arts & Social Sciences",
@@ -181,7 +237,12 @@
             48,
             30,
             19
-          ]
+          ],
+          "kind": "academic",
+          "facade": "#d7c7b4",
+          "floors": 5,
+          "roof_style": "parapet",
+          "canopy": true
         },
         {
           "name": "Library Courtyard",
@@ -193,9 +254,17 @@
             29,
             16,
             6
-          ]
+          ],
+          "kind": "courtyard",
+          "facade": "#c4d5c2",
+          "floors": 1,
+          "roof_style": "terrace",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "COM3",
@@ -219,7 +288,12 @@
             46,
             35,
             27
-          ]
+          ],
+          "kind": "glass_tower",
+          "facade": "#bfcbd1",
+          "floors": 8,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "COM Innovation Block",
@@ -231,9 +305,17 @@
             40,
             32,
             20
-          ]
+          ],
+          "kind": "academic",
+          "facade": "#c5c5be",
+          "floors": 6,
+          "roof_style": "parapet",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "BIZ2",
@@ -257,7 +339,12 @@
             44,
             34,
             21
-          ]
+          ],
+          "kind": "academic",
+          "facade": "#d5c7b4",
+          "floors": 6,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "Hon Sui Sen Centre",
@@ -269,9 +356,17 @@
             37,
             32,
             16
-          ]
+          ],
+          "kind": "library",
+          "facade": "#d3c2af",
+          "floors": 4,
+          "roof_style": "parapet",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "UHC",
@@ -295,7 +390,12 @@
             42,
             34,
             17
-          ]
+          ],
+          "kind": "clinic",
+          "facade": "#e1d6c7",
+          "floors": 4,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "University Hall",
@@ -307,9 +407,17 @@
             38,
             27,
             15
-          ]
+          ],
+          "kind": "administration",
+          "facade": "#d6d5ca",
+          "floors": 4,
+          "roof_style": "parapet",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "SCIENCE",
@@ -333,7 +441,12 @@
             43,
             38,
             24
-          ]
+          ],
+          "kind": "academic",
+          "facade": "#d7d2c3",
+          "floors": 7,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "Frontier Food Court",
@@ -345,7 +458,12 @@
             43,
             27,
             12
-          ]
+          ],
+          "kind": "canteen",
+          "facade": "#e2d6b7",
+          "floors": 2,
+          "roof_style": "parapet",
+          "canopy": true
         },
         {
           "name": "Science S7 / S8",
@@ -357,9 +475,17 @@
             43,
             30,
             19
-          ]
+          ],
+          "kind": "academic",
+          "facade": "#cfc8ba",
+          "floors": 5,
+          "roof_style": "terrace",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "KR_MRT",
@@ -383,7 +509,12 @@
             30,
             20,
             9
-          ]
+          ],
+          "kind": "station",
+          "facade": "#d2e0df",
+          "floors": 2,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "NUH Medical Centre",
@@ -395,7 +526,12 @@
             52,
             41,
             26
-          ]
+          ],
+          "kind": "glass_tower",
+          "facade": "#d9e2e2",
+          "floors": 9,
+          "roof_style": "parapet",
+          "canopy": true
         },
         {
           "name": "Kent Ridge Piazza",
@@ -407,9 +543,17 @@
             41,
             22,
             7
-          ]
+          ],
+          "kind": "courtyard",
+          "facade": "#c5d3c9",
+          "floors": 1,
+          "roof_style": "terrace",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     },
     {
       "id": "PGP",
@@ -433,7 +577,12 @@
             40,
             34,
             25
-          ]
+          ],
+          "kind": "residence",
+          "facade": "#d8c5ac",
+          "floors": 8,
+          "roof_style": "flat",
+          "canopy": true
         },
         {
           "name": "PGP House",
@@ -445,7 +594,12 @@
             39,
             31,
             17
-          ]
+          ],
+          "kind": "residence",
+          "facade": "#d5c7b4",
+          "floors": 5,
+          "roof_style": "parapet",
+          "canopy": true
         },
         {
           "name": "King Edward Hall",
@@ -457,9 +611,17 @@
             43,
             26,
             14
-          ]
+          ],
+          "kind": "residence",
+          "facade": "#e0ccb6",
+          "floors": 5,
+          "roof_style": "terrace",
+          "canopy": true
         }
-      ]
+      ],
+      "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
+      "facade_style": "tropical-modern campus architecture",
+      "planting": "shaded palms, rain trees, covered paths"
     }
   ],
   "stops": [
