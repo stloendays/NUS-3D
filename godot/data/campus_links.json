@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "notice_zh": "这些链接会在默认浏览器中打开。只有你点击时才会访问，不会自动同步账号、课程或游戏进度。",
+  "notice_en": "Links open in your default browser only after you click them. Game progress and local accounts are never sent automatically.",
+  "links": [
+    {
+      "id": "chatgpt",
+      "group": "ai",
+      "label_zh": "ChatGPT 网页版",
+      "label_en": "ChatGPT",
+      "note_zh": "在浏览器打开 ChatGPT；不使用游戏内账号登录。",
+      "note_en": "Open ChatGPT in your browser; separate from your game account.",
+      "url": "https://chatgpt.com/"
+    },
+    {
+      "id": "claude",
+      "group": "ai",
+      "label_zh": "Claude 网页版",
+      "label_en": "Claude",
+      "note_zh": "第三方 AI 对话网站。",
+      "note_en": "Third-party AI chat website.",
+      "url": "https://claude.ai/"
+    },
+    {
+      "id": "gemini",
+      "group": "ai",
+      "label_zh": "Google Gemini",
+      "label_en": "Google Gemini",
+      "note_zh": "第三方 AI 对话网站。",
+      "note_en": "Third-party AI chat website.",
+      "url": "https://gemini.google.com/"
+    },
+    {
+      "id": "perplexity",
+      "group": "ai",
+      "label_zh": "Perplexity 搜索",
+      "label_en": "Perplexity Search",
+      "note_zh": "外部 AI 搜索网站，结果需要自行核验。",
+      "note_en": "External AI search; verify its answers.",
+      "url": "https://www.perplexity.ai/"
+    },
+    {
+      "id": "openai_docs",
+      "group": "ai",
+      "label_zh": "OpenAI API 文档",
+      "label_en": "OpenAI API Docs",
+      "note_zh": "开发者 API 的官方参考资料。",
+      "note_en": "Official developer API reference.",
+      "url": "https://developers.openai.com/api/docs"
+    },
+    {
+      "id": "nus_map",
+      "group": "campus",
+      "label_zh": "NUS 官方校园地图",
+      "label_en": "NUS Official Campus Map",
+      "note_zh": "游戏地图是示意版；真实位置请看官网。",
+      "note_en": "The game world is schematic; verify real locations here.",
+      "url": "https://map.nus.edu.sg/"
+    },
+    {
+      "id": "nus_bus",
+      "group": "campus",
+      "label_zh": "NUS 校内巴士信息",
+      "label_en": "NUS Shuttle Information",
+      "note_zh": "游戏公交不代表官方实时车次。",
+      "note_en": "Game shuttles are not official real-time services.",
+      "url": "https://uci.nus.edu.sg/campus-life/campus-services/transportation/internal-shuttle-bus/"
+    },
+    {
+      "id": "nusmods",
+      "group": "campus",
+      "label_zh": "NUSMods 课程规划",
+      "label_en": "NUSMods Course Planner",
+      "note_zh": "非官方学生课程规划工具；游戏作业完全虚构。",
+      "note_en": "Unofficial course planning; in-game coursework is fictional.",
+      "url": "https://nusmods.com/"
+    },
+    {
+      "id": "nus",
+      "group": "campus",
+      "label_zh": "NUS 学校官网",
+      "label_en": "NUS Website",
+      "note_zh": "真实学术和学校信息以官方来源为准。",
+      "note_en": "Verify real academic and campus information here.",
+      "url": "https://www.nus.edu.sg/"
+    },
+    {
+      "id": "repo",
+      "group": "dev",
+      "label_zh": "报告游戏问题",
+      "label_en": "Report a Game Issue",
+      "note_zh": "打开 NUS-3D GitHub 问题列表。",
+      "note_en": "Open the NUS-3D GitHub issue tracker.",
+      "url": "https://github.com/stloendays/NUS-3D/issues"
+    }
+  ]
+}
