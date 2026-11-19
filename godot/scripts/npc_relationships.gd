@@ -96,8 +96,8 @@ func conversation(name: String, chinese: bool) -> String:
     var gain: int = 0
     if eligible:
         var profile: Dictionary = PROFILES[name]
-        var trait: String = str(profile["trait"])
-        gain = 2 if trait == "reserved" else 4 if trait == "chaotic" else 3
+        var temperament: String = str(profile["trait"])
+        gain = 2 if temperament == "reserved" else 4 if temperament == "chaotic" else 3
         scores[name] = mini(MAX_AFFINITY, affinity(name) + gain)
         last_talk[name] = now
         talk_counts[name] = int(talk_counts.get(name, 0)) + 1
