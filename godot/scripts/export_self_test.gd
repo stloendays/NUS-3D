@@ -36,6 +36,8 @@ func collect_issues() -> Array[String]:
     if site == null:
         issues.append("World node missing")
     else:
+        if site.weather_reactive_materials.size() != 2:
+            issues.append("Two original walkway/plaza materials are not registered for weather")
         if site.layout.is_empty():
             issues.append("UTown JSON did not load")
         var buildings: Array = site.layout.get("buildings", [])
@@ -73,6 +75,17 @@ func collect_issues() -> Array[String]:
         issues.append("Campus NPCs, two interior concepts or shuttle did not load")
     if campus_life != null and (campus_life.bicycle_wheels.size() != 2 or campus_life.shuttle_wheels.size() != 4 or campus_life.shuttle_passengers.size() != 3):
         issues.append("Bicycle or shuttle visual components are incomplete")
+    if campus_life != null:
+        for id in ["ERC", "SRC"]:
+            if not campus_life.interiors.has(id):
+                continue
+            var room: Node3D = campus_life.interiors[id]
+            if room.get_node_or_null("InteriorFinishM34/OpaqueRoofShadow") == null:
+                issues.append("No sheltered interior roof for " + id)
+            if room.get_node_or_null("WalkableStairSlope") == null:
+                issues.append("Walkable interior stairs missing for " + id)
+            if not campus_life.activity_spots.has(id) or campus_life.activity_spots[id].size() != 3:
+                issues.append("Activity zones incomplete for " + id)
     return issues
 
 func _run_export_test() -> void:
@@ -103,6 +116,8 @@ func _run_export_test() -> void:
         "interior_count": campus_life.interiors.size() if campus_life != null else 0,
         "shuttle_loaded": campus_life.shuttle != null if campus_life != null else false,
         "puddle_count": weather.puddle_nodes.size() if weather != null else 0,
+        "wet_surface_count": world.weather_reactive_materials.size() if world != null else 0,
+        "interior_activity_count": 6 if campus_life != null and campus_life.activity_spots.size() == 2 else 0,
         "rain_streak_count": weather.rain_multimesh.instance_count if weather != null and weather.rain_multimesh != null else 0,
         "bicycle_wheels": campus_life.bicycle_wheels.size() if campus_life != null else 0,
         "shuttle_passengers": campus_life.shuttle_passengers.size() if campus_life != null else 0,
