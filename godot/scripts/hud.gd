@@ -115,7 +115,7 @@ func _load_osm_fit_summary() -> void:
 
 func _process(_delta: float) -> void:
     gis_card.visible = world.osm_reference_visible and gis_metric_count == 2
-    hint_label.text = "M2 %s [F2] | %s [T] | OSM %s [F6] | Notes [C] | Sprint [V]" % ["ON" if world.m2_details_visible else "OFF", world.lighting_name(), "ON" if world.osm_reference_visible else "OFF"]
+    hint_label.text = "COMEDY ARCADE  |  M2 %s [F2] | %s [T] | OSM %s [F6] | Notes [C] | Sprint [V] | DDL [H]" % ["ON" if world.m2_details_visible else "OFF", world.lighting_name(), "ON" if world.osm_reference_visible else "OFF"]
     if tour.completed:
         target_label.text = "Tour complete  |  %d/%d stops  [G replay]" % [tour.discovered_ids.size(), tour.stops.size()]
     elif not tour.current_stop().is_empty():
