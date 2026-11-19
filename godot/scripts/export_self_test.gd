@@ -108,9 +108,9 @@ func collect_issues() -> Array[String]:
         issues.append("M3.9 must have three tabletop NPCs, proximity anchors and real board stones")
     if leisure_ui != null and (leisure_ui.fx_sparkles.size() != 19 or leisure_ui.secret_button == null):
         issues.append("M3.9 victory animation or hidden epilogue control is missing")
-    if audio == null or audio.players.size() != 6:
-        issues.append("M3.9 six original generated sound cues were not initialized")
-    if audio != null and audio.players.size() == 6:
+    if audio == null or audio.players.size() != 7:
+        issues.append("M3.9 seven original generated tones/cheering sounds were not initialized")
+    if audio != null and audio.players.size() == 7:
         var cue: AudioStreamWAV = audio.players["win"].stream
         if cue == null or cue.data.size() < 1000:
             issues.append("M3.9 original PCM victory sound has no generated samples")
