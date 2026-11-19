@@ -228,8 +228,20 @@ func talk_to_nearest() -> bool:
     var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
     var role: String = bank.role_for("indoor", speaker) if bank != null else str(actor["role"])
     var line: String = bank.next_line("indoor", speaker, 0) if bank != null else str(actor["dialogue"])
+    var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
+    var affinity_line: String = ""
+    var affinity_status: String = ""
+    if relationships != null:
+        var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+        var chinese: bool = language != null and language.is_chinese()
+        affinity_status = relationships.conversation(speaker, chinese)
+        affinity_line = relationships.contextual_line(speaker, chinese)
     life.message = "%s / %s\n%s" % [speaker, role, line]
-    life.message_time = 5.0
+    if not affinity_line.is_empty():
+        life.message += "\n" + affinity_line
+    if not affinity_status.is_empty():
+        life.message += "\n♥ " + affinity_status
+    life.message_time = 7.0
     return true
 
 func active_count() -> int:
