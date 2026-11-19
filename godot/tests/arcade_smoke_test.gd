@@ -1,11 +1,11 @@
 extends SceneTree
-## Isolated M3.5 regression, separate from the long-lived M3.4 smoke test.
+## Isolated M3.6 regression, separate from the long-lived M3.4 smoke test.
 
 func _initialize() -> void:
     call_deferred("_smoke")
 
 func _fail(reason: String) -> void:
-    push_error("M3.5 regression: " + reason)
+    push_error("M3.6 regression: " + reason)
     quit(1)
 
 func _smoke() -> void:
@@ -119,6 +119,6 @@ func _smoke() -> void:
         if bool(state["active"]) or state["node"].visible:
             _fail("projectile did not return to pool")
             return
-    print("PASS: M3.5 recycled student actors, 2 teachers, XP progression, separate save, blocked modes and pooled projectiles")
+    print("PASS: M3.6 recycled student actors, 2 teachers, XP progression, separate save, blocked modes and pooled projectiles")
     instance.queue_free()
     quit(0)

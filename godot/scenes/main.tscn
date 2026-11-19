@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -10,7 +10,9 @@
 [ext_resource type="Script" path="res://scripts/utown_challenge.gd" id="8"]
 [ext_resource type="Script" path="res://scripts/utown_weather.gd" id="9"]
 [ext_resource type="Script" path="res://scripts/utown_campus_life.gd" id="10"]
-[ext_resource type="Script" path="res://scripts/utown_arcade.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/utown_indoor_npcs.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/utown_visual_polish.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/utown_arcade.gd" id="13"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -52,6 +54,12 @@ script = ExtResource("9")
 
 [node name="CampusLife" type="Node" parent="."]
 script = ExtResource("10")
+
+[node name="IndoorNPCs" type="Node" parent="."]
+script = ExtResource("11")
+
+[node name="VisualPolish" type="Node" parent="."]
+script = ExtResource("12")
 
 [node name="ExportSelfTest" type="Node" parent="."]
 script = ExtResource("6")
@@ -185,7 +193,7 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "1/2/3 equip   LMB/J toy   K teacher   WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   L lift floors   F indoor activity   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD"
+text = "1/2/3 toys   LMB/J throw   K teacher   WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   L lift floors   F indoor activity   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD"
 
 [node name="Arcade" type="Node3D" parent="."]
-script = ExtResource("11")
+script = ExtResource("13")

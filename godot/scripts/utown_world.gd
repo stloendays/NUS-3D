@@ -191,13 +191,13 @@ func _build_walkways() -> void:
 func _building_color(role: String) -> StandardMaterial3D:
     match role:
         "academic":
-            return _mat("#e3e5df")
+            return _mat("#c8d0cb")
         "civic":
-            return _mat("#b3c4cc")
+            return _mat("#aabec2")
         "research":
-            return _mat("#b9b5ac")
+            return _mat("#a9aaa0")
         "residence":
-            return _mat("#d7c8ad")
+            return _mat("#c4b7a1")
     return _mat("#c8c8c8")
 
 func _build_buildings() -> void:
@@ -205,7 +205,7 @@ func _build_buildings() -> void:
     root.name = "BuildingMassing_Estimated"
     add_child(root)
     var glass: Material = _mat("#688a9c", 0.34)
-    var roof: Material = _mat("#dde0dc")
+    var roof: Material = _mat("#bac6c5", 0.82)
     var entrance: Material = _mat("#426675", 0.32)
     for record in layout.get("buildings", []):
         var group: Node3D = Node3D.new()
