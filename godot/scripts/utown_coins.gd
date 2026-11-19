@@ -22,7 +22,7 @@ const DELIVERY_COOLDOWN_SECONDS: float = 32.0
 @onready var arcade: UTownArcade = $"../Arcade"
 @onready var green_dining: UTownGreenDining = $"../GreenDining"
 @onready var hud: CanvasLayer = $"../HUD"
-@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var save_path: String = DEFAULT_SAVE_PATH
 var balance: int = 0
