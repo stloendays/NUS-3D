@@ -97,6 +97,24 @@ func _ready() -> void:
     add_child(release_updater)
 
 
+## An update restart must flush the same account-specific ledgers as a normal
+## exit. Do not log the player out or replace the GameShell/active scene.
+func save_for_version_update() -> void:
+    if not accounts.is_logged_in():
+        return
+    _scan_rewards()
+    challenge._save_progress()
+    var names: Array[String] = ["Coursework", "EnglishExams", "Arcade", "Coins", "Leisure", "CampusLife", "DDLStory"]
+    var methods: Array[String] = ["_save_progress", "_save_progress", "_save_progress", "save_progress", "_save_stats", "_save_activities", "_save_progress"]
+    for i in range(names.size()):
+        var system: Node = game.get_node_or_null(names[i])
+        if system != null and system.has_method(methods[i]):
+            system.call(methods[i])
+    if story_director != null:
+        story_director._persist()
+    accounts._save_profile()
+
+
 func _ui_sound_service() -> NUS3DUISound:
     return get_node_or_null("/root/UISound") as NUS3DUISound
 
