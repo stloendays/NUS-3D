@@ -1,4 +1,4 @@
-extends Control
+extends CanvasLayer
 class_name NUS3DBootLoading
 ## Lightweight standalone launcher. Loads actual PackedScenes in Godot's
 ## threaded ResourceLoader and keeps a visible overlay through world init.
@@ -40,12 +40,12 @@ var tip_description: Label
 var tip_counter: Label
 var retry_button: Button
 var card: PanelContainer
+var root_control: Control
 var language_service: NUS3DGameLanguage
 
 func _ready() -> void:
     process_mode = Node.PROCESS_MODE_ALWAYS
-    set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    mouse_filter = Control.MOUSE_FILTER_STOP
+    layer = 90
     _read_tips()
     language_service = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
     _build_ui()
@@ -100,13 +100,20 @@ func _label(value: String, size: int, color: String) -> Label:
     return label
 
 func _build_ui() -> void:
+    # CanvasLayer 90 stays above GameShell's layer 30 login while the
+    # scene is synchronously instantiated (no login-screen flash).
+    root_control = Control.new()
+    root_control.name = "LoadingSurface"
+    root_control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    root_control.mouse_filter = Control.MOUSE_FILTER_STOP
+    add_child(root_control)
     # No images or shaders: this intro renders even on the lowest-spec profile.
     var background := ColorRect.new()
     background.name = "FlatCampusBackdrop"
     background.color = Color.html("#172a31")
     background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     background.mouse_filter = Control.MOUSE_FILTER_STOP
-    add_child(background)
+    root_control.add_child(background)
 
     var canopy := ColorRect.new()
     canopy.name = "AbstractSkyBand"
@@ -128,7 +135,7 @@ func _build_ui() -> void:
     centered.name = "LoadingLayout"
     centered.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     centered.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    add_child(centered)
+    root_control.add_child(centered)
     card = PanelContainer.new()
     card.name = "LoadingCard"
     card.mouse_filter = Control.MOUSE_FILTER_STOP
