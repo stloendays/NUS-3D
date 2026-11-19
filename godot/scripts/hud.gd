@@ -1,4 +1,5 @@
 extends CanvasLayer
+const UI_FONT_KIT = preload("res://scripts/utown_ui_font.gd")
 ## Minimal status panel with a conceptual walking loop, labels and a toggleable map.
 
 @onready var world: UTownWorld = $"../World"
@@ -31,6 +32,9 @@ var gis_metric_count: int = 0
 const FIT_BASELINE_PATH: String = "res://data/osm_fit_baseline.json"
 
 func _ready() -> void:
+    var font_theme: Theme = UI_FONT_KIT.make_theme()
+    for root_control in [$Info, $GISCard, $TourCard, $ChallengeCard, $CampusCard, $Help]:
+        root_control.theme = font_theme
     var panel: PanelContainer = $Info
     var style: StyleBoxFlat = StyleBoxFlat.new()
     style.bg_color = Color(0.08, 0.12, 0.15, 0.86)
