@@ -40,4 +40,4 @@ For each tested computer, note OS version, graphics GPU/driver, CPU, RAM, displa
 
 
 ## M3.5 exported-runtime checks
-The unsigned Windows runtime contract also checks six fictional indoor NPCs, ERC/SRC's two distinct F2-toggleable facade finish groups, at least 40 procedural glass panes, two indoor material finish groups and room-local accent light arrays. The matching Linux CI additionally renders 6 new M3.5 screenshots for indoor conversation, interior day/night lighting and facade day/evening comparisons. These are actual Godot software-rendered frames, not Windows GPU-performance evidence.
+The unsigned Windows runtime contract also checks six fictional indoor NPCs, ERC/SRC's two distinct F2-toggleable facade finish groups, at least 40 procedural glass panes, two indoor material finish groups and room-local accent light arrays. The matching Linux CI additionally renders 7 new M3.5 screenshots for indoor conversation, interior day/night lighting and close-up ERC/SRC facade day/evening comparisons. These are actual Godot software-rendered frames, not Windows GPU-performance evidence.
