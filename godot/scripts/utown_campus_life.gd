@@ -111,6 +111,8 @@ func _build_pedestrians() -> void:
         if route.size() < 2:
             continue
         var total: float = _route_length(route)
+        if total <= 0.001:
+            continue
         var distance: float = total * float((i % 7) + 1) / 8.0
         var npc: Node3D = _make_person(i)
         npc.position = _sample_route(route, distance)["position"]
