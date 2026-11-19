@@ -138,6 +138,29 @@ func _graded_strip(parent: Node3D, name_value: String, start: Vector3, finish: V
     _box(axis, "GradedSurface", Vector3.ZERO, Vector3(width_value, 0.11, length_value), color, solid_surface)
 
 
+const PATH_SAMPLE_STEP: float = 18.0
+const PATH_MAX_SEGMENTS: int = 64
+
+func _terrain_following_strip(parent: Node3D, name_value: String, start: Vector3, finish: Vector3, lateral_offset: float, width_value: float, color: String, clearance: float) -> void:
+    var flat_delta: Vector3 = Vector3(finish.x - start.x, 0.0, finish.z - start.z)
+    var distance_m: float = flat_delta.length()
+    if distance_m < 0.2:
+        return
+    var right: Vector3 = Vector3(flat_delta.z, 0.0, -flat_delta.x).normalized()
+    var segments: int = clampi(ceili(distance_m / PATH_SAMPLE_STEP), 1, PATH_MAX_SEGMENTS)
+    var group := Node3D.new()
+    group.name = name_value
+    parent.add_child(group)
+    var previous: Vector3 = Vector3.ZERO
+    for i in range(segments + 1):
+        var t: float = float(i) / float(segments)
+        var point: Vector3 = start.lerp(finish, t) + right * lateral_offset
+        point.y = _surface_elevation(point) + clearance
+        if i > 0:
+            _graded_strip(group, "Footpath_segment_%02d" % (i - 1) if name_value.begins_with("Footpath_") else ("CycleLane_segment_%02d" % (i - 1) if name_value.begins_with("CycleLane_") else "Road_segment_%02d" % (i - 1)), previous, point, width_value, color)
+        previous = point
+
+
 func _build_extended_ground() -> void:
     var min_x: float = -320.0
     var max_x: float = 320.0
@@ -167,16 +190,13 @@ func _build_road_links() -> void:
             continue
         var start: Vector3 = left["position"]
         var finish: Vector3 = right["position"]
-        _graded_strip(roads_root, "WalkLink_" + str(connection[0]) + "_" + str(connection[1]),
-            start + Vector3(0, 0.08, 0), finish + Vector3(0, 0.08, 0), 7.8, "#91918a")
-        var flat_delta: Vector3 = finish - start
-        var side: Vector3 = Vector3(flat_delta.z, 0, -flat_delta.x).normalized()
-        _graded_strip(roads_root, "Footpath_" + str(connection[0]) + "_" + str(connection[1]),
-            start - side * 5.0 + Vector3(0, 0.16, 0),
-            finish - side * 5.0 + Vector3(0, 0.16, 0), 2.3, "#c2c6b7")
-        _graded_strip(roads_root, "CycleLane_" + str(connection[0]) + "_" + str(connection[1]),
-            start + side * 5.0 + Vector3(0, 0.12, 0),
-            finish + side * 5.0 + Vector3(0, 0.12, 0), 2.0, "#b3aa83")
+        var link_name: String = str(connection[0]) + "_" + str(connection[1])
+        _terrain_following_strip(roads_root, "WalkLink_" + link_name,
+            start, finish, 0.0, 7.8, "#91918a", 0.08)
+        _terrain_following_strip(roads_root, "Footpath_" + link_name,
+            start, finish, -5.0, 2.3, "#c2c6b7", 0.16)
+        _terrain_following_strip(roads_root, "CycleLane_" + link_name,
+            start, finish, 5.0, 2.0, "#b3aa83", 0.12)
 
 
 func _build_districts() -> void:
