@@ -498,6 +498,7 @@ func load_progress() -> void:
     claimed_rewards.clear()
     var data := ConfigFile.new()
     if data.load(save_path) != OK:
+        _refresh_display()
         return
     balance = clampi(int(data.get_value("coins", "balance", 0)), 0, MAX_BALANCE)
     lifetime_earned = maxi(balance, int(data.get_value("coins", "lifetime_earned", balance)))

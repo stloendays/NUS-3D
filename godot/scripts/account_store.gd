@@ -180,6 +180,44 @@ func challenge_save_path() -> String:
     return storage_root.path_join("challenge_" + str(record.get("id", "unknown")) + ".cfg")
 
 
+func feature_save_path(feature: String) -> String:
+    # Keep profile-owned game saves separate from shared language and sound settings.
+    if not is_logged_in() or not ["arcade", "coursework", "coins", "activities", "ddl_story"].has(feature):
+        return ""
+    var record: Dictionary = accounts.get(active_username, {})
+    var path: String = storage_root.path_join("features").path_join(
+        str(record.get("id", "unknown")) + "-" + feature + ".cfg")
+    if DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(path.get_base_dir())) != OK:
+        push_warning("Unable to create account feature save directory")
+    return path
+
+
+func sync_source_xp(source_id: String, cumulative_xp: int) -> int:
+    # Imported XP is monotonic; relogging cannot replay the same reward.
+    if not is_logged_in() or source_id.is_empty() or cumulative_xp < 0:
+        return 0
+    var totals: Dictionary = profile.get("source_xp_totals", {})
+    var already: int = maxi(0, int(totals.get(source_id, 0)))
+    if cumulative_xp <= already:
+        return 0
+    var old_level: int = int(level_progress()["level"])
+    var gain: int = mini(1000000000 - maxi(0, int(profile.get("xp", 0))), cumulative_xp - already)
+    totals[source_id] = cumulative_xp
+    profile["source_xp_totals"] = totals
+    profile["xp"] = mini(1000000000, maxi(0, int(profile.get("xp", 0))) + gain)
+    var level: int = int(level_progress()["level"])
+    if level > old_level:
+        _append_inbox("Campus Office", "Level up! LV %d" % level,
+            "New campus adventure rank unlocked. Keep exploring UTown!")
+    if not _save_profile():
+        push_warning("Unable to save feature XP checkpoint")
+        return 0
+    profile_changed.emit()
+    if level > old_level:
+        mailbox_changed.emit()
+    return gain
+
+
 func _migrate_legacy_progress() -> void:
     var destination: String = challenge_save_path()
     if FileAccess.file_exists(LEGACY_CHALLENGE_SAVE) and not FileAccess.file_exists(destination):
