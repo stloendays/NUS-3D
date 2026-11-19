@@ -44,3 +44,7 @@ godot --headless --path godot --script res://tests/integration_smoke_test.gd
 The boot test verifies real threaded world/shell loading, tip content and locale, monotonic percentage, 95% vs 100% distinction, no duplicate login, old tutorial accessibility, the original login pause state and the scene ownership handoff. Existing Godot CI and Windows preview CI should be checked before merging.
 
 **Limitations:** Loading progress reflects Godot's resource-loader status, not OS network/download speed or shader compilation. The final instantiation phase still runs on the main thread and may briefly pause a frame; a later optimization could spread procedural world generation over frames, but that would require changes to multiple gameplay scripts and is deliberately out of scope here.
+
+## Main integration notes (2026-11-19)
+
+This port is layered on the main-based oral-presentation integration branch (#52) so it retains optional microphone settings and the Science district from #48. The old parent branch is not merged. Loading tips were updated to current controls (P/Shift+P for coursework/faculty, Tab for leisure). UI/asset initialization still runs on the Godot main thread, so the bar holds at 95% until the shell reports readiness; this is not a guarantee of fully non-blocking startup.
