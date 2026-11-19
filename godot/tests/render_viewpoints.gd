@@ -510,6 +510,29 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    # Four isolated prop close-ups: direct stage selection does not trigger rewards or save.
+    hud.visible = false
+    ddl_story.set_process(false)
+    var comic_names := PackedStringArray(["MAIL", "PRINTER", "COFFEE", "PORTAL"])
+    for prop_index in range(4):
+        for checkpoint in ddl_story.stage_roots:
+            checkpoint.visible = false
+        ddl_story.stage_roots[prop_index].visible = true
+        var sign: float = 1.0 if prop_index % 2 == 0 else -1.0
+        var prop_look_at: Vector3 = ddl_story.stage_points[prop_index] + Vector3(sign * 3.0, 2.0, -1.1)
+        player.global_position = prop_look_at + Vector3(3.0, -1.82, 8.0)
+        player.look_at(prop_look_at, Vector3.UP)
+        player.head.rotation = Vector3.ZERO
+        for settle_frame in range(8):
+            await process_frame
+        if not await _capture_frame(output, "M3_7_DDL_PROP_%s.png" % comic_names[prop_index]):
+            push_error("Cannot capture original giant comic task prop " + str(prop_index))
+            quit(1)
+            return
+        count += 1
+    for checkpoint in ddl_story.stage_roots:
+        checkpoint.visible = false
+    ddl_story.set_process(true)
     # Restore photo-friendly state; rendering should not award XP or alter mission saves.
     hud.visible = false
     world.set_osm_reference_visible(false)
@@ -527,7 +550,7 @@ func _render() -> void:
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
         "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
-        "m37_showcase": ["sky_clear_static", "sky_overcast_static", "sky_storm_static", "street_furniture", "street_density", "tiled_lawn_and_shrubs", "ddl_quest_hud"],
+        "m37_showcase": ["sky_clear_static", "sky_overcast_static", "sky_storm_static", "street_furniture", "street_density", "tiled_lawn_and_shrubs", "ddl_quest_hud", "ddl_mail_prop", "ddl_printer_prop", "ddl_coffee_prop", "ddl_portal_prop"],
         "m37_cloud_sprites": 33,
         "m37_street_clusters": streetscape.cluster_count,
         "m37_paper_instances": streetscape.scrap_count,

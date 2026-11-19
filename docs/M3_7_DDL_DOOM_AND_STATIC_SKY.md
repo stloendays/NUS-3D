@@ -23,7 +23,7 @@ A deliberately exaggerated, low-stakes five-minute slapstick game: the campus sh
 
 ## Story: DDL DOOM
 
-Press **H** at an illuminated stage marker (the scene HUD displays the current target). The timer now has a prominent separate headline and larger quest text to avoid crowding the bottom HUD.
+Press **H** at an illuminated stage marker (the scene HUD displays the current target). The timer now has a prominent separate headline, larger quest text, distance-to-objective readout, a final-minute red/orange warning and subtly pulsing markers. Each stage has its own non-colliding giant comic prop (email, printer, coffee, upload portal).
 
 | Stage | Location (approximate game loop) | Punchline |
 | --- | --- | --- |
@@ -40,7 +40,7 @@ Successful first submission gives **80 arcade XP exactly once**. Replays are wel
 
 The CI workflow headlessly imports SVG textures and executes `res://tests/m3_7_smoke_test.gd`, in addition to all pre-existing Godot tests. This tests 33 fixed cloud sprites and readable scale, sky mode switches, indoor hide, all 6 authored textures including tiling checks, bounded scattered paper/shrub/flower MultiMeshes, absence of scenery collisions, all four story acts, timers, replay/save, first-completion XP guard and F7 photo mode.
 
-For visual QA, `godot/tests/render_viewpoints.gd` now adds **seven M3.7 real-engine screenshots** to the existing review artifact: clear/overcast/thunder sky, street furniture, street density, tiled grass/shrubbery and the DDL quest HUD, with manifest counts. In Godot 4.4+, open `godot/project.godot`, use **Y** for weather and **H** near the DDL marker. Actual GPU frame pacing and crowd/cloud occlusion still require manual checks; automated Linux rendering is not a substitute for Windows GPU performance.
+For visual QA, `godot/tests/render_viewpoints.gd` now adds **eleven M3.7 real-engine screenshots** to the existing review artifact: clear/overcast/thunder sky, street furniture, street density, tiled grass/shrubbery, the DDL quest HUD and four distinct giant checkpoint prop close-ups, with manifest counts. In Godot 4.4+, open `godot/project.godot`, use **Y** for weather and **H** near the DDL marker. Actual GPU frame pacing and crowd/cloud occlusion still require manual checks; automated Linux rendering is not a substitute for Windows GPU performance.
 
 ## Integration discipline
 

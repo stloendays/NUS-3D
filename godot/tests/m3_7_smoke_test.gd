@@ -112,12 +112,13 @@ func _smoke() -> void:
         if checkpoint.find_children("*", "CollisionShape3D", true, false).size() > 0:
             _fail("new quest props should never obstruct the shuttle or existing walkway")
             return
+    # Isolate a unique temporary save before evaluating any starting-state markers.
+    story.save_path = "user://ddl-m37-test-%d.cfg" % Time.get_ticks_usec()
+    story.load_progress()
     story._process(0.25)
     if not story.stage_roots[0].visible or story.stage_roots[1].visible:
         _fail("only the next DDL stage must be marked on the map")
         return
-    story.save_path = "user://ddl-m37-test-%d.cfg" % Time.get_ticks_usec()
-    story.load_progress()
     player.global_position = story.stage_points[0] + Vector3(0, 0.18, 0)
     if story.interact() != true or story.stage != 1 or not story.running:
         _fail("Town Green email should start a DDL countdown")
