@@ -401,7 +401,13 @@ func _refresh_marker() -> void:
         return
     var at: Vector3 = objective_position()
     marker.position = at + Vector3(0.0, 0.02, 0.0)
-    marker_label.text = _t("[K] 接取作业", "[K] TAKE BRIEF") if active_stage == STAGE_BRIEF         else _t("[I] 进入室内", "[I] ENTER ROOM") if active_stage < STAGE_SUBMIT         else _t("[K] 提交", "[K] SUBMIT")
+    match active_stage:
+        STAGE_BRIEF:
+            marker_label.text = _t("[K] 接取作业", "[K] TAKE BRIEF")
+        STAGE_ACTIVITY, STAGE_PARTNER:
+            marker_label.text = _t("[I] 进入室内", "[I] ENTER ROOM")
+        STAGE_SUBMIT:
+            marker_label.text = _t("[K] 提交", "[K] SUBMIT")
     marker.visible = not life.interior_active
 
 func _process(delta: float) -> void:
