@@ -139,6 +139,12 @@ func _make_toast() -> void:
     toast_card.hide()
 
 
+func _play_ui_sound(effect: String) -> void:
+    var service: NUS3DUISound = get_node_or_null("/root/UISound") as NUS3DUISound
+    if service != null:
+        service.play_ui(effect)
+
+
 func _show_toast(message: String, effect: String = "confirm") -> void:
     toast_label.text = message
     toast_remaining = 2.7
@@ -152,7 +158,7 @@ func _show_toast(message: String, effect: String = "confirm") -> void:
     _toast_tween.set_parallel(true)
     _toast_tween.tween_property(toast_card, "modulate:a", 1.0, 0.14)
     _toast_tween.tween_property(toast_card, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-    UISound.play_ui(effect)
+    _play_ui_sound(effect)
 
 
 func _update_notices(delta: float) -> void:
