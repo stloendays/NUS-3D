@@ -77,6 +77,21 @@ func _test() -> void:
         _fail("Movement lock must prevent footstep playback")
         return
     player.movement_locked = false
+    for state in ambient.chickens:
+        var chicken_model: Node3D = state["node"]
+        if chicken_model.get_node_or_null("TailFeather") == null or chicken_model.get_node_or_null("Toe") == null:
+            _fail("Detailed chicken model parts missing")
+            return
+    for state in ambient.cats:
+        var cat_model: Node3D = state["node"]
+        if cat_model.get_node_or_null("Muzzle") == null or cat_model.get_node_or_null("Paw") == null:
+            _fail("Detailed cat model parts missing")
+            return
+    for state in ambient.birds:
+        var bird_model: Node3D = state["node"]
+        if bird_model.get_node_or_null("Tail") == null or bird_model.get_node_or_null("LeftWing") == null:
+            _fail("Detailed bird model parts missing")
+            return
     var chicken: Dictionary = ambient.chickens[0]
     var chicken_node: Node3D = chicken["node"]
     player.global_position = chicken_node.global_position + Vector3(1.0, 0, 0)
