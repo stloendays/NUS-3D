@@ -167,7 +167,7 @@ func _process(delta: float) -> void:
         return
     var science_stop: Vector3 = network.stop_position("SCIENCE")
     var sports_stop: Vector3 = network.stop_position("SPORTS")
-    var canteen_at: Vector3 = science_stop + Vector3(43.0, 0.0, -28.0)
+    var canteen_at: Vector3 = science_stop + Vector3(43.0, 0.0, -66.0)
     var d_science: float = Vector2(player.global_position.x - canteen_at.x, player.global_position.z - canteen_at.z).length()
     var d_sports: float = Vector2(player.global_position.x - sports_stop.x, player.global_position.z - sports_stop.z).length()
     var zone: String = "canteen" if d_science <= RANGE_M else "sports" if d_sports <= RANGE_M else ""
