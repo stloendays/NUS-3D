@@ -151,12 +151,15 @@ func _build_districts() -> void:
     for district in districts:
         var root: Node3D = Node3D.new()
         root.name = str(district["id"])
-        root.position = district["position"]
+        var terrace_height: float = float(district.get("elevation_m", 0.0))
+        root.position = district["position"] + Vector3(0.0, terrace_height, 0.0)
         district_root.add_child(root)
         var size_values: Array = district.get("size", [150, 140])
         var width_m: float = float(size_values[0])
         var depth_m: float = float(size_values[1])
-        _box(root, "DistrictPlaza", Vector3(0, 0.022, 0), Vector3(width_m, 0.05, depth_m), "#8cac80")
+        _box(root, "DistrictTerrace", Vector3(0, -terrace_height * 0.5, 0), Vector3(width_m, maxf(terrace_height, 0.1), depth_m), "#728b70", true)
+        _box(root, "DistrictPlaza", Vector3(0, 0.022, 0), Vector3(width_m, 0.05, depth_m), "#8cac80", true)
+        _build_district_ramp(root, terrace_height, depth_m)
         _box(root, "MainPromenade", Vector3(0, 0.07, 0), Vector3(width_m - 9.0, 0.10, 8), "#c4c5b8")
         _box(root, "NorthSouthPromenade", Vector3(0, 0.079, 0), Vector3(8.0, 0.10, depth_m - 9.0), "#c4c5b8")
         _label(root, str(district["name"]).to_upper(), Vector3(0, 5, 0), str(district["accent"]), 26)
@@ -226,6 +229,26 @@ func _build_md1_access(science_root: Node3D) -> void:
     _label(access, "MD1  |  PEDESTRIAN ENTRY", Vector3(68.0, 3.1, 64.0), "#e5f1ee", 17)
     # Science Drive 4 vehicle access is intentionally not represented by a
     # driveable link here; do not route buses across these footpaths.
+
+
+func _build_district_ramp(district: Node3D, elevation: float, depth_m: float) -> void:
+    if elevation <= 0.1:
+        return
+    # Accessible schematic approach from ground level on the positive-z edge.
+    # The ramp is placed outside the terrace footprint to avoid buried geometry.
+    var run_length: float = maxf(30.0, elevation * 10.0)
+    var ramp: Node3D = Node3D.new()
+    ramp.name = "DistrictPedestrianRamp"
+    ramp.position = Vector3(0.0, -elevation * 0.5 + 0.12, depth_m * 0.5 + run_length * 0.5)
+    ramp.rotation.x = -atan2(elevation, run_length)
+    district.add_child(ramp)
+    _box(ramp, "SlopedWalkSurface", Vector3.ZERO,
+        Vector3(4.2, 0.28, sqrt(run_length * run_length + elevation * elevation)),
+        "#bfc4b4", true)
+    # Connection between the terrace promenade and the top of the ramp.
+    _box(district, "RampLanding", Vector3(0.0, 0.11, depth_m * 0.5 + 1.5),
+        Vector3(4.6, 0.2, 3.0), "#bfc4b4", true)
+
 
 func _build_stations() -> void:
     for stop in stops:
