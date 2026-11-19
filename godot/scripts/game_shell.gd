@@ -1,0 +1,440 @@
+extends Node
+## Application shell: a separate login, profile and mailbox layer around main.tscn.
+## The original 3D world and its hotkeys remain in their own scene.
+
+@onready var accounts: NUS3DAccountStore = $Accounts
+
+var game: Node3D
+var tour: UTownTour
+var challenge: UTownChallenge
+var ui: CanvasLayer
+var login_cover: Control
+var mail_cover: Control
+var profile_card: PanelContainer
+var profile_label: Label
+var login_title: Label
+var login_name: LineEdit
+var login_password: LineEdit
+var login_message: Label
+var login_submit: Button
+var login_toggle: Button
+var registering: bool = false
+var mail_list: ItemList
+var mail_heading: Label
+var mail_body: TextEdit
+var mail_delete: Button
+var mail_status: Label
+var mail_read_panel: HBoxContainer
+var mail_compose_panel: VBoxContainer
+var compose_to: LineEdit
+var compose_subject: LineEdit
+var compose_body: TextEdit
+var mailbox_mode: String = "inbox"
+var displayed_messages: Array = []
+var selected_message_id: String = ""
+var observed_tour_ids: PackedStringArray = PackedStringArray()
+var observed_note_ids: PackedStringArray = PackedStringArray()
+var observed_sprint_time: float = -1.0
+
+
+func _ready() -> void:
+    var scene: PackedScene = load("res://scenes/main.tscn") as PackedScene
+    if scene == null:
+        push_error("NUS-3D main world scene is unavailable.")
+        return
+    game = scene.instantiate() as Node3D
+    game.process_mode = Node.PROCESS_MODE_PAUSABLE
+    add_child(game)
+    tour = game.get_node("Tour") as UTownTour
+    challenge = game.get_node("Challenge") as UTownChallenge
+
+    # The exported EXE smoke test must run without prompting for an account.
+    if OS.get_cmdline_user_args().has("--nus3d-self-test"):
+        return
+
+    ui = CanvasLayer.new()
+    ui.name = "AccountInterface"
+    ui.layer = 30
+    ui.process_mode = Node.PROCESS_MODE_ALWAYS
+    add_child(ui)
+    _build_login()
+    _build_mail()
+    _build_profile_card()
+    accounts.profile_changed.connect(_refresh_profile)
+    accounts.mailbox_changed.connect(_on_mailbox_changed)
+    _show_login()
+
+
+func _panel_style(background: Color) -> StyleBoxFlat:
+    var style: StyleBoxFlat = StyleBoxFlat.new()
+    style.bg_color = background
+    style.border_color = Color.html("#446878")
+    style.set_border_width_all(1)
+    style.set_corner_radius_all(15)
+    style.content_margin_left = 23.0
+    style.content_margin_right = 23.0
+    style.content_margin_top = 22.0
+    style.content_margin_bottom = 22.0
+    return style
+
+
+func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> Label:
+    var label: Label = Label.new()
+    label.text = value
+    label.add_theme_font_size_override("font_size", font_size)
+    label.add_theme_color_override("font_color", color)
+    return label
+
+
+func _button(title: String, callback: Callable) -> Button:
+    var result: Button = Button.new()
+    result.text = title
+    result.custom_minimum_size.y = 36.0
+    result.pressed.connect(callback)
+    return result
+
+
+func _cover(name: String) -> Control:
+    var cover: Control = Control.new()
+    cover.name = name
+    cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    cover.mouse_filter = Control.MOUSE_FILTER_STOP
+    ui.add_child(cover)
+
+    var backdrop: ColorRect = ColorRect.new()
+    backdrop.color = Color(0.025, 0.067, 0.091, 0.91)
+    backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+    cover.add_child(backdrop)
+    return cover
+
+
+func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
+    var center: CenterContainer = CenterContainer.new()
+    center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    cover.add_child(center)
+    var panel: PanelContainer = PanelContainer.new()
+    panel.custom_minimum_size = size
+    panel.add_theme_stylebox_override("panel", _panel_style(Color.html("#10212c")))
+    center.add_child(panel)
+    var content: VBoxContainer = VBoxContainer.new()
+    content.add_theme_constant_override("separation", 13)
+    panel.add_child(content)
+    return content
+
+
+func _build_login() -> void:
+    login_cover = _cover("Login")
+    var box: VBoxContainer = _center_panel(login_cover, Vector2(480, 0))
+    box.add_child(_label("NUS-3D", 42, Color.html("#e8f9ff")))
+    box.add_child(_label("UTOWN EXPLORER  /  OFFLINE ALPHA", 14, Color.html("#75c8d6")))
+    box.add_child(_label("Explore an original, unofficial campus world.", 15, Color.html("#cbdde0")))
+    var spacer: Control = Control.new()
+    spacer.custom_minimum_size.y = 20
+    box.add_child(spacer)
+    login_title = _label("SIGN IN", 24)
+    box.add_child(login_title)
+    login_name = LineEdit.new()
+    login_name.placeholder_text = "Local username (3-20 characters)"
+    login_name.max_length = 20
+    box.add_child(login_name)
+    login_password = LineEdit.new()
+    login_password.placeholder_text = "Password (at least 8 characters)"
+    login_password.secret = true
+    login_password.max_length = 128
+    login_password.text_submitted.connect(func(_value: String) -> void: _submit_login())
+    box.add_child(login_password)
+    login_submit = _button("Sign in and explore", _submit_login)
+    box.add_child(login_submit)
+    login_toggle = _button("Create a new local account", _toggle_register)
+    box.add_child(login_toggle)
+    login_message = _label("", 13, Color.html("#efb8ad"))
+    login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    box.add_child(login_message)
+    var foot: Label = _label(
+        "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.",
+        12, Color.html("#a4c0c6"))
+    foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    box.add_child(foot)
+
+
+func _build_profile_card() -> void:
+    profile_card = PanelContainer.new()
+    profile_card.name = "ProfileStatus"
+    profile_card.anchor_left = 0.5
+    profile_card.anchor_right = 0.5
+    profile_card.offset_left = -245
+    profile_card.offset_right = 245
+    profile_card.offset_top = 10
+    profile_card.offset_bottom = 61
+    profile_card.add_theme_stylebox_override("panel", _panel_style(Color(0.03, 0.14, 0.20, 0.88)))
+    ui.add_child(profile_card)
+    var row: HBoxContainer = HBoxContainer.new()
+    row.add_theme_constant_override("separation", 10)
+    profile_card.add_child(row)
+    profile_label = _label("LV 1", 13, Color.html("#e4f5f6"))
+    profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    row.add_child(profile_label)
+    row.add_child(_button("Mail [J]", _open_mail))
+    row.add_child(_button("Log out", _logout))
+    profile_card.hide()
+
+
+func _build_mail() -> void:
+    mail_cover = _cover("Mailbox")
+    var layout: VBoxContainer = _center_panel(mail_cover, Vector2(960, 530))
+    var header: HBoxContainer = HBoxContainer.new()
+    layout.add_child(header)
+    var title: Label = _label("CAMPUS POST  /  LOCAL MAILBOX", 23, Color.html("#cff5f2"))
+    title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    header.add_child(title)
+    header.add_child(_button("Close [J]", _close_mail))
+    layout.add_child(_label("Only accounts registered on this installation can exchange messages.",
+        12, Color.html("#b0c8cc")))
+
+    var options: HBoxContainer = HBoxContainer.new()
+    layout.add_child(options)
+    options.add_child(_button("Inbox", func() -> void: _show_mailbox("inbox")))
+    options.add_child(_button("Sent", func() -> void: _show_mailbox("sent")))
+    options.add_child(_button("Compose", _show_compose))
+
+    mail_read_panel = HBoxContainer.new()
+    mail_read_panel.custom_minimum_size.y = 355
+    mail_read_panel.add_theme_constant_override("separation", 17)
+    layout.add_child(mail_read_panel)
+    mail_list = ItemList.new()
+    mail_list.custom_minimum_size.x = 320
+    mail_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    mail_list.item_selected.connect(_select_mail)
+    mail_read_panel.add_child(mail_list)
+    var detail: VBoxContainer = VBoxContainer.new()
+    detail.custom_minimum_size.x = 545
+    detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    mail_read_panel.add_child(detail)
+    mail_heading = _label("Select a message.", 18)
+    mail_heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    detail.add_child(mail_heading)
+    mail_body = TextEdit.new()
+    mail_body.editable = false
+    mail_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    mail_body.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+    detail.add_child(mail_body)
+    mail_delete = _button("Delete selected message", _delete_selected)
+    detail.add_child(mail_delete)
+
+    mail_compose_panel = VBoxContainer.new()
+    mail_compose_panel.custom_minimum_size.y = 350
+    mail_compose_panel.hide()
+    layout.add_child(mail_compose_panel)
+    mail_compose_panel.add_child(_label("New local message", 19))
+    compose_to = LineEdit.new()
+    compose_to.placeholder_text = "Recipient username on this computer"
+    mail_compose_panel.add_child(compose_to)
+    compose_subject = LineEdit.new()
+    compose_subject.placeholder_text = "Subject"
+    compose_subject.max_length = 80
+    mail_compose_panel.add_child(compose_subject)
+    compose_body = TextEdit.new()
+    compose_body.placeholder_text = "Write your message (up to 2,000 characters)"
+    compose_body.custom_minimum_size.y = 170
+    mail_compose_panel.add_child(compose_body)
+    mail_compose_panel.add_child(_button("Send local message", _send_mail))
+    mail_status = _label("", 13, Color.html("#b8dbdf"))
+    layout.add_child(mail_status)
+    mail_cover.hide()
+
+
+func _show_login() -> void:
+    get_tree().paused = true
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    login_cover.show()
+    mail_cover.hide()
+    profile_card.hide()
+    login_password.clear()
+    login_message.text = ""
+    login_name.grab_focus.call_deferred()
+
+
+func _toggle_register() -> void:
+    registering = not registering
+    login_title.text = "CREATE ACCOUNT" if registering else "SIGN IN"
+    login_submit.text = "Register and explore" if registering else "Sign in and explore"
+    login_toggle.text = "Already have an account? Sign in" if registering else "Create a new local account"
+    login_message.text = ""
+
+
+func _submit_login() -> void:
+    var error: String = accounts.register(login_name.text, login_password.text) \
+        if registering else accounts.sign_in(login_name.text, login_password.text)
+    login_password.clear()
+    if not error.is_empty():
+        login_message.text = error
+        return
+    _enter_game()
+
+
+func _enter_game() -> void:
+    challenge.sprint_active = false
+    challenge.sprint_elapsed = 0
+    challenge.sprint_last_time = -1
+    challenge.save_path = accounts.challenge_save_path()
+    challenge.load_progress()
+
+    tour.restart()
+    var saved_tour: Array = accounts.profile.get("tour_ids", [])
+    for entry in saved_tour:
+        if tour.current_index >= tour.stops.size():
+            break
+        if str(entry) != str(tour.stops[tour.current_index].get("id", "")):
+            break
+        tour.discovered_ids.append(str(entry))
+        tour.current_index += 1
+    tour.completed = tour.current_index == tour.stops.size()
+
+    observed_tour_ids.clear()
+    observed_note_ids.clear()
+    observed_sprint_time = -1
+    _scan_rewards() # Backfill already completed exploration and existing Field Notes.
+    _refresh_profile()
+    login_cover.hide()
+    mail_cover.hide()
+    profile_card.show()
+    game.get_node("Player").call("reset_player")
+    get_tree().paused = false
+    Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _logout() -> void:
+    if not accounts.is_logged_in():
+        return
+    challenge.sprint_active = false
+    accounts.sign_out()
+    _show_login()
+
+
+func _refresh_profile() -> void:
+    if not accounts.is_logged_in() or profile_label == null:
+        return
+    var progress: Dictionary = accounts.level_progress()
+    profile_label.text = "%s   LV %d   XP %d/%d  |  Mail %d" % [
+        accounts.get_username(), int(progress["level"]),
+        int(progress["into"]), int(progress["required"]), accounts.unread_count()
+    ]
+
+
+func _on_mailbox_changed() -> void:
+    _refresh_profile()
+    if mail_cover != null and mail_cover.visible and mailbox_mode != "compose":
+        _show_mailbox(mailbox_mode)
+
+
+func _open_mail() -> void:
+    if not accounts.is_logged_in():
+        return
+    get_tree().paused = true
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    mail_cover.show()
+    mail_status.text = ""
+    _show_mailbox("inbox")
+
+
+func _close_mail() -> void:
+    mail_cover.hide()
+    if accounts.is_logged_in():
+        get_tree().paused = false
+        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _show_mailbox(mode: String) -> void:
+    mailbox_mode = mode
+    mail_read_panel.show()
+    mail_compose_panel.hide()
+    displayed_messages = accounts.get_sent() if mode == "sent" else accounts.get_inbox()
+    selected_message_id = ""
+    mail_list.clear()
+    for message in displayed_messages:
+        var prefix: String = "" if bool(message.get("read", false)) or mode == "sent" else "* "
+        var address: String = str(message.get("to", "")) if mode == "sent" else str(message.get("from", ""))
+        mail_list.add_item("%s%s  |  %s" % [prefix, address, str(message.get("subject", ""))])
+    mail_heading.text = "Sent mail" if mode == "sent" else "Inbox"
+    mail_body.text = "Select a message on the left."
+    mail_delete.disabled = true
+
+
+func _select_mail(index: int) -> void:
+    if index < 0 or index >= displayed_messages.size():
+        return
+    var message: Dictionary = displayed_messages[index]
+    selected_message_id = str(message.get("id", ""))
+    mail_heading.text = str(message.get("subject", "(no subject)"))
+    mail_body.text = "FROM  %s\nTO  %s\nDATE  %s\n\n%s" % [
+        str(message.get("from", "")), str(message.get("to", "")),
+        str(message.get("time", "")), str(message.get("body", ""))]
+    mail_delete.disabled = mailbox_mode != "inbox"
+    if mailbox_mode == "inbox":
+        accounts.mark_read(selected_message_id)
+        # Updating the unread count refreshes the list; keep the opened message visible.
+
+
+func _delete_selected() -> void:
+    if mailbox_mode != "inbox" or selected_message_id.is_empty():
+        return
+    accounts.delete_message(selected_message_id)
+    _show_mailbox("inbox")
+
+
+func _show_compose() -> void:
+    mailbox_mode = "compose"
+    mail_read_panel.hide()
+    mail_compose_panel.show()
+    mail_status.text = ""
+    compose_to.grab_focus()
+
+
+func _send_mail() -> void:
+    var status: String = accounts.send_mail_to(compose_to.text, compose_subject.text, compose_body.text)
+    if not status.is_empty():
+        mail_status.text = status
+        return
+    compose_to.clear()
+    compose_subject.clear()
+    compose_body.clear()
+    mail_status.text = "Message delivered to the recipient's local inbox."
+    _show_mailbox("sent")
+
+
+func _scan_rewards() -> void:
+    if not accounts.is_logged_in():
+        return
+    if tour.discovered_ids != observed_tour_ids:
+        var saved_ids: Array = []
+        for stop_id in tour.discovered_ids:
+            accounts.award_once("tour:" + stop_id, 60)
+            saved_ids.append(stop_id)
+        accounts.save_tour_ids(saved_ids)
+        observed_tour_ids = tour.discovered_ids.duplicate()
+    if challenge.collected_ids != observed_note_ids:
+        for item_id in challenge.collected_ids:
+            accounts.award_once("field_note:" + item_id, 40)
+        observed_note_ids = challenge.collected_ids.duplicate()
+    if challenge.sprint_last_time >= 0 and challenge.sprint_last_time != observed_sprint_time:
+        accounts.award_once("sprint:completed", 120)
+        if challenge.sprint_medal == "GOLD":
+            accounts.award_once("sprint:gold", 80)
+        observed_sprint_time = challenge.sprint_last_time
+
+
+func _process(_delta: float) -> void:
+    if accounts.is_logged_in() and not get_tree().paused:
+        _scan_rewards()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+    if not accounts.is_logged_in() or event is not InputEventKey:
+        return
+    if event.pressed and not event.echo and event.keycode == KEY_J:
+        if mail_cover.visible:
+            _close_mail()
+        else:
+            _open_mail()
+        get_viewport().set_input_as_handled()
