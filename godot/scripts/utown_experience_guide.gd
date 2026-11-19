@@ -15,6 +15,34 @@ const ZONE_RADIUS_M: float = 39.0
 @onready var arcade: UTownArcade = $"../Arcade"
 @onready var coins: UTownCoins = $"../Coins"
 @onready var hud: CanvasLayer = $"../HUD"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+const EXPERIENCE_ZH: Dictionary = {
+    "ALIGHT SHUTTLE": "下校车",
+    "Back to walking before your next class": "下车后走去下一节课",
+    "Revisit activity": "再次参加活动",
+    "Discover a new indoor activity": "发现新的室内活动",
+    "The hallway gossip has lore": "听听校园里的新鲜事",
+    "L: change floor  •  I: back outdoors": "L 换楼层 · I 回室外",
+    "DELIVER THE LUNCH": "完成送餐",
+    "Your food has survived the deadline": "你的午饭幸存了",
+    "START LUNCH EXPRESS": "开始送餐挑战",
+    "Deliver before the food loses hope": "赶在午饭绝望之前送达",
+    "PICK UP CAMPUS COIN": "拾取校园金币",
+    "COLLECT FIELD NOTE": "收集探索笔记",
+    "A tiny achievement, a huge academic ego": "小小成就，大大满足",
+    "Check in and keep exploring UTown": "打卡后继续探索校园",
+    "May assign bizarre homework": "可能布置奇怪作业",
+    "Campus stories are more fun than DDLs": "校园故事比赶作业有趣",
+    "Enter a fictional indoor space": "进入虚构室内空间",
+    "BOARD UTOWN SHUTTLE": "乘坐校园校车",
+    "A suspiciously convenient commute": "好得可疑的便利交通",
+    "Beat the clock  •  Keep moving": "与时间赛跑 · 继续前进",
+    _l("IN RANGE  •  Your next action is ready"): "已抵达 · 可以操作了",
+    "INTERACT": "互动", "Approach to use": "靠近互动",
+    "NEXT OBJECTIVE": "下一个目标", "Schematic direction only": "仅供游戏引导",
+    "AREA DISCOVERED": "发现新区域",
+    "Your next deadline is already loading.": "新的截止时间正在加载"
+}
 
 var screen: Control
 var prompt_card: PanelContainer
@@ -47,7 +75,32 @@ func _ready() -> void:
     _make_action_card()
     _make_objective_card()
     _make_zone_card()
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
     # Let the neighbouring gameplay nodes complete their ready handlers.
+    call_deferred("_refresh_feedback")
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _l(text_value: String) -> String:
+    if language == null or not language.is_chinese():
+        return text_value
+    return str(EXPERIENCE_ZH.get(text_value, text_value))
+
+
+func _place_name(name: String) -> String:
+    return language.translate_world_name(name) if language != null else name
+
+
+func _on_language_changed(_code: String) -> void:
+    if zone_heading != null and not _active_zone.is_empty():
+        zone_heading.text = _t("进入区域：", "NOW ENTERING: ") + _place_name(_active_zone)
+        zone_caption.text = _zone_text(_active_zone)
+    _active_prompt = ""
+    _active_goal = ""
     call_deferred("_refresh_feedback")
 
 
@@ -125,8 +178,8 @@ func _make_action_card() -> void:
     details.mouse_filter = Control.MOUSE_FILTER_IGNORE
     details.add_theme_constant_override("separation", 3)
     horizontal.add_child(details)
-    prompt_name = _label("INTERACT", 16, Color("#f1faf8"))
-    prompt_detail = _label("Approach to use", 12, Color("#abcbd1"))
+    prompt_name = _label(_l("INTERACT"), 16, Color("#f1faf8"))
+    prompt_detail = _label(_l("Approach to use"), 12, Color("#abcbd1"))
     details.add_child(prompt_name)
     details.add_child(prompt_detail)
     prompt_card.hide()
@@ -148,8 +201,8 @@ func _make_objective_card() -> void:
     content.mouse_filter = Control.MOUSE_FILTER_IGNORE
     content.add_theme_constant_override("separation", 0)
     row.add_child(content)
-    objective_name = _label("NEXT OBJECTIVE", 14, Color("#f9ead1"))
-    objective_detail = _label("Schematic direction only", 11, Color("#9cb9be"))
+    objective_name = _label(_l("NEXT OBJECTIVE"), 14, Color("#f9ead1"))
+    objective_detail = _label(_l("Schematic direction only"), 11, Color("#9cb9be"))
     content.add_child(objective_name)
     content.add_child(objective_detail)
     objective_distance = _label("0 m", 16, Color("#f1e0aa"))
@@ -166,8 +219,8 @@ func _make_zone_card() -> void:
     column.mouse_filter = Control.MOUSE_FILTER_IGNORE
     column.add_theme_constant_override("separation", 5)
     zone_card.add_child(column)
-    zone_heading = _label("AREA DISCOVERED", 16, Color("#e3f9e9"))
-    zone_caption = _label("Your next deadline is already loading.", 12, Color("#b3cfd1"))
+    zone_heading = _label(_l("AREA DISCOVERED"), 16, Color("#e3f9e9"))
+    zone_caption = _label(_l("Your next deadline is already loading."), 12, Color("#b3cfd1"))
     zone_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     column.add_child(zone_heading)
     column.add_child(zone_caption)
@@ -180,7 +233,7 @@ func _horizontal_distance(a: Vector3, b: Vector3) -> float:
 
 func _candidate(best: Dictionary, priority: int, key: String, title: String, detail: String, distance: float) -> Dictionary:
     if best.is_empty() or priority > int(best.get("priority", 0)) or (priority == int(best.get("priority", 0)) and distance < float(best.get("distance", 9999.0))):
-        return {"priority": priority, "key": key, "title": title, "detail": detail, "distance": distance}
+        return {"priority": priority, "key": key, "title": _l(title), "detail": _l(detail), "distance": distance}
     return best
 
 
@@ -196,11 +249,11 @@ func _nearest_offer() -> Dictionary:
         if not activity.is_empty():
             var activity_id: String = "%s/%s" % [life.active_interior, str(activity["id"])]
             var caption: String = "Revisit activity" if life.visited_activities.has(activity_id) else "Discover a new indoor activity"
-            best = _candidate(best, 120, "F", str(activity.get("name", "Campus activity")), caption, 0.0)
+            best = _candidate(best, 120, "F", _place_name(str(activity.get("name", _t("校园活动", "Campus activity")))), _l(caption), 0.0)
         var person_name: String = indoor_npcs.nearby_name()
         if not person_name.is_empty():
-            best = _candidate(best, 108, "Q", "TALK TO " + person_name.to_upper(), "The hallway gossip has lore", 0.0)
-        best = _candidate(best, 20, "I", "LEAVE " + life.active_interior, "L: change floor  •  I: back outdoors", 2.0)
+            best = _candidate(best, 108, "Q", _t("与 %s 交谈", "TALK TO %s") % person_name, "The hallway gossip has lore", 0.0)
+        best = _candidate(best, 20, "I", _t("离开 %s", "LEAVE %s") % life.active_interior, "L: change floor  •  I: back outdoors", 2.0)
         return best
 
     if coins.delivery_active and _horizontal_distance(player.global_position, coins.delivery_destination) <= coins.DELIVERY_FINISH_RADIUS:
@@ -215,14 +268,14 @@ func _nearest_offer() -> Dictionary:
             continue
         var coin_distance: float = _horizontal_distance(player.global_position, pickup["base"])
         if coin_distance <= coins.PICKUP_RADIUS:
-            best = _candidate(best, 135, "Z", "PICK UP CAMPUS COIN", "+%d C for your questionable spending" % int(pickup["value"]), coin_distance)
+            best = _candidate(best, 135, "Z", "PICK UP CAMPUS COIN", _t("获得 %d 金币", "+%d C for your questionable spending") % int(pickup["value"]), coin_distance)
 
     var note_index: int = challenge.nearest_item_index()
     if note_index >= 0:
         best = _candidate(best, 130, "C", "COLLECT FIELD NOTE", "A tiny achievement, a huge academic ego", 0.0)
     if tour.can_check_in():
         var stop: Dictionary = tour.current_stop()
-        best = _candidate(best, 125, "E", str(stop.get("title", "DISCOVERY CHECKPOINT")).to_upper(), "Check in and keep exploring UTown", tour.current_distance_m())
+        best = _candidate(best, 125, "E", _place_name(str(stop.get("title", _t("探索打卡点", "DISCOVERY CHECKPOINT")))), "Check in and keep exploring UTown", tour.current_distance_m())
 
     for professor in arcade.professors:
         var professor_node: Node3D = professor.get("node") as Node3D
@@ -230,7 +283,7 @@ func _nearest_offer() -> Dictionary:
             continue
         var professor_distance: float = _horizontal_distance(player.global_position, professor_node.global_position)
         if professor_distance <= 4.5:
-            best = _candidate(best, 112, "K", "MEET " + str(professor.get("name", "PROFESSOR")).to_upper(), "May assign bizarre homework", professor_distance)
+            best = _candidate(best, 112, "K", _t("寻找 %s", "MEET %s") % str(professor.get("name", _t("教授", "PROFESSOR"))), "May assign bizarre homework", professor_distance)
 
     for person in life.pedestrians:
         var node: Node3D = person.get("node") as Node3D
@@ -238,7 +291,7 @@ func _nearest_offer() -> Dictionary:
             continue
         var talk_distance: float = _horizontal_distance(player.global_position, node.global_position)
         if talk_distance <= life.TALK_RADIUS:
-            best = _candidate(best, 90, "Q", "TALK TO " + str(person.get("name", "STUDENT")).to_upper(), "Campus stories are more fun than DDLs", talk_distance)
+            best = _candidate(best, 90, "Q", _t("与 %s 交谈", "TALK TO %s") % str(person.get("name", _t("学生", "STUDENT"))), "Campus stories are more fun than DDLs", talk_distance)
 
     if not life.bicycle_enabled:
         for room_id in ["ERC", "SRC"]:
@@ -246,7 +299,7 @@ func _nearest_offer() -> Dictionary:
                 continue
             var entry_distance: float = _horizontal_distance(player.global_position, life.entry_positions[room_id])
             if entry_distance <= life.ENTRY_RADIUS:
-                best = _candidate(best, 70, "I", "EXPLORE " + room_id + " INTERIOR", "Enter a fictional indoor space", entry_distance)
+                best = _candidate(best, 70, "I", _t("探索 %s 室内", "EXPLORE %s INTERIOR") % room_id, "Enter a fictional indoor space", entry_distance)
         if life.shuttle != null:
             var shuttle_distance: float = _horizontal_distance(player.global_position, life.shuttle.global_position)
             if shuttle_distance <= life.BOARD_RADIUS:
@@ -263,14 +316,14 @@ func _goal_offer() -> Dictionary:
         return {
             "id": "lunch",
             "position": coins.delivery_destination,
-            "title": "LUNCH EXPRESS  /  TOWN GREEN",
-            "detail": "%ds left  •  Press N at the destination" % ceili(coins.delivery_time)
+            "title": _t("送餐任务 | 中央草坪", "LUNCH EXPRESS | TOWN GREEN"),
+            "detail": _t("剩余 %d 秒 · 抵达后按 N", "%ds left · Press N at the destination") % ceili(coins.delivery_time)
         }
     if challenge.sprint_active and challenge.sprint_next_index < challenge.sprint_route.size():
         return {
             "id": "sprint:%d" % challenge.sprint_next_index,
             "position": challenge.sprint_route[challenge.sprint_next_index],
-            "title": "CAMPUS SPRINT  /  CHECKPOINT",
+            "title": _t("校园竞速 | 打卡点", "CAMPUS SPRINT | CHECKPOINT"),
             "detail": "Beat the clock  •  Keep moving"
         }
     if not tour.completed and not tour.current_stop().is_empty():
@@ -278,8 +331,8 @@ func _goal_offer() -> Dictionary:
         return {
             "id": "tour:%d" % tour.current_index,
             "position": tour.stop_world_position(tour.current_index),
-            "title": "DISCOVERY  /  " + str(stop.get("title", "NEXT STOP")).to_upper(),
-            "detail": "Waypoint %d/%d  •  Illustrative route" % [tour.discovered_ids.size() + 1, tour.stops.size()]
+            "title": _t("探索 | ", "DISCOVERY | ") + _place_name(str(stop.get("title", _t("下一站", "NEXT STOP")))),
+            "detail": _t("打卡点 %d/%d · 游戏示意路线", "Waypoint %d/%d · Illustrative route") % [tour.discovered_ids.size() + 1, tour.stops.size()]
         }
     return {}
 
@@ -350,7 +403,7 @@ func _update_goal(goal: Dictionary) -> void:
     if arrived:
         objective_detail.text = "IN RANGE  •  Your next action is ready"
     elif urgent:
-        objective_detail.text = "HURRY!  •  %d seconds before cold lunch" % ceili(coins.delivery_time)
+        objective_detail.text = _t("快点！午饭还有 %d 秒就凉了", "HURRY! %d seconds before cold lunch") % ceili(coins.delivery_time)
     else:
         objective_detail.text = str(goal["detail"])
     objective_distance.text = "%d m" % roundi(distance_m)
@@ -365,14 +418,14 @@ func _update_goal(goal: Dictionary) -> void:
 func _zone_text(zone: String) -> String:
     var lowered: String = zone.to_lower()
     if lowered.contains("green"):
-        return "Deadline demons are doing cardio on the lawn."
+        return _t("截止时间恶魔正在草坪跑步。", "Deadline demons are doing cardio on the lawn.")
     if lowered.contains("erc") or lowered.contains("education"):
-        return "Printer queue: a boss fight nobody requested."
+        return _t("打印机排队，是没人要求的终极挑战。", "Printer queue: a boss fight nobody requested.")
     if lowered.contains("src") or lowered.contains("sport"):
-        return "You cannot outrun coursework, but you can try."
+        return _t("虽然跑不过作业，但可以试试。", "You cannot outrun coursework, but you can try.")
     if lowered.contains("plaza"):
-        return "Coins first. Existential crisis after lunch."
-    return "New district unlocked. Coursework remains unlocked too."
+        return _t("先攒金币，人生问题饭后再说。", "Coins first. Existential crisis after lunch.")
+    return _t("解锁新区域，课程任务也仍然保留。", "New district unlocked. Coursework remains unlocked too.")
 
 
 func _update_zone() -> void:
@@ -389,7 +442,7 @@ func _update_zone() -> void:
     if current_zone.is_empty() or _visited_zones.has(current_zone):
         return
     _visited_zones[current_zone] = true
-    zone_heading.text = "NOW ENTERING  /  " + current_zone.to_upper()
+    zone_heading.text = _t("进入区域：", "NOW ENTERING: ") + _place_name(current_zone)
     zone_caption.text = _zone_text(current_zone)
     _zone_remaining = 4.5
     _fade_in(zone_card, "zone")
