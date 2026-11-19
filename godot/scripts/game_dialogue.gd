@@ -89,7 +89,8 @@ func next_line(scope: String, name: String, weather_mode: int = 0, force_random:
     if candidates.is_empty():
         candidates = pool.duplicate()
     var picked: Dictionary = candidates[randi_range(0, candidates.size() - 1)]
-    seen_counts[id] = talked + 1
+    if not force_random:
+        seen_counts[id] = talked + 1
     last_english_line[id] = str(picked.get("en", ""))
     return _text(picked)
 
