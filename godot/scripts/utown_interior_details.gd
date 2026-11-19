@@ -38,6 +38,8 @@ static func _sign(parent: Node3D, label_text: String, at: Vector3, size: int = 2
     var sign := Label3D.new()
     sign.text = label_text
     sign.position = at
+    if at.z > 5.0:
+        sign.rotation.y = PI  # Front-facing toward the room, not mirrored from behind.
     sign.font_size = size
     sign.pixel_size = 0.013
     sign.outline_size = 5
