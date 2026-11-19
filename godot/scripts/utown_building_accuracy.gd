@@ -6,8 +6,8 @@ class_name UTownBuildingAccuracy
 ## collision proxies, official-map disclaimer and F2 comparison remain intact.
 ## OSM source: res://data/osm_p0_reference.json (© OSM contributors, ODbL 1.0).
 
-const P0_BUILDINGS: PackedStringArray = PackedStringArray(["ERC", "SRC"])
-const HIGHRISE_BUILDINGS: PackedStringArray = PackedStringArray(["CREATE_TOWER", "UTR_N", "UTR_S"])
+const P0_BUILDINGS = ["ERC", "SRC"]
+const HIGHRISE_BUILDINGS = ["CREATE_TOWER", "UTR_N", "UTR_S"]
 const MAX_PERIMETER_EDGES: int = 150
 const MAX_WINDOWS_PER_TOWER: int = 1200
 
@@ -229,8 +229,9 @@ func _build_highrise_details(identifier: String) -> void:
     var facade := MultiMeshInstance3D.new()
     facade.name = "FloorByFloorCurtainWall_OneBatch"
     facade.multimesh = instances
-    facade.material_override = _material("tower:glass", "#ffffff", 0.07)
-    facade.material_override.vertex_color_use_as_albedo = true
+    var window_material: StandardMaterial3D = _material("tower:glass", "#ffffff", 0.07)
+    window_material.vertex_color_use_as_albedo = true
+    facade.material_override = window_material
     facade.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
     layer.add_child(facade)
     var trim: Material = _material("tower:trim", "#d5d9d5", 0.10)
