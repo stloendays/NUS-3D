@@ -18,7 +18,8 @@ func _run() -> void:
         _fail("Game shell scene missing")
         return
     var shell: NUS3DGameShell = packed.instantiate() as NUS3DGameShell
-    shell.get_node("Accounts").storage_root = "user://nus3d-ai-smoke-%d" % Time.get_ticks_usec()
+    var shell_accounts: NUS3DAccountStore = shell.get_node("Accounts") as NUS3DAccountStore
+    shell_accounts.storage_root = "user://nus3d-ai-smoke-%d" % Time.get_ticks_usec()
     root.add_child(shell)
     await process_frame
 
