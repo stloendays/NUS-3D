@@ -114,7 +114,8 @@ func _build_pedestrians() -> void:
             "idle_remaining": 0.0, "talk_remaining": 0.0,
             "left_arm": npc.get_node("LeftArmPivot"), "right_arm": npc.get_node("RightArmPivot"),
             "left_leg": npc.get_node("LeftLegPivot"), "right_leg": npc.get_node("RightLegPivot"),
-            "name": npc_names[i], "line": npc_lines[i]
+            "name": npc_names[i], "line": npc_lines[i],
+            "personality_enabled": ["Maya", "Ethan", "Mei"].has(npc_names[i])
         })
 
 func _make_person(index: int) -> Node3D:
@@ -675,8 +676,22 @@ func talk_to_nearest() -> bool:
     var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
     var role: String = bank.role_for("outdoor", speaker) if bank != null else "Student"
     var line: String = bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"])
-    message = "%s · %s\n%s" % [speaker, role, line]
-    message_time = 6.0
+    var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
+    var affinity_text: String = ""
+    if relationships != null and relationships.is_story_character(speaker):
+        var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+        var chinese: bool = language != null and language.is_chinese()
+        var status: String = relationships.conversation(speaker, chinese)
+        var line_after: String = relationships.contextual_line(speaker, chinese)
+        var invitation: String = relationships.invitation(speaker, chinese)
+        if not line_after.is_empty():
+            affinity_text += "\n" + line_after
+        if not invitation.is_empty():
+            affinity_text += "\n" + invitation
+        if not status.is_empty():
+            affinity_text += "\n♥ " + status
+    message = "%s · %s\n%s%s" % [speaker, role, line, affinity_text]
+    message_time = 7.0 if not affinity_text.is_empty() else 6.0
     talked_to.emit(speaker)
     return true
 
