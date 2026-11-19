@@ -166,9 +166,14 @@ func _run() -> void:
         _fail("Cannot restore original test account")
         return
     shell._enter_game()
-    if director.save_path != alice_story_save or director.archive != archive_copy \
-        or director.decisions.get("coffee_protocol", "") != "sleep":
-        _fail("Endings and choices did not persist across account switching")
+    if director.save_path != alice_story_save:
+        _fail("Story account storage path changed: expected %s but got %s" % [alice_story_save, director.save_path])
+        return
+    if director.archive != archive_copy:
+        _fail("Story ending archive mismatch: expected=%s loaded=%s" % [JSON.stringify(archive_copy), JSON.stringify(director.archive)])
+        return
+    if director.decisions.get("coffee_protocol", "") != "sleep":
+        _fail("Last run choices did not persist: %s" % JSON.stringify(director.decisions))
         return
     if not FileAccess.file_exists(alice_story_save):
         _fail("Independent story save is missing")
