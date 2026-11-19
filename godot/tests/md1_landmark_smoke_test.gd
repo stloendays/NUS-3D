@@ -28,5 +28,11 @@ func _run() -> void:
         push_error("MD1 landmark must appear once in Science district")
         quit(1)
         return
-    print("PASS: MD1 Science district landmark present")
+    var world_script: String = FileAccess.get_file_as_string("res://scripts/kent_ridge_world.gd")
+    for required in ["MD1_PedestrianAccess_Schematic", "MD6_To_MD1_Walk", "NUH_To_MD6_Walk", "MD1_Entrance_Walk"]:
+        if not world_script.contains(required):
+            push_error("MD1 access component missing: " + required)
+            quit(1)
+            return
+    print("PASS: MD1 landmark and schematic pedestrian access present")
     quit(0)
