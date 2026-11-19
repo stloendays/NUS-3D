@@ -102,6 +102,17 @@ func _run() -> void:
     if paused or shell.login_cover.visible or not shell.profile_card.visible:
         _fail("Signing in must resume original gameplay")
         return
+    if not shell.tour.try_check_in():
+        _fail("First tour checkpoint unavailable after login")
+        return
+    shell._scan_rewards()
+    if int(shell_accounts.level_progress()["total"]) != 60:
+        _fail("Tour gameplay event did not award 60 XP")
+        return
+    shell._scan_rewards()
+    if int(shell_accounts.level_progress()["total"]) != 60:
+        _fail("Repeated reward scan farmed XP")
+        return
     shell._open_mail()
     if not paused or not shell.mail_cover.visible:
         _fail("Reading local mail must pause the world")
@@ -114,6 +125,14 @@ func _run() -> void:
     if not paused or not shell.login_cover.visible or shell_accounts.is_logged_in():
         _fail("Logout must return to a locked login screen")
         return
+    if shell_accounts.sign_in("shell_tester", "game-test-123") != "":
+        _fail("Second login did not restore account")
+        return
+    shell._enter_game()
+    if shell.tour.current_index != 1 or int(shell_accounts.level_progress()["total"]) != 60:
+        _fail("Logged-in gameplay must restore tour progress and XP")
+        return
+    shell._logout()
     paused = false
     print("NUS3D_ACCOUNT_SMOKE_OK")
     quit(0)
