@@ -80,7 +80,7 @@ layout_mode = 2
 
 [node name="Title" type="Label" parent="HUD/Info/VBox"]
 layout_mode = 2
-text = "NUS / UTOWN — UNOFFICIAL 3D"
+text = "NUS-3D | DDL DOOM: CAMPUS CHAOS"
 
 [node name="Hint" type="Label" parent="HUD/Info/VBox"]
 layout_mode = 2
