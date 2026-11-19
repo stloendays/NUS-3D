@@ -16,7 +16,9 @@ func _render() -> void:
     var review: UTownViewReview = instance.get_node_or_null("ViewReview") as UTownViewReview
     var world: UTownWorld = instance.get_node_or_null("World") as UTownWorld
     var hud: CanvasLayer = instance.get_node_or_null("HUD") as CanvasLayer
-    if review == null or world == null or hud == null or review.viewpoint_count() != 4:
+    var coursework: UTownCoursework = instance.get_node_or_null("Coursework") as UTownCoursework
+    var course_ui: UTownCourseworkUI = instance.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if review == null or world == null or hud == null or coursework == null or course_ui == null or review.viewpoint_count() != 4:
         push_error("Photo-review scene did not initialize")
         quit(1)
         return
@@ -32,6 +34,45 @@ func _render() -> void:
         quit(1)
         return
     var count: int = 0
+    var intro: UTownIntro = instance.get_node_or_null("Intro") as UTownIntro
+    if intro == null or not intro.playing:
+        push_error("Intro camera must play for in-engine screenshot review")
+        quit(1)
+        return
+    # True viewport frames from the opening animation, not concept art.
+    var intro_shots: Array[Dictionary] = [
+        {"time": 1.7, "file": "M3_7_INTRO_01_ARRIVAL.png"},
+        {"time": 4.7, "file": "M3_7_INTRO_02_GROUP_PROJECT.png"},
+        {"time": 7.6, "file": "M3_7_INTRO_03_DDL_WARNING.png"},
+        {"time": 10.6, "file": "M3_7_INTRO_04_FACULTY_HANDOFF.png"}
+    ]
+    for shot in intro_shots:
+        intro.seek_preview(float(shot["time"]))
+        if not await _capture_frame(output, str(shot["file"])):
+            push_error("Could not render opening scene: " + str(shot["file"]))
+            quit(1)
+            return
+        count += 1
+    intro.finish_intro()
+    hud.visible = false
+    # Screenshot the genuine first-run faculty selector before selecting a profile.
+    # Isolate CI saves so no actual user profile is modified.
+    coursework.save_path = "user://nus3d_coursework_render_temp.cfg"
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
+    coursework._load_progress()
+    course_ui.show_selector()
+    if not await _capture_frame(output, "M3_6_FACULTY_SELECTION.png"):
+        push_error("Cannot capture first-run faculty choice UI")
+        quit(1)
+        return
+    count += 1
+    if not coursework.select_faculty("science"):
+        push_error("Cannot select demo faculty for screenshot review")
+        quit(1)
+        return
+    course_ui.hide_modal()
+    course_ui.set_hud_enabled(false)
+    coursework.set_markers_visible(false)
     for index in range(review.viewpoint_count()):
         if not review.select_view(index):
             push_error("Could not select camera preset")
@@ -122,6 +163,376 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    # M3.3 gameplay showcase: original Godot renders of weather, pedestrians,
+    # isolated interior concepts, bicycle mode and the procedural shuttle.
+    var player: UTownPlayer = instance.get_node_or_null("Player") as UTownPlayer
+    var weather: UTownWeather = instance.get_node_or_null("Weather") as UTownWeather
+    var campus_life: UTownCampusLife = instance.get_node_or_null("CampusLife") as UTownCampusLife
+    if player == null or weather == null or campus_life == null:
+        push_error("M3.3 showcase controllers did not load")
+        quit(1)
+        return
+    hud.visible = true
+    world.set_osm_reference_visible(false)
+    world.set_m2_details_visible(true)
+    world.set_lighting_mode(0)
+    review.select_view(3)
+    weather.set_mode(3)
+    weather.rain.restart()
+    for rain_frame in range(60):
+        await process_frame
+    if not await _capture_frame(output, "M3_3_WEATHER_RAIN.png"):
+        push_error("Could not capture the rain and puddle showcase")
+        quit(1)
+        return
+    count += 1
+
+    weather.set_mode(4)
+    weather.flash_wait = 60.0
+    weather.flash_time = 0.14
+    for storm_frame in range(8):
+        await process_frame
+    if not await _capture_frame(output, "M3_3_WEATHER_THUNDERSTORM.png"):
+        push_error("Could not capture the thunderstorm showcase")
+        quit(1)
+        return
+    count += 1
+
+    weather.set_mode(0)
+    var featured_npc: Node3D = campus_life.pedestrians[0]["node"]
+    player.global_position = featured_npc.global_position + Vector3(0.0, 0.18, 6.5)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(featured_npc.global_position + Vector3(0.0, 1.0, 0.0), Vector3.UP)
+    if not await _capture_frame(output, "M3_3_CAMPUS_NPCS_AND_HUD.png"):
+        push_error("Could not capture the campus-life HUD showcase")
+        quit(1)
+        return
+    count += 1
+
+    if not campus_life.enter_interior("ERC"):
+        push_error("Could not enter ERC interior for screenshot")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_3_ERC_INTERIOR_GROUND.png"):
+        push_error("Could not capture ERC interior ground floor")
+        quit(1)
+        return
+    count += 1
+    campus_life.toggle_interior_floor()
+    if not await _capture_frame(output, "M3_3_ERC_INTERIOR_MEZZANINE.png"):
+        push_error("Could not capture ERC interior mezzanine")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+
+    if not campus_life.enter_interior("SRC"):
+        push_error("Could not enter SRC interior for screenshot")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_3_SRC_INTERIOR.png"):
+        push_error("Could not capture SRC interior")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+
+    review.select_view(3)
+    if not campus_life.set_bicycle(true):
+        push_error("Could not enable bicycle for screenshot")
+        quit(1)
+        return
+    for frame_index in range(12):
+        await process_frame
+    if not await _capture_frame(output, "M3_3_BICYCLE_RIDE.png"):
+        push_error("Could not capture bicycle mode")
+        quit(1)
+        return
+    count += 1
+    campus_life.set_bicycle(false)
+
+    var bus: Node3D = campus_life.shuttle
+    player.global_position = bus.global_position + Vector3(5.0, 0.18, 5.0)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(bus.global_position + Vector3(0.0, 1.0, 0.0), Vector3.UP)
+    if not await _capture_frame(output, "M3_3_UTOWN_SHUTTLE.png"):
+        push_error("Could not capture the shuttle showcase")
+        quit(1)
+        return
+    count += 1
+
+    # M3.4 visual QA: roof-shadowed, furnished indoor spaces and wet pavements.
+    # Capture the project's real Godot viewport, never a generated concept image.
+    hud.visible = false
+    world.set_lighting_mode(0)
+    weather.set_mode(0)
+    var erc_room: Node3D = campus_life.interiors["ERC"]
+    if not campus_life.enter_interior("ERC"):
+        push_error("Could not enter ERC for M3.4 interior review")
+        quit(1)
+        return
+    player.global_position = erc_room.to_global(Vector3(-2.8, 0.18, 5.5))
+    player.rotation = Vector3(0.0, PI * 0.5, 0.0)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_4_ERC_CAFE_CORNER.png"):
+        push_error("Cannot capture new ERC cafe corner")
+        quit(1)
+        return
+    count += 1
+    hud.visible = true
+    if not await _capture_frame(output, "M3_4_INDOOR_MAP_AND_ACTIVITY_HUD.png"):
+        push_error("Cannot capture room-local activity minimap")
+        quit(1)
+        return
+    count += 1
+    hud.visible = false
+    if not campus_life.toggle_interior_floor():
+        push_error("Cannot access the ERC mezzanine")
+        quit(1)
+        return
+    player.rotation = Vector3(0.0, PI, 0.0)
+    player.head.rotation = Vector3(-0.1, 0.0, 0.0)
+    if not await _capture_frame(output, "M3_4_ERC_MEZZANINE_ATRIUM.png"):
+        push_error("Cannot capture ERC mezzanine atrium")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+    var src_room: Node3D = campus_life.interiors["SRC"]
+    if not campus_life.enter_interior("SRC"):
+        push_error("Could not enter SRC for M3.4 interior review")
+        quit(1)
+        return
+    player.global_position = src_room.to_global(Vector3(-3.5, 0.18, -0.5))
+    var src_aim: Vector3 = src_room.to_global(Vector3(-9.0, 0.18, -5.5))
+    player.look_at(src_aim, Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_4_SRC_EQUIPMENT_AND_HALL.png"):
+        push_error("Cannot capture new SRC activity corner")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+
+    if not review.select_view(3):
+        push_error("Cannot select wet-weather overview")
+        quit(1)
+        return
+    weather.set_mode(3)
+    for wet_frame in range(85):
+        await process_frame
+    if not await _capture_frame(output, "M3_4_RAIN_DARKENED_WALKWAYS.png"):
+        push_error("Cannot capture wet paving scene")
+        quit(1)
+        return
+    count += 1
+    # Move to the water itself; the distant facade camera cannot show puddle height.
+    var water_at: Vector3 = weather.puddle_nodes[0].global_position
+    player.global_position = water_at + Vector3(2.0, 0.035, 4.4)
+    var aim_point := Vector3(water_at.x, player.global_position.y, water_at.z)
+    player.look_at(aim_point, Vector3.UP)
+    player.head.rotation = Vector3(-0.36, 0.0, 0.0)
+    if not await _capture_frame(output, "M3_4_RAIN_PUDDLE_CLOSEUP.png"):
+        push_error("Cannot capture above-paving puddle visual")
+        quit(1)
+        return
+    count += 1
+    weather.set_mode(0)
+    for clearing_frame in range(18):
+        await process_frame
+    if not await _capture_frame(output, "M3_4_AFTER_RAIN_DRYING.png"):
+        push_error("Cannot capture gradual rain-to-clear transition")
+        quit(1)
+        return
+    count += 1
+
+    # M3.5 architectural materials, adaptive interior lighting and lived-in rooms.
+    var indoor_npcs: UTownIndoorNPCs = instance.get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+    var polish: UTownVisualPolish = instance.get_node_or_null("VisualPolish") as UTownVisualPolish
+    if indoor_npcs == null or polish == null or polish.facade_groups.size() != 2:
+        push_error("M3.5 gameplay/finish systems are unavailable during screenshot review")
+        quit(1)
+        return
+    hud.visible = false
+    world.set_lighting_mode(0)
+    weather.set_mode(0)
+    if not campus_life.enter_interior("ERC"):
+        push_error("M3.5 ERC study-lounge could not open")
+        quit(1)
+        return
+    var erc_lounge: Node3D = campus_life.interiors["ERC"]
+    player.global_position = erc_lounge.to_global(Vector3(-2.2, 0.18, 5.6))
+    player.rotation = Vector3(0, PI * 0.5, 0)
+    player.head.rotation = Vector3.ZERO
+    for occupied_frame in range(16):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_ERC_CAFE_OCCUPANTS.png"):
+        push_error("Cannot capture populated ERC cafe")
+        quit(1)
+        return
+    count += 1
+    var barista: Node3D = indoor_npcs.actors[0]["node"]
+    player.global_position = barista.global_position + Vector3(1.2, 0.18, -3.4)
+    player.look_at(barista.global_position + Vector3(0.0, 1.35, 0.0), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not campus_life.talk_to_nearest():
+        push_error("Cannot capture indoor NPC dialogue scenario")
+        quit(1)
+        return
+    hud.visible = true
+    if not await _capture_frame(output, "M3_5_ERC_DIALOGUE_HUD.png"):
+        push_error("Cannot capture actual indoor NPC dialogue HUD")
+        quit(1)
+        return
+    count += 1
+    hud.visible = false
+    world.set_lighting_mode(3)
+    for light_frame in range(28):
+        await process_frame
+    player.global_position = erc_lounge.to_global(Vector3(-2.2, 0.18, 5.6))
+    player.rotation = Vector3(0, PI * 0.5, 0)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_5_ERC_EVENING_INTERIOR.png"):
+        push_error("Cannot capture evening room with adaptive accent lighting")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+    world.set_lighting_mode(0)
+    if not campus_life.enter_interior("SRC"):
+        push_error("M3.5 SRC recreation hall could not open")
+        quit(1)
+        return
+    var src_hall: Node3D = campus_life.interiors["SRC"]
+    player.global_position = src_hall.to_global(Vector3(3.3, 0.18, 5.0))
+    var athlete_position: Vector3 = src_hall.to_global(Vector3(1.2, 1.3, -2.2))
+    player.look_at(athlete_position, Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    for athlete_frame in range(12):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_SRC_ACTIVE_CHARACTERS.png"):
+        push_error("Cannot capture active SRC indoor characters")
+        quit(1)
+        return
+    count += 1
+    campus_life.exit_interior()
+    weather.set_mode(0)
+    world.set_m2_details_visible(true)
+    world.set_lighting_mode(0)
+    if not review.select_view(2):
+        push_error("Could not select ERC facade review")
+        quit(1)
+        return
+    var erc_building: Node3D = world.get_node_or_null("BuildingMassing_Estimated/ERC") as Node3D
+    if erc_building == null:
+        push_error("Original ERC building proxy was not found")
+        quit(1)
+        return
+    player.global_position = erc_building.to_global(Vector3(-9.0, 0.18, 31.0))
+    player.look_at(erc_building.to_global(Vector3(-9.0, 5.5, -1.0)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_5_ERC_FACADE_FINISH_DAY.png"):
+        push_error("Cannot capture facade material enhancements")
+        quit(1)
+        return
+    count += 1
+    world.set_lighting_mode(3)
+    for evening_frame in range(40):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_ERC_FACADE_FINISH_EVENING.png"):
+        push_error("Cannot capture facade evening accent lighting")
+        quit(1)
+        return
+    count += 1
+    world.set_lighting_mode(1)
+    if not review.select_view(3):
+        push_error("Could not select SRC facade review")
+        quit(1)
+        return
+    var src_building: Node3D = world.get_node_or_null("BuildingMassing_Estimated/SRC") as Node3D
+    if src_building == null:
+        push_error("Original SRC building proxy was not found")
+        quit(1)
+        return
+    player.global_position = src_building.to_global(Vector3(-14.0, 0.18, 25.0))
+    player.look_at(src_building.to_global(Vector3(-14.0, 5.8, -21.0)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    for src_light_frame in range(16):
+        await process_frame
+    if not await _capture_frame(output, "M3_5_SRC_FACADE_GOLDEN_HOUR.png"):
+        push_error("Cannot capture SRC facade close-up")
+        quit(1)
+        return
+    count += 1
+
+    # M3.6: actual gameplay shots of the selected-faculty coursework HUD and journal.
+    world.set_lighting_mode(0)
+    weather.set_mode(0)
+    hud.visible = false
+    course_ui.set_hud_enabled(true)
+    coursework.set_markers_visible(true)
+    var brief_pos: Vector3 = coursework.objective_position()
+    player.global_position = brief_pos + Vector3(5.0, 0.18, 6.0)
+    player.look_at(brief_pos + Vector3(0.0, 1.25, 0.0), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_6_COURSEWORK_HUD_AND_MARKER.png"):
+        push_error("Cannot capture coursework mission waypoint and status HUD")
+        quit(1)
+        return
+    count += 1
+    course_ui.show_journal()
+    if not await _capture_frame(output, "M3_6_COURSEWORK_JOURNAL.png"):
+        push_error("Cannot capture fictional coursework journal")
+        quit(1)
+        return
+    count += 1
+    course_ui.hide_modal()
+    player.global_position = coursework.objective_position() + Vector3(0.0, 0.18, 0.0)
+    if not coursework.interact_nearby():
+        push_error("Cannot trigger DDL mission for gameplay screenshot")
+        quit(1)
+        return
+    coursework.current_time_left = 35.0
+    if not await _capture_frame(output, "M3_6_DDL_35_SECONDS.png"):
+        push_error("Cannot capture the game-only DDL countdown")
+        quit(1)
+        return
+    count += 1
+    course_ui.set_hud_enabled(false)
+    coursework.set_markers_visible(false)
+    # M3.8: record genuine unlocked post-course games, using a temporary profile.
+    var leisure: UTownLeisure = instance.get_node_or_null("Leisure") as UTownLeisure
+    var leisure_ui: UTownLeisureUI = instance.get_node_or_null("LeisureUI") as UTownLeisureUI
+    if leisure == null or leisure_ui == null:
+        push_error("M3.8 leisure scene missing from visual review")
+        quit(1)
+        return
+    coursework.active_quest_index = 3
+    coursework._store_active_state()
+    if not leisure.unlocked() or not leisure_ui.open_lounge():
+        push_error("Cannot present the unlocked post-course club")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_8_GOMOKU_UNLOCKED.png"):
+        push_error("Cannot render playable 9x9 Gomoku board")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.switch_tab("cards")
+    if not await _capture_frame(output, "M3_8_CARD_DUEL_UNLOCKED.png"):
+        push_error("Cannot render five-round card game")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.switch_tab("social")
+    if not await _capture_frame(output, "M3_8_AFTER_CLASS_SOCIAL.png"):
+        push_error("Cannot render post-course social and no-alcohol option")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.close_lounge()
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
+
     hud.visible = false
     world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
@@ -135,9 +546,24 @@ func _render() -> void:
         "engine": str(Engine.get_version_info().get("string", "")),
         "viewpoints": review.viewpoints,
         "image_count": count,
-        "note": "Original scene screenshots, not real reference photo files. No Windows GPU performance claim."
+        "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
+        "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
+        "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
+        "m36_showcase": ["faculty_selection", "coursework_hud", "coursework_journal", "ddl_countdown"],
+        "m37_intro": ["arrival", "group_project", "ddl_warning", "faculty_handoff"],
+        "m38_leisure": ["gomoku", "five_round_cards", "social_mocktails"],
+        "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
     print("PASS: generated %d original Godot view comparison PNGs" % count)
     instance.queue_free()
     quit(0)
+
+func _capture_frame(output: String, filename: String) -> bool:
+    await process_frame
+    await process_frame
+    await RenderingServer.frame_post_draw
+    var frame: Image = root.get_texture().get_image()
+    if frame == null or frame.is_empty() or frame.get_width() < 400 or frame.get_height() < 300:
+        return false
+    return frame.save_png(output.path_join(filename)) == OK

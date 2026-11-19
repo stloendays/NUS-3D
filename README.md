@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.3 source-footprint comparison + M3/M3.1 atmosphere and guided exploration + M4 alpha Windows portable build pipeline (2026-11-16)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M3.4 sheltered interiors/rain + M3.5 visual finishing + M3.6 Coursework + M3.7 skippable cinematic entrance + M4 alpha Windows portable build pipeline (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M3.6 选择学院与 Coursework 任务](docs/M3_6_COURSEWORK_FACULTY.md) · [M3.7 入场动画](docs/M3_7_CINEMATIC_INTRO.md) · [M3.8 课后社团与棋牌聚会](docs/M3_8_POSTCOURSE_CLUB.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -12,12 +12,12 @@
 
 - **第一版核心区**：Town Green + Town Plaza + Education Resource Centre (ERC) + Stephen Riady Centre (SRC)。
 - **周边占位模型**：Tembusu College、College of Alice & Peter Tan (CAPT)、Residential College 4 (RC4)、Cinnamon College、UTown Residence、CREATE；待核实后按批次完善。
-- **暂不做**：整个 Kent Ridge 校区、所有室内、精细 BIM、联网多人、自动真实校车仿真。
+- **暂不做**：整个 Kent Ridge 校区、完整楼层级室内复刻、精细 BIM、联网多人和真实校车时刻/路径仿真。当前室内和交通仅是独立的玩法原型。
 - **原则**：不是 NUS 官方项目；不要将尚未验证的点云、建筑高度或模型授权表述为已取得。
 
 ## Play the first prototype / 运行第一版
 
-Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
+Download the repository, install **Godot 4.4.1+**, import `godot/project.godot`, then press **F5**. Walk using **WASD**, turn with mouse, **Shift** to run, **R** to reset, **M** to toggle the map, **F2** to compare the original greybox against provisional ERC/SRC architectural layers, **T** to cycle daylight/golden-hour/blue-hour/evening, **E** to discover a nearby tour stop, **G** to replay the completed tour, **C** to collect Field Notes, **V** to start/cancel Campus Sprint, **Y** to cycle weather, **Q** to talk to fictional NPCs, **I** to enter/exit illustrative ERC/SRC interiors, **L** to use the interior mezzanine lift, **F** to discover six indoor activity spots, **O** to choose/change faculty, **J** to inspect the Coursework journal, **K** to accept/submit a mission at a glowing coursework marker, **B** to ride a bicycle, **X** to board/alight the moving shuttle, **F7** to hide the HUD for photos, **F6** to show/hide ODbL-attributed ERC/SRC outlines and their IoU/coverage card, **F3** to cycle public-geotag camera viewpoints, **F4** to save original screenshot and JSON provenance, **Esc** to release mouse. See [M1_GREYBOX.md](docs/M1_GREYBOX.md) for limitations, validation and licensing.
 
 The prototype has procedural low-poly buildings, a ground plane, an approximate Town Green, a conceptual walking loop, lighting, trees and HUD. **It is not a precise site survey, a completed M1/M2 milestone, or a Windows installer.**
 
@@ -53,7 +53,7 @@ NUS official map + OpenStreetMap outlines + reference photographs/360 views
 | M0 — Evidence | UTown 基础地图与可追踪来源 | 明确边界、坐标基准、建筑清单；每项来源有授权状态 |
 | M1 — Greybox | 可行走的 Town Green 核心区 | ERC/SRC/Plaza/Green 位置与比例基本准确，能连续绕行 |
 | M2 — Architecture | 第一批实景辨识度模型 | 4 个核心地标外形、入口及连接路径可辨识 |
-| M3 — Atmosphere | 有生命感的校园 | 树木/草地、基础光照与日夜变化、行走音效 |
+| M3 — Atmosphere & play | 有生命感且可互动的校园 | 天气、NPC、示意室内、自行车、循环穿梭巴士和可重复挑战均可运行；图形界面验收另行完成 |
 | M4 — Release | Windows 可执行文件 | 普通 Windows 电脑可运行；性能测量与版权清单完成 |
 | M5 — Optional | Three.js 在线参观 | 同一 GLB 资产可重用，网页版有自由相机和建筑标签 |
 
@@ -131,3 +131,82 @@ The playable scene now includes an original, optional **UTown Explorer** check-i
 ## M2.3 P0 footprint coverage scorecard
 
 M2.3 now computes reproducible, exact-in-local-projection plan-view IoU, two-sided area differences and centroid offset between the current ERC/SRC multi-part box massing and independently archived OpenStreetMap outer-ring polygons. CI publishes both `build/osm-proxy-fit.json` and an original SVG scorecard in `utown-route-clearance-audit`. **These are dataset agreement statistics, not validated true building dimensions, roads or accessibility.** See [M2.3 methodology and caveats](docs/M2_3_FOOTPRINT_FIT.md).
+
+
+## M3.2: Field Notes and Campus Sprint
+
+Eight glowing Field Notes are interpolated along existing schematic walkway segments; press **C** nearby to collect one. Press **V** near Town Green to start the four-stop Campus Sprint (ERC → SRC → Town Plaza → return to Green). The timer awards a game-design medal, and collected-note IDs plus the best Sprint time persist in a local save file. See [M3.2 usage and save contract](docs/M3_2_PLAYABLE_CHALLENGES.md).
+
+## M3.3: weather, campus life, interiors and transport
+
+- **Weather:** press **Y** to cycle Clear, Cloudy, Overcast, Rain and Thunderstorm. Procedural clouds, rain particles and deterministic rain-streak MultiMesh, wet-ground puddles, ripple rings, fog and occasional lightning are local effects, not a live forecast.
+- **Pedestrians:** six fictional low-poly student NPCs walk, pause at path ends and animate arms/legs. Press **Q** nearby for a short original dialogue line.
+- **Interiors:** press **I** near the ERC or SRC conceptual approach to enter an original two-level study-lounge or recreation-atrium pocket; use **L** to switch between the ground floor and mezzanine, and **I** again to return. These are standalone illustrative rooms, not actual NUS floor plans or connected building interiors.
+- **Bicycle:** press **B** to switch between walking and a faster bicycle mode. The follow camera eases into place, while wheels, pedals and handlebars animate.
+- **Shuttle:** a procedural bus loops between the four existing conceptual waypoints. Press **X** near it to board and **X** again to alight. It is a gameplay vehicle, not a real NUS service or route.
+- The minimap shows pedestrian and shuttle positions. All NPCs, interiors, vehicle geometry, weather and dialogue are offline and procedurally generated. No accounts, telemetry or network services are used.
+
+See [M3.3 implementation and limitations](docs/M3_3_CAMPUS_LIFE_WEATHER.md). The current rooms and shuttle use isolated/estimated game-space positions; visual GUI testing and route/placement review remain necessary.
+
+
+## M3.4: sheltered rooms, activities and wet-weather response
+
+This original gameplay extension builds on M3.3 without claiming measured NUS interiors or real meteorology:
+
+- ERC and SRC gain opaque sheltering roofs, warm/cool soffit lighting, ceiling diffusers, planters, room zoning, furniture and signs. ERC includes a cafe corner and reading nook; SRC includes a water refill counter, sports equipment wall and spectator lounge.
+- A continuous sloped collision ramp now supports visible mezzanine stair treads; **L** remains a convenient lift shortcut. The indoor minimap shows an illustrative plan for each floor.
+- Discover three fictional activity stations in each room using **F** at close range. Local progress persists in user://nus3d_campus_activities.cfg (no cloud accounts or telemetry).
+- The conceptual plaza and pedestrian paths share two registered materials with rain-responsive roughness, metallic and darkening; grass darkens separately during rain. Puddles are now visibly above the walkway surface, with a pair per path entry. After rain, materials dry gradually while pools temporarily remain. Clouds, sun and fog also transition.
+- Linux CI captures original in-engine M3.4 indoor and rain-state screenshots, not measurements or performance benchmarks.
+
+See [M3.4 guide and QA limits](docs/M3_4_INTERIOR_WEATHER_POLISH.md). These are separate teleport-accessible game pockets, not reconstructed building floors. Stairs, collision feel and frame rate require a manual 3D GUI playtest.
+
+
+## M3.5: original material finishing and occupied interiors
+
+The two priority-0 conceptual ERC/SRC facade studies now contain a separate, **F2-toggleable** M3.5 visual finish: aluminum mullions, layered reflective-tinted glass, entrance canopy undersides, window sills, roof parapets and warm entrance lights. These are deliberately not measured facade reconstructions.
+
+The illustrative ERC/SRC interior pockets receive tiled floors, transition grout, ribbed wall strips, mezzanine acoustic panels, glass accents and three additional room-local lights (including one shadow-capable light per room). Lighting adapts to the game's existing artistic time-of-day and rain mode; there are **no imported HDRI, textures, commercial 3D assets or real architectural plans**.
+
+Six fictional interior characters are distributed across two rooms. Their simple looping routines depict cafe service, reading, upper-floor study movement, warm-up, spectating and a water-refill volunteer. Press **Q** near an indoor character to display original dialogue; outside, **Q** still talks to existing walking NPCs. Characters are non-colliding and spawn inside independent fictional room pockets rather than in real NUS spaces.
+
+See [M3.5 gameplay and QA contract](docs/M3_5_MATERIALS_INDOOR_LIFE.md); this remains a low-poly Godot compatibility-renderer prototype, not photorealistic PBR validation or a completed campus digital twin.
+
+
+## M3.6: Choose your Faculty + Coursework: The DDL Apocalypse
+
+At first run, choose from **13 fictional gameplay faculty/academic-unit affiliations** based on public NUS academic names. Options include Science, Design & Engineering, Computing, Business, FASS, CHS, Medicine, Law, Dentistry, Music, NUS College, Public Health and Public Policy. The selector is a game-only roleplaying option, not real student affiliation or admissions data. Press **O** later to change it; each faculty's incomplete coursework progress is preserved.
+
+Each faculty has an original, discipline-specific **3-chapter DDL comedy storyline** — 39 playable coursework chapters total. Follow the golden homework marker, press **K** to accept an assignment, use **F** at the relevant interior learning/recreation activity and **Q** with the right fictional groupmate, then rush back and submit with **K**. The clock starts on accepting a chapter. Missing the game deadline is **not a hard failure**: late submissions complete with a smaller reward. Grades, Coursework XP, levels and campus credits are in-game only, and existing exploration and traffic do not reset.
+
+- **O**: choose/change faculty; **J**: journal and story; **K**: collect brief / submit.
+- Coursework progress is stored locally in `user://nus3d_coursework.cfg`; it contains no player email, real transcript, academic schedule, network service or telemetry.
+- Windows native-runtime validation includes the JSON, all 13 picker options and 39 quest chapters. Godot CI additionally captures real in-engine screenshots of the faculty picker, DDL HUD and mission journal.
+
+See the [M3.6 coursework guide](docs/M3_6_COURSEWORK_FACULTY.md) for detailed gameplay, save rules and manual test limitations.
+
+
+## M3.7 — Skippable 3D entrance cinematic
+
+A **12-second Godot-rendered opening** now plays when launching the UTown game: a camera flies along the established conceptual Town Green → ERC → SRC → Plaza route while an original comedy storyline announces the looming Coursework DDL. Animated lettering, cinematic letterboxes, smoothly eased camera movement, four changing story captions, a progress bar and a skip control complete the intro. No pre-rendered footage or imported copyrighted assets are required.
+
+- Skip with **Space**, **Esc**, **Enter** or a mouse click / top-right skip button.
+- On first run, the cinematic ends on the faculty selector; on later runs it restores the saved faculty profile and normal first-person gameplay.
+- The intro never changes spawn, route progress, grades, weather or saved work. DDL timer and player movement are paused during playback.
+- Godot CI includes four actual viewport frames from the animated opening, plus tests for camera takeover, scripted beats, skipping and UI handoff.
+
+Read [M3.7 intro documentation](docs/M3_7_CINEMATIC_INTRO.md). This original intro is artistic/fictional and does not show surveyed campus navigation or actual NUS coursework.
+
+
+## M3.8 — Post-Course Club: Gomoku, card duels and optional social celebration
+
+Finish **all three Coursework chapters in any one faculty** to unlock the Post-Course Club permanently. Changing faculties preserves this unlock; completing all 39 fictional chapters grants a cosmetic all-faculty master title.
+
+- **P** opens or closes the club while on foot. Play a real **9 × 9 Gomoku** match against an NPC with immediate-win/block tactics, or a replayable **five-round high-card duel** using a 52-card shuffled deck. No wagers, cash prizes or gambling.
+- A third tab offers an original fictional after-class social scene with rotating NPC dialogue. Mocktails and tea/juice are always available; an optional adult toast requires a non-persistent declaration of local legal drinking age. There is no XP, currency or story advantage to the adult beverage.
+- After the optional adult scene, fictional bicycle and shuttle use are briefly restricted. No personal age, consumption history or payment information is stored.
+- Three decorative low-poly club stations appear in the existing *illustrative SRC room*, without altering walkable collisions or original quests.
+- Save location: user://nus3d_leisure.cfg (only game counts/wins/visits). Existing local Coursework, tour, weather and indoor activity saves are separate.
+- Windows runtime and Godot smoke checks assert chess rules, card rounds, age acknowledgement, save/reload and faculty switching. Three actual Godot preview screenshots demonstrate the unlock screens.
+
+[Read M3.8 QA and rules](docs/M3_8_POSTCOURSE_CLUB.md). This original game venue is not a real NUS service.

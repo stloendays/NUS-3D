@@ -4,6 +4,9 @@ extends Control
 @onready var world: UTownWorld = get_parent().get_parent().get_node("World")
 @onready var player: CharacterBody3D = get_parent().get_parent().get_node("Player")
 @onready var tour: UTownTour = get_parent().get_parent().get_node("Tour")
+@onready var challenge: UTownChallenge = get_parent().get_parent().get_node("Challenge")
+@onready var campus_life: UTownCampusLife = get_parent().get_parent().get_node("CampusLife")
+@onready var coursework: UTownCoursework = get_parent().get_parent().get_node("Coursework")
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
@@ -21,6 +24,9 @@ func _to_map(p: Vector3) -> Vector2:
 func _draw() -> void:
     draw_rect(Rect2(Vector2.ZERO, Vector2(MAP_SIZE, MAP_SIZE)), Color(0.07, 0.13, 0.15, 0.89), true)
     draw_rect(Rect2(Vector2(0, 0), Vector2(MAP_SIZE - 1, MAP_SIZE - 1)), Color(0.55, 0.68, 0.66, 0.9), false, 1.2)
+    if campus_life.interior_active:
+        _draw_interior_plan()
+        return
     if world.layout.is_empty():
         return
     var green_polygon: PackedVector2Array = PackedVector2Array()
@@ -61,6 +67,24 @@ func _draw() -> void:
             draw_circle(marker, 3.6, Color.html("#f1ce6a"))
         else:
             draw_circle(marker, 3.0, Color.html("#a7b2b0"))
+    # Optional collectible markers are derived from existing conceptual walkway segments.
+    for item_index in range(challenge.items.size()):
+        var item_id_value: String = challenge.item_id(item_index)
+        if not challenge.is_item_collected(item_id_value):
+            draw_circle(_to_map(challenge.item_world_position(item_index)), 3.2, Color.html("#b99aff"))
+    if challenge.sprint_active and challenge.sprint_next_index < challenge.sprint_route.size():
+        var sprint_target: Vector2 = _to_map(challenge.sprint_route[challenge.sprint_next_index])
+        draw_circle(sprint_target, 8.5, Color.html("#f2a8df"), false, 2.0)
+    for state in campus_life.pedestrians:
+        var npc: Node3D = state["node"]
+        draw_circle(_to_map(npc.global_position), 2.2, Color.html("#e8a17c"))
+    if campus_life.shuttle != null:
+        draw_rect(Rect2(_to_map(campus_life.shuttle.global_position) - Vector2(4.0, 3.0), Vector2(8.0, 6.0)), Color.html("#f2a85d"), true)
+    # A bright mission pin uses only existing schematic waypoint coordinates.
+    if not coursework.current_quest().is_empty() and coursework.marker_preference:
+        var quest_point: Vector2 = _to_map(coursework.objective_position())
+        draw_circle(quest_point, 9.0, Color.html("#ffd16f"), false, 2.4)
+        draw_circle(quest_point, 3.7, Color.html("#f4b94a"))
     var pp: Vector2 = _to_map(player.global_position)
     draw_circle(pp, 5.0, Color.html("#52a6e0"))
     draw_circle(pp, 5.0, Color.WHITE, false, 1.1)
@@ -69,3 +93,54 @@ func _draw() -> void:
     draw_line(pp, pp + arrow * 14.0, Color.WHITE, 2.0)
     draw_string(ThemeDB.fallback_font, Vector2(106, 19), "N", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, Color.WHITE)
     draw_string(ThemeDB.fallback_font, Vector2(9, MAP_SIZE - 12), "SCHEMATIC", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#a6b8b9"))
+
+func _interior_map(p: Vector3) -> Vector2:
+    return Vector2(MAP_SIZE * 0.5 + p.x * 8.0, MAP_SIZE * 0.5 + p.z * 8.0)
+
+func _draw_interior_plan() -> void:
+    # Fictional room pocket navigation only. Not a measured floor plan.
+    var room: Node3D = campus_life.interiors[campus_life.active_interior]
+    var level: int = campus_life.interior_floor
+    var heading: String = "%s  |  %s" % [campus_life.active_interior, "MEZZANINE" if level == 1 else "GROUND"]
+    draw_string(ThemeDB.fallback_font, Vector2(12, 20), heading, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, Color.html("#e5f3ee"))
+    var outline := Rect2(Vector2(15, 39), Vector2(192, 144))
+    draw_rect(outline, Color.html("#324b54"), true)
+    draw_rect(outline, Color.html("#9db8b3"), false, 1.5)
+    if level == 1:
+        draw_rect(Rect2(Vector2(16, 40), Vector2(190, 40)), Color.html("#819d9c"), true)
+        draw_line(Vector2(16, 80), Vector2(206, 80), Color.html("#dfc483"), 2.0)
+    else:
+        draw_rect(Rect2(Vector2(101, 41), Vector2(20, 140)), Color.html("#607e84"), true)
+        for bay_x in [46.0, 75.0, 147.0, 175.0]:
+            for bay_y in [89.0, 116.0]:
+                draw_rect(Rect2(Vector2(bay_x - 7.0, bay_y - 4.0), Vector2(14, 8)), Color.html("#b9a787"), true)
+    var stairs := Rect2(_interior_map(Vector3(9.25, 0, -3.9)), Vector2(14, 57))
+    draw_rect(stairs, Color.html("#d7bb79"), false, 2.0)
+    draw_string(ThemeDB.fallback_font, Vector2(169, 165), "STAIRS", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#e7d59d"))
+    for activity in campus_life.activity_spots.get(campus_life.active_interior, []):
+        var p3: Vector3 = activity["position"]
+        if (p3.y > 2.0) != (level == 1):
+            continue
+        var marker: Vector2 = _interior_map(p3)
+        var item_id: String = "%s/%s" % [campus_life.active_interior, str(activity["id"])]
+        draw_circle(marker, 4.3, Color.html("#83d2ac") if campus_life.visited_activities.has(item_id) else Color.html("#e8c27a"))
+        draw_circle(marker, 4.3, Color.html("#ecf2e9"), false, 1.0)
+        if coursework.active_stage == coursework.STAGE_ACTIVITY and not coursework.current_quest().is_empty():
+            if str(coursework.current_quest()["activity"]) == item_id:
+                draw_circle(marker, 8.0, Color.html("#ffc06e"), false, 2.0)
+    if coursework.active_stage == coursework.STAGE_PARTNER and not coursework.current_quest().is_empty():
+        var npc_ref: String = str(coursework.current_quest()["partner"])
+        var indoor_npcs: UTownIndoorNPCs = get_parent().get_parent().get_node("IndoorNPCs") as UTownIndoorNPCs
+        for actor in indoor_npcs.actors:
+            if str(actor["id"]) == npc_ref:
+                var actor_node: Node3D = actor["node"]
+                draw_circle(_interior_map(room.to_local(actor_node.global_position)), 7.0, Color.html("#f2c870"), false, 2.0)
+                break
+    var local_player: Vector3 = room.to_local(player.global_position)
+    var pos: Vector2 = _interior_map(local_player)
+    draw_circle(pos, 5.0, Color.html("#55b2ef"))
+    draw_circle(pos, 5.0, Color.WHITE, false, 1.3)
+    var forward: Vector3 = -player.global_transform.basis.z
+    var arrow := Vector2(forward.x, forward.z).normalized()
+    draw_line(pos, pos + arrow * 12.0, Color.WHITE, 2.0)
+    draw_string(ThemeDB.fallback_font, Vector2(12, 204), "ILLUSTRATIVE / NOT FLOOR PLAN", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#abc2c5"))

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -7,6 +7,16 @@
 [ext_resource type="Script" path="res://scripts/viewpoint_review.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/export_self_test.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/utown_tour.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/utown_challenge.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/utown_weather.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/utown_campus_life.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/utown_indoor_npcs.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/utown_visual_polish.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/utown_coursework.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/utown_coursework_ui.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/utown_intro.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/utown_leisure.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/utown_leisure_ui.gd" id="17"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -40,11 +50,41 @@ script = ExtResource("5")
 [node name="Tour" type="Node" parent="."]
 script = ExtResource("7")
 
+[node name="Challenge" type="Node" parent="."]
+script = ExtResource("8")
+
+[node name="Weather" type="Node" parent="."]
+script = ExtResource("9")
+
+[node name="CampusLife" type="Node" parent="."]
+script = ExtResource("10")
+
+[node name="IndoorNPCs" type="Node" parent="."]
+script = ExtResource("11")
+
+[node name="VisualPolish" type="Node" parent="."]
+script = ExtResource("12")
+
+[node name="Coursework" type="Node" parent="."]
+script = ExtResource("13")
+
 [node name="ExportSelfTest" type="Node" parent="."]
 script = ExtResource("6")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("3")
+
+[node name="CourseworkUI" type="CanvasLayer" parent="."]
+script = ExtResource("14")
+
+[node name="Intro" type="Node" parent="."]
+script = ExtResource("15")
+
+[node name="Leisure" type="Node" parent="."]
+script = ExtResource("16")
+
+[node name="LeisureUI" type="CanvasLayer" parent="."]
+script = ExtResource("17")
 
 [node name="Info" type="PanelContainer" parent="HUD"]
 offset_left = 18.0
@@ -119,6 +159,37 @@ autowrap_mode = 3
 text = "SCHEMATIC EXPLORATION — not a real route."
 theme_override_font_sizes/font_size = 15
 
+[node name="ChallengeCard" type="PanelContainer" parent="HUD"]
+anchors_preset = 15
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -370.0
+offset_top = -202.0
+offset_right = -18.0
+offset_bottom = -54.0
+mouse_filter = 2
+
+[node name="Message" type="Label" parent="HUD/ChallengeCard"]
+layout_mode = 2
+autowrap_mode = 3
+text = "UTOWN FIELD NOTES  0 / 8"
+theme_override_font_sizes/font_size = 14
+
+[node name="CampusCard" type="PanelContainer" parent="HUD"]
+offset_left = 18.0
+offset_top = 170.0
+offset_right = 430.0
+offset_bottom = 345.0
+mouse_filter = 2
+
+[node name="Message" type="Label" parent="HUD/CampusCard"]
+layout_mode = 2
+autowrap_mode = 3
+text = "WEATHER  CLEAR  |  [Y] change\nCAMPUS LIFE"
+theme_override_font_sizes/font_size = 13
+
 [node name="Crosshair" type="Label" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5
@@ -141,4 +212,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "SCHEMATIC / NOT REAL DIRECTIONS   WASD walk   E discover   G replay   M map   F1 help   F2 facade   F3 view   F4 PNG   T time   F6 OSM   F7 photo   Esc mouse"
+text = "WASD move  B bike  X bus  I indoors  L floor  F activity  Q talk  O faculty  J coursework  K submit  P leisure  Y weather  C notes  V sprint  M map  F7 photo  F1 help"

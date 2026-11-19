@@ -1,0 +1,594 @@
+{
+  "schema": "nus3d-coursework-v1",
+  "status": "fictional-gameplay-not-real-nus-curriculum",
+  "unofficial": true,
+  "offline": true,
+  "description": "Humorous fictional coursework quest lines inspired by broad academic disciplines; not real modules, deadlines, official faculty endorsements, or academic records.",
+  "faculty_options": [
+    {
+      "id": "science",
+      "name": "Faculty of Science",
+      "zh": "理学院",
+      "abbr": "FoS",
+      "flavor": "离心机转得比你的 DDL 还快。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "烧杯的复仇：实验报告失踪",
+          "story": "紧急通知：烧杯的复仇：实验报告失踪。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "实验室数据去哪儿了？",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。实验室数据去哪儿了？ 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "SRC/refill",
+          "partner": "SRC/Daniel",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "23:59：PDF 不想被提交",
+          "story": "最终挑战：23:59：PDF 不想被提交。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "ERC/mezzanine",
+          "partner": "ERC/Mei",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "cde",
+      "name": "College of Design and Engineering",
+      "zh": "设计与工程学院",
+      "abbr": "CDE",
+      "flavor": "图纸刚改完，组员又改了设计要求。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "模型爆炸前的设计审查",
+          "story": "紧急通知：模型爆炸前的设计审查。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "SRC/warmup",
+          "partner": "SRC/Lucas",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "热力学作业：系统正在沸腾",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。热力学作业：系统正在沸腾 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/mezzanine",
+          "partner": "ERC/Mei",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "最后的 CAD：导出失败 99 次",
+          "story": "最终挑战：最后的 CAD：导出失败 99 次。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "computing",
+      "name": "School of Computing",
+      "zh": "计算机学院",
+      "abbr": "SoC",
+      "flavor": "代码没 bug，有问题的是宇宙。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "编译器吃掉了作业",
+          "story": "紧急通知：编译器吃掉了作业。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/mezzanine",
+          "partner": "ERC/Mei",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "Git Merge Conflict：队友失踪",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。Git Merge Conflict：队友失踪 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "服务器 23:59 选择了躺平",
+          "story": "最终挑战：服务器 23:59 选择了躺平。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "SRC/refill",
+          "partner": "SRC/Daniel",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "business",
+      "name": "NUS Business School",
+      "zh": "商学院",
+      "abbr": "Biz",
+      "flavor": "你的估值很高，但咖啡余额很低。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "商业计划：预算是负数",
+          "story": "紧急通知：商业计划：预算是负数。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/cafe",
+          "partner": "ERC/Maya",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "PPT 有 200 页但没人写结论",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。PPT 有 200 页但没人写结论 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "路演前一分钟投资人改主意",
+          "story": "最终挑战：路演前一分钟投资人改主意。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "fass",
+      "name": "Faculty of Arts and Social Sciences",
+      "zh": "人文与社会科学学院",
+      "abbr": "FASS",
+      "flavor": "论文才写了标题，文献综述已读到天亮。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "田野笔记被雨淋湿了",
+          "story": "紧急通知：田野笔记被雨淋湿了。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "参考文献为什么有 87 页",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。参考文献为什么有 87 页 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/cafe",
+          "partner": "ERC/Maya",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "4000 字论文：最后一个标点",
+          "story": "最终挑战：4000 字论文：最后一个标点。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "ERC/mezzanine",
+          "partner": "ERC/Mei",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "chs",
+      "name": "College of Humanities and Sciences",
+      "zh": "人文与科学学院",
+      "abbr": "CHS",
+      "flavor": "科学说要数据，人文说要故事，组长说要放假。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "跨学科小组：大家都说不归我管",
+          "story": "紧急通知：跨学科小组：大家都说不归我管。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "实验数据与访谈开始吵架",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。实验数据与访谈开始吵架 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "SRC/warmup",
+          "partner": "SRC/Lucas",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "跨界报告 DDL 从天而降",
+          "story": "最终挑战：跨界报告 DDL 从天而降。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "ERC/mezzanine",
+          "partner": "ERC/Mei",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "medicine",
+      "name": "Yong Loo Lin School of Medicine",
+      "zh": "杨潞龄医学院",
+      "abbr": "Medicine",
+      "flavor": "医生需要睡觉，但作业不这么认为。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "解剖卡片大逃亡",
+          "story": "紧急通知：解剖卡片大逃亡。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "SRC/refill",
+          "partner": "SRC/Daniel",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "模拟病例：病人是闹钟",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。模拟病例：病人是闹钟 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "夜间查房和 23:59 抢时间",
+          "story": "最终挑战：夜间查房和 23:59 抢时间。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "law",
+      "name": "Faculty of Law",
+      "zh": "法学院",
+      "abbr": "Law",
+      "flavor": "判例会反驳你，DDL 不会给你申诉。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "案例卷宗堆成山",
+          "story": "紧急通知：案例卷宗堆成山。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "模拟法庭：证据在咖啡杯里",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。模拟法庭：证据在咖啡杯里 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "最后一次提交：谁把判例改了",
+          "story": "最终挑战：最后一次提交：谁把判例改了。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "ERC/cafe",
+          "partner": "ERC/Maya",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "dentistry",
+      "name": "Faculty of Dentistry",
+      "zh": "牙科学院",
+      "abbr": "Dentistry",
+      "flavor": "模型张开了嘴，队友却一句话不说。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "牙齿模型比你还倔强",
+          "story": "紧急通知：牙齿模型比你还倔强。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "SRC/refill",
+          "partner": "SRC/Daniel",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "咬合模拟：模型拒绝配合",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。咬合模拟：模型拒绝配合 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/mezzanine",
+          "partner": "ERC/Mei",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "临床记录：最后一分钟补全",
+          "story": "最终挑战：临床记录：最后一分钟补全。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "music",
+      "name": "Yong Siew Toh Conservatory of Music",
+      "zh": "杨秀桃音乐学院",
+      "abbr": "Music",
+      "flavor": "调音五分钟，找队友两小时。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "乐谱自己长出了新音符",
+          "story": "紧急通知：乐谱自己长出了新音符。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "合奏排练：指挥消失了",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。合奏排练：指挥消失了 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/cafe",
+          "partner": "ERC/Maya",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "演出前一分钟的最终谱",
+          "story": "最终挑战：演出前一分钟的最终谱。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "SRC/warmup",
+          "partner": "SRC/Lucas",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "nusc",
+      "name": "NUS College",
+      "zh": "国大学院（跨学科）",
+      "abbr": "NUSC",
+      "flavor": "导师说要大胆探索，提交系统说文件太大。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "跨学院任务：每个人有不同答案",
+          "story": "紧急通知：跨学院任务：每个人有不同答案。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/cafe",
+          "partner": "ERC/Maya",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "探究式报告：问题比答案多",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。探究式报告：问题比答案多 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "23:59：跨学科大团结",
+          "story": "最终挑战：23:59：跨学科大团结。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "public_health",
+      "name": "Saw Swee Hock School of Public Health",
+      "zh": "苏瑞福公共卫生学院",
+      "abbr": "SPH",
+      "flavor": "你正在拯救全体组员的 deadline 健康。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "流行病曲线画成了过山车",
+          "story": "紧急通知：流行病曲线画成了过山车。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "SRC/refill",
+          "partner": "SRC/Daniel",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "社区调查：问卷丢了",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。社区调查：问卷丢了 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "ERC/reading",
+          "partner": "ERC/Ethan",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "政策简报：DDL 在扩散",
+          "story": "最终挑战：政策简报：DDL 在扩散。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    },
+    {
+      "id": "public_policy",
+      "name": "Lee Kuan Yew School of Public Policy",
+      "zh": "李光耀公共政策学院",
+      "abbr": "LKYSPP",
+      "flavor": "每个人都有意见，只有 DDL 没有。",
+      "quests": [
+        {
+          "id": "q1",
+          "title": "政策备忘录：打印机突然罢工",
+          "story": "紧急通知：政策备忘录：打印机突然罢工。辅导员说资料在校园里，离 DDL 只差一杯咖啡的时间。",
+          "pickup": "GREEN",
+          "activity": "ERC/cafe",
+          "partner": "ERC/Maya",
+          "submit": "PLAZA",
+          "deadline_s": 210,
+          "xp": 100,
+          "credits": 30
+        },
+        {
+          "id": "q2",
+          "title": "利益相关方开会到明天",
+          "story": "队友终于回复：他正在“马上到”，但已经过去三天。利益相关方开会到明天 需要你亲自出马。",
+          "pickup": "ERC",
+          "activity": "SRC/viewing",
+          "partner": "SRC/Aisha",
+          "submit": "ERC",
+          "deadline_s": 300,
+          "xp": 175,
+          "credits": 50
+        },
+        {
+          "id": "q3",
+          "title": "公共决策：最后 30 秒",
+          "story": "最终挑战：公共决策：最后 30 秒。提交按钮开始冒烟，校园里响起了 DDL 警报。",
+          "pickup": "PLAZA",
+          "activity": "ERC/mezzanine",
+          "partner": "ERC/Mei",
+          "submit": "GREEN",
+          "deadline_s": 390,
+          "xp": 250,
+          "credits": 70
+        }
+      ]
+    }
+  ]
+}

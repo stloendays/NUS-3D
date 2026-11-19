@@ -19,6 +19,8 @@ var generated_building_count: int = 0
 var generated_tree_count: int = 0
 var generated_tree_positions: Array[Vector3] = []
 var generated_path_count: int = 0
+var weather_reactive_materials: Array[StandardMaterial3D] = []
+var weather_reactive_grass: Array[StandardMaterial3D] = []
 var m2_profiles: Dictionary = {}
 var m2_detail_nodes: Array[Node3D] = []
 var generated_facade_count: int = 0
@@ -121,7 +123,9 @@ func _build_ground() -> void:
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), _mat("#819e7a"), true)
+    var terrain_material: StandardMaterial3D = _mat("#819e7a")
+    weather_reactive_grass.append(terrain_material)
+    _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), terrain_material, true)
 
 func _build_green() -> void:
     var poly: PackedVector2Array = PackedVector2Array()
@@ -144,6 +148,7 @@ func _build_green() -> void:
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
     var grass_mat: StandardMaterial3D = _mat("#8aba75")
+    weather_reactive_grass.append(grass_mat)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
     grass.material_override = grass_mat
     add_child(grass)
@@ -156,7 +161,9 @@ func _build_plaza() -> void:
     root.position = at
     root.rotation.y = deg_to_rad(float(plaza.get("rotation_deg", 0.0)))
     add_child(root)
-    _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), _mat("#b9bcb5"))
+    var plaza_surface: StandardMaterial3D = _mat("#b9bcb5")
+    weather_reactive_materials.append(plaza_surface)
+    _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), plaza_surface)
     for i in range(4):
         _add_box(root, Vector3(-16.0 + float(i) * 10.0, 2.4, -12.0), Vector3(0.8, 4.8, 0.8), _mat("#e8e8e3"))
     _add_box(root, Vector3(-1.0, 4.9, -12.0), Vector3(44.0, 0.45, 7.0), _mat("#b9c6cb"))
@@ -165,7 +172,8 @@ func _build_walkways() -> void:
     var root: Node3D = Node3D.new()
     root.name = "ConceptualFootpaths_NotSurveyed"
     add_child(root)
-    var path_material: Material = _mat("#c8c7bd")
+    var path_material: StandardMaterial3D = _mat("#c8c7bd")
+    weather_reactive_materials.append(path_material)
     for way in layout.get("walkways", []):
         var points: Array = way.get("lonlat", [])
         var width_m: float = float(way.get("width_m", 3.5))
@@ -183,13 +191,13 @@ func _build_walkways() -> void:
 func _building_color(role: String) -> StandardMaterial3D:
     match role:
         "academic":
-            return _mat("#e3e5df")
+            return _mat("#c8d0cb")
         "civic":
-            return _mat("#b3c4cc")
+            return _mat("#aabec2")
         "research":
-            return _mat("#b9b5ac")
+            return _mat("#a9aaa0")
         "residence":
-            return _mat("#d7c8ad")
+            return _mat("#c4b7a1")
     return _mat("#c8c8c8")
 
 func _build_buildings() -> void:
@@ -197,7 +205,7 @@ func _build_buildings() -> void:
     root.name = "BuildingMassing_Estimated"
     add_child(root)
     var glass: Material = _mat("#688a9c", 0.34)
-    var roof: Material = _mat("#dde0dc")
+    var roof: Material = _mat("#bac6c5", 0.82)
     var entrance: Material = _mat("#426675", 0.32)
     for record in layout.get("buildings", []):
         var group: Node3D = Node3D.new()

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "original-in-game-pickups-derived-from-existing-schematic-walkway-segments",
+  "no_official_affiliation": true,
+  "placement_basis": "Each pickup is interpolated from a segment in utown_core.json. No new latitude or longitude is introduced.",
+  "route_disclaimer": "Walkway geometry is conceptual and unsurveyed. Pickups are game objects, not real campus points or navigation guidance.",
+  "items": [
+    {"id": "GREEN_PATH_01", "title": "Local Coordinate Frame", "note": "The scene uses a local east/north coordinate frame: east is +X and north is -Z.", "path_index": 0, "segment_index": 0, "t": 0.5},
+    {"id": "GREEN_PATH_02", "title": "Procedural Green", "note": "Town Green is an approximate outline. Its grass, trees and small props are procedural interpretations.", "path_index": 0, "segment_index": 1, "t": 0.5},
+    {"id": "ERC_APPROACH", "title": "ERC Facade Study", "note": "The ERC glazing, sunshades and curved bay are estimated architectural studies, not measured construction drawings.", "path_index": 1, "segment_index": 0, "t": 0.5},
+    {"id": "GREEN_EDGE", "title": "Schematic Walkway", "note": "This connector is a game-world proxy. It is not a surveyed pedestrian route or accessibility recommendation.", "path_index": 1, "segment_index": 2, "t": 0.5},
+    {"id": "SRC_LINK", "title": "SRC Forum Study", "note": "The SRC forum disc and stacked connector volumes are provisional visual studies.", "path_index": 1, "segment_index": 4, "t": 0.5},
+    {"id": "SRC_FORECOURT", "title": "GIS Reference Layer", "note": "OpenStreetMap outlines are comparison references, not certified building footprints or verified 3D geometry.", "path_index": 2, "segment_index": 0, "t": 0.5},
+    {"id": "PLAZA_APPROACH", "title": "Lighting Presets", "note": "Daylight, golden-hour, blue-hour and evening modes are artistic presets, not a solar or weather simulation.", "path_index": 2, "segment_index": 1, "t": 0.5},
+    {"id": "SOUTH_LOOP", "title": "Photo Review", "note": "Camera viewpoints support visual comparison, but heading, elevation and building alignment still need manual review.", "path_index": 3, "segment_index": 1, "t": 0.5}
+  ]
+}
