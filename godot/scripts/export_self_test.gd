@@ -13,6 +13,7 @@ const REQUIRED_SOURCE_FILES: Array[String] = [
     "res://data/osm_fit_baseline.json",
     "res://data/discovery_tour.json",
     "res://data/explorer_items.json",
+    "res://data/startup_tutorial.json",
 ]
 
 func _ready() -> void:
