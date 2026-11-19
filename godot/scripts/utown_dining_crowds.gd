@@ -19,6 +19,7 @@ var tick: float = 0.0
 var hud: Label
 var crowd_root: Node3D
 var player_slowdown: float = 1.0
+var camera: Camera3D
 
 func _ready() -> void:
     rng.seed = 20261120
@@ -75,6 +76,8 @@ func _process(delta: float) -> void:
     var elapsed: float = tick
     tick = 0.0
     congestion = clock.dining_intensity()
+    if not is_instance_valid(camera) or not camera.is_current():
+        camera = get_viewport().get_camera_3d()
     var active_count: int = int(round(lerpf(4.0, float(MAX_PEOPLE), congestion)))
     if life.interior_active:
         active_count = 0
@@ -88,7 +91,13 @@ func _process(delta: float) -> void:
         var state: Dictionary = people[i]
         var npc: Node3D = state["node"]
         npc.visible = i < active_count and npc.global_position.distance_squared_to(current) < 9025.0
-        if not npc.visible:
+        if npc.visible and camera != null:
+            npc.visible = camera.is_position_in_frustum(npc.global_position + Vector3.UP)
+        if i >= active_count:
+            continue
+        # Nearby pedestrians still affect movement even when behind the camera.
+        var near_player: bool = npc.global_position.distance_squared_to(current) < 9.0
+        if not npc.visible and not near_player:
             continue
         var base: Vector3 = state["base"]
         var offset: Vector3 = state["offset"]
