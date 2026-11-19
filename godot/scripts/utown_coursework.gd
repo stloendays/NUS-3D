@@ -300,7 +300,7 @@ func status_text() -> String:
     var current: Dictionary = current_quest()
     var header: String = "%s  |  Lv.%d  XP %d  $%d" % [faculty_name(), level(), total_xp, credits]
     if current.is_empty():
-        return "COURSEWORK  |  " + header + "\n学院任务全部完成！[P] 查看成绩  [Shift+P] 切换学院"
+        return "COURSEWORK  |  " + header + "\n学院任务完成！[Tab] 五子棋/打牌/聚会  [Shift+P] 切换学院"
     return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[P] 任务手册  [Shift+P] 切换学院" % [
         active_quest_index + 1, header, str(current["title"]), format_ddl(), objective_description()
     ]
@@ -456,6 +456,10 @@ func _complete_quest() -> void:
     active_quest_index += 1
     active_stage = STAGE_BRIEF
     current_time_left = 0.0
+    var chapters: Array = faculty_by_id[current_faculty_id]["quests"]
+    if active_quest_index >= chapters.size():
+        feedback += "\n解锁：下课后社团 [Tab] — 五子棋、牌局和聚会！"
+        feedback_left = 9.0
     _save_progress()
     _refresh_marker()
 

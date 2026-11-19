@@ -187,8 +187,8 @@ func _smoke() -> void:
         push_error("invalid lighting preset was accepted")
         quit(1)
         return
-    if world.navigation_labels.size() < 10 or world.route_marker_root == null:
-        push_error("Missing navigational world labels for clean photo mode")
+    if world.route_marker_root == null:
+        push_error("Missing route marker visibility controller for clean photo mode")
         quit(1)
         return
     world.set_navigation_markers_visible(false)
@@ -202,8 +202,8 @@ func _smoke() -> void:
         quit(1)
         return
     world.set_navigation_markers_visible(true)
-    if not world.route_marker_root.visible:
-        push_error("F7 photo mode did not restore navigation markers")
+    if world.route_marker_root.visible:
+        push_error("Removed sky-high route labels reappeared after F7 photo mode")
         quit(1)
         return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
@@ -664,6 +664,15 @@ func _smoke() -> void:
         quit(1)
         return
     player.call("reset_player")
+    # M3.8 checks run with isolated leisure and Coursework saves, never the user's progress.
+    var leisure: UTownLeisure = instance.get_node_or_null("Leisure") as UTownLeisure
+    var leisure_ui: UTownLeisureUI = instance.get_node_or_null("LeisureUI") as UTownLeisureUI
+    if leisure == null or leisure_ui == null or leisure.chess_board.size() != 81 or leisure_ui.cells.size() != 81:
+        push_error("Post-course games or the 9x9 chess board could not initialize")
+        quit(1)
+        return
+    leisure.save_path = "user://nus3d_leisure_smoke_temp.cfg"
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
     DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
