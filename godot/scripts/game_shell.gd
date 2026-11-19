@@ -61,6 +61,12 @@ func _ready() -> void:
         push_error("NUS-3D main world scene is unavailable.")
         return
     game = scene.instantiate() as Node3D
+    # Add a small account-scoped NPC relationship service at runtime.
+    # Avoid modifying the packed campus map: art and wardrobe PRs can evolve independently.
+    if game.get_node_or_null("Relationships") == null:
+        var relationships_controller: NUS3DRelationships = NUS3DRelationships.new()
+        relationships_controller.name = "Relationships"
+        game.add_child(relationships_controller)
     game.process_mode = Node.PROCESS_MODE_PAUSABLE
     add_child(game)
     tour = game.get_node("Tour") as UTownTour
@@ -526,6 +532,9 @@ func _enter_game() -> void:
     # Feature rewards must read the newly restored tour and challenge, never the
     # previous user's objects during account switching.
     _restore_game_features()
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.load_account(accounts.feature_save_path("relationships"))
     observed_tour_ids.clear()
     observed_note_ids.clear()
     observed_sprint_time = -1
@@ -547,6 +556,9 @@ func _enter_game() -> void:
 func _logout() -> void:
     if not accounts.is_logged_in():
         return
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.clear_account()
     if campus_hub != null:
         campus_hub.clear_session()
         campus_hub.close_hub()
