@@ -10,6 +10,7 @@ var game: Node3D
 var tour: UTownTour
 var challenge: UTownChallenge
 var story_director: NUS3DStoryDirector
+var session_overlay: NUS3DSessionOverlay
 var ui: CanvasLayer
 var login_cover: Control
 var mail_cover: Control
@@ -79,6 +80,10 @@ func _ready() -> void:
     story_director.name = "StoryCampaign"
     story_director.configure(accounts, game)
     add_child(story_director)
+    session_overlay = NUS3DSessionOverlay.new()
+    session_overlay.name = "MultiplayerAndGraphics"
+    add_child(session_overlay)
+    session_overlay.setup(self, game)
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
@@ -438,6 +443,10 @@ func _logout() -> void:
     challenge.sprint_active = false
     if story_director != null:
         story_director.on_logout()
+    if session_overlay != null:
+        if session_overlay.is_open:
+            session_overlay.toggle()
+        session_overlay.network.leave_room()
     var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
         coursework._save_progress()
