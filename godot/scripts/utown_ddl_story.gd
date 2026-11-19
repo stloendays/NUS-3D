@@ -232,6 +232,9 @@ func _save_progress() -> void:
         push_warning("Could not save independent DDL story: " + str(error))
 
 func load_progress() -> void:
+    rewarded = false
+    fail_count = 0
+    best_seconds = -1.0
     reset_episode()
     var config := ConfigFile.new()
     if config.load(save_path) != OK:
