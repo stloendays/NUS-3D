@@ -797,11 +797,13 @@ func _smoke() -> void:
         push_error("Post-toast bike/bus safety rule was bypassed")
         quit(1)
         return
-    campus_life.exit_interior()
+    # Verify the rejection message before exiting: exit_interior replaces
+    # the HUD message with its own room-exit notice.
     if not campus_life.message.contains("cooldown"):
         push_error("Alcohol-choice travel guard did not explain its decision")
         quit(1)
         return
+    campus_life.exit_interior()
     leisure._process(leisure.SOCIAL_COOLDOWN + 0.1)
     if not leisure.safe_to_ride() or not campus_life.set_bicycle(true):
         push_error("Post-toast temporary travel restriction failed to clear")
