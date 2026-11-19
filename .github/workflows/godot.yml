@@ -80,6 +80,7 @@ jobs:
             green_dining_smoke_test.gd \
             ambient_ecology_smoke_test.gd \
             campus_time_crowd_smoke_test.gd \
+            campus_shop_smoke_test.gd \
             coins_smoke_test.gd \
             experience_guide_smoke_test.gd \
             building_accuracy_smoke_test.gd \
