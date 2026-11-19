@@ -27,6 +27,7 @@ const SHUTTLE_SPEED: float = 5.2
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
 @onready var weather: UTownWeather = $"../Weather"
+@onready var npc_navigation: NUS3DNPCNavigation = $"../NPCNavigation"
 
 var pedestrians: Array[Dictionary] = []
 var bicycle_wheels: Array[MeshInstance3D] = []
@@ -614,14 +615,27 @@ func _process(delta: float) -> void:
         var walking: bool = talk_remaining <= 0.0 and idle_remaining <= 0.0
         var gait: float = sin(now * 6.2 + float(state["phase"])) if walking else sin(now * 1.8 + float(state["phase"])) * 0.08
         var bob: float = absf(sin(now * 6.2 + float(state["phase"]))) * 0.035 if walking else sin(now * 1.8 + float(state["phase"])) * 0.012
-        npc.position = npc_ground_position(npc.global_position, sample["position"], delta) + Vector3(0.0, bob, 0.0)
+        var previous_position: Vector3 = npc.global_position
+        if walking and npc_navigation != null:
+            var next_waypoint: Vector3 = npc_navigation.next_target(str(state["name"]), previous_position, sample["position"], now)
+            var toward_waypoint: Vector3 = next_waypoint - previous_position
+            toward_waypoint.y = 0.0
+            var step_distance: float = minf(float(state["speed"]) * delta, toward_waypoint.length())
+            var desired: Vector3 = previous_position + toward_waypoint.normalized() * step_distance if step_distance > 0.0001 else previous_position
+            npc.global_position = npc_navigation.move_safe(previous_position, desired, delta)
+            if npc.global_position.distance_squared_to(previous_position) < 0.0000005 and step_distance > 0.001:
+                state["distance"] = float(state["distance"]) - float(state["direction"]) * float(state["speed"]) * delta
+        elif walking:
+            npc.global_position = npc_ground_position(previous_position, sample["position"], delta)
+        npc.position.y += bob
         if talk_remaining > 0.0:
             var to_player: Vector3 = player.global_position - npc.global_position
             to_player.y = 0.0
             if to_player.length() > 0.05:
                 npc.look_at(npc.global_position + to_player, Vector3.UP)
         else:
-            var facing: Vector3 = sample["direction"] * float(state["direction"])
+            var facing: Vector3 = npc.global_position - previous_position if walking else sample["direction"] * float(state["direction"])
+            facing.y = 0.0
             if facing.length() > 0.01:
                 npc.look_at(npc.global_position + facing, Vector3.UP)
         var left_arm: Node3D = state["left_arm"]
