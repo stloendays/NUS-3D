@@ -362,6 +362,9 @@ func _build_ui() -> void:
     close_buttons.add_child(done)
 
 func _can_open() -> bool:
+    var voice: Node = get_parent().get_node_or_null("VoicePresentation")
+    if voice != null and bool(voice.get("is_open")):
+        return false
     return not is_open and not coursework.current_faculty_id.is_empty() and hud.visible \
         and not intro.playing and not course_ui.intro_blocked and not course_ui.modal_visible \
         and not leisure_ui.is_open and not life.on_shuttle and not player.bicycle_mode \
@@ -575,6 +578,9 @@ func _process(delta: float) -> void:
             submit_exam()
 
 func _input(event: InputEvent) -> void:
+    var voice: Node = get_parent().get_node_or_null("VoicePresentation")
+    if voice != null and bool(voice.get("is_open")):
+        return
     if not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
