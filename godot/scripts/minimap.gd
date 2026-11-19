@@ -6,9 +6,12 @@ extends Control
 @onready var tour: UTownTour = get_parent().get_parent().get_node("Tour")
 @onready var challenge: UTownChallenge = get_parent().get_parent().get_node("Challenge")
 @onready var campus_life: UTownCampusLife = get_parent().get_parent().get_node("CampusLife")
+@onready var campus_expansion: NUSKentRidgeWorld = get_parent().get_parent().get_node_or_null("KentRidgeExpansion") as NUSKentRidgeWorld
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
+const FOLLOW_START_METRES: float = 180.0
+var map_focus: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
     clip_contents = true
@@ -18,9 +21,12 @@ func _process(_delta: float) -> void:
     queue_redraw()
 
 func _to_map(p: Vector3) -> Vector2:
-    return Vector2(MAP_SIZE * 0.5 + p.x * SCALE, MAP_SIZE * 0.5 + p.z * SCALE)
+    return Vector2(MAP_SIZE * 0.5 + (p.x - map_focus.x) * SCALE, MAP_SIZE * 0.5 + (p.z - map_focus.z) * SCALE)
 
 func _draw() -> void:
+    # UTown stays north-up as before; the off-UTown minimap now follows the player
+    # instead of allowing their position to disappear outside the old UTown viewport.
+    map_focus = Vector3.ZERO if Vector2(player.global_position.x, player.global_position.z).length() < FOLLOW_START_METRES or campus_life.interior_active else player.global_position
     draw_rect(Rect2(Vector2.ZERO, Vector2(MAP_SIZE, MAP_SIZE)), Color(0.07, 0.13, 0.15, 0.89), true)
     draw_rect(Rect2(Vector2(0, 0), Vector2(MAP_SIZE - 1, MAP_SIZE - 1)), Color(0.55, 0.68, 0.66, 0.9), false, 1.2)
     if campus_life.interior_active:
@@ -55,6 +61,7 @@ func _draw() -> void:
         draw_rect(Rect2(p - Vector2(5, 5), Vector2(10, 10)), color, true)
         if priority == "P0":
             draw_string(ThemeDB.fallback_font, p + Vector2(7, -3), str(item["id"]), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 12, Color.WHITE)
+    _draw_campus_expansion()
     # One source for stops: existing conceptual waypoints, not real directions.
     for i in range(tour.stops.size()):
         var item: Dictionary = tour.stops[i]
@@ -87,6 +94,38 @@ func _draw() -> void:
     draw_line(pp, pp + arrow * 14.0, Color.WHITE, 2.0)
     draw_string(ThemeDB.fallback_font, Vector2(106, 19), "N", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, Color.WHITE)
     draw_string(ThemeDB.fallback_font, Vector2(9, MAP_SIZE - 12), "SCHEMATIC", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#a6b8b9"))
+
+func _draw_campus_expansion() -> void:
+    if campus_expansion == null:
+        return
+    for connection in campus_expansion.walk_connections:
+        if connection.size() < 2:
+            continue
+        var a: Dictionary = campus_expansion.stop_record(str(connection[0]))
+        var b: Dictionary = campus_expansion.stop_record(str(connection[1]))
+        if a.is_empty() or b.is_empty():
+            continue
+        draw_line(_to_map(a["position"]), _to_map(b["position"]), Color("#829e9c"), 2.3)
+    for district in campus_expansion.districts:
+        var center: Vector2 = _to_map(district["position"])
+        var extents: Array = district.get("size", [120, 120])
+        var footprint: Vector2 = Vector2(float(extents[0]), float(extents[1])) * SCALE
+        draw_rect(Rect2(center - footprint * 0.5, footprint), Color("#587e73"), true)
+        draw_rect(Rect2(center - footprint * 0.5, footprint), Color("#a4b7aa"), false, 1.0)
+    for station in campus_expansion.stops:
+        var point: Vector2 = _to_map(station["position"])
+        if point.x < -8.0 or point.y < -8.0 or point.x > MAP_SIZE + 8.0 or point.y > MAP_SIZE + 8.0:
+            continue
+        draw_circle(point, 3.5, Color("#efc36f"))
+        draw_circle(point, 3.5, Color("#283e40"), false, 1.0)
+        draw_string(ThemeDB.fallback_font, point + Vector2(6.0, -4.0), str(station["id"]).replace("_", " "), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color("#fbecd2"))
+    for bus_state in campus_expansion.bus_states:
+        var vehicle: Node3D = bus_state["node"]
+        var at: Vector2 = _to_map(vehicle.position)
+        draw_rect(Rect2(at - Vector2(3.5, 2.1), Vector2(7.0, 4.2)), Color("#63e0ca"), true)
+    if map_focus != Vector3.ZERO:
+        draw_string(ThemeDB.fallback_font, Vector2(9, 31), "NEARBY / PLAYER CENTERED", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 11, Color("#c9e5e5"))
+
 
 func _interior_map(p: Vector3) -> Vector2:
     return Vector2(MAP_SIZE * 0.5 + p.x * 8.0, MAP_SIZE * 0.5 + p.z * 8.0)
