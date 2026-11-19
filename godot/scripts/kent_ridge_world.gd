@@ -130,10 +130,19 @@ func _graded_strip(parent: Node3D, name_value: String, start: Vector3, finish: V
     var axis := Node3D.new()
     axis.name = name_value
     axis.position = (start + finish) * 0.5
-    axis.rotation.y = atan2(delta.x, delta.z)
-    axis.rotation.x = -atan2(delta.y, Vector2(delta.x, delta.z).length())
+    # Build an orthonormal slope basis; Euler yaw/pitch produced inverted
+    # grades for some route directions.
+    var forward: Vector3 = delta.normalized()
+    var right: Vector3 = Vector3(forward.z, 0.0, -forward.x).normalized()
+    if right.length_squared() < 0.01:
+        return
+    var normal: Vector3 = forward.cross(right).normalized()
+    axis.basis = Basis(right, normal, forward)
     parent.add_child(axis)
-    _box(axis, "GradedSurface", Vector3.ZERO, Vector3(width_value, 0.11, length_value), color)
+    # The walk and cycle strips are now physical walking surfaces.
+    # Keep the wider shared bus strip cosmetic to avoid duplicate collisions.
+    var solid_surface: bool = name_value.begins_with("Footpath_") or name_value.begins_with("CycleLane_")
+    _box(axis, "GradedSurface", Vector3.ZERO, Vector3(width_value, 0.11, length_value), color, solid_surface)
 
 
 func _build_extended_ground() -> void:
