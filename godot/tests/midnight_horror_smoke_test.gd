@@ -138,7 +138,41 @@ func _check() -> void:
     if horror.active or horror.wins != 0 or horror.armed:
         _fail("Failed/abandoned mode retained progress or active state")
         return
-    print("PASS: M15 opt-in world, weapon-first combat, two chasing NPCs, three clues, exit, replay guards, per-account saves and atmosphere restoration")
     world.queue_free()
     accounts.queue_free()
+    await process_frame
+
+    # The standalone world has no LAN node; verify the nested GameShell path too.
+    var shell_scene: PackedScene = load("res://scenes/game_shell.tscn") as PackedScene
+    var shell: NUS3DGameShell = shell_scene.instantiate() as NUS3DGameShell
+    var shell_accounts: NUS3DAccountStore = shell.get_node("Accounts") as NUS3DAccountStore
+    shell_accounts.storage_root = "user://nus3d-horror-lan-smoke-%d" % Time.get_ticks_usec()
+    root.add_child(shell)
+    await process_frame
+    if shell_accounts.register("night_host", "local-test-owner-2026") != "":
+        _fail("Could not set up account for LAN restriction test")
+        return
+    shell._enter_game()
+    NUS3DServices.enter_test_playmode(shell.game)
+    (shell.game.get_node("Player") as UTownPlayer).movement_locked = false
+    var host_horror: UTownHorrorMode = shell.horror_mode
+    if not host_horror.can_start():
+        _fail("Local offline game unexpectedly blocked the opt-in mode")
+        return
+    shell.session_overlay.network.state = NUS3DNetworkSession.State.CONNECTING
+    if host_horror.can_start():
+        _fail("LAN connection state allowed horror mode to begin")
+        return
+    shell.session_overlay.network.state = NUS3DNetworkSession.State.OFFLINE
+    if not host_horror.start_run():
+        _fail("Horror mode could not start after LAN returned offline")
+        return
+    shell.session_overlay.network.state = NUS3DNetworkSession.State.CLIENT
+    host_horror._process(0.1)
+    if host_horror.active:
+        _fail("Horror mode did not stop when a multiplayer client became active")
+        return
+    shell.session_overlay.network.state = NUS3DNetworkSession.State.OFFLINE
+    shell.queue_free()
+    print("PASS: M15 opt-in world, weapon-first combat, two chasing NPCs, three clues, exit, replay guards, per-account saves, LAN isolation and atmosphere restoration")
     quit(0)
