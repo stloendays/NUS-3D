@@ -118,7 +118,7 @@ func _build() -> void:
     panel.add_child(column)
     var heading := HBoxContainer.new()
     column.add_child(heading)
-    header_label = _label("POST-COURSE CLUB  /  下课后才是真正的游戏", 23, "#ffcf86")
+    header_label = _label("POST-COURSE CLUB  /  课后社团", 23, "#ffcf86")
     header_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     heading.add_child(header_label)
     sound_button = _button("SFX: ON", 112.0)
@@ -248,7 +248,7 @@ func _build() -> void:
     fx_label.name = "VictoryBanner"
     fx_label.anchor_left = 0.25
     fx_label.anchor_right = 0.75
-    fx_label.anchor_top = 0.12
+    fx_label.anchor_top = 0.46
     fx_label.offset_bottom = 58.0
     fx_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     fx_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -390,7 +390,7 @@ func _animate_victory(delta: float) -> void:
 func _refresh() -> void:
     if chess_score == null:
         return
-    header_label.text = "POST-COURSE CLUB  /  下课后才是真正的游戏"
+    header_label.text = "POST-COURSE CLUB  /  课后社团"
     secret_button.visible = leisure.secret_unlocked()
     if leisure.grand_master_unlocked():
         secret_button.text = "39/39 TRUE ENDING  /  毕业终章"
