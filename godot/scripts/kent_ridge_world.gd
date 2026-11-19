@@ -128,7 +128,7 @@ func _build_extended_ground() -> void:
     land.name = "CampusBaseTerrain_Estimated"
     add_child(land)
     var center: Vector3 = Vector3((min_x + max_x) * 0.5, -0.33, (min_z + max_z) * 0.5)
-    _box(land, "GroundBeyondUTown", center, Vector3(max_x - min_x, 0.64, max_z - min_z), "#759573", true)
+    _box(land, "GroundBeyondUTown", center, Vector3(max_x - min_x, 0.64, max_z - min_z), "#83ad78", true)
 
 
 func _build_road_links() -> void:
@@ -150,9 +150,9 @@ func _build_road_links() -> void:
         axis.position = (start + finish) * 0.5
         axis.rotation.y = atan2(delta.x, delta.z)
         roads_root.add_child(axis)
-        _box(axis, "SharedPath_Schematic", Vector3(0.0, 0.045, 0.0), Vector3(7.8, 0.065, delta.length()), "#91918a")
-        _box(axis, "Footpath", Vector3(-5.0, 0.075, 0.0), Vector3(2.3, 0.09, delta.length()), "#c2c6b7")
-        _box(axis, "CycleLane", Vector3(5.0, 0.067, 0.0), Vector3(2.0, 0.06, delta.length()), "#b3aa83")
+        _box(axis, "SharedPath_Schematic", Vector3(0.0, 0.045, 0.0), Vector3(7.8, 0.065, delta.length()), "#9eaaa6")
+        _box(axis, "Footpath", Vector3(-5.0, 0.075, 0.0), Vector3(2.3, 0.09, delta.length()), "#ddd8c9")
+        _box(axis, "CycleLane", Vector3(5.0, 0.067, 0.0), Vector3(2.0, 0.06, delta.length()), "#c8b995")
 
 
 func _build_districts() -> void:
@@ -164,9 +164,9 @@ func _build_districts() -> void:
         var size_values: Array = district.get("size", [150, 140])
         var width_m: float = float(size_values[0])
         var depth_m: float = float(size_values[1])
-        _box(root, "DistrictPlaza", Vector3(0, 0.022, 0), Vector3(width_m, 0.05, depth_m), "#8cac80")
-        _box(root, "MainPromenade", Vector3(0, 0.07, 0), Vector3(width_m - 9.0, 0.10, 8), "#c4c5b8")
-        _box(root, "NorthSouthPromenade", Vector3(0, 0.079, 0), Vector3(8.0, 0.10, depth_m - 9.0), "#c4c5b8")
+        _box(root, "DistrictPlaza", Vector3(0, 0.022, 0), Vector3(width_m, 0.05, depth_m), "#96be82")
+        _box(root, "MainPromenade", Vector3(0, 0.07, 0), Vector3(width_m - 9.0, 0.10, 8), "#d9d5c7")
+        _box(root, "NorthSouthPromenade", Vector3(0, 0.079, 0), Vector3(8.0, 0.10, depth_m - 9.0), "#d9d5c7")
         _label(root, str(district["name"]).to_upper(), Vector3(0, 5, 0), str(district["accent"]), 26)
         for info in district.get("landmarks", []):
             var local_offset: Array = info.get("offset", [0, 0])
@@ -180,10 +180,10 @@ func _build_districts() -> void:
             building.position = Vector3(at.x, 0.0, at.z)
             root.add_child(building)
             _box(building, "OriginalMass", Vector3(0.0, height_value * 0.5, 0.0), Vector3(width_value, height_value, depth_value), str(district["accent"]), true)
-            _box(building, "Roof", Vector3(0.0, height_value + 0.22, 0.0), Vector3(width_value + 1.4, 0.45, depth_value + 1.4), "#d4dad6")
-            _box(building, "Entrance", Vector3(0.0, 2.4, depth_value * 0.5 + 0.07), Vector3(minf(width_value * 0.42, 14.0), 4.6, 0.16), "#466678")
+            _box(building, "Roof", Vector3(0.0, height_value + 0.22, 0.0), Vector3(width_value + 1.4, 0.45, depth_value + 1.4), "#e5e5dc")
+            _box(building, "Entrance", Vector3(0.0, 2.4, depth_value * 0.5 + 0.07), Vector3(minf(width_value * 0.42, 14.0), 4.6, 0.16), "#638b9a")
             for level in range(mini(int(height_value / 4.6), 6)):
-                _box(building, "Windows_%d" % level, Vector3(0.0, 3.9 + float(level) * 3.3, depth_value * 0.5 + 0.11), Vector3(width_value * 0.72, 1.2, 0.14), "#5b818b")
+                _box(building, "Windows_%d" % level, Vector3(0.0, 3.9 + float(level) * 3.3, depth_value * 0.5 + 0.11), Vector3(width_value * 0.72, 1.2, 0.14), "#7ba6b1")
             _label(building, str(info["name"]), Vector3(0.0, height_value + 3.1, 0.0), "#f7f7df", 19)
             _decorate_building(building, info, width_value, depth_value, height_value)
             building_count += 1
@@ -191,14 +191,14 @@ func _build_districts() -> void:
         for i in range(3):
             var x: float = -width_m * 0.35 + float(i) * width_m * 0.35
             var z: float = depth_m * 0.31
-            _box(root, "Planter_%d" % i, Vector3(x, 0.45, z), Vector3(2.0, 0.9, 2.0), "#957f68")
+            _box(root, "Planter_%d" % i, Vector3(x, 0.45, z), Vector3(2.0, 0.9, 2.0), "#ad9075")
             var canopy: MeshInstance3D = MeshInstance3D.new()
             var treetop: SphereMesh = SphereMesh.new()
             treetop.radius = 2.1
             treetop.height = 4.2
             canopy.mesh = treetop
             canopy.position = Vector3(x, 3.0, z)
-            canopy.material_override = _material("#5e966a")
+            canopy.material_override = _material("#65a374")
             root.add_child(canopy)
 
 
@@ -211,9 +211,9 @@ func _build_stations() -> void:
         stand.position = stop["position"]
         stops_root.add_child(stand)
         _box(stand, "Platform", Vector3(0, 0.12, 0), Vector3(12, 0.22, 6), "#d0d0bf")
-        _box(stand, "ShelterRoof", Vector3(0, 3.1, -2), Vector3(10.2, 0.24, 3.0), "#47737b")
+        _box(stand, "ShelterRoof", Vector3(0, 3.1, -2), Vector3(10.2, 0.24, 3.0), "#6d9da1")
         for x_offset in [-4.4, 4.4]:
-            _box(stand, "ShelterPost", Vector3(x_offset, 1.62, -3), Vector3(0.18, 3.12, 0.18), "#283943")
+            _box(stand, "ShelterPost", Vector3(x_offset, 1.62, -3), Vector3(0.18, 3.12, 0.18), "#566c70")
         _box(stand, "RoutePanel", Vector3(5.3, 1.58, 0), Vector3(1.5, 2.5, 0.24), "#f2d387")
         _label(stand, str(stop["name"]), Vector3(0, 4.2, 0), "#e5f8f6", 19)
         var available_lines: PackedStringArray = PackedStringArray()
@@ -230,7 +230,7 @@ func _build_stations() -> void:
     guide.position = Vector3(12.0, 0.0, 9.0)
     stops_root.add_child(guide)
     _box(guide, "GuidePole", Vector3(0, 1.45, 0), Vector3(0.18, 2.9, 0.18), "#304953")
-    _box(guide, "GuideBoard", Vector3(0, 2.95, 0), Vector3(4.7, 0.82, 0.16), "#37666d")
+    _box(guide, "GuideBoard", Vector3(0, 2.95, 0), Vector3(4.7, 0.82, 0.16), "#638d8d")
     _label(guide, "BUS  ↘  TOWN PLAZA", Vector3(0, 3.0, 0.23), "#f9e6b4", 18)
 
 
@@ -256,7 +256,7 @@ func _build_buses() -> void:
         bus.position = points[0] + Vector3(0, 0.4, 0)
         bus_root.add_child(bus)
         _box(bus, "Body", Vector3(0, 1.0, 0), Vector3(2.45, 1.45, 5.4), str(route_colors[route_name]))
-        _box(bus, "WindowBand", Vector3(0, 1.63, 0), Vector3(2.51, 0.56, 4.4), "#365b68")
+        _box(bus, "WindowBand", Vector3(0, 1.63, 0), Vector3(2.51, 0.56, 4.4), "#5c8492")
         _box(bus, "Roof", Vector3(0, 2.02, 0), Vector3(2.5, 0.23, 5.1), "#eff2dd")
         for side in [-1.0, 1.0]:
             for z in [-1.6, 1.6]:
@@ -320,7 +320,7 @@ func _decorate_building(parent: Node3D, info: Dictionary, width_m: float, depth_
     var facade: String = str(info.get("facade", "#d7d1c3"))
     var floor_count: int = maxi(1, int(info.get("floors", 4)))
     var floor_height: float = height_m / float(floor_count)
-    var glass: String = "#59899a" if kind == "glass_tower" else "#72929a"
+    var glass: String = "#7da9b8" if kind == "glass_tower" else "#8fb0b5"
     var frame: String = "#e7e2d6"
     if kind == "residence":
         frame = "#ddcbb0"
@@ -342,7 +342,7 @@ func _decorate_building(parent: Node3D, info: Dictionary, width_m: float, depth_
         for side in [-1.0, 1.0]:
             _box(parent, "SideGlass_%d_%d" % [floor_index, int(side)], Vector3(side * (width_m * 0.5 + 0.09), y, 0), Vector3(0.18, minf(2.2, floor_height * 0.58), depth_m * 0.62), glass)
     if kind == "glass_tower":
-        _box(parent, "CurtainWall", Vector3(0, height_m * 0.52, depth_m * 0.5 + 0.13), Vector3(width_m * 0.86, height_m * 0.80, 0.20), "#5a9cae")
+        _box(parent, "CurtainWall", Vector3(0, height_m * 0.52, depth_m * 0.5 + 0.13), Vector3(width_m * 0.86, height_m * 0.80, 0.20), "#80b8c6")
         for bay in range(1, bays):
             var x: float = -width_m * 0.43 + width_m * 0.86 * float(bay) / float(bays)
             _box(parent, "CurtainMullion_%02d" % bay, Vector3(x, height_m * 0.52, depth_m * 0.5 + 0.27), Vector3(0.12, height_m * 0.82, 0.12), "#d9e4df")
@@ -378,9 +378,9 @@ func _build_sports_ground() -> void:
     root_node.name = "ScienceSportsGround"
     root_node.position = sports["position"]
     add_child(root_node)
-    _box(root_node, "TrackBed", Vector3(0, 0.16, 0), Vector3(142, 0.12, 96), "#a95d51")
-    _box(root_node, "InnerTrack", Vector3(0, 0.24, 0), Vector3(117, 0.10, 75), "#c17a63")
-    _box(root_node, "FootballGrass", Vector3(0, 0.32, 0), Vector3(104, 0.10, 64), "#468c59")
+    _box(root_node, "TrackBed", Vector3(0, 0.16, 0), Vector3(142, 0.12, 96), "#b86e5d")
+    _box(root_node, "InnerTrack", Vector3(0, 0.24, 0), Vector3(117, 0.10, 75), "#cf8b74")
+    _box(root_node, "FootballGrass", Vector3(0, 0.32, 0), Vector3(104, 0.10, 64), "#5aa66a")
     for x in [-51.0, 51.0]:
         _box(root_node, "GoalLine", Vector3(x, 0.40, 0), Vector3(0.25, 0.03, 64), "#f2eee0")
         _box(root_node, "GoalCrossbar", Vector3(x, 2.4, 0), Vector3(0.22, 0.22, 7.4), "#e9eae6")
@@ -452,12 +452,12 @@ func _build_campus_edge() -> void:
             sphere.height = 9.6
             canopy.mesh = sphere
             canopy.position = Vector3(x, trunk_height + 3.5, z)
-            canopy.material_override = _material("#4a7557" if i % 2 == 0 else "#638a5d")
+            canopy.material_override = _material("#578963" if i % 2 == 0 else "#75a36a")
             edge.add_child(canopy)
     for side in [-1.0, 1.0]:
-        _box(edge, "FarRidge", Vector3(center.x + side * (half_x + 35.0), 4.5, center.z), Vector3(65.0, 9.0, shape.size.z + 180.0), "#668467")
+        _box(edge, "FarRidge", Vector3(center.x + side * (half_x + 35.0), 4.5, center.z), Vector3(65.0, 9.0, shape.size.z + 180.0), "#80a47a")
     for side in [-1.0, 1.0]:
-        _box(edge, "FarRidge", Vector3(center.x, 4.5, center.z + side * (half_z + 35.0)), Vector3(shape.size.x + 180.0, 9.0, 65.0), "#668467")
+        _box(edge, "FarRidge", Vector3(center.x, 4.5, center.z + side * (half_z + 35.0)), Vector3(shape.size.x + 180.0, 9.0, 65.0), "#80a47a")
 
 
 func _build_canteen_terrace() -> void:
@@ -472,8 +472,8 @@ func _build_canteen_terrace() -> void:
     terrace.name = "FrontierCanteenTerrace"
     terrace.position = science["position"] + Vector3(43.0, 0.0, -66.0)
     add_child(terrace)
-    _box(terrace, "TerracePaving", Vector3(0, 0.09, 0), Vector3(55, 0.18, 42), "#c6c1ad")
-    _box(terrace, "Awning", Vector3(0, 4.2, 0), Vector3(48, 0.48, 27), "#e0d4bb")
+    _box(terrace, "TerracePaving", Vector3(0, 0.09, 0), Vector3(55, 0.18, 42), "#dbd2bc")
+    _box(terrace, "Awning", Vector3(0, 4.2, 0), Vector3(48, 0.48, 27), "#eadbc0")
     for x in [-21.0, 21.0]:
         for z in [-11.0, 11.0]:
             _box(terrace, "AwningPost", Vector3(x, 2.1, z), Vector3(0.35, 4.2, 0.35), "#c8c2b4")
@@ -496,7 +496,7 @@ func _build_canteen_terrace() -> void:
         terrace.add_child(plant)
     _label(terrace, "FRONTIER CANTEEN", Vector3(0, 5.6, -15.0), "#fff0c8", 23)
     for i in range(3):
-        var npc: Node3D = _make_campus_npc("CanteenStudent_%d" % i, Vector3(-12.0 + float(i) * 12.0, 0.0, 15.0), ["#d58a6d", "#7999b8", "#b7a074"][i])
+        var npc: Node3D = _make_campus_npc("CanteenStudent_%d" % i, Vector3(-12.0 + float(i) * 12.0, 0.0, 15.0), ["#dc9a7b", "#8caac2", "#c3ae86"][i])
         terrace.add_child(npc)
 
 
@@ -533,7 +533,7 @@ func _build_sports_npcs(parent: Node3D) -> void:
     for i in range(4):
         var x: float = -26.0 + float(i) * 17.0
         var z: float = -38.0 if i % 2 == 0 else 38.0
-        var npc: Node3D = _make_campus_npc("SportsStudent_%d" % i, Vector3(x, 0.0, z), ["#d58a6d", "#7999b8", "#b7a074", "#7da88c"][i])
+        var npc: Node3D = _make_campus_npc("SportsStudent_%d" % i, Vector3(x, 0.0, z), ["#dc9a7b", "#8caac2", "#c3ae86", "#7da88c"][i])
         parent.add_child(npc)
     for x in [-57.0, 57.0]:
         _box(parent, "WaterStation", Vector3(x, 1.1, 0.0), Vector3(1.8, 2.2, 1.5), "#77a8aa")
