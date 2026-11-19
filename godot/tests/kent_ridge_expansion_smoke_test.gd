@@ -33,14 +33,20 @@ func _run() -> void:
     if world == null or extension == null or bus == null or player == null or minimap == null or hud == null:
         _fail("Existing world or new travel scene nodes are absent")
         return
-    if extension.districts.size() != 10 or extension.stops.size() != 11:
-        _fail("Expected 10 extended districts and 11 shuttle stop anchors")
+    if extension.districts.size() != 11 or extension.stops.size() != 11:
+        _fail("Expected 11 extended districts and 11 shuttle stop anchors")
         return
     if extension.shelter_count != 11 or extension.building_count < 24:
         _fail("Shelters and low-poly campus building geometry are missing")
         return
     if extension.bus_states.size() != 2:
         _fail("Visual D1/D2 route buses did not initialize")
+        return
+    if extension.get_node_or_null("ScienceSportsGround/FootballGrass") == null or extension.get_node_or_null("ScienceSportsGround/TrackBed") == null:
+        _fail("Science-side sports pitch and running track are missing")
+        return
+    if extension.get_node_or_null("WoodedCampusBoundary") == null:
+        _fail("Natural wooded campus boundary is missing")
         return
     if extension.get_node_or_null("CampusBaseTerrain_Estimated") == null:
         _fail("Large walkable campus terrain is missing")
