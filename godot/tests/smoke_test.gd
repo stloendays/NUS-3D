@@ -560,7 +560,8 @@ func _smoke() -> void:
         push_error("First fictional coursework mission/marker did not initialize")
         quit(1)
         return
-    if coursework.interact_nearby() and player.global_position.distance_to(coursework.objective_position()) > 13.0:
+    player.global_position = coursework.objective_position() + Vector3(65.0, 0.18, 0.0)
+    if coursework.interact_nearby() or coursework.active_stage != 0:
         push_error("Coursework brief could be taken outside the proximity radius")
         quit(1)
         return
