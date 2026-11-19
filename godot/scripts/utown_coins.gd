@@ -30,6 +30,12 @@ var claimed_rewards: Dictionary = {}
 var lucky_pickups: int = 0
 var lunch_passes: int = 0
 var double_tip_passes: int = 0
+var coffee_count: int = 0
+var snack_count: int = 0
+var umbrella_owned: bool = false
+var sprint_boost_seconds: float = 0.0
+var shop_stock: Dictionary = {"coffee": 5, "snack": 8, "umbrella": 1}
+var shop_stock_day: int = -1
 var source_student_wins: int = 0
 var reward_poll_timer: float = 0.0
 var drop_timer: float = 0.0
@@ -212,6 +218,9 @@ func _build_shop() -> void:
     _shop_button(contents, "Lucky Badge - 35 C  |  Double next 5 coin pickups", _purchase_lucky)
     _shop_button(contents, "Lunch Time Pass - 28 C  |  +35 seconds on next delivery", _purchase_lunch)
     _shop_button(contents, "Golden Tip Pass - 60 C  |  x2 next delivery payment", _purchase_tip)
+    _shop_button(contents, "Coffee - 12 C  |  Sprint boost (60s)", func(): purchase("coffee"))
+    _shop_button(contents, "Campus Snack - 8 C  |  Collectible", func(): purchase("snack"))
+    _shop_button(contents, "Rain Umbrella - 45 C  |  Permanent collectible", func(): purchase("umbrella"))
     _shop_button(contents, "Close  [O]", _close_shop)
 
 func _purchase_lucky() -> void:
@@ -236,6 +245,21 @@ func purchase(item_id: String) -> bool:
             if lunch_passes >= 3:
                 _notify("Too many unused lunch passes.", 2.5)
                 return false
+        "coffee":
+            price = 12
+            if coffee_count >= 9 or int(shop_stock["coffee"]) <= 0:
+                _notify("Coffee sold out or your bag is full.", 2.5)
+                return false
+        "snack":
+            price = 8
+            if snack_count >= 20 or int(shop_stock["snack"]) <= 0:
+                _notify("Snacks sold out or your bag is full.", 2.5)
+                return false
+        "umbrella":
+            price = 45
+            if umbrella_owned or int(shop_stock["umbrella"]) <= 0:
+                _notify("You already own the campus umbrella.", 2.5)
+                return false
         "tip":
             price = 60
             if double_tip_passes >= 3:
@@ -254,6 +278,15 @@ func purchase(item_id: String) -> bool:
             lunch_passes += 1
         "tip":
             double_tip_passes += 1
+        "coffee":
+            coffee_count += 1
+            shop_stock["coffee"] = int(shop_stock["coffee"]) - 1
+        "snack":
+            snack_count += 1
+            shop_stock["snack"] = int(shop_stock["snack"]) - 1
+        "umbrella":
+            umbrella_owned = true
+            shop_stock["umbrella"] = 0
     _save_progress()
     _notify("Bought %s for %d C" % [item_id, price], 3.0)
     return true
@@ -464,8 +497,9 @@ func _refresh_display() -> void:
             lines.append("Explore, discover and collect for more coins.")
         wallet_label.text = "\n".join(lines)
     if shop_status != null:
-        shop_status.text = "Wallet: %d C  |  Lucky %d pickups  |  Lunch %d  |  Tips %d" % [
-            balance, lucky_pickups, lunch_passes, double_tip_passes
+        shop_status.text = "Wallet %d C | Coffee %d (%d left) | Snack %d (%d left) | Umbrella %s | [G] drink" % [
+            balance, coffee_count, int(shop_stock["coffee"]), snack_count, int(shop_stock["snack"]),
+            "owned" if umbrella_owned else "45 C"
         ]
 
 func save_progress() -> void:
@@ -480,6 +514,11 @@ func _save_progress() -> void:
     data.set_value("coins", "lunch_passes", lunch_passes)
     data.set_value("coins", "double_tip_passes", double_tip_passes)
     data.set_value("coins", "delivery_count", delivery_count)
+    data.set_value("shop", "coffee_count", coffee_count)
+    data.set_value("shop", "snack_count", snack_count)
+    data.set_value("shop", "umbrella_owned", umbrella_owned)
+    data.set_value("shop", "stock", shop_stock)
+    data.set_value("shop", "stock_day", shop_stock_day)
     var ids := PackedStringArray()
     for claimed in claimed_rewards.keys():
         ids.append(str(claimed))
@@ -495,6 +534,11 @@ func load_progress() -> void:
     lunch_passes = 0
     double_tip_passes = 0
     delivery_count = 0
+    coffee_count = 0
+    snack_count = 0
+    umbrella_owned = false
+    shop_stock = {"coffee": 5, "snack": 8, "umbrella": 1}
+    shop_stock_day = -1
     claimed_rewards.clear()
     var data := ConfigFile.new()
     if data.load(save_path) != OK:
@@ -506,6 +550,14 @@ func load_progress() -> void:
     lunch_passes = clampi(int(data.get_value("coins", "lunch_passes", 0)), 0, 3)
     double_tip_passes = clampi(int(data.get_value("coins", "double_tip_passes", 0)), 0, 3)
     delivery_count = maxi(0, int(data.get_value("coins", "delivery_count", 0)))
+    coffee_count = clampi(int(data.get_value("shop", "coffee_count", 0)), 0, 9)
+    snack_count = clampi(int(data.get_value("shop", "snack_count", 0)), 0, 20)
+    umbrella_owned = bool(data.get_value("shop", "umbrella_owned", false))
+    var stored_stock: Variant = data.get_value("shop", "stock", {})
+    if typeof(stored_stock) == TYPE_DICTIONARY:
+        for item in ["coffee", "snack", "umbrella"]:
+            shop_stock[item] = clampi(int(stored_stock.get(item, shop_stock[item])), 0, 8)
+    shop_stock_day = int(data.get_value("shop", "stock_day", -1))
     var saved_ids: Variant = data.get_value("coins", "claimed_rewards", PackedStringArray())
     if typeof(saved_ids) == TYPE_PACKED_STRING_ARRAY or typeof(saved_ids) == TYPE_ARRAY:
         for raw in saved_ids:
@@ -514,7 +566,18 @@ func load_progress() -> void:
                 claimed_rewards[reward_id] = true
     _refresh_display()
 
+func drink_coffee() -> bool:
+    if coffee_count <= 0 or sprint_boost_seconds > 0.0:
+        _notify("No coffee available, or caffeine is still active.", 2.5)
+        return false
+    coffee_count -= 1
+    sprint_boost_seconds = 60.0
+    _save_progress()
+    _notify("CAFFEINE MODE: faster sprint for 60 seconds!", 3.0)
+    return true
+
 func _process(delta: float) -> void:
+    sprint_boost_seconds = maxf(0.0, sprint_boost_seconds - delta)
     notice_time = maxf(0.0, notice_time - delta)
     delivery_cooldown = maxf(0.0, delivery_cooldown - delta)
     if delivery_active:
@@ -565,6 +628,9 @@ func _unhandled_input(event: InputEvent) -> void:
             KEY_N:
                 if not shop_open:
                     delivery_interact()
+            KEY_G:
+                if not shop_open and not player.movement_locked:
+                    drink_coffee()
             KEY_O:
                 toggle_shop()
                 get_viewport().set_input_as_handled()
