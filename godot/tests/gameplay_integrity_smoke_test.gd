@@ -180,7 +180,30 @@ func _run() -> void:
         _fail("session reset unexpectedly expanded or destroyed pooled geometry")
         return
     shell._logout()
-    print("PASS: faculty input lock, exclusive coin shop, safe click/respawn, logout session cleanup, per-account wallet and NPC progress, no duplicate rewards.")
+
+    # A failed disk write must not spend money, lose a booster or mark a
+    # one-time reward claimed. The missing subdirectory is never created.
+    coins.save_path = "user://m14-absent-directory-%d/no-wallet.cfg" % Time.get_ticks_usec()
+    coins.load_progress()
+    coins.balance = 100
+    if coins.credit(12, "cannot persist") or coins.balance != 100:
+        _fail("unwritable wallet path accepted a credit or changed balance")
+        return
+    if coins.reward_once("m14:unwritten", 10, "cannot persist") or coins.claimed_rewards.has("m14:unwritten"):
+        _fail("failed quest reward write consumed the once-only reward")
+        return
+    if coins.purchase("lunch") or coins.balance != 100 or coins.lunch_passes != 0:
+        _fail("unsaved shop purchase spent coins or granted a pass")
+        return
+    coins.lucky_pickups = 2
+    player.global_position = Vector3(500.0, 0.18, 500.0)
+    if not coins._drop_at(player.global_position + Vector3(1.0, 0.0, 0.0), 2):
+        _fail("cannot prepare unsaved Lucky Badge pickup")
+        return
+    if coins.pickup_nearby() or coins.balance != 100 or coins.lucky_pickups != 2:
+        _fail("failed pickup save consumed a Lucky Badge or increased coins")
+        return
+    print("PASS: faculty lock, exclusive shop, account cleanup, private wallet/NPC progression, one-time rewards, failed-save rollback.")
     paused = false
     shell.queue_free()
     quit(0)
