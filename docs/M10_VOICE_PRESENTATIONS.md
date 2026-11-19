@@ -28,7 +28,7 @@
 | --- | --- |
 | `godot/data/presentation_briefs.json` | 32 original English briefs / 96 speaking slide prompts / 32 Q&As |
 | `godot/scripts/utown_voice_presentation.gd` | UI, microphone start/stop, bounded RMS sampling, grading, attempts and save |
-| `godot/scenes/main.tscn` | A new `VoicePresentation` CanvasLayer under resource ID 19 |
+| `godot/scenes/main.tscn` | A new `VoicePresentation` CanvasLayer under resource ID 30 in the integrated main game |
 | `godot/scripts/utown_coursework_ui.gd` | A new presentation button in the original Coursework Journal |
 | `godot/scripts/utown_english_exams.gd` and `godot/scripts/utown_leisure_ui.gd` | Small guards against conflicting modal hotkeys |
 | `godot/project.godot` | Allows microphone input; never starts capture on its own |
@@ -50,4 +50,4 @@ godot --headless --path godot --script res://tests/voice_presentation_smoke_test
 
 ## Parallel branch safety
 
-M10 is stacked on **M9 English Major Exams (PR #23)**. Only its own new modules, main-scene registration, the shared UI guards and project input setting are touched; the older projects / NPC / monetary systems remain unchanged. Do not merge this PR directly to main before base PR #23 and its CI have been reviewed.
+This forward-port is based on the integrated main gameplay after #48, rather than the obsolete PR #23 branch. Only its own new modules, main-scene registration, shared UI guards and microphone input capability are touched; existing NPC, admin, economy and progression state remains untouched. CI must pass on this exact branch before integration; validate actual microphone permission and capture on Windows separately.
