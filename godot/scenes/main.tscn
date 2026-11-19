@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://scripts/utown_intro.gd" id="15"]
 [ext_resource type="Script" path="res://scripts/utown_leisure.gd" id="16"]
 [ext_resource type="Script" path="res://scripts/utown_leisure_ui.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/utown_leisure_audio.gd" id="18"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -85,6 +86,9 @@ script = ExtResource("16")
 
 [node name="LeisureUI" type="CanvasLayer" parent="."]
 script = ExtResource("17")
+
+[node name="Sound" type="Node" parent="LeisureUI"]
+script = ExtResource("18")
 
 [node name="Info" type="PanelContainer" parent="HUD"]
 offset_left = 18.0
@@ -212,4 +216,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD move  B bike  X bus  I indoors  L floor  F activity  Q talk  O faculty  J coursework  K submit  P leisure  Y weather  C notes  V sprint  M map  F7 photo  F1 help"
+text = "WASD move  B bike  X bus  I indoors  L floor  F activity  Q talk  O faculty  J coursework  K submit  P nearby table  Y weather  C notes  V sprint  M map  F7 photo  F1 help"
