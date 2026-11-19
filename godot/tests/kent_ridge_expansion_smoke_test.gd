@@ -55,6 +55,14 @@ func _run() -> void:
     if laundry_root == null or laundry_root.get_node_or_null("WasherDoor_0") == null:
         _fail("Residence washer model detail is missing")
         return
+    for line_id in ["D1", "D2"]:
+        var bus_model: Node3D = extension.get_node_or_null("CampusBuses_Cosmetic/MovingBus_" + line_id) as Node3D
+        if bus_model == null or bus_model.get_node_or_null("Windshield") == null or bus_model.get_node_or_null("Wheel_1_-16") == null:
+            _fail("Refined shuttle model missing windshield or rounded wheels: " + line_id)
+            return
+    if extension._box_meshes.is_empty():
+        _fail("Shared box mesh cache was not populated")
+        return
     if extension.get_node_or_null("ScienceSportsGround/FootballGrass") == null or extension.get_node_or_null("ScienceSportsGround/TrackBed") == null:
         _fail("Science-side sports pitch and running track are missing")
         return
