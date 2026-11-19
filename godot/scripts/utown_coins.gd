@@ -251,6 +251,10 @@ func purchase(item_id: String) -> bool:
     if balance < price:
         _notify("Need %d coins. Explore or deliver lunch first!" % price, 3.0)
         return false
+    var previous_balance: int = balance
+    var previous_lucky: int = lucky_pickups
+    var previous_lunch: int = lunch_passes
+    var previous_tips: int = double_tip_passes
     balance -= price
     match item_id:
         "lucky":
@@ -259,7 +263,13 @@ func purchase(item_id: String) -> bool:
             lunch_passes += 1
         "tip":
             double_tip_passes += 1
-    _save_progress()
+    if not _save_progress():
+        balance = previous_balance
+        lucky_pickups = previous_lucky
+        lunch_passes = previous_lunch
+        double_tip_passes = previous_tips
+        _notify("Purchase was not saved. No coins were spent.", 3.0)
+        return false
     _notify("Bought %s for %d C" % [item_id, price], 3.0)
     return true
 
@@ -338,11 +348,12 @@ func pickup_nearby() -> bool:
     var doubled: bool = lucky_pickups > 0
     if doubled:
         amount *= 2
-    if not credit(amount, "Found a dropped coin"):
-        return false
-    if doubled:
         lucky_pickups -= 1
-        _save_progress()
+    # One write commits both the coin amount and consumed Lucky Badge charge.
+    if not credit(amount, "Found a dropped coin"):
+        if doubled:
+            lucky_pickups += 1
+        return false
     state["active"] = false
     var root: Node3D = state["node"]
     root.visible = false
@@ -352,9 +363,14 @@ func credit(amount: int, reason: String) -> bool:
     var gain: int = mini(maxi(amount, 0), MAX_BALANCE - balance)
     if gain <= 0:
         return false
+    var previous_balance: int = balance
+    var previous_lifetime: int = lifetime_earned
     balance += gain
     lifetime_earned = mini(MAX_BALANCE * 100, lifetime_earned + gain)
-    _save_progress()
+    if not _save_progress():
+        balance = previous_balance
+        lifetime_earned = previous_lifetime
+        return false
     _notify("+%d C  |  %s" % [gain, reason], 3.0)
     return true
 
@@ -402,6 +418,9 @@ func delivery_interact() -> bool:
             _notify("Lunch is getting cold! Reach Town Green and press N.", 3.0)
             return false
         var base_reward: int = 38 + (15 if delivery_time >= 50.0 else 0)
+        var previously_tipped: int = double_tip_passes
+        var previous_time: float = delivery_time
+        var previous_count: int = delivery_count
         if double_tip_passes > 0:
             double_tip_passes -= 1
             base_reward *= 2
@@ -409,8 +428,15 @@ func delivery_interact() -> bool:
         delivery_time = 0.0
         delivery_cooldown = DELIVERY_COOLDOWN_SECONDS
         delivery_count += 1
-        credit(base_reward, "Lunch Express delivered")
-        _save_progress()
+        # Reward, delivery count and consumed tip pass share one save.
+        if not credit(base_reward, "Lunch Express delivered"):
+            delivery_active = true
+            delivery_time = previous_time
+            delivery_cooldown = 0.0
+            delivery_count = previous_count
+            double_tip_passes = previously_tipped
+            _notify("Delivery could not be saved. Please try again.", 3.0)
+            return false
         return true
     if delivery_cooldown > 0.0:
         _notify("Food court is preparing the next order (%ds)." % ceili(delivery_cooldown), 2.3)
@@ -426,7 +452,12 @@ func delivery_interact() -> bool:
     if lunch_passes > 0:
         lunch_passes -= 1
         delivery_time += 35.0
-        _save_progress()
+        if not _save_progress():
+            lunch_passes += 1
+            delivery_active = false
+            delivery_time = 0.0
+            _notify("Order could not be saved. Please try again.", 3.0)
+            return false
     _notify("LUNCH EXPRESS! Deliver to Town Green. Press N at destination.", 4.2)
     return true
 
@@ -522,7 +553,7 @@ func _refresh_display() -> void:
 func save_progress() -> void:
     _save_progress()
 
-func _save_progress() -> void:
+func _save_progress() -> bool:
     var data := ConfigFile.new()
     data.set_value("coins", "schema_version", 1)
     data.set_value("coins", "balance", balance)
@@ -536,8 +567,11 @@ func _save_progress() -> void:
         ids.append(str(claimed))
     ids.sort()
     data.set_value("coins", "claimed_rewards", ids)
-    if data.save(save_path) != OK:
-        push_warning("Could not save independent campus coins file")
+    var status: Error = data.save(save_path)
+    if status != OK:
+        push_warning("Could not save independent campus coins file (error %d)" % status)
+        return false
+    return true
 
 func load_progress() -> void:
     balance = 0
