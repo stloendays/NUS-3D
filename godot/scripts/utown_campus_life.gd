@@ -1,6 +1,7 @@
 extends Node
 class_name UTownCampusLife
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
+const CLASSROOM_PROPS = preload("res://scripts/utown_classroom_props.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -348,6 +349,7 @@ func _build_study_room(room: Node3D) -> void:
         _box(room, "UpperStudyDesk", Vector3(x, 3.95, -6.5), Vector3(2.7, 0.14, 1.0), table)
         _box(room, "UpperStudySeat", Vector3(x, 3.68, -5.7), Vector3(0.7, 0.12, 0.65), seat)
     _box(room, "UpperQuietBooth", Vector3(9.5, 4.0, -6.5), Vector3(1.4, 0.9, 2.6), dark)
+    CLASSROOM_PROPS.decorate(room)
 
 func _build_recreation_room(room: Node3D) -> void:
     var dark := _mat("#4e6269")
