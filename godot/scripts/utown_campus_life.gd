@@ -2,6 +2,7 @@ extends Node
 class_name UTownCampusLife
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
 const CLASSROOM_PROPS = preload("res://scripts/utown_classroom_props.gd")
+const CAMPUS_PROPS = preload("res://scripts/utown_campus_props.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -65,6 +66,7 @@ var message_time: float = 0.0
 
 func _ready() -> void:
     _load_waypoints()
+    CAMPUS_PROPS.decorate(self, entry_positions)
     _build_pedestrians()
     _build_interiors()
     _build_bicycle()
