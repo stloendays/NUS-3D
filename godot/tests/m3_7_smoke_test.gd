@@ -35,8 +35,8 @@ func _smoke() -> void:
             return
         for visual in layer.get_children():
             var sprite: Sprite3D = visual as Sprite3D
-            if sprite == null or sprite.texture == null:
-                _fail("cloud sprite missing authored texture")
+            if sprite == null or sprite.texture == null or sprite.pixel_size < 0.35:
+                _fail("cloud sprite missing texture or is too small to read behind buildings")
                 return
     var thin_layer: Node3D = sky.clouds.get_child(0) as Node3D
     var full_layer: Node3D = sky.clouds.get_child(1) as Node3D
@@ -56,6 +56,18 @@ func _smoke() -> void:
         return
     sky.set_indoor(false)
     sky.set_mode(0)
+    var world: UTownWorld = scene.get_node_or_null("World") as UTownWorld
+    if world == null or world.weather_reactive_grass.size() != 2 or world.weather_reactive_materials.size() != 2:
+        _fail("original weather-linked lawn and path material lists changed")
+        return
+    for grass_material in world.weather_reactive_grass:
+        if grass_material.albedo_texture == null:
+            _fail("untextured grass surface; authored lawn SVG must load")
+            return
+    for paving_material in world.weather_reactive_materials:
+        if paving_material.albedo_texture == null or not paving_material.uv1_triplanar:
+            _fail("paving should use original repeated world-space tiles")
+            return
     if decor.texture_cache.size() != 4 or decor.cluster_count < 6 or decor.cluster_count > decor.MAX_CLUSTERS:
         _fail("four reusable textures or expected bounded props missing")
         return
@@ -75,8 +87,8 @@ func _smoke() -> void:
     if decor.mesh_cache.size() != old_meshes or decor.material_cache.size() != old_materials:
         _fail("cycling weather should not generate new street meshes/materials")
         return
-    if story.stage_points.size() != 4 or not story.enabled:
-        _fail("four approximate campus mission checkpoints missing")
+    if story.stage_points.size() != 4 or not story.enabled or story.countdown_label == null:
+        _fail("four approximate campus checkpoints or enlarged timer display missing")
         return
     story.save_path = "user://ddl-m37-test-%d.cfg" % Time.get_ticks_usec()
     story.load_progress()
@@ -132,6 +144,6 @@ func _smoke() -> void:
     if story.display_layer.visible:
         _fail("F7 clean-photo mode should hide DDL overlay")
         return
-    print("PASS M3.7: 33 authored cloud sprites, 4 shared scenery textures, %d prop scenes, %d paper scraps, 4 DDL acts with timer, no repeated XP" % [decor.cluster_count, decor.scrap_count])
+    print("PASS M3.7: 33 readable fixed clouds, 6 shared surface textures, %d prop scenes, %d paper scraps, 4 DDL acts with timer, no repeated XP" % [decor.cluster_count, decor.scrap_count])
     scene.queue_free()
     quit(0)
