@@ -79,6 +79,12 @@
           "body": "回到 Town Green 起点按 V 启动 Campus Sprint，按指示经过各检查点并返回起点；竞速途中再次按 V 可以取消。个人最佳用时会自动保存。",
           "heading_en": "Campus Sprint / V",
           "body_en": "Return to the Town Green starting point and press V to start Campus Sprint. Visit the checkpoints in order and return to the start. Press V again to cancel. Personal-best time saves automatically."
+        },
+        {
+          "heading": "支线剧情与多结局  /  P",
+          "body": "游戏中按 P 打开剧情任务手册。完成目标后可以选择不同做法：帮助队友、归还实验笔记、赶校车、咖啡续命、DDL 竞速与时间循环。每种选择会影响诚信、人缘和压力。完成至少三条支线，即可开启最后的 DDL 终章。结局有好有坏，还藏着一个秘密结局。通关后可开启新周目，原有经验、地图收集与结局图鉴都不会清空。",
+          "heading_en": "Side quests and endings / P",
+          "body_en": "Press P to open the Story Journal. After meeting each quest's objectives, choose what to do: help your teammates, return lab notes, catch the shuttle, survive on coffee, race a deadline or break a time loop. Your choices affect integrity, kindness and stress. Complete at least three side quests to unlock the final DDL chapter. There are good, bad and secret endings. Start a new story run after the finale; your account XP, world collectibles and ending gallery stay intact."
         }
       ],
       "title_en": "03  Exploration & Quests",
