@@ -10,17 +10,25 @@
       "sections": [
         {
           "heading": "登录与注册",
-          "body": "首次进入，请选择“Create a new local account”注册游戏账号：用户名使用 3–20 位英文字母、数字或下划线；密码为 8–128 位。之后可在登录页使用同一账号继续游玩。"
+          "body": "首次进入，请选择“Create a new local account”注册游戏账号：用户名使用 3–20 位英文字母、数字或下划线；密码为 8–128 位。之后可在登录页使用同一账号继续游玩。",
+          "heading_en": "Sign-in & registration",
+          "body_en": "First-time players should choose Create a new local account. Use 3–20 letters, numbers or underscores for a username, and a password of 8–128 characters. Sign in later with the same details to continue."
         },
         {
           "heading": "独立存档",
-          "body": "每个账号都有自己的探索、收藏、竞速成绩、等级和邮件。顶部账号栏显示等级与经验，点击 Log out 可安全返回登录页面。"
+          "body": "每个账号都有自己的探索、收藏、竞速成绩、等级和邮件。顶部账号栏显示等级与经验，点击 Log out 可安全返回登录页面。",
+          "heading_en": "Separate saves",
+          "body_en": "Each account has its own exploration checkpoints, collectibles, Sprint best, XP, level and mail. The top account bar shows your progress. Choose Log out to return to the sign-in screen."
         },
         {
           "heading": "重要说明",
-          "body": "这是非官方的离线单机游戏，不是新加坡国立大学官方服务，也不能使用 NUS 学生账号登录。游戏账号和邮件保存在本机，不会自动跨设备同步。"
+          "body": "这是非官方的离线单机游戏，不是新加坡国立大学官方服务，也不能使用 NUS 学生账号登录。游戏账号和邮件保存在本机，不会自动跨设备同步。",
+          "heading_en": "Important disclaimer",
+          "body_en": "This unofficial single-player prototype is not a National University of Singapore service or a real NUS login. Profiles and mailbox contents stay on this computer and do not sync automatically."
         }
-      ]
+      ],
+      "title_en": "01  Getting Started",
+      "tag_en": "Accounts & saved games"
     },
     {
       "id": "controls",
@@ -29,17 +37,25 @@
       "sections": [
         {
           "heading": "行走",
-          "body": "W/A/S/D 或方向键移动；移动鼠标环顾四周；按住 Shift 加速跑；Space 跳跃；R 回到起点。"
+          "body": "W/A/S/D 或方向键移动；移动鼠标环顾四周；按住 Shift 加速跑；Space 跳跃；R 回到起点。",
+          "heading_en": "Walking",
+          "body_en": "Use W/A/S/D or the arrow keys to move. Look around with the mouse. Hold Shift to run, press Space to jump, and R to respawn at the start."
         },
         {
           "heading": "释放鼠标",
-          "body": "按 Esc 让鼠标光标重新出现；回到游戏画面内单击左键可重新锁定视角。"
+          "body": "按 Esc 让鼠标光标重新出现；回到游戏画面内单击左键可重新锁定视角。",
+          "heading_en": "Release mouse",
+          "body_en": "Press Esc to make the cursor visible again. Click inside the game window to recapture the camera."
         },
         {
           "heading": "地图与帮助",
-          "body": "按 M 显示或隐藏右上角小地图；按 F1 显示或隐藏游戏内操作提示。"
+          "body": "按 M 显示或隐藏右上角小地图；按 F1 显示或隐藏游戏内操作提示。",
+          "heading_en": "Map & help",
+          "body_en": "Press M to toggle the minimap in the upper right. Press F1 to show or hide in-game control help."
         }
-      ]
+      ],
+      "title_en": "02  Movement & Camera",
+      "tag_en": "First-person basics"
     },
     {
       "id": "missions",
@@ -48,17 +64,25 @@
       "sections": [
         {
           "heading": "校园打卡  /  E",
-          "body": "前往 Town Green、ERC、SRC、Town Plaza 四个探索点。靠近目标（游戏内约 12 米）后按 E 打卡。完成全部四站可重新游玩，但不会重复发放账号经验。"
+          "body": "前往 Town Green、ERC、SRC、Town Plaza 四个探索点。靠近目标（游戏内约 12 米）后按 E 打卡。完成全部四站可重新游玩，但不会重复发放账号经验。",
+          "heading_en": "Four campus stops / E",
+          "body_en": "Explore Town Green, ERC, SRC and Town Plaza. Move within about 12 game metres of the target and press E to check in. You can replay the route, but each achievement grants account XP only once."
         },
         {
           "heading": "探索笔记  /  C",
-          "body": "沿着道路寻找发光的 Field Notes；走近后按 C 收集。共有 8 份，每份只会为该账号发放一次经验。"
+          "body": "沿着道路寻找发光的 Field Notes；走近后按 C 收集。共有 8 份，每份只会为该账号发放一次经验。",
+          "heading_en": "Field Notes / C",
+          "body_en": "Look for glowing Field Notes along the schematic walkways. Approach them and press C to collect. There are 8 notes; each grants XP only on the first pickup for that account."
         },
         {
           "heading": "校园竞速  /  V",
-          "body": "回到 Town Green 起点按 V 启动 Campus Sprint，按指示经过各检查点并返回起点；竞速途中再次按 V 可以取消。个人最佳用时会自动保存。"
+          "body": "回到 Town Green 起点按 V 启动 Campus Sprint，按指示经过各检查点并返回起点；竞速途中再次按 V 可以取消。个人最佳用时会自动保存。",
+          "heading_en": "Campus Sprint / V",
+          "body_en": "Return to the Town Green starting point and press V to start Campus Sprint. Visit the checkpoints in order and return to the start. Press V again to cancel. Personal-best time saves automatically."
         }
-      ]
+      ],
+      "title_en": "03  Exploration & Quests",
+      "tag_en": "Discover, collect & sprint"
     },
     {
       "id": "campus",
@@ -67,17 +91,25 @@
       "sections": [
         {
           "heading": "人物与场景",
-          "body": "靠近校园 NPC 后按 Q 对话；到 ERC 或 SRC 附近按 I 进入室内，室内按 I 离开；按 L 使用室内的楼层切换，按 F 与附近活动设施交互。"
+          "body": "靠近校园 NPC 后按 Q 对话；到 ERC 或 SRC 附近按 I 进入室内，室内按 I 离开；按 L 使用室内的楼层切换，按 F 与附近活动设施交互。",
+          "heading_en": "Characters & interiors",
+          "body_en": "Approach NPCs and press Q to chat. Enter ERC or SRC concept interiors with I near their entrances; press I again to leave. Press L to change floors and F to interact with nearby facilities."
         },
         {
           "heading": "骑行与校车",
-          "body": "按 B 开启或关闭自行车模式；在校车附近按 X 上下车。车辆和室内设施是游戏化概念，并非真实运营信息。"
+          "body": "按 B 开启或关闭自行车模式；在校车附近按 X 上下车。车辆和室内设施是游戏化概念，并非真实运营信息。",
+          "heading_en": "Bicycle & shuttle",
+          "body_en": "Press B to toggle bicycle mode. Press X near the shuttle to board or alight. These vehicles and indoor features are playful conceptual designs, not real transport schedules."
         },
         {
           "heading": "天气和光线",
-          "body": "按 Y 在晴天、多云、阴天、雨天、雷暴天气之间切换；按 T 切换不同时间的光照。天气不连接实时预报。"
+          "body": "按 Y 在晴天、多云、阴天、雨天、雷暴天气之间切换；按 T 切换不同时间的光照。天气不连接实时预报。",
+          "heading_en": "Weather & lighting",
+          "body_en": "Press Y to cycle between Clear, Cloudy, Overcast, Rain and Thunderstorm; press T to switch lighting times. These weather modes are not real-time forecasts."
         }
-      ]
+      ],
+      "title_en": "04  Campus Life",
+      "tag_en": "NPCs, rooms & weather"
     },
     {
       "id": "level_mail",
@@ -86,17 +118,25 @@
       "sections": [
         {
           "heading": "怎样升级",
-          "body": "完成每个不同的探索打卡点获得 60 XP；每份 Field Note 获得 40 XP；首次完成校园竞速获得 120 XP；首次获得金牌额外获得 80 XP。重复完成同一奖励事件不会反复增加经验。"
+          "body": "完成每个不同的探索打卡点获得 60 XP；每份 Field Note 获得 40 XP；首次完成校园竞速获得 120 XP；首次获得金牌额外获得 80 XP。重复完成同一奖励事件不会反复增加经验。",
+          "heading_en": "How levels work",
+          "body_en": "Earn 60 XP for each unique discovery stop, 40 XP per Field Note, 120 XP for finishing Campus Sprint for the first time, and an extra 80 XP for your first gold medal. Replaying an achievement does not grant duplicate XP."
         },
         {
           "heading": "查看等级",
-          "body": "进入游戏后，顶部账户栏会显示 LV（等级）和 XP（当前进度）。升级时会收到一封系统通知。"
+          "body": "进入游戏后，顶部账户栏会显示 LV（等级）和 XP（当前进度）。升级时会收到一封系统通知。",
+          "heading_en": "Viewing your level",
+          "body_en": "After logging in, the account bar at the top shows LV and XP progress. You will receive an automatic local system notice when you level up."
         },
         {
           "heading": "游戏内邮件  /  J",
-          "body": "按 J 或点击顶部 Mail 打开 Campus Post，可查看收件箱、已发送邮件、阅读、删除或撰写消息。仅支持向本机已注册的其他游戏账号发送邮件，不会发送真实网络电子邮件。打开邮箱时游戏自动暂停。"
+          "body": "按 J 或点击顶部 Mail 打开 Campus Post，可查看收件箱、已发送邮件、阅读、删除或撰写消息。仅支持向本机已注册的其他游戏账号发送邮件，不会发送真实网络电子邮件。打开邮箱时游戏自动暂停。",
+          "heading_en": "In-game mail / J",
+          "body_en": "Press J or click Mail to open Campus Post. Browse Inbox and Sent, read/delete messages, or write to another local account registered on this computer. No actual network email is sent. The world pauses while the mailbox is open."
         }
-      ]
+      ],
+      "title_en": "05  Levels & Campus Post",
+      "tag_en": "XP rewards & local mail"
     },
     {
       "id": "extra",
@@ -105,17 +145,27 @@
       "sections": [
         {
           "heading": "画面与截图",
-          "body": "F2 切换建筑细节层；F3 切换参考相机视角；F4 保存游戏截图；F6 切换 OSM 轮廓对比；F7 隐藏或显示 HUD，便于拍照。"
+          "body": "F2 切换建筑细节层；F3 切换参考相机视角；F4 保存游戏截图；F6 切换 OSM 轮廓对比；F7 隐藏或显示 HUD，便于拍照。",
+          "heading_en": "Graphics & photos",
+          "body_en": "F2 toggles architectural detail layers, F3 cycles evidence-reference viewpoints, F4 saves an original screenshot, F6 toggles the OSM reference comparison, and F7 hides or restores the HUD for photos."
         },
         {
           "heading": "建议先做什么",
-          "body": "建议先在 Town Green 熟悉 WASD 和鼠标，按 M 查看地图，按 E 完成第一个打卡点，再探索发光的 Field Notes 和 ERC/SRC 内部。"
+          "body": "建议先在 Town Green 熟悉 WASD 和鼠标，按 M 查看地图，按 E 完成第一个打卡点，再探索发光的 Field Notes 和 ERC/SRC 内部。",
+          "heading_en": "Where to begin",
+          "body_en": "Start at Town Green and practise using WASD and the mouse. Open the map with M, visit the first checkpoint with E, then search for glowing Field Notes and try the ERC/SRC interiors."
         },
         {
           "heading": "非官方说明",
-          "body": "NUS-3D 是独立制作的虚构化校园探索作品。部分路线、室内、NPC、校车及天气为示意或游戏内容，不应作为真实校园导航、交通或安全信息。"
+          "body": "NUS-3D 是独立制作的虚构化校园探索作品。部分路线、室内、NPC、校车及天气为示意或游戏内容，不应作为真实校园导航、交通或安全信息。",
+          "heading_en": "Unofficial campus model",
+          "body_en": "NUS-3D is a fictionalized, independently created exploration game. Some routes, interiors, NPCs, shuttle and weather visuals are illustrative and must not be used for real campus navigation, transportation or safety guidance."
         }
-      ]
+      ],
+      "title_en": "06  Extra Controls & Notes",
+      "tag_en": "Photography, UI & boundaries"
     }
-  ]
+  ],
+  "title_en": "NUS-3D Beginner Guide",
+  "subtitle_en": "Read six short chapters before entering UTown. Unofficial offline game guide."
 }
