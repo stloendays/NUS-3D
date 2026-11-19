@@ -209,7 +209,7 @@ def call_provider(data: dict[str, Any]) -> dict[str, str]:
     if provider == "openai":
         result = _upstream_json(
             "https://api.openai.com/v1/responses",
-            {"model": model, "instructions": system, "input": messages, "max_output_tokens": 450},
+            {"model": model, "instructions": system, "input": messages, "max_output_tokens": 450, "store": False},
             {"Authorization": "Bearer " + key},
         )
         reply = _extract_openai(result)
