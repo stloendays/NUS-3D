@@ -4,7 +4,7 @@ config_version=5
 
 [application]
 config/name="NUS-3D | UTown M2 Study"
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://scenes/game_shell.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 
 [display]
