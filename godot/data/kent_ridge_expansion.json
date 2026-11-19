@@ -35,7 +35,7 @@
             16
           ],
           "kind": "museum",
-          "facade": "#e2d7c4",
+          "facade": "#e6d9c7",
           "floors": 4,
           "roof_style": "flat",
           "canopy": true
@@ -52,7 +52,7 @@
             17
           ],
           "kind": "auditorium",
-          "facade": "#e6d5c2",
+          "facade": "#e4d4bd",
           "floors": 3,
           "roof_style": "parapet",
           "canopy": true
@@ -69,7 +69,7 @@
             13
           ],
           "kind": "studio",
-          "facade": "#ddd4bc",
+          "facade": "#e1d4c2",
           "floors": 3,
           "roof_style": "terrace",
           "canopy": true
@@ -103,7 +103,7 @@
             21
           ],
           "kind": "academic",
-          "facade": "#cbbba8",
+          "facade": "#d9d7c9",
           "floors": 6,
           "roof_style": "flat",
           "canopy": true
@@ -120,7 +120,7 @@
             19
           ],
           "kind": "academic",
-          "facade": "#bcb9ac",
+          "facade": "#cbd6d6",
           "floors": 5,
           "roof_style": "parapet",
           "canopy": true
@@ -137,7 +137,7 @@
             11
           ],
           "kind": "canteen",
-          "facade": "#d9cfb8",
+          "facade": "#e3d1bc",
           "floors": 2,
           "roof_style": "terrace",
           "canopy": true
@@ -171,7 +171,7 @@
             14
           ],
           "kind": "community",
-          "facade": "#e4d5bf",
+          "facade": "#e6e4d9",
           "floors": 4,
           "roof_style": "flat",
           "canopy": true
@@ -188,7 +188,7 @@
             12
           ],
           "kind": "courtyard",
-          "facade": "#d8c9b4",
+          "facade": "#e1d9c9",
           "floors": 2,
           "roof_style": "parapet",
           "canopy": true
@@ -222,7 +222,7 @@
             22
           ],
           "kind": "library",
-          "facade": "#d2c6b0",
+          "facade": "#d5e0df",
           "floors": 6,
           "roof_style": "flat",
           "canopy": true
@@ -239,7 +239,7 @@
             19
           ],
           "kind": "academic",
-          "facade": "#d7c7b4",
+          "facade": "#e1cfb7",
           "floors": 5,
           "roof_style": "parapet",
           "canopy": true
@@ -256,7 +256,7 @@
             6
           ],
           "kind": "courtyard",
-          "facade": "#c4d5c2",
+          "facade": "#e6d9c7",
           "floors": 1,
           "roof_style": "terrace",
           "canopy": true
@@ -290,7 +290,7 @@
             27
           ],
           "kind": "glass_tower",
-          "facade": "#bfcbd1",
+          "facade": "#e4d4bd",
           "floors": 8,
           "roof_style": "flat",
           "canopy": true
@@ -307,7 +307,7 @@
             20
           ],
           "kind": "academic",
-          "facade": "#c5c5be",
+          "facade": "#e1d4c2",
           "floors": 6,
           "roof_style": "parapet",
           "canopy": true
@@ -341,7 +341,7 @@
             21
           ],
           "kind": "academic",
-          "facade": "#d5c7b4",
+          "facade": "#d9d7c9",
           "floors": 6,
           "roof_style": "flat",
           "canopy": true
@@ -358,7 +358,7 @@
             16
           ],
           "kind": "library",
-          "facade": "#d3c2af",
+          "facade": "#cbd6d6",
           "floors": 4,
           "roof_style": "parapet",
           "canopy": true
@@ -392,7 +392,7 @@
             17
           ],
           "kind": "clinic",
-          "facade": "#e1d6c7",
+          "facade": "#e3d1bc",
           "floors": 4,
           "roof_style": "flat",
           "canopy": true
@@ -409,7 +409,7 @@
             15
           ],
           "kind": "administration",
-          "facade": "#d6d5ca",
+          "facade": "#e6e4d9",
           "floors": 4,
           "roof_style": "parapet",
           "canopy": true
@@ -443,7 +443,7 @@
             24
           ],
           "kind": "academic",
-          "facade": "#d7d2c3",
+          "facade": "#e1d9c9",
           "floors": 7,
           "roof_style": "flat",
           "canopy": true
@@ -460,7 +460,7 @@
             12
           ],
           "kind": "canteen",
-          "facade": "#e2d6b7",
+          "facade": "#d5e0df",
           "floors": 2,
           "roof_style": "parapet",
           "canopy": true
@@ -477,7 +477,7 @@
             19
           ],
           "kind": "academic",
-          "facade": "#cfc8ba",
+          "facade": "#e1cfb7",
           "floors": 5,
           "roof_style": "terrace",
           "canopy": true
@@ -511,7 +511,7 @@
             9
           ],
           "kind": "station",
-          "facade": "#d2e0df",
+          "facade": "#e6d9c7",
           "floors": 2,
           "roof_style": "flat",
           "canopy": true
@@ -528,7 +528,7 @@
             26
           ],
           "kind": "glass_tower",
-          "facade": "#d9e2e2",
+          "facade": "#e4d4bd",
           "floors": 9,
           "roof_style": "parapet",
           "canopy": true
@@ -545,7 +545,7 @@
             7
           ],
           "kind": "courtyard",
-          "facade": "#c5d3c9",
+          "facade": "#e1d4c2",
           "floors": 1,
           "roof_style": "terrace",
           "canopy": true
@@ -579,7 +579,7 @@
             25
           ],
           "kind": "residence",
-          "facade": "#d8c5ac",
+          "facade": "#d9d7c9",
           "floors": 8,
           "roof_style": "flat",
           "canopy": true
@@ -596,7 +596,7 @@
             17
           ],
           "kind": "residence",
-          "facade": "#d5c7b4",
+          "facade": "#cbd6d6",
           "floors": 5,
           "roof_style": "parapet",
           "canopy": true
@@ -613,7 +613,7 @@
             14
           ],
           "kind": "residence",
-          "facade": "#e0ccb6",
+          "facade": "#e3d1bc",
           "floors": 5,
           "roof_style": "terrace",
           "canopy": true
