@@ -1,5 +1,7 @@
 extends Node
 class_name UTownCampusLife
+
+signal talked_to(character_name: String)
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -677,6 +679,7 @@ func talk_to_nearest() -> bool:
     var line: String = DialogueBank.next_line("outdoor", speaker, weather.mode)
     message = "%s · %s\n%s" % [speaker, role, line]
     message_time = 7.0
+    talked_to.emit(speaker)
     return true
 
 func enter_interior(id: String) -> bool:
