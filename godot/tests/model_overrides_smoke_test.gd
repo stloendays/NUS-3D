@@ -23,9 +23,17 @@ func _run() -> void:
     if shop.previews.size() != 3:
         _fail("procedural fallback models missing")
         return
-    if overrides.entries.size() != 3:
+    if overrides.entries.size() != 6:
         _fail("manifest entries missing")
         return
+    for target in ["wildlife/chickens", "wildlife/cats", "wildlife/birds"]:
+        var found: bool = false
+        for entry in overrides.entries:
+            if entry.get("target") == target:
+                found = true
+        if not found:
+            _fail("Missing wildlife asset slot: " + target)
+            return
     var rejected_before: int = overrides.rejected_count
     overrides._apply({"target": "shop/coffee", "path": "res://scripts/player_controller.gd", "license": "CC0-1.0"})
     overrides._apply({"target": "shop/coffee", "path": "res://assets/models/coffee.glb", "license": "unknown"})
