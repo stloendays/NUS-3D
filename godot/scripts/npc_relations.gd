@@ -167,7 +167,8 @@ func _process(delta: float) -> void:
         toward.y = 0.0
         if toward.length() > TAG_DISTANCE:
             var step: float = minf(speed * delta, toward.length() - TAG_DISTANCE)
-            npc.global_position += toward.normalized() * step
+            var desired: Vector3 = npc.global_position + toward.normalized() * step
+            npc.global_position = campus.npc_ground_position(npc.global_position, desired, delta)
             npc.look_at(npc.global_position + toward, Vector3.UP)
             var gait: float = sin(now * 12.0)
             (state["left_leg"] as Node3D).rotation.x = gait * 0.8

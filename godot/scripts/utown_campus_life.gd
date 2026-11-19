@@ -19,6 +19,8 @@ var npc_lines: PackedStringArray = PackedStringArray([
 var npc_colors: PackedStringArray = PackedStringArray(["#d77f69", "#6d93bf", "#9b83bd", "#6eaa91", "#d4a65f", "#8a9da7"])
 const TALK_RADIUS: float = 5.5
 const ENTRY_RADIUS: float = 18.0
+const NPC_STEP_HEIGHT: float = 0.6
+const NPC_GROUND_SNAP_SPEED: float = 7.0
 const BOARD_RADIUS: float = 7.0
 const SHUTTLE_SPEED: float = 5.2
 
@@ -92,6 +94,24 @@ func _sample_route(route: Array[Vector3], distance: float) -> Dictionary:
                 return {"position": route[i].lerp(route[i + 1], remaining / length), "direction": segment.normalized()}
             remaining -= length
     return {"position": route[route.size() - 1], "direction": (route[-1] - route[-2]).normalized()}
+
+func npc_ground_position(current: Vector3, desired: Vector3, delta: float) -> Vector3:
+    # Probe from near the NPC feet to avoid snapping onto overhead roofs.
+    # Only static walkable surfaces; reject steep slopes and large height jumps.
+    var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
+    var from: Vector3 = desired + Vector3.UP * (NPC_STEP_HEIGHT + 0.15)
+    var to: Vector3 = desired + Vector3.DOWN * 1.6
+    var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
+    query.collide_with_areas = false
+    var hit: Dictionary = space.intersect_ray(query)
+    if hit.is_empty():
+        return Vector3(desired.x, current.y, desired.z)
+    var normal: Vector3 = hit.get("normal", Vector3.UP)
+    var surface_y: float = float((hit["position"] as Vector3).y)
+    if normal.dot(Vector3.UP) < 0.72 or absf(surface_y - current.y) > NPC_STEP_HEIGHT:
+        return Vector3(desired.x, current.y, desired.z)
+    var blend: float = clampf(delta * NPC_GROUND_SNAP_SPEED, 0.0, 1.0)
+    return Vector3(desired.x, lerpf(current.y, surface_y, blend), desired.z)
 
 func _build_pedestrians() -> void:
     var walkways: Array = world.layout.get("walkways", [])
@@ -594,7 +614,7 @@ func _process(delta: float) -> void:
         var walking: bool = talk_remaining <= 0.0 and idle_remaining <= 0.0
         var gait: float = sin(now * 6.2 + float(state["phase"])) if walking else sin(now * 1.8 + float(state["phase"])) * 0.08
         var bob: float = absf(sin(now * 6.2 + float(state["phase"]))) * 0.035 if walking else sin(now * 1.8 + float(state["phase"])) * 0.012
-        npc.position = sample["position"] + Vector3(0.0, bob, 0.0)
+        npc.position = npc_ground_position(npc.global_position, sample["position"], delta) + Vector3(0.0, bob, 0.0)
         if talk_remaining > 0.0:
             var to_player: Vector3 = player.global_position - npc.global_position
             to_player.y = 0.0
