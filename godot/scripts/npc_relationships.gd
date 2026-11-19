@@ -109,6 +109,22 @@ func conversation(name: String, chinese: bool) -> String:
     return result
 
 
+func invitation(name: String, chinese: bool) -> String:
+    if not PROFILES.has(name) or tier(name) < 2:
+        return ""
+    var zh: Dictionary = {
+        "Maya": "支线邀请：一起去食堂制定反 DDL 作战计划。",
+        "Ethan": "支线邀请：一起去图书馆安静自习。",
+        "Mei": "支线邀请：一起去咖啡厅研究神秘配方。"
+    }
+    var en: Dictionary = {
+        "Maya": "Side activity: plan a deadline survival strategy at the canteen.",
+        "Ethan": "Side activity: study quietly together at the library.",
+        "Mei": "Side activity: investigate a mysterious coffee recipe."
+    }
+    return str((zh if chinese else en).get(name, ""))
+
+
 func contextual_line(name: String, chinese: bool) -> String:
     if not PROFILES.has(name):
         return ""
