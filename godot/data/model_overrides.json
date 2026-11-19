@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "target": "shop/coffee",
+      "path": "res://assets/models/coffee.glb",
+      "license": "CC0-1.0",
+      "scale": 1,
+      "offset_y": 0
+    },
+    {
+      "target": "shop/snack",
+      "path": "res://assets/models/snack.glb",
+      "license": "CC0-1.0",
+      "scale": 1,
+      "offset_y": 0
+    },
+    {
+      "target": "shop/umbrella",
+      "path": "res://assets/models/umbrella.glb",
+      "license": "CC0-1.0",
+      "scale": 1,
+      "offset_y": 0
+    }
+  ]
+}
