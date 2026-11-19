@@ -29,6 +29,7 @@ var _shown_level: int = 0
 var login_error_source: String = ""
 var mail_status_source: String = ""
 var tutorial: NUS3DTutorial
+var campus_hub: NUS3DCampusHub
 var registering: bool = false
 var mail_list: ItemList
 var mail_heading: Label
@@ -74,6 +75,7 @@ func _ready() -> void:
     _build_profile_card()
     _build_mail()
     _build_tutorial()
+    _build_campus_hub()
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
@@ -226,13 +228,42 @@ func _open_tutorial() -> void:
         tutorial.open_guide()
 
 
+func _build_campus_hub() -> void:
+    campus_hub = NUS3DCampusHub.new()
+    campus_hub.name = "CampusAIHub"
+    ui.add_child(campus_hub)
+    campus_hub.close_requested.connect(_close_campus_hub)
+
+
+func _open_campus_hub() -> void:
+    if campus_hub == null or not accounts.is_logged_in() or login_cover.visible or mail_cover.visible:
+        return
+    var course_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if course_ui != null and course_ui.modal_visible:
+        return
+    get_tree().paused = true
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    profile_card.hide()
+    campus_hub.open_hub()
+
+
+func _close_campus_hub() -> void:
+    if campus_hub == null:
+        return
+    campus_hub.close_hub()
+    if accounts.is_logged_in() and not login_cover.visible and not mail_cover.visible:
+        profile_card.show()
+        get_tree().paused = false
+        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
 func _build_profile_card() -> void:
     profile_card = PanelContainer.new()
     profile_card.name = "ProfileStatus"
     profile_card.anchor_left = 0.5
     profile_card.anchor_right = 0.5
-    profile_card.offset_left = -410
-    profile_card.offset_right = 410
+    profile_card.offset_left = -500
+    profile_card.offset_right = 500
     profile_card.offset_top = 10
     profile_card.offset_bottom = 61
     profile_card.add_theme_stylebox_override("panel", _panel_style(Color(0.03, 0.14, 0.20, 0.88)))
@@ -248,6 +279,7 @@ func _build_profile_card() -> void:
     profile_sound_button = _button("Sound ON", _toggle_ui_sound)
     row.add_child(profile_sound_button)
     row.add_child(_button("Mail [J]", _open_mail))
+    row.add_child(_button("Campus AI [F8]", _open_campus_hub))
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
 
@@ -358,6 +390,9 @@ func _show_login() -> void:
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     login_cover.show()
     mail_cover.hide()
+    if campus_hub != null:
+        campus_hub.clear_session()
+        campus_hub.close_hub()
     profile_card.hide()
     _shown_level = 0
     _refresh_sound_buttons()
@@ -458,7 +493,7 @@ func _on_mailbox_changed() -> void:
 
 
 func _open_mail() -> void:
-    if not accounts.is_logged_in():
+    if not accounts.is_logged_in() or (campus_hub != null and campus_hub.visible):
         return
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -649,6 +684,15 @@ func _unhandled_input(event: InputEvent) -> void:
         get_viewport().set_input_as_handled()
         return
     if not accounts.is_logged_in():
+        return
+    if key_event.keycode == KEY_F8:
+        if campus_hub != null and campus_hub.visible:
+            _close_campus_hub()
+        elif not mail_cover.visible:
+            _open_campus_hub()
+        get_viewport().set_input_as_handled()
+        return
+    if campus_hub != null and campus_hub.visible:
         return
     var coursework_modal: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if coursework_modal != null and coursework_modal.modal_visible:
