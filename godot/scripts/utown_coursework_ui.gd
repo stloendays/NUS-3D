@@ -182,7 +182,7 @@ func _build_modal() -> void:
     journal_box.add_child(exam_button)
     var presentation_button := Button.new()
     presentation_button.name = "OpenEnglishPresentations"
-    presentation_button.text = "ENGLISH ORAL PRESENTATION  [F9]"
+    _dual_button(presentation_button, "英语口头报告 [F9]", "ENGLISH ORAL PRESENTATION [F9]")
     presentation_button.custom_minimum_size.y = 43.0
     presentation_button.pressed.connect(_open_oral_presentations)
     journal_box.add_child(presentation_button)
