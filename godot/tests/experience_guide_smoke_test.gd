@@ -59,9 +59,11 @@ func _run() -> void:
         _fail("Right compass direction is not aligned with the player")
         return
     var at_stop: Dictionary = guide._nearest_offer()
-    if str(at_stop.get("key", "")) != "E":
-        _fail("The tour checkpoint is not suggested in discovery range")
+    var expected_action: String = "C" if challenge.nearest_item_index() >= 0 else "E"
+    if str(at_stop.get("key", "")) != expected_action:
+        _fail("The nearest note or tour checkpoint must be suggested in range")
         return
+    var initial_note_count: int = challenge.collected_ids.size()
 
     var balance_before: int = coins.balance
     if not coins._drop_at(player.global_position + Vector3(0.6, 0, 0), 3):
@@ -109,7 +111,7 @@ func _run() -> void:
         return
 
     # Browsing clues must be side-effect-free (no save, no pickup, no quest award).
-    if coins.balance != balance_before or challenge.collected_ids.size() < 0:
+    if coins.balance != balance_before or challenge.collected_ids.size() != initial_note_count:
         _fail("Reading guide hints changed gameplay state")
         return
     print("NUS3D_EXPERIENCE_GUIDE_SMOKE_OK")
