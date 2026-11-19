@@ -500,6 +500,37 @@ func _render() -> void:
     count += 1
     course_ui.set_hud_enabled(false)
     coursework.set_markers_visible(false)
+    # M3.8: record genuine unlocked post-course games, using a temporary profile.
+    var leisure: UTownLeisure = instance.get_node_or_null("Leisure") as UTownLeisure
+    var leisure_ui: UTownLeisureUI = instance.get_node_or_null("LeisureUI") as UTownLeisureUI
+    if leisure == null or leisure_ui == null:
+        push_error("M3.8 leisure scene missing from visual review")
+        quit(1)
+        return
+    coursework.active_quest_index = 3
+    coursework._store_active_state()
+    if not leisure.unlocked() or not leisure_ui.open_lounge():
+        push_error("Cannot present the unlocked post-course club")
+        quit(1)
+        return
+    if not await _capture_frame(output, "M3_8_GOMOKU_UNLOCKED.png"):
+        push_error("Cannot render playable 9x9 Gomoku board")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.switch_tab("cards")
+    if not await _capture_frame(output, "M3_8_CARD_DUEL_UNLOCKED.png"):
+        push_error("Cannot render five-round card game")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.switch_tab("social")
+    if not await _capture_frame(output, "M3_8_AFTER_CLASS_SOCIAL.png"):
+        push_error("Cannot render post-course social and no-alcohol option")
+        quit(1)
+        return
+    count += 1
+    leisure_ui.close_lounge()
     DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
 
     hud.visible = false
@@ -520,6 +551,7 @@ func _render() -> void:
         "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
         "m36_showcase": ["faculty_selection", "coursework_hud", "coursework_journal", "ddl_countdown"],
         "m37_intro": ["arrival", "group_project", "ddl_warning", "faculty_handoff"],
+        "m38_leisure": ["gomoku", "five_round_cards", "social_mocktails"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
