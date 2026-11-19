@@ -80,3 +80,8 @@ The only new save is **user://nus3d_coursework.cfg**. It includes a chosen facul
 NUS Bulletin AY2026/27 public faculties/schools/colleges listing: https://www.nus.edu.sg/nusbulletin/ay202627/programmes/
 
 All course-specific stories and missions in this repository are invented.
+
+
+## M3.8 after-course gameplay
+
+Completing all three chapters for one faculty permanently unlocks the original Post-Course Club, even after changing to another faculty. P opens real Gomoku, a no-wager card duel and fictional NPC celebration scene. Completing all 39 chapters adds an optional cosmetic title. Details and controls are described in M3_8_POSTCOURSE_CLUB.md.
