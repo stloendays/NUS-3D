@@ -14,6 +14,8 @@ var save_path: String = LOCALE_SAVE
 var catalog: Dictionary = {}
 var fragments: Array = []
 var stop_zh: Dictionary = {}
+var world_names: Dictionary = {}
+var item_zh: Dictionary = {}
 
 
 func _ready() -> void:
@@ -42,6 +44,10 @@ func _load_catalog() -> void:
     )
     var stops: Variant = catalog.get("tour_zh", {})
     stop_zh = stops if typeof(stops) == TYPE_DICTIONARY else {}
+    var places: Variant = catalog.get("world_names", {})
+    world_names = places if typeof(places) == TYPE_DICTIONARY else {}
+    var notes: Variant = catalog.get("item_zh", {})
+    item_zh = notes if typeof(notes) == TYPE_DICTIONARY else {}
 
 
 func is_chinese() -> bool:
@@ -83,6 +89,9 @@ func game_text(source: String) -> String:
     if exact != source:
         return exact
     var result: String = source
+    for title in item_zh.keys():
+        result = result.replace(str(title), str(item_zh[title]))
+    result = translate_world_name(result)
     for raw in fragments:
         if typeof(raw) != TYPE_DICTIONARY:
             continue
@@ -120,6 +129,24 @@ func apply_static_ui(node: Node) -> void:
         area.placeholder_text = ui_text(str(area.get_meta("i18n_original_placeholder")))
     for child in node.get_children():
         apply_static_ui(child)
+
+
+func translate_world_name(name: String) -> String:
+    if not is_chinese():
+        return name
+    var localized: String = name
+    for original in world_names.keys():
+        localized = localized.replace(str(original), str(world_names[original]))
+    return localized
+
+
+func refresh_world_labels(world: UTownWorld) -> void:
+    if world == null:
+        return
+    for sign in world.navigation_labels:
+        if not sign.has_meta("i18n_english"):
+            sign.set_meta("i18n_english", sign.text)
+        sign.text = translate_world_name(str(sign.get_meta("i18n_english")))
 
 
 func tour_card(tour: UTownTour) -> String:
