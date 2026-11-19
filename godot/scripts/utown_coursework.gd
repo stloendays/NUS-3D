@@ -249,7 +249,8 @@ func format_ddl() -> String:
         return "尚未开始"
     if current_time_left <= 0.0:
         return "逾期，但还能交！"
-    var minutes: int = int(ceil(current_time_left)) / 60
+    var minutes: int = int(ceil(current_time_left / 60.0)) - (1 if int(ceil(current_time_left)) % 60 == 0 else 1)
+    minutes = maxi(0, minutes)
     var seconds: int = int(ceil(current_time_left)) % 60
     return "%02d:%02d" % [minutes, seconds]
 
