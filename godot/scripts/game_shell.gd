@@ -18,6 +18,10 @@ var login_password: LineEdit
 var login_message: Label
 var login_submit: Button
 var login_toggle: Button
+var login_sound_button: Button
+var profile_sound_button: Button
+var mail_sound_button: Button
+var _shown_level: int = 0
 var registering: bool = false
 var mail_list: ItemList
 var mail_heading: Label
@@ -66,16 +70,7 @@ func _ready() -> void:
 
 
 func _panel_style(background: Color) -> StyleBoxFlat:
-    var style: StyleBoxFlat = StyleBoxFlat.new()
-    style.bg_color = background
-    style.border_color = Color.html("#446878")
-    style.set_border_width_all(1)
-    style.set_corner_radius_all(15)
-    style.content_margin_left = 23.0
-    style.content_margin_right = 23.0
-    style.content_margin_top = 22.0
-    style.content_margin_bottom = 22.0
-    return style
+    return NUS3DUISkin.panel(background, Color("#79d6dd"), 16, 19)
 
 
 func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> Label:
@@ -89,7 +84,9 @@ func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> L
 func _button(title: String, callback: Callable) -> Button:
     var result: Button = Button.new()
     result.text = title
-    result.custom_minimum_size.y = 36.0
+    result.custom_minimum_size.y = 39.0
+    NUS3DUISkin.button(result)
+    result.pressed.connect(func() -> void: UISound.play_ui("press"))
     result.pressed.connect(callback)
     return result
 
@@ -138,16 +135,20 @@ func _build_login() -> void:
     login_name.placeholder_text = "Local username (3-20 characters)"
     login_name.max_length = 20
     box.add_child(login_name)
+    NUS3DUISkin.field(login_name)
     login_password = LineEdit.new()
     login_password.placeholder_text = "Password (at least 8 characters)"
     login_password.secret = true
     login_password.max_length = 128
     login_password.text_submitted.connect(func(_value: String) -> void: _submit_login())
     box.add_child(login_password)
+    NUS3DUISkin.field(login_password)
     login_submit = _button("Sign in and explore", _submit_login)
     box.add_child(login_submit)
     login_toggle = _button("Create a new local account", _toggle_register)
     box.add_child(login_toggle)
+    login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
+    box.add_child(login_sound_button)
     login_message = _label("", 13, Color.html("#efb8ad"))
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
@@ -176,6 +177,8 @@ func _build_profile_card() -> void:
     profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     row.add_child(profile_label)
     row.add_child(_button("Mail [J]", _open_mail))
+    profile_sound_button = _button("Sound ON", _toggle_ui_sound)
+    row.add_child(profile_sound_button)
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
 
@@ -188,6 +191,8 @@ func _build_mail() -> void:
     var title: Label = _label("CAMPUS POST  /  LOCAL MAILBOX", 23, Color.html("#cff5f2"))
     title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     header.add_child(title)
+    mail_sound_button = _button("Sound ON", _toggle_ui_sound)
+    header.add_child(mail_sound_button)
     header.add_child(_button("Close [J]", _close_mail))
     layout.add_child(_label("Only accounts registered on this installation can exchange messages.",
         12, Color.html("#b0c8cc")))
@@ -206,6 +211,10 @@ func _build_mail() -> void:
     mail_list.custom_minimum_size.x = 320
     mail_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
     mail_list.item_selected.connect(_select_mail)
+    mail_list.add_theme_stylebox_override("panel", NUS3DUISkin.panel(Color("#142a35"), Color("#638e9c"), 9, 9))
+    mail_list.add_theme_stylebox_override("selected", NUS3DUISkin.keycap(true))
+    mail_list.add_theme_stylebox_override("selected_focus", NUS3DUISkin.keycap(true))
+    mail_list.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     mail_read_panel.add_child(mail_list)
     var detail: VBoxContainer = VBoxContainer.new()
     detail.custom_minimum_size.x = 545
@@ -218,6 +227,7 @@ func _build_mail() -> void:
     mail_body.editable = false
     mail_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
     mail_body.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+    NUS3DUISkin.field(mail_body)
     detail.add_child(mail_body)
     mail_delete = _button("Delete selected message", _delete_selected)
     detail.add_child(mail_delete)
@@ -230,18 +240,36 @@ func _build_mail() -> void:
     compose_to = LineEdit.new()
     compose_to.placeholder_text = "Recipient username on this computer"
     mail_compose_panel.add_child(compose_to)
+    NUS3DUISkin.field(compose_to)
     compose_subject = LineEdit.new()
     compose_subject.placeholder_text = "Subject"
     compose_subject.max_length = 80
     mail_compose_panel.add_child(compose_subject)
+    NUS3DUISkin.field(compose_subject)
     compose_body = TextEdit.new()
     compose_body.placeholder_text = "Write your message (up to 2,000 characters)"
     compose_body.custom_minimum_size.y = 170
     mail_compose_panel.add_child(compose_body)
+    NUS3DUISkin.field(compose_body)
     mail_compose_panel.add_child(_button("Send local message", _send_mail))
     mail_status = _label("", 13, Color.html("#b8dbdf"))
     layout.add_child(mail_status)
     mail_cover.hide()
+    _refresh_sound_buttons()
+
+
+func _refresh_sound_buttons() -> void:
+    var active: bool = UISound.enabled
+    if login_sound_button != null:
+        login_sound_button.text = "UI sound: ON  [F9]" if active else "UI sound: OFF  [F9]"
+    for button in [profile_sound_button, mail_sound_button]:
+        if button != null:
+            button.text = "Sound ON" if active else "Sound OFF"
+
+
+func _toggle_ui_sound() -> void:
+    UISound.toggle_enabled()
+    _refresh_sound_buttons()
 
 
 func _show_login() -> void:
@@ -250,6 +278,8 @@ func _show_login() -> void:
     login_cover.show()
     mail_cover.hide()
     profile_card.hide()
+    _shown_level = 0
+    _refresh_sound_buttons()
     login_password.clear()
     login_message.text = ""
     login_name.call_deferred("grab_focus")
@@ -269,8 +299,10 @@ func _submit_login() -> void:
     login_password.clear()
     if not error.is_empty():
         login_message.text = error
+        UISound.play_ui("error")
         return
     _enter_game()
+    UISound.play_ui("confirm")
 
 
 func _enter_game() -> void:
@@ -316,6 +348,10 @@ func _refresh_profile() -> void:
     if not accounts.is_logged_in() or profile_label == null:
         return
     var progress: Dictionary = accounts.level_progress()
+    var current_level: int = int(progress["level"])
+    if _shown_level > 0 and current_level > _shown_level:
+        UISound.play_ui("reward")
+    _shown_level = current_level
     profile_label.text = "%s   LV %d   XP %d/%d  |  Mail %d" % [
         accounts.get_username(), int(progress["level"]),
         int(progress["into"]), int(progress["required"]), accounts.unread_count()
@@ -335,6 +371,7 @@ func _open_mail() -> void:
     profile_card.hide()
     mail_status.text = ""
     _show_mailbox("inbox")
+    UISound.play_ui("open")
 
 
 func _close_mail() -> void:
@@ -343,6 +380,7 @@ func _close_mail() -> void:
         profile_card.show()
         get_tree().paused = false
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+        UISound.play_ui("release")
 
 
 func _show_mailbox(mode: String) -> void:
@@ -367,6 +405,7 @@ func _select_mail(index: int) -> void:
     var message: Dictionary = displayed_messages[index]
     selected_message_id = str(message.get("id", ""))
     mail_heading.text = str(message.get("subject", "(no subject)"))
+    UISound.play_ui("release")
     mail_body.text = "FROM  %s\nTO  %s\nDATE  %s\n\n%s" % [
         str(message.get("from", "")), str(message.get("to", "")),
         str(message.get("time", "")), str(message.get("body", ""))]
@@ -395,7 +434,9 @@ func _send_mail() -> void:
     var status: String = accounts.send_mail_to(compose_to.text, compose_subject.text, compose_body.text)
     if not status.is_empty():
         mail_status.text = status
+        UISound.play_ui("error")
         return
+    UISound.play_ui("confirm")
     compose_to.clear()
     compose_subject.clear()
     compose_body.clear()
@@ -430,9 +471,18 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-    if not accounts.is_logged_in() or event is not InputEventKey:
+    if event is not InputEventKey:
         return
-    if event.pressed and not event.echo and event.keycode == KEY_J:
+    var key: InputEventKey = event as InputEventKey
+    if not key.pressed or key.echo:
+        return
+    if key.keycode == KEY_F9 and (login_cover.visible or mail_cover.visible):
+        _toggle_ui_sound()
+        get_viewport().set_input_as_handled()
+        return
+    if not accounts.is_logged_in():
+        return
+    if key.keycode == KEY_J:
         if mail_cover.visible:
             _close_mail()
         else:
