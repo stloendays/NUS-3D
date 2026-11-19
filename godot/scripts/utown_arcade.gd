@@ -462,8 +462,8 @@ func _process(delta: float) -> void:
             state["active"] = false
     if photo_visible != hud.visible:
         photo_visible = hud.visible
-        status_layer.visible = photo_visible
         var horror: UTownHorrorMode = get_node_or_null("../MidnightHorror") as UTownHorrorMode
+        status_layer.visible = photo_visible and (horror == null or not horror.active)
         held_toy.visible = photo_visible and (horror == null or not horror.active)
         for student in students:
             var student_label: Label3D = student["label"]
