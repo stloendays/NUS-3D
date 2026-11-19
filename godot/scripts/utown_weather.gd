@@ -4,7 +4,7 @@ class_name UTownWeather
 
 const MODE_COUNT: int = 5
 var names: PackedStringArray = PackedStringArray(["Clear", "Cloudy", "Overcast", "Rain", "Thunderstorm"])
-var sky_colors: Array[Color] = [Color("#bfd0d9"), Color("#d8c1a5"), Color("#607e9c"), Color("#243951")]
+var sky_colors: Array[Color] = [Color("#AFCBD4"), Color("#d8c1a5"), Color("#607e9c"), Color("#243951")]
 var ambient_colors: Array[Color] = [Color("#e8edf0"), Color("#ffddb3"), Color("#a3b9d0"), Color("#96afce")]
 var sun_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.80, 0.65, 0.32, 0.14])
 var ambient_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.61, 0.61, 0.50, 0.41])
@@ -28,7 +28,7 @@ var puddle_water_material: StandardMaterial3D
 var puddle_ripple_material: StandardMaterial3D
 var wetness: float = 0.0
 var target_wetness: float = 0.0
-var target_sky: Color = Color("#c6d8df")
+var target_sky: Color = Color("#ADC9D3")
 var target_ambient: Color = Color("#e8edf0")
 var target_sun: float = 1.0
 var target_ambient_energy: float = 0.78

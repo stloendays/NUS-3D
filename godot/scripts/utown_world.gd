@@ -117,7 +117,7 @@ func _add_box(parent: Node3D, at: Vector3, size_m: Vector3, material: Material, 
 func _build_sky() -> void:
     var env: Environment = Environment.new()
     env.background_mode = Environment.BG_COLOR
-    env.background_color = Color.html("#c6d8df")
+    env.background_color = Color.html("#ADC9D3")
     env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
     env.ambient_light_color = Color.html("#e8edf0")
     env.ambient_light_energy = 0.78
@@ -137,7 +137,7 @@ func _build_ground() -> void:
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    var terrain_material: StandardMaterial3D = _mat("#ecf7e8")
+    var terrain_material: StandardMaterial3D = _mat("#86A892")
     _repeat_texture(terrain_material, COMIC_LAWN_PATH, 5.5)
     weather_reactive_grass.append(terrain_material)
     _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), terrain_material, true)
@@ -163,7 +163,7 @@ func _build_green() -> void:
     var grass: MeshInstance3D = MeshInstance3D.new()
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
-    var grass_mat: StandardMaterial3D = _mat("#effbea")
+    var grass_mat: StandardMaterial3D = _mat("#7BAA85")
     grass_mat.albedo_texture = load(COMIC_LAWN_PATH) as Texture2D
     weather_reactive_grass.append(grass_mat)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -178,7 +178,7 @@ func _build_plaza() -> void:
     root.position = at
     root.rotation.y = deg_to_rad(float(plaza.get("rotation_deg", 0.0)))
     add_child(root)
-    var plaza_surface: StandardMaterial3D = _mat("#eef3ec")
+    var plaza_surface: StandardMaterial3D = _mat("#DED3BF")
     _repeat_texture(plaza_surface, COMIC_PAVERS_PATH, 3.2)
     weather_reactive_materials.append(plaza_surface)
     _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), plaza_surface)
@@ -190,7 +190,7 @@ func _build_walkways() -> void:
     var root: Node3D = Node3D.new()
     root.name = "ConceptualFootpaths_NotSurveyed"
     add_child(root)
-    var path_material: StandardMaterial3D = _mat("#eff5ed")
+    var path_material: StandardMaterial3D = _mat("#EADBC6")
     _repeat_texture(path_material, COMIC_PAVERS_PATH, 3.0)
     weather_reactive_materials.append(path_material)
     for way in layout.get("walkways", []):
@@ -210,21 +210,21 @@ func _build_walkways() -> void:
 func _building_color(role: String) -> StandardMaterial3D:
     match role:
         "academic":
-            return _mat("#c8d0cb")
+            return _mat("#D4DCD3")
         "civic":
-            return _mat("#aabec2")
+            return _mat("#B7CECA")
         "research":
-            return _mat("#a9aaa0")
+            return _mat("#CACBBB")
         "residence":
-            return _mat("#c4b7a1")
-    return _mat("#c8c8c8")
+            return _mat("#D6C9B5")
+    return _mat("#CECFC4")
 
 func _build_buildings() -> void:
     var root: Node3D = Node3D.new()
     root.name = "BuildingMassing_Estimated"
     add_child(root)
-    var glass: Material = _mat("#688a9c", 0.34)
-    var roof: Material = _mat("#bac6c5", 0.82)
+    var glass: Material = _mat("#5E8794", 0.34)
+    var roof: Material = _mat("#B3C6BF", 0.82)
     var entrance: Material = _mat("#426675", 0.32)
     for record in layout.get("buildings", []):
         var group: Node3D = Node3D.new()
@@ -292,7 +292,7 @@ func set_lighting_mode(index: int) -> bool:
     lighting_mode = index
     match lighting_mode:
         0: # Midday: reproduce the previous fixed lighting.
-            sky_environment.background_color = Color.html("#c6d8df")
+            sky_environment.background_color = Color.html("#ADC9D3")
             sky_environment.ambient_light_color = Color.html("#e8edf0")
             sky_environment.ambient_light_energy = 0.78
             sunlight.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
@@ -419,15 +419,19 @@ func _build_trees() -> void:
     var root: Node3D = Node3D.new()
     root.name = "Vegetation_Procedural"
     add_child(root)
-    var woody: Material = _mat("#6e6455")
-    var canopy: Material = _mat("#457c57")
+    var woody: Material = _mat("#786859")
+    var canopy: StandardMaterial3D = _mat("#FFFFFF")
+    canopy.vertex_color_use_as_albedo = true
     var trunk: CylinderMesh = CylinderMesh.new()
     trunk.top_radius = 0.28
     trunk.bottom_radius = 0.40
     trunk.height = 4.4
+    trunk.radial_segments = 7
     var leaves: SphereMesh = SphereMesh.new()
     leaves.radius = 2.5
     leaves.height = 4.5
+    leaves.radial_segments = 8
+    leaves.rings = 5
     var rng: RandomNumberGenerator = RandomNumberGenerator.new()
     rng.seed = 20261024
     var tree_positions: Array[Vector3] = []
@@ -447,6 +451,7 @@ func _build_trees() -> void:
     trunk_batch.instance_count = tree_positions.size()
     var canopy_batch: MultiMesh = MultiMesh.new()
     canopy_batch.transform_format = MultiMesh.TRANSFORM_3D
+    canopy_batch.use_colors = true
     canopy_batch.mesh = leaves
     canopy_batch.instance_count = tree_positions.size()
     generated_tree_positions = tree_positions.duplicate()
@@ -462,13 +467,22 @@ func _build_trees() -> void:
     canopy_instances.material_override = canopy
     root.add_child(canopy_instances)
 
-    # Populate after the MultiMeshInstance3D nodes are attached to the scene tree.
+    # Variation prevents the same tree silhouette repeating 64 times, with no
+    # new geometry, collision shapes, materials or draw calls.
+    var canopy_palette: PackedStringArray = ["#5B986A", "#6EA679", "#81B287", "#51876B", "#719C65"]
     for i in range(tree_positions.size()):
         var base: Vector3 = tree_positions[i]
-        var trunk_transform: Transform3D = Transform3D(Basis(), base + Vector3(0.0, 2.2, 0.0))
-        var canopy_transform: Transform3D = Transform3D(Basis(), base + Vector3(0.0, 6.2, 0.0))
+        var scale_value: float = rng.randf_range(0.79, 1.27)
+        var trunk_transform: Transform3D = Transform3D(
+            Basis().scaled(Vector3(scale_value, scale_value, scale_value)),
+            base + Vector3(0.0, 2.2 * scale_value, 0.0))
+        var canopy_transform: Transform3D = Transform3D(
+            Basis(Vector3.UP, rng.randf_range(0.0, TAU)).scaled(Vector3(
+                scale_value, rng.randf_range(0.85, 1.18) * scale_value, scale_value)),
+            base + Vector3(0.0, 6.2 * scale_value, 0.0))
         trunk_batch.set_instance_transform(i, trunk_transform)
         canopy_batch.set_instance_transform(i, canopy_transform)
+        canopy_batch.set_instance_color(i, Color.html(canopy_palette[i % canopy_palette.size()]))
 
     generated_tree_count = tree_positions.size()
 
