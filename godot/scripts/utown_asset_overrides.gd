@@ -5,6 +5,7 @@ class_name UTownAssetOverrides
 const CATALOG_PATH := "res://data/model_overrides.json"
 @onready var shop: UTownShopVisuals = $"../ShopVisuals"
 @onready var world: UTownWorld = $"../World"
+@onready var ecology: UTownAmbientEcology = $"../AmbientEcology"
 var loaded_count: int = 0
 var missing_count: int = 0
 var rejected_count: int = 0
@@ -27,7 +28,7 @@ func _ready() -> void:
 func _apply(entry: Dictionary) -> void:
     var asset_path: String = str(entry.get("path", ""))
     var target_id: String = str(entry.get("target", ""))
-    var allowed_targets := ["shop/coffee", "shop/snack", "shop/umbrella"]
+    var allowed_targets := ["shop/coffee", "shop/snack", "shop/umbrella", "wildlife/chickens", "wildlife/cats", "wildlife/birds"]
     if not target_id in allowed_targets or not asset_path.begins_with("res://assets/models/") or (
         not asset_path.ends_with(".glb") and not asset_path.ends_with(".gltf") and not asset_path.ends_with(".tscn")):
         rejected_count += 1
@@ -43,6 +44,9 @@ func _apply(entry: Dictionary) -> void:
         missing_count += 1
         return
     var parts: PackedStringArray = target_id.split("/")
+    if parts[0] == "wildlife":
+        _apply_wildlife(parts[1], packed, entry)
+        return
     var root: Node3D = shop.previews.get(parts[1]) as Node3D
     if root == null:
         missing_count += 1
@@ -63,6 +67,30 @@ func _apply(entry: Dictionary) -> void:
         if child != model and child is GeometryInstance3D:
             (child as GeometryInstance3D).visible = false
     loaded_count += 1
+
+func _apply_wildlife(kind: String, packed: PackedScene, entry: Dictionary) -> void:
+    var collection: Array = ecology.get(kind)
+    if collection.is_empty():
+        missing_count += 1
+        return
+    for state in collection:
+        var root: Node3D = state["node"]
+        var instance: Node = packed.instantiate()
+        if not instance is Node3D:
+            instance.free()
+            rejected_count += 1
+            return
+        var model: Node3D = instance as Node3D
+        model.name = "Imported_CC0_" + kind
+        model.scale = Vector3.ONE * clampf(float(entry.get("scale", 1.0)), 0.01, 8.0)
+        model.position.y = float(entry.get("offset_y", 0.0))
+        _strip_collisions(model)
+        root.add_child(model)
+        # Keep named procedural bones: gameplay animation refers to Head and Wings.
+        for child in root.get_children():
+            if child != model and child is GeometryInstance3D:
+                (child as GeometryInstance3D).visible = false
+        loaded_count += 1
 
 func _strip_collisions(node: Node) -> void:
     for child in node.get_children():
