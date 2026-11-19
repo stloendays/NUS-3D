@@ -5,6 +5,7 @@ class_name NUSKentRidgeWorld
 ## Does not mutate existing UTown layouts, physics, vehicles or missions.
 
 const DATA_PATH: String = "res://data/kent_ridge_expansion.json"
+const TERRAIN_MESH = preload("res://scripts/kent_ridge_terrain_mesh.gd")
 const BUS_SPEED: float = 20.0
 const BUS_DWELL: float = 2.0
 
@@ -46,6 +47,7 @@ func _ready() -> void:
         stops.append(stop)
         _stops_by_id[str(stop["id"])] = stop
     _build_extended_ground()
+    add_child(TERRAIN_MESH.create(districts))
     district_root = Node3D.new()
     district_root.name = "KentRidgeDistricts_Schematic"
     add_child(district_root)
