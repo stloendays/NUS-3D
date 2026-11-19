@@ -107,7 +107,7 @@ func _run() -> void:
         return
 
     director.open_journal()
-    if not director.cover.visible or not paused or not director.listing.item_count == 7:
+    if not director.cover.visible or not paused or director.listing.item_count != 7:
         _fail("P journal needs a paused, independent six-quest list and finale")
         return
     director.close_journal()
