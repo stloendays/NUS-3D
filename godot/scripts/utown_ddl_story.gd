@@ -49,6 +49,7 @@ var display_layer: CanvasLayer
 var display_label: Label
 var countdown_label: Label
 var elapsed_since_refresh: float = 0.0
+var marker_time: float = 0.0
 var panic_notified: bool = false
 var final_warning_notified: bool = false
 var enabled: bool = true
@@ -254,8 +255,16 @@ func _process(delta: float) -> void:
     if not enabled:
         return
     display_layer.visible = hud.visible
+    marker_time += delta
     for i in range(stage_roots.size()):
-        stage_roots[i].visible = hud.visible and not campus_life.interior_active and not completed and stage == i
+        var marker_root: Node3D = stage_roots[i]
+        marker_root.visible = hud.visible and not campus_life.interior_active and not completed and stage == i
+        if marker_root.visible:
+            # Small visual pulse + non-colliding comic prop wobble, 4 marker nodes total.
+            marker_root.scale = Vector3.ONE * (1.0 + 0.045 * sin(marker_time * 2.2))
+            var prop_root: Node3D = marker_root.get_node_or_null("ComicTaskProp_%d" % i) as Node3D
+            if prop_root != null:
+                prop_root.rotation.y = sin(marker_time * 0.9 + float(i)) * 0.13
     if running:
         deadline_left = maxf(0.0, deadline_left - delta)
         if deadline_left < 150.0 and not panic_notified:
@@ -282,11 +291,19 @@ func _refresh() -> void:
     var seconds: int = int(ceil(deadline_left)) % 60
     var timer_label: String = "%02d:%02d" % [minutes, seconds]
     countdown_label.text = "DDL DOOM   %s   |   RETRIES %d" % [timer_label, fail_count]
+    var timer_color: Color = Color.html("#ffe386")
+    if running and deadline_left <= 20.0:
+        timer_color = Color.html("#ff6265") if int(marker_time * 3.2) % 2 == 0 else Color.html("#ffe7aa")
+    elif running and deadline_left <= 60.0:
+        timer_color = Color.html("#ffae73")
+    countdown_label.add_theme_color_override("font_color", timer_color)
     var lines := PackedStringArray()
     if completed:
         lines.append("SUBMITTED! Best: %.1f s | [H] at Green to replay" % best_seconds)
     else:
-        lines.append("ACT %d/4   %s" % [stage + 1, EPISODES[stage]["name"]])
+        var delta_to_target: Vector3 = player.global_position - stage_points[stage]
+        var metres: float = Vector2(delta_to_target.x, delta_to_target.z).length()
+        lines.append("ACT %d/4   %s  |  %.0f m" % [stage + 1, EPISODES[stage]["name"], metres])
         lines.append("%s  |  [H] at marker" % EPISODES[stage]["hint"])
     lines.append(latest_line)
     display_label.text = "\n".join(lines)
