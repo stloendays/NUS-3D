@@ -30,6 +30,8 @@ var login_error_source: String = ""
 var mail_status_source: String = ""
 var tutorial: NUS3DTutorial
 var campus_hub: NUS3DCampusHub
+var admin_authority: NUS3DAdminAuthority
+var admin_console: NUS3DAdminConsole
 var registering: bool = false
 var mail_list: ItemList
 var mail_heading: Label
@@ -76,6 +78,7 @@ func _ready() -> void:
     _build_mail()
     _build_tutorial()
     _build_campus_hub()
+    _build_admin_console()
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
@@ -236,7 +239,7 @@ func _build_campus_hub() -> void:
 
 
 func _open_campus_hub() -> void:
-    if campus_hub == null or not accounts.is_logged_in() or login_cover.visible or mail_cover.visible:
+    if campus_hub == null or not accounts.is_logged_in() or login_cover.visible or mail_cover.visible or (admin_console != null and admin_console.visible):
         return
     var course_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if course_ui != null and course_ui.modal_visible:
@@ -251,6 +254,46 @@ func _close_campus_hub() -> void:
     if campus_hub == null:
         return
     campus_hub.close_hub()
+    if accounts.is_logged_in() and not login_cover.visible and not mail_cover.visible:
+        profile_card.show()
+        get_tree().paused = false
+        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _build_admin_console() -> void:
+    admin_authority = NUS3DAdminAuthority.new()
+    admin_authority.name = "AdminAuthority"
+    admin_authority.accounts = accounts
+    admin_authority.game = game
+    add_child(admin_authority)
+    admin_console = NUS3DAdminConsole.new()
+    admin_console.name = "AdminConsole"
+    ui.add_child(admin_console)
+    admin_console.setup(admin_authority)
+    admin_console.close_requested.connect(_close_admin_console)
+
+
+func _open_admin_console() -> void:
+    if admin_console == null or not accounts.is_logged_in() or login_cover.visible or mail_cover.visible:
+        return
+    if campus_hub != null and campus_hub.visible:
+        return
+    var coursework_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if coursework_ui != null and coursework_ui.modal_visible:
+        return
+    var lobby: Node = get_node_or_null("MultiplayerAndGraphics")
+    if lobby != null and bool(lobby.get("is_open")):
+        return
+    get_tree().paused = true
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    profile_card.hide()
+    admin_console.open_console()
+
+
+func _close_admin_console() -> void:
+    if admin_console == null:
+        return
+    admin_console.close_console()
     if accounts.is_logged_in() and not login_cover.visible and not mail_cover.visible:
         profile_card.show()
         get_tree().paused = false
@@ -280,6 +323,7 @@ func _build_profile_card() -> void:
     row.add_child(profile_sound_button)
     row.add_child(_button("Mail [J]", _open_mail))
     row.add_child(_button("Campus AI [F11]", _open_campus_hub))
+    row.add_child(_button("Admin [F12]", _open_admin_console))
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
 
@@ -393,6 +437,10 @@ func _show_login() -> void:
     if campus_hub != null:
         campus_hub.clear_session()
         campus_hub.close_hub()
+    if admin_console != null:
+        admin_console.close_console()
+    if admin_authority != null:
+        admin_authority.lock()
     profile_card.hide()
     _shown_level = 0
     _refresh_sound_buttons()
@@ -424,6 +472,8 @@ func _submit_login() -> void:
 
 
 func _enter_game() -> void:
+    if admin_authority != null:
+        admin_authority.lock()
     _restore_game_features()
     challenge.sprint_active = false
     challenge.sprint_elapsed = 0
@@ -459,6 +509,10 @@ func _enter_game() -> void:
 func _logout() -> void:
     if not accounts.is_logged_in():
         return
+    if admin_authority != null:
+        admin_authority.lock()
+    if admin_console != null:
+        admin_console.close_console()
     challenge.sprint_active = false
     var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
@@ -493,7 +547,7 @@ func _on_mailbox_changed() -> void:
 
 
 func _open_mail() -> void:
-    if not accounts.is_logged_in() or (campus_hub != null and campus_hub.visible):
+    if not accounts.is_logged_in() or (campus_hub != null and campus_hub.visible) or (admin_console != null and admin_console.visible):
         return
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -684,6 +738,15 @@ func _unhandled_input(event: InputEvent) -> void:
         get_viewport().set_input_as_handled()
         return
     if not accounts.is_logged_in():
+        return
+    if key_event.keycode == KEY_F12:
+        if admin_console != null and admin_console.visible:
+            _close_admin_console()
+        elif not mail_cover.visible:
+            _open_admin_console()
+        get_viewport().set_input_as_handled()
+        return
+    if admin_console != null and admin_console.visible:
         return
     if key_event.keycode == KEY_F11:
         if campus_hub != null and campus_hub.visible:
