@@ -77,17 +77,44 @@ func _test() -> void:
         _fail("Movement lock must prevent footstep playback")
         return
     player.movement_locked = false
-    var settings: Dictionary = ambient.budgets()
-    # Upper bounds are determined by the existing high-detail profile rather
-    # than obsolete MAX_BIRDS/MAX_LEAVES fields removed by ecology refactors.
-    for category in ["birds", "butterflies", "cats", "leaves", "chickens"]:
-        if not settings.has(category):
-            _fail("Missing ecology budget category: " + category)
+    for state in ambient.chickens:
+        var chicken_model: Node3D = state["node"]
+        if chicken_model.get_node_or_null("TailFeather") == null or chicken_model.get_node_or_null("Toe") == null:
+            _fail("Detailed chicken model parts missing")
             return
-    var caps: Dictionary = {"birds": 14, "butterflies": 18, "cats": 3, "leaves": 64, "chickens": 9}
-    for category in caps:
-        if int(settings[category]) < 0 or int(settings[category]) > int(caps[category]):
-            _fail("Ecology performance budgets exceeded for " + str(category))
+    for state in ambient.cats:
+        var cat_model: Node3D = state["node"]
+        if cat_model.get_node_or_null("Muzzle") == null or cat_model.get_node_or_null("Paw") == null:
+            _fail("Detailed cat model parts missing")
+            return
+    for state in ambient.birds:
+        var bird_model: Node3D = state["node"]
+        if bird_model.get_node_or_null("Tail") == null or bird_model.get_node_or_null("LeftWing") == null:
+            _fail("Detailed bird model parts missing")
+            return
+    var chicken: Dictionary = ambient.chickens[0]
+    var chicken_node: Node3D = chicken["node"]
+    player.global_position = chicken_node.global_position + Vector3(1.0, 0, 0)
+    weather.set_mode(0)
+    ambient._tick_chicken(chicken, 0.15, false, false, false)
+    if ambient.chicken_flee_count < 1 or float(chicken["flee_timer"]) <= 0.0:
+        _fail("Approaching a chicken must trigger a bounded escape response")
+        return
+    if ambient.chicken_cluck_count < 1:
+        _fail("Startled chickens must emit an original call")
+        return
+    ambient._tick_chicken(chicken, 0.15, false, true, false)
+    if chicken_node.visible:
+        _fail("Chickens should shelter during heavy rain")
+        return
+    if not ambient._safe_chicken_point(chicken["base"]):
+        _fail("Chicken spawn must remain within safe lawn clearance")
+        return
+    var settings: Dictionary = ambient.budgets()
+    var high_caps: Dictionary = {"birds": 14, "butterflies": 18, "cats": 3, "leaves": 64, "chickens": 9}
+    for category in high_caps:
+        if not settings.has(category) or int(settings[category]) < 0 or int(settings[category]) > int(high_caps[category]):
+            _fail("Performance budget exceeded for " + str(category))
             return
     print("PASS: M11 bounded tropical wildlife, weather/day-night/indoor gating, spatial original sound, no new collision or hotkeys")
     game.queue_free()
