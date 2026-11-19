@@ -444,7 +444,21 @@ func _smoke() -> void:
         push_error("player could not leave the shuttle")
         quit(1)
         return
+    if not campus_life.enter_interior("SRC"):
+        push_error("SRC interior failed during reset-state regression")
+        quit(1)
+        return
     player.call("reset_player")
+    if campus_life.interior_active or weather.indoor:
+        push_error("reset left the room or indoor-weather flag active")
+        quit(1)
+        return
+    campus_life.set_bicycle(true)
+    player.call("reset_player")
+    if campus_life.bicycle_enabled or player.bicycle_mode:
+        push_error("reset did not clean up bicycle mode")
+        quit(1)
+        return
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D
     if trunks == null or canopies == null or trunks.multimesh == null or canopies.multimesh == null:
