@@ -380,7 +380,8 @@ func _refresh_effects() -> void:
         mode >= 3
     ]
     for i in range(clouds.get_child_count()):
-        clouds.get_child(i).visible = layer_visibility[i]
+        var cloud_layer: Node3D = clouds.get_child(i) as Node3D
+        cloud_layer.visible = layer_visibility[i]
     puddle_root.visible = (mode >= 3 or wetness > 0.07) and not indoor
     rain.visible = mode >= 3 and not indoor
     rain.emitting = mode >= 3 and not indoor
