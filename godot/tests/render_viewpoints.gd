@@ -238,6 +238,13 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    hud.visible = true
+    if not await _capture_frame(output, "M3_4_INDOOR_MAP_AND_ACTIVITY_HUD.png"):
+        push_error("Cannot capture room-local activity minimap")
+        quit(1)
+        return
+    count += 1
+    hud.visible = false
     if not campus_life.toggle_interior_floor():
         push_error("Cannot access the ERC mezzanine")
         quit(1)
@@ -278,6 +285,17 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    # Move to the water itself; the distant facade camera cannot show puddle height.
+    var water_at: Vector3 = weather.puddle_nodes[0].global_position
+    player.global_position = water_at + Vector3(2.0, 0.035, 4.4)
+    var aim_point := Vector3(water_at.x, player.global_position.y, water_at.z)
+    player.look_at(aim_point, Vector3.UP)
+    player.head.rotation = Vector3(-0.36, 0.0, 0.0)
+    if not await _capture_frame(output, "M3_4_RAIN_PUDDLE_CLOSEUP.png"):
+        push_error("Cannot capture above-paving puddle visual")
+        quit(1)
+        return
+    count += 1
     weather.set_mode(0)
     for clearing_frame in range(18):
         await process_frame
@@ -301,7 +319,7 @@ func _render() -> void:
         "viewpoints": review.viewpoints,
         "image_count": count,
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
-        "m34_showcase": ["erc_cafe", "erc_atrium", "src_equipment", "wet_walkways", "rain_drying"],
+        "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
