@@ -793,17 +793,17 @@ func _smoke() -> void:
         push_error("Adult social option did not begin temporary no-travel cooldown")
         quit(1)
         return
+    # Leaving the interior is necessary to reach the vehicle-specific guard:
+    # the ordinary campus code rejects vehicle controls indoors first.
+    campus_life.exit_interior()
     if campus_life.set_bicycle(true) or campus_life.board_or_alight():
         push_error("Post-toast bike/bus safety rule was bypassed")
         quit(1)
         return
-    # Verify the rejection message before exiting: exit_interior replaces
-    # the HUD message with its own room-exit notice.
     if not campus_life.message.contains("cooldown"):
         push_error("Alcohol-choice travel guard did not explain its decision")
         quit(1)
         return
-    campus_life.exit_interior()
     leisure._process(leisure.SOCIAL_COOLDOWN + 0.1)
     if not leisure.safe_to_ride() or not campus_life.set_bicycle(true):
         push_error("Post-toast temporary travel restriction failed to clear")
