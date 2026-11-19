@@ -1,5 +1,6 @@
 extends Node
 class_name NUS3DDialogueBank
+var language_service: NUS3DGameLanguage
 ## Bilingual authored comedy for fictional campus NPCs, independent of quest logic.
 ## Repeat suppression and fixed introductions are runtime-only; XP/saves untouched.
 
@@ -11,6 +12,7 @@ var last_english_line: Dictionary = {}
 
 
 func _ready() -> void:
+    language_service = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
     _load()
 
 
@@ -46,18 +48,18 @@ func role_for(scope: String, name: String) -> String:
     var entries: Dictionary = characters.get(scope, {})
     var info: Dictionary = entries.get(name, {})
     var roles: Dictionary = info.get("role", {})
-    return str(roles.get(GameLanguage.locale, roles.get("en", "")))
+    return str(roles.get(language_service.locale, roles.get("en", "")))
 
 
 func _text(row: Dictionary) -> String:
-    return str(row.get(GameLanguage.locale, row.get("en", "")))
+    return str(row.get(language_service.locale, row.get("en", "")))
 
 
 func next_line(scope: String, name: String, weather_mode: int = 0, force_random: bool = false) -> String:
     var entries: Dictionary = characters.get(scope, {})
     var character: Dictionary = entries.get(name, {})
     if character.is_empty():
-        return GameLanguage.localized_text(
+        return language_service.localized_text(
             "这个 NPC 忙着赶 DDL，还没想好要说什么。", "This NPC is still thinking of a line before the deadline.")
 
     var id: String = scope + ":" + name

@@ -7,6 +7,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+    NUS3DServices.ensure_scene_services(self)
     print("NUS3D_UI_STAGE_1_START")
     var sound: NUS3DUISound = root.get_node_or_null("UISound") as NUS3DUISound
     if sound == null or sound._clips.size() != 6:

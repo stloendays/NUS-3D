@@ -1,4 +1,5 @@
 extends Node
+var language_service: NUS3DGameLanguage
 class_name NUS3DGameShell
 ## Application shell: a separate login, profile and mailbox layer around main.tscn.
 ## The original 3D world and its hotkeys remain in their own scene.
@@ -48,6 +49,8 @@ var observed_sprint_time: float = -1.0
 
 
 func _ready() -> void:
+    NUS3DServices.ensure_scene_services(get_tree())
+    language_service = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
     var scene: PackedScene = load("res://scenes/main.tscn") as PackedScene
     if scene == null:
         push_error("NUS-3D main world scene is unavailable.")
@@ -73,8 +76,8 @@ func _ready() -> void:
     _build_tutorial()
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
-    GameLanguage.language_changed.connect(_on_language_changed)
-    _on_language_changed(GameLanguage.locale)
+    language_service.language_changed.connect(_on_language_changed)
+    _on_language_changed(language_service.locale)
     _show_login()
 
 
@@ -324,20 +327,20 @@ func _build_mail() -> void:
 
 
 func _toggle_language() -> void:
-    GameLanguage.set_locale("en" if GameLanguage.is_chinese() else "zh")
+    language_service.set_locale("en" if language_service.is_chinese() else "zh")
 
 
 func _on_language_changed(_language: String) -> void:
-    GameLanguage.apply_static_ui(login_cover)
-    GameLanguage.apply_static_ui(mail_cover)
-    GameLanguage.apply_static_ui(profile_card)
-    GameLanguage.refresh_world_labels(game.get_node("World") as UTownWorld)
+    language_service.apply_static_ui(login_cover)
+    language_service.apply_static_ui(mail_cover)
+    language_service.apply_static_ui(profile_card)
+    language_service.refresh_world_labels(game.get_node("World") as UTownWorld)
     _refresh_auth_text()
-    var button_text: String = "English / 中文" if GameLanguage.is_chinese() else "中文 / English"
+    var button_text: String = "English / 中文" if language_service.is_chinese() else "中文 / English"
     language_login_button.text = button_text
     language_game_button.text = button_text
-    login_message.text = GameLanguage.ui_text(login_error_source)
-    mail_status.text = GameLanguage.ui_text(mail_status_source)
+    login_message.text = language_service.ui_text(login_error_source)
+    mail_status.text = language_service.ui_text(mail_status_source)
     _refresh_profile()
     _refresh_sound_buttons()
     if mail_cover.visible and mailbox_mode != "compose":
@@ -345,9 +348,9 @@ func _on_language_changed(_language: String) -> void:
 
 
 func _refresh_auth_text() -> void:
-    login_title.text = GameLanguage.ui_text("CREATE ACCOUNT" if registering else "SIGN IN")
-    login_submit.text = GameLanguage.ui_text("Register and explore" if registering else "Sign in and explore")
-    login_toggle.text = GameLanguage.ui_text("Already have an account? Sign in" if registering else "Create a new local account")
+    login_title.text = language_service.ui_text("CREATE ACCOUNT" if registering else "SIGN IN")
+    login_submit.text = language_service.ui_text("Register and explore" if registering else "Sign in and explore")
+    login_toggle.text = language_service.ui_text("Already have an account? Sign in" if registering else "Create a new local account")
 
 
 func _show_login() -> void:
@@ -380,7 +383,7 @@ func _submit_login() -> void:
     if not error.is_empty():
         _play_ui_sound("error")
         login_error_source = error
-        login_message.text = GameLanguage.ui_text(error)
+        login_message.text = language_service.ui_text(error)
         return
     _enter_game()
 
@@ -440,7 +443,7 @@ func _refresh_profile() -> void:
     if _shown_level > 0 and current_level > _shown_level:
         _play_ui_sound("reward")
     _shown_level = current_level
-    if GameLanguage.is_chinese():
+    if language_service.is_chinese():
         profile_label.text = "%s   等级 %d   经验 %d/%d  |  未读 %d" % [
             accounts.get_username(), int(progress["level"]),
             int(progress["into"]), int(progress["required"]), accounts.unread_count()]
@@ -487,11 +490,11 @@ func _show_mailbox(mode: String) -> void:
         var address: String = str(message.get("to", "")) if mode == "sent" else str(message.get("from", ""))
         var subject: String = str(message.get("subject", ""))
         if mode == "inbox" and str(message.get("from", "")) == "Campus Office":
-            subject = str(GameLanguage.system_mail(subject, str(message.get("body", ""))).get("subject", subject))
-            address = GameLanguage.ui_text(address)
+            subject = str(language_service.system_mail(subject, str(message.get("body", ""))).get("subject", subject))
+            address = language_service.ui_text(address)
         mail_list.add_item("%s%s  |  %s" % [prefix, address, subject])
-    mail_heading.text = GameLanguage.ui_text("Sent mail" if mode == "sent" else "Inbox")
-    mail_body.text = GameLanguage.localized_text("请从左侧选择一封邮件。", "Select a message on the left.")
+    mail_heading.text = language_service.ui_text("Sent mail" if mode == "sent" else "Inbox")
+    mail_body.text = language_service.localized_text("请从左侧选择一封邮件。", "Select a message on the left.")
     mail_delete.disabled = true
 
 
@@ -504,12 +507,12 @@ func _select_mail(index: int) -> void:
     var body: String = str(message.get("body", ""))
     var from_name: String = str(message.get("from", ""))
     if mailbox_mode == "inbox" and from_name == "Campus Office":
-        var system_text: Dictionary = GameLanguage.system_mail(subject, body)
+        var system_text: Dictionary = language_service.system_mail(subject, body)
         subject = str(system_text.get("subject", subject))
         body = str(system_text.get("body", body))
-        from_name = GameLanguage.ui_text(from_name)
+        from_name = language_service.ui_text(from_name)
     mail_heading.text = subject
-    var fields: String = "发件人 %s\n收件人 %s\n时间 %s" if GameLanguage.is_chinese() else "FROM  %s\nTO  %s\nDATE  %s"
+    var fields: String = "发件人 %s\n收件人 %s\n时间 %s" if language_service.is_chinese() else "FROM  %s\nTO  %s\nDATE  %s"
     mail_body.text = fields % [from_name, str(message.get("to", "")), str(message.get("time", ""))] + "\n\n" + body
     mail_delete.disabled = mailbox_mode != "inbox"
     if mailbox_mode == "inbox":
@@ -537,13 +540,13 @@ func _send_mail() -> void:
     var status: String = accounts.send_mail_to(compose_to.text, compose_subject.text, compose_body.text)
     if not status.is_empty():
         mail_status_source = status
-        mail_status.text = GameLanguage.ui_text(status)
+        mail_status.text = language_service.ui_text(status)
         return
     compose_to.clear()
     compose_subject.clear()
     compose_body.clear()
     mail_status_source = "Message delivered to the recipient's local inbox."
-    mail_status.text = GameLanguage.ui_text(mail_status_source)
+    mail_status.text = language_service.ui_text(mail_status_source)
     _show_mailbox("sent")
 
 

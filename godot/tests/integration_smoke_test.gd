@@ -8,6 +8,9 @@ func _fail(message: String) -> void:
     quit(1)
 
 func _run() -> void:
+    NUS3DServices.ensure_scene_services(self)
+    var language_service: NUS3DGameLanguage = root.get_node("GameLanguage") as NUS3DGameLanguage
+    var dialogue_service: NUS3DDialogueBank = root.get_node("DialogueBank") as NUS3DDialogueBank
     var packed: PackedScene = load("res://scenes/main.tscn") as PackedScene
     if packed == null:
         _fail("Combined game scene failed to load")
@@ -31,10 +34,10 @@ func _run() -> void:
     if coursework.faculty_options.size() != 13 or not hud.has_node("ActionRail"):
         _fail("Faculty data or tactile action rail not integrated")
         return
-    if ui.status_card == null or GameLanguage.catalog.is_empty() or DialogueBank.count() != 14:
+    if ui.status_card == null or language_service.catalog.is_empty() or dialogue_service.count() != 14:
         _fail("Bilingual gameplay components did not initialize")
         return
-    if GameLanguage.is_chinese() and not (hud.get_node("Help") as Label).text.contains("移动"):
+    if language_service.is_chinese() and not (hud.get_node("Help") as Label).text.contains("移动"):
         _fail("Chinese help requires a supported locale")
         return
     var accounts: NUS3DAccountStore = NUS3DAccountStore.new()

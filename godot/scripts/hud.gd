@@ -1,4 +1,5 @@
 extends CanvasLayer
+var language_service: NUS3DGameLanguage
 const UI_FONT_KIT = preload("res://scripts/utown_ui_font.gd")
 ## Beveled campus HUD with tactile key hints and lightweight milestone notifications.
 
@@ -40,6 +41,8 @@ var _seen_activities: int = 0
 var _seen_sprint_time: float = -1.0
 
 func _ready() -> void:
+    NUS3DServices.ensure_scene_services(get_tree())
+    language_service = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
     var font_theme: Theme = UI_FONT_KIT.make_theme()
     for root_control in [$Info, $GISCard, $TourCard, $ChallengeCard, $CampusCard, $Help]:
         root_control.theme = font_theme
@@ -67,22 +70,22 @@ func _ready() -> void:
     _make_toast()
     _load_osm_fit_summary()
     sync_feedback_state()
-    GameLanguage.language_changed.connect(_apply_language)
-    _apply_language(GameLanguage.locale)
+    language_service.language_changed.connect(_apply_language)
+    _apply_language(language_service.locale)
 
 
 func _help_text() -> String:
-    if GameLanguage.is_chinese():
+    if language_service.is_chinese():
         return "WASD 移动  Shift 冲刺  Space 跳跃  B 骑车  X 校车  I 进出室内  L 楼层  Q 对话\n[P] 作业手册  [Shift+P] 学院  [K] 接/交任务  [U] 老师  [LMB] 扔玩具\n[O] 商店  [Z] 金币  [N] 食堂外送  [H] DDL 支线  [J] 邮箱\n[M] 地图  [Y] 天气  [T] 时段  [F7] 拍照  [F9] 声音  [F10] 语言  [F1] 帮助"
     return "WASD move  Shift sprint  Space jump  B bike  X shuttle  I indoors  L floor  Q talk\n[P] coursework  [Shift+P] faculty  [K] task  [U] professor  [LMB] throw toy\n[O] shop  [Z] coins  [N] food delivery  [H] DDL story  [J] mailbox\n[M] map  [Y] weather  [T] time  [F7] photo  [F9] sound  [F10] language  [F1] help"
 
 
 func _apply_language(_locale: String) -> void:
-    GameLanguage.apply_static_ui(title_label)
+    language_service.apply_static_ui(title_label)
     help_label.text = _help_text()
     _load_osm_fit_summary()
-    if GameLanguage.is_chinese():
-        gis_summary.text = GameLanguage.game_text(gis_summary.text)
+    if language_service.is_chinese():
+        gis_summary.text = language_service.game_text(gis_summary.text)
     _process(0.0)
 
 
@@ -253,14 +256,14 @@ func _process(delta: float) -> void:
     challenge_card.visible = not challenge_message.text.is_empty()
     campus_message.text = weather.status_text() + "\n" + campus_life.status_text()
     campus_card.visible = true
-    if GameLanguage.is_chinese():
-        hint_label.text = GameLanguage.hud_hint(world)
-        target_label.text = GameLanguage.hud_target(tour)
-        nearest_label.text = GameLanguage.game_text(nearest_label.text)
-        perf_label.text = GameLanguage.game_text(perf_label.text)
-        tour_message.text = GameLanguage.tour_card(tour)
-        challenge_message.text = GameLanguage.challenge_card(challenge)
-        campus_message.text = GameLanguage.weather_card(weather) + "\n" + GameLanguage.game_text(campus_life.status_text())
+    if language_service.is_chinese():
+        hint_label.text = language_service.hud_hint(world)
+        target_label.text = language_service.hud_target(tour)
+        nearest_label.text = language_service.game_text(nearest_label.text)
+        perf_label.text = language_service.game_text(perf_label.text)
+        tour_message.text = language_service.tour_card(tour)
+        challenge_message.text = language_service.challenge_card(challenge)
+        campus_message.text = language_service.weather_card(weather) + "\n" + language_service.game_text(campus_life.status_text())
     _update_notices(delta)
 
 func _unhandled_input(event: InputEvent) -> void:

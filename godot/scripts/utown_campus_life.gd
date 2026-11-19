@@ -665,8 +665,9 @@ func talk_to_nearest() -> bool:
         return false
     pedestrians[index]["talk_remaining"] = 6.0
     var speaker: String = str(pedestrians[index]["name"])
-    var role: String = DialogueBank.role_for("outdoor", speaker)
-    var line: String = DialogueBank.next_line("outdoor", speaker, weather.mode)
+    var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
+    var role: String = bank.role_for("outdoor", speaker) if bank != null else "Student"
+    var line: String = bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"])
     message = "%s · %s\n%s" % [speaker, role, line]
     message_time = 6.0
     return true
