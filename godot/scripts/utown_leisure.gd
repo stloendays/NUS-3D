@@ -10,15 +10,23 @@ const CARD_ROUNDS: int = 5
 const SOCIAL_COOLDOWN: float = 75.0
 const SUITS: Array[String] = ["S", "H", "D", "C"]
 const SOCIAL_LINES: Array[String] = [
-    "Maya：终于不用追着队友要 Google Docs 编辑权限了。",
+    "Maya：终于不用追着队友要文档编辑权限了。",
     "Ethan：今天阅读的唯一文献，是饮料菜单。",
-    "Aisha：你以为通关了？别忘了下学期还有 DDL。",
+    "Aisha：你以为通关了？别忘了下学期还有截止日期。",
     "Daniel：干杯！不管喝什么，课程总算提交成功了。",
-    "Mei：这一杯献给凌晨 3 点的备份文件。"
+    "Mei：这一杯献给凌晨三点的备份文件。"
+]
+const SOCIAL_LINES_EN: Array[String] = [
+    "Maya: No more chasing teammates for document editing access.",
+    "Ethan: The only reading I did today was the drink menu.",
+    "Aisha: Think you beat the game? Next semester still has deadlines.",
+    "Daniel: Cheers! At least our coursework is finally submitted.",
+    "Mei: A toast to every backup file saved at 3 a.m."
 ]
 
 @onready var coursework: UTownCoursework = $"../Coursework"
 @onready var life: UTownCampusLife = $"../CampusLife"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var save_path: String = SAVE_PATH
 var chess_board: PackedInt32Array = PackedInt32Array()
@@ -38,7 +46,7 @@ var card_over: bool = false
 var card_message: String = ""
 var card_rng := RandomNumberGenerator.new()
 
-var social_message: String = "DDL 已清空。来一杯什么？"
+var social_message: String = ""
 var celebration_counter: int = 0
 var adult_toast_cooldown: float = 0.0  # per-session only; no birth dates saved
 var chess_wins: int = 0
@@ -55,6 +63,22 @@ func _ready() -> void:
     start_cards()
     _load_stats()
     _create_lounge_props()
+    social_message = _t("截止时间危机结束，来杯饮料吧！", "Deadline crisis over. Care for a drink?")
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _on_language_changed(_locale: String) -> void:
+    for node in get_tree().get_nodes_in_group("leisure_localized_signs"):
+        if node is Label3D:
+            (node as Label3D).text = _t(str(node.get_meta("zh_text", "")), str(node.get_meta("en_text", "")))
+    reset_chess()
+    start_cards()
+    social_message = _t("截止时间危机结束，来杯饮料吧！", "Deadline crisis over. Care for a drink?")
 
 func unlocked() -> bool:
     # Completion of all three chapters in ANY faculty is a persistent pass.
@@ -104,7 +128,7 @@ func reset_chess() -> void:
     chess_over = false
     chess_winner = 0
     chess_moves = 0
-    chess_last_message = "五子棋：你执黑先手。把五颗棋子连成一线！"
+    chess_last_message = _t("五子棋：你先下黑棋，五子连线获胜。", "Gomoku: You play black first. Connect five stones to win.")
 
 func stone_at(x: int, y: int) -> int:
     if x < 0 or y < 0 or x >= BOARD_SIZE or y >= BOARD_SIZE:
@@ -194,7 +218,7 @@ func play_chess(x: int, y: int) -> bool:
     elif chess_moves >= BOARD_SIZE * BOARD_SIZE:
         _finish_chess(0)
     else:
-        chess_last_message = "你：黑棋  |  NPC：白棋  |  已走 %d 手" % chess_moves
+        chess_last_message = _t("你执黑棋 | 对手执白棋 | 已走 %d 手", "You: black | NPC: white | %d moves") % chess_moves
     return true
 
 func _finish_chess(winner: int) -> void:
@@ -203,11 +227,11 @@ func _finish_chess(winner: int) -> void:
     chess_games += 1
     if winner == 1:
         chess_wins += 1
-        chess_last_message = "五子棋胜利！NPC：『我本来想走那里的……』"
+        chess_last_message = _t("五子棋获胜！对手：我本来也想下这里……", "Gomoku victory! Rival: I was about to play there...")
     elif winner == 2:
-        chess_last_message = "NPC 赢了这局。队友终于做了点有用的事。"
+        chess_last_message = _t("对手赢了！队友终于做了件有用的事。", "Your rival wins! A teammate finally did something useful.")
     else:
-        chess_last_message = "平局。你们谁也没有躲过下学期的 DDL。"
+        chess_last_message = _t("平局。谁都没逃过下学期的截止时间。", "Draw. Neither of you escaped next semester's deadlines.")
     _save_stats()
 
 func _new_deck() -> Array[Dictionary]:
@@ -236,7 +260,7 @@ func start_cards() -> void:
     card_player_points = 0
     card_npc_points = 0
     card_over = false
-    card_message = "社团牌局：五轮比点数，不下注。选出你最适合的一张牌。"
+    card_message = _t("社团纸牌：五轮比点数，不下注。选择要出的牌。", "Club cards: Five high-card rounds, no wagers. Choose your card.")
 
 func card_label(card: Dictionary) -> String:
     if card.is_empty():
@@ -269,12 +293,12 @@ func play_card(index: int) -> bool:
     var other_rank: int = int(npc_card["rank"])
     if own_rank > other_rank:
         card_player_points += 1
-        card_message = "第%d轮：你出 %s，NPC 出 %s。你赢这一手！" % [card_round, card_label(player_card), card_label(npc_card)]
+        card_message = _t("第 %d 轮：你出 %s，对手出 %s。你得分！", "Round %d: You played %s, NPC played %s. Point for you!") % [card_round, card_label(player_card), card_label(npc_card)]
     elif own_rank < other_rank:
         card_npc_points += 1
-        card_message = "第%d轮：你出 %s，NPC 出 %s。NPC 得分！" % [card_round, card_label(player_card), card_label(npc_card)]
+        card_message = _t("第 %d 轮：你出 %s，对手出 %s。对手得分！", "Round %d: You played %s, NPC played %s. Point for the NPC!") % [card_round, card_label(player_card), card_label(npc_card)]
     else:
-        card_message = "第%d轮：你出 %s，NPC 出 %s。平手！" % [card_round, card_label(player_card), card_label(npc_card)]
+        card_message = _t("第 %d 轮：你出 %s，对手出 %s。平手！", "Round %d: You played %s, NPC played %s. Tie!") % [card_round, card_label(player_card), card_label(npc_card)]
     if card_round >= CARD_ROUNDS or card_hand.is_empty():
         _finish_cards()
     return true
@@ -284,19 +308,20 @@ func _finish_cards() -> void:
     card_games += 1
     if card_player_points > card_npc_points:
         card_wins += 1
-        card_message += "\n你赢下这场牌局！队友：『下局能不能让我洗牌？』"
+        card_message += _t("\n牌局胜利！队友：下次让我洗牌吧？", "\nYou win the match! Teammate: Can I shuffle next time?")
     elif card_player_points < card_npc_points:
-        card_message += "\nNPC 获胜！现在终于有人愿意做组长了。"
+        card_message += _t("\n对手获胜！终于有人愿意当组长了。", "\nNPC wins! Someone finally volunteers to lead the group.")
     else:
-        card_message += "\n本场平局，奖金是零张作业。"
+        card_message += _t("\n本场平局。奖品是不用写作业。", "\nDraw. Your prize is zero extra homework.")
     _save_stats()
 
 func celebrate(kind: String, adult_confirmed: bool = false) -> bool:
     if not unlocked():
-        social_message = "先通关任一学院的 3 个 Coursework 任务。"
+        social_message = _t("先完成任意学院的三章任务。", "Finish three quests in any faculty to unlock the club.")
         return false
     if kind == "adult" and not adult_confirmed:
-        social_message = "含酒精选项仅供已达到所在地合法饮酒年龄的玩家。也可以选择无酒精饮品。"
+        social_message = _t("含酒精选项仅面向达到所在地法定饮酒年龄的玩家，也可选择无酒精饮品。",
+            "The optional alcoholic drink is for players of legal drinking age. Non-alcoholic options are available.")
         return false
     if kind not in ["mocktail", "tea", "adult"]:
         return false
@@ -304,9 +329,11 @@ func celebrate(kind: String, adult_confirmed: bool = false) -> bool:
     social_visits += 1
     if kind == "adult":
         adult_toast_cooldown = SOCIAL_COOLDOWN
-    var drink: String = "无酒精特调" if kind == "mocktail" else "茶饮" if kind == "tea" else "成年人小酌"
-    var line: String = SOCIAL_LINES[(celebration_counter - 1) % SOCIAL_LINES.size()]
-    social_message = "%s：%s\n%s\n不会获得额外 XP，也无需喝酒才能解锁剧情。" % [drink, "Cheers!" if kind == "adult" else "干杯！", line]
+    var drink: String = _t("无酒精特调", "Mocktail") if kind == "mocktail"         else _t("茶饮", "Tea") if kind == "tea" else _t("成年人的小酌", "Adult toast")
+    var index: int = (celebration_counter - 1) % SOCIAL_LINES.size()
+    var line: String = SOCIAL_LINES[index] if language != null and language.is_chinese()         else SOCIAL_LINES_EN[index]
+    social_message = _t("%s：干杯！\n%s\n饮品选择不会增加经验或解锁额外剧情。",
+        "%s: Cheers!\n%s\nYour drink choice does not grant XP or unlock extra stories.") % [drink, line]
     _save_stats()
     return true
 
@@ -339,9 +366,12 @@ func _prop_box(parent: Node3D, name: String, at: Vector3, size: Vector3, tint: M
     mesh.material_override = tint
     parent.add_child(mesh)
 
-func _prop_sign(parent: Node3D, text_value: String, at: Vector3) -> void:
+func _prop_sign(parent: Node3D, zh_text: String, en_text: String, at: Vector3) -> void:
     var label := Label3D.new()
-    label.text = text_value
+    label.text = _t(zh_text, en_text)
+    label.set_meta("zh_text", zh_text)
+    label.set_meta("en_text", en_text)
+    label.add_to_group("leisure_localized_signs")
     label.name = "ClubLabel"
     label.font_size = 22
     label.pixel_size = 0.01
@@ -377,6 +407,6 @@ func _create_lounge_props() -> void:
     for j in range(3):
         _prop_box(lounge_root, "PartyCup", Vector3(-5.5 + float(j) * 0.63, 1.21, 5.4),
             Vector3(0.22, 0.29, 0.22), glass)
-    _prop_sign(lounge_root, "POST-COURSE CLUB  |  [P]", Vector3(0.0, 2.45, -5.7))
-    _prop_sign(lounge_root, "CHEERS / MOCKTAILS", Vector3(-4.8, 2.22, 5.4))
+    _prop_sign(lounge_root, "课后社团 [Tab]", "POST-COURSE CLUB [Tab]", Vector3(0.0, 2.45, -5.7))
+    _prop_sign(lounge_root, "饮品区", "DRINKS", Vector3(-4.8, 2.22, 5.4))
     lounge_root.visible = unlocked()
