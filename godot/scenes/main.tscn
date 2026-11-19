@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/utown_arcade.gd" id="13"]
 [ext_resource type="Script" path="res://scripts/utown_green_dining.gd" id="14"]
 [ext_resource type="Script" path="res://scripts/utown_coins.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/utown_building_accuracy.gd" id="16"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -205,3 +206,6 @@ script = ExtResource("14")
 
 [node name="Coins" type="Node3D" parent="."]
 script = ExtResource("15")
+
+[node name="BuildingAccuracy" type="Node3D" parent="."]
+script = ExtResource("16")
