@@ -1,5 +1,6 @@
 extends CanvasLayer
 class_name UTownCourseworkUI
+const UI_FONT_KIT = preload("res://scripts/utown_ui_font.gd")
 ## Game-only faculty picker, quest journal and compact coursework HUD.
 ## No login or student details: the choice is stored only on this device.
 
@@ -26,6 +27,9 @@ var selection_visible: bool = false
 func _ready() -> void:
     _build_status()
     _build_modal()
+    var font_theme: Theme = UI_FONT_KIT.make_theme()
+    status_card.theme = font_theme
+    shade.theme = font_theme
     if coursework.current_faculty_id.is_empty():
         show_selector()
 
