@@ -38,13 +38,16 @@ func _smoke() -> void:
             if sprite == null or sprite.texture == null:
                 _fail("cloud sprite missing authored texture")
                 return
-    if not sky.set_mode(0) or not sky.clouds.get_child(0).visible or sky.clouds.get_child(2).visible:
+    var thin_layer: Node3D = sky.clouds.get_child(0) as Node3D
+    var full_layer: Node3D = sky.clouds.get_child(1) as Node3D
+    var storm_layer: Node3D = sky.clouds.get_child(2) as Node3D
+    if not sky.set_mode(0) or not thin_layer.visible or storm_layer.visible:
         _fail("clear sky must show thin fixed clouds")
         return
-    if not sky.set_mode(2) or sky.clouds.get_child(0).visible or not sky.clouds.get_child(1).visible:
+    if not sky.set_mode(2) or thin_layer.visible or not full_layer.visible:
         _fail("overcast failed to select illustrated mid-layer")
         return
-    if not sky.set_mode(4) or not sky.clouds.get_child(2).visible:
+    if not sky.set_mode(4) or not storm_layer.visible:
         _fail("thunderstorm failed to show illustrated storm clouds")
         return
     sky.set_indoor(true)
