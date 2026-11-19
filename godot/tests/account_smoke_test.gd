@@ -84,7 +84,7 @@ func _run() -> void:
     if startup_scene == null:
         _fail("Login shell scene cannot load")
         return
-    var shell: Node = startup_scene.instantiate()
+    var shell: NUS3DGameShell = startup_scene.instantiate() as NUS3DGameShell
     var shell_accounts: NUS3DAccountStore = shell.get_node("Accounts") as NUS3DAccountStore
     shell_accounts.storage_root = "user://nus3d-shell-smoke-%d" % Time.get_ticks_usec()
     root.add_child(shell)
