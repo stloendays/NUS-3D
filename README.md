@@ -156,7 +156,7 @@ This original gameplay extension builds on M3.3 without claiming measured NUS in
 - ERC and SRC gain opaque sheltering roofs, warm/cool soffit lighting, ceiling diffusers, planters, room zoning, furniture and signs. ERC includes a cafe corner and reading nook; SRC includes a water refill counter, sports equipment wall and spectator lounge.
 - A continuous sloped collision ramp now supports visible mezzanine stair treads; **L** remains a convenient lift shortcut. The indoor minimap shows an illustrative plan for each floor.
 - Discover three fictional activity stations in each room using **F** at close range. Local progress persists in user://nus3d_campus_activities.cfg (no cloud accounts or telemetry).
-- The conceptual plaza and pedestrian paths share two registered materials with rain-responsive roughness, metallic and darkening. In rain these change smoothly; after rain they dry gradually while puddles temporarily remain visible. Clouds, sun and fog also transition.
+- The conceptual plaza and pedestrian paths share two registered materials with rain-responsive roughness, metallic and darkening; grass darkens separately during rain. Puddles are now visibly above the walkway surface, with a pair per path entry. After rain, materials dry gradually while pools temporarily remain. Clouds, sun and fog also transition.
 - Linux CI captures original in-engine M3.4 indoor and rain-state screenshots, not measurements or performance benchmarks.
 
 See [M3.4 guide and QA limits](docs/M3_4_INTERIOR_WEATHER_POLISH.md). These are separate teleport-accessible game pockets, not reconstructed building floors. Stairs, collision feel and frame rate require a manual 3D GUI playtest.
