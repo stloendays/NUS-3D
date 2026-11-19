@@ -77,6 +77,24 @@ func _test() -> void:
         _fail("Movement lock must prevent footstep playback")
         return
     player.movement_locked = false
+    var chicken: Dictionary = ambient.chickens[0]
+    var chicken_node: Node3D = chicken["node"]
+    player.global_position = chicken_node.global_position + Vector3(1.0, 0, 0)
+    weather.set_mode(0)
+    ambient._tick_chicken(chicken, 0.15, false, false, false)
+    if ambient.chicken_flee_count < 1 or float(chicken["flee_timer"]) <= 0.0:
+        _fail("Approaching a chicken must trigger a bounded escape response")
+        return
+    if ambient.chicken_cluck_count < 1:
+        _fail("Startled chickens must emit an original call")
+        return
+    ambient._tick_chicken(chicken, 0.15, false, true, false)
+    if chicken_node.visible:
+        _fail("Chickens should shelter during heavy rain")
+        return
+    if not ambient._safe_chicken_point(chicken["base"]):
+        _fail("Chicken spawn must remain within safe lawn clearance")
+        return
     var settings: Dictionary = ambient.budgets()
     if int(settings["birds"]) > ambient.MAX_BIRDS or int(settings["leaves"]) > ambient.MAX_LEAVES:
         _fail("Performance budgets exceeded")
