@@ -77,6 +77,16 @@ func _smoke() -> void:
     if decor.scrap_count > decor.SCRAP_CAPACITY or decor.scrap_count <= 0:
         _fail("decorative paper batching is not bounded")
         return
+    if decor.shrub_count < 12 or decor.shrub_count > decor.SHRUB_CAPACITY:
+        _fail("bounded roadside shrub batches were not populated")
+        return
+    if decor.bloom_count <= 0 or decor.bloom_count > decor.BLOOM_CAPACITY:
+        _fail("comic flower accents missing or exceeded the cap")
+        return
+    var foliage: Node3D = decor.get_node_or_null("RoadsideBushesAndFlowerPops_TwoBatches") as Node3D
+    if foliage == null or foliage.get_child_count() != 2:
+        _fail("roadside vegetation must use only two shared draw batches")
+        return
     if decor.find_children("*", "CollisionShape3D", true, false).size() != 0:
         _fail("decorative streetscape should not block existing paths")
         return
@@ -144,6 +154,6 @@ func _smoke() -> void:
     if story.display_layer.visible:
         _fail("F7 clean-photo mode should hide DDL overlay")
         return
-    print("PASS M3.7: 33 readable fixed clouds, 6 shared surface textures, %d prop scenes, %d paper scraps, 4 DDL acts with timer, no repeated XP" % [decor.cluster_count, decor.scrap_count])
+    print("PASS M3.7: 33 readable fixed clouds, 6 textures, %d prop scenes, %d paper scraps, %d shrubs + %d blooms, 4 DDL acts, no duplicate XP" % [decor.cluster_count, decor.scrap_count, decor.shrub_count, decor.bloom_count])
     scene.queue_free()
     quit(0)
