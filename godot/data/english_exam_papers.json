@@ -407,7 +407,7 @@
         },
         {
           "id": "electrical_engineering_q4",
-          "prompt": "In binary, what is decimal 13?",
+          "prompt": "Which binary number represents the decimal value 13?",
           "options": [
             "1101",
             "1010",
@@ -547,7 +547,7 @@
         },
         {
           "id": "computer_science_q4",
-          "prompt": "A database index usually improves:",
+          "prompt": "Which database operation is often accelerated by an appropriate index?",
           "options": [
             "The speed of every write without cost",
             "The amount of free disk space",
@@ -769,7 +769,7 @@
         },
         {
           "id": "finance_q5",
-          "prompt": "What is a company's gross profit?",
+          "prompt": "In corporate financial reporting, how is gross profit calculated?",
           "options": [
             "Revenue minus income tax only",
             "Cash balance plus debt",
@@ -815,7 +815,7 @@
         },
         {
           "id": "accounting_q3",
-          "prompt": "Depreciation normally allocates:",
+          "prompt": "In financial accounting, depreciation normally allocates which cost?",
           "options": [
             "All company debt to shareholders",
             "Revenue to bank accounts",
@@ -943,7 +943,7 @@
         },
         {
           "id": "economics_q2",
-          "prompt": "What is opportunity cost?",
+          "prompt": "In economics, what is meant by the opportunity cost of a decision?",
           "options": [
             "Only the monetary amount paid",
             "A sunk cost that cannot be recovered",
@@ -1013,7 +1013,7 @@
         },
         {
           "id": "psychology_q2",
-          "prompt": "What is confirmation bias?",
+          "prompt": "In cognitive psychology, which description best explains confirmation bias?",
           "options": [
             "Perfectly remembering all events",
             "Favoring information that supports existing beliefs",
@@ -1049,7 +1049,7 @@
         },
         {
           "id": "psychology_q5",
-          "prompt": "What is the placebo effect?",
+          "prompt": "In clinical research, what is meant by the placebo effect?",
           "options": [
             "The absence of any response",
             "A treatment's chemical dosage",
@@ -1083,7 +1083,7 @@
         },
         {
           "id": "sociology_q2",
-          "prompt": "What is social stratification?",
+          "prompt": "In sociology, what is meant by the concept of social stratification?",
           "options": [
             "Structured inequality among groups in society",
             "The study of earthquakes",
@@ -1177,7 +1177,7 @@
         },
         {
           "id": "environmental_studies_q4",
-          "prompt": "What does biodiversity include?",
+          "prompt": "Which forms of biological variation are included in biodiversity?",
           "options": [
             "Only the number of buildings",
             "Variation at genetic, species and ecosystem levels",
@@ -1585,7 +1585,7 @@
         },
         {
           "id": "restorative_dentistry_q3",
-          "prompt": "What does dental caries involve?",
+          "prompt": "In oral health, which mechanism best describes dental caries?",
           "options": [
             "Acid-mediated loss of mineral from tooth tissue associated with biofilms",
             "A fracture caused only by chewing",
@@ -1679,7 +1679,7 @@
         },
         {
           "id": "oral_biology_q5",
-          "prompt": "What is gingivitis?",
+          "prompt": "In dentistry, what condition is described by the term gingivitis?",
           "options": [
             "A fracture of the jawbone",
             "Inflammation of the gingiva",
@@ -1795,7 +1795,7 @@
         },
         {
           "id": "composition_q3",
-          "prompt": "What is orchestration?",
+          "prompt": "In musical composition, what does the term orchestration describe?",
           "options": [
             "Writing concert reviews",
             "Assigning musical material to instruments and their combinations",
@@ -1981,7 +1981,7 @@
       "questions": [
         {
           "id": "epidemiology_q1",
-          "prompt": "What does incidence measure?",
+          "prompt": "In epidemiology, what quantity is measured by incidence?",
           "options": [
             "New cases occurring in a population over a defined period",
             "All existing cases at a point in time",
@@ -1993,7 +1993,7 @@
         },
         {
           "id": "epidemiology_q2",
-          "prompt": "What does prevalence describe?",
+          "prompt": "In epidemiology, what quantity is measured by prevalence?",
           "options": [
             "Only new cases this morning",
             "The effectiveness of a vaccine alone",
@@ -2063,7 +2063,7 @@
         },
         {
           "id": "health_policy_q2",
-          "prompt": "What does health equity emphasize?",
+          "prompt": "In population health policy, what principle does health equity emphasize?",
           "options": [
             "Giving everyone identical treatments regardless of need",
             "Maximizing revenue alone",
@@ -2191,7 +2191,7 @@
       "questions": [
         {
           "id": "public_administration_q1",
-          "prompt": "What is public accountability?",
+          "prompt": "In governance, what does the concept of public accountability mean?",
           "options": [
             "The absence of all reporting",
             "The obligation of public bodies to explain and justify their actions",
