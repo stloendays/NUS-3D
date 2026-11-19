@@ -23,6 +23,9 @@ func _to_map(p: Vector3) -> Vector2:
 func _draw() -> void:
     draw_rect(Rect2(Vector2.ZERO, Vector2(MAP_SIZE, MAP_SIZE)), Color(0.07, 0.13, 0.15, 0.89), true)
     draw_rect(Rect2(Vector2(0, 0), Vector2(MAP_SIZE - 1, MAP_SIZE - 1)), Color(0.55, 0.68, 0.66, 0.9), false, 1.2)
+    if campus_life.interior_active:
+        _draw_interior_plan()
+        return
     if world.layout.is_empty():
         return
     var green_polygon: PackedVector2Array = PackedVector2Array()
@@ -84,3 +87,43 @@ func _draw() -> void:
     draw_line(pp, pp + arrow * 14.0, Color.WHITE, 2.0)
     draw_string(ThemeDB.fallback_font, Vector2(106, 19), "N", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, Color.WHITE)
     draw_string(ThemeDB.fallback_font, Vector2(9, MAP_SIZE - 12), "SCHEMATIC", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#a6b8b9"))
+
+func _interior_map(p: Vector3) -> Vector2:
+    return Vector2(MAP_SIZE * 0.5 + p.x * 8.0, MAP_SIZE * 0.5 + p.z * 8.0)
+
+func _draw_interior_plan() -> void:
+    # Fictional room pocket navigation only. Not a measured floor plan.
+    var room: Node3D = campus_life.interiors[campus_life.active_interior]
+    var level: int = campus_life.interior_floor
+    var heading: String = "%s  |  %s" % [campus_life.active_interior, "MEZZANINE" if level == 1 else "GROUND"]
+    draw_string(ThemeDB.fallback_font, Vector2(12, 20), heading, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, Color.html("#e5f3ee"))
+    var outline := Rect2(Vector2(15, 39), Vector2(192, 144))
+    draw_rect(outline, Color.html("#324b54"), true)
+    draw_rect(outline, Color.html("#9db8b3"), false, 1.5)
+    if level == 1:
+        draw_rect(Rect2(Vector2(16, 40), Vector2(190, 40)), Color.html("#819d9c"), true)
+        draw_line(Vector2(16, 80), Vector2(206, 80), Color.html("#dfc483"), 2.0)
+    else:
+        draw_rect(Rect2(Vector2(101, 41), Vector2(20, 140)), Color.html("#607e84"), true)
+        for bay_x in [46.0, 75.0, 147.0, 175.0]:
+            for bay_y in [89.0, 116.0]:
+                draw_rect(Rect2(Vector2(bay_x - 7.0, bay_y - 4.0), Vector2(14, 8)), Color.html("#b9a787"), true)
+    var stairs := Rect2(_interior_map(Vector3(9.25, 0, -3.9)), Vector2(14, 57))
+    draw_rect(stairs, Color.html("#d7bb79"), false, 2.0)
+    draw_string(ThemeDB.fallback_font, Vector2(169, 165), "STAIRS", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#e7d59d"))
+    for activity in campus_life.activity_spots.get(campus_life.active_interior, []):
+        var p3: Vector3 = activity["position"]
+        if (p3.y > 2.0) != (level == 1):
+            continue
+        var marker: Vector2 = _interior_map(p3)
+        var item_id: String = "%s/%s" % [campus_life.active_interior, str(activity["id"])]
+        draw_circle(marker, 4.3, Color.html("#83d2ac") if campus_life.visited_activities.has(item_id) else Color.html("#e8c27a"))
+        draw_circle(marker, 4.3, Color.html("#ecf2e9"), false, 1.0)
+    var local_player: Vector3 = room.to_local(player.global_position)
+    var pos: Vector2 = _interior_map(local_player)
+    draw_circle(pos, 5.0, Color.html("#55b2ef"))
+    draw_circle(pos, 5.0, Color.WHITE, false, 1.3)
+    var forward: Vector3 = -player.global_transform.basis.z
+    var arrow := Vector2(forward.x, forward.z).normalized()
+    draw_line(pos, pos + arrow * 12.0, Color.WHITE, 2.0)
+    draw_string(ThemeDB.fallback_font, Vector2(12, 204), "ILLUSTRATIVE / NOT FLOOR PLAN", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 10, Color.html("#abc2c5"))
