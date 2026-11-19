@@ -104,7 +104,7 @@ func _label(text_value: String, size_value: int, color: Color) -> Label:
 
 
 func _make_action_card() -> void:
-    prompt_card = _panel("ActionSuggestion", -220, 220, 43, 112, 0.5, 0.5, Color(0.065, 0.12, 0.16, 0.96), Color("#82dacb"))
+    prompt_card = _panel("ActionSuggestion", -220, 220, 30, 96, 0.5, 0.5, Color(0.065, 0.12, 0.16, 0.96), Color("#82dacb"))
     var horizontal: HBoxContainer = HBoxContainer.new()
     horizontal.mouse_filter = Control.MOUSE_FILTER_IGNORE
     horizontal.add_theme_constant_override("separation", 13)
