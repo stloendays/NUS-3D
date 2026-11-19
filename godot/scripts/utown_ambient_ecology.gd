@@ -13,6 +13,9 @@ var butterflies: Array[Dictionary] = []
 var cats: Array[Dictionary] = []
 var chickens: Array[Dictionary] = []
 var sound_clips: Dictionary = {}
+var _material_cache: Dictionary = {}
+var _sphere_cache: Dictionary = {}
+var _box_cache: Dictionary = {}
 var leaf_batch: MultiMeshInstance3D
 var footstep_count: int = 0
 var bird_startle_count: int = 0
@@ -48,9 +51,13 @@ func _ready() -> void:
     last_position = player.global_position
 
 func _mat(color: Color) -> StandardMaterial3D:
+    var key: String = color.to_html(true)
+    if _material_cache.has(key):
+        return _material_cache[key]
     var m := StandardMaterial3D.new()
     m.albedo_color = color
     m.roughness = 0.86
+    _material_cache[key] = m
     return m
 
 func _part(parent: Node3D, name: String, mesh: Mesh, at: Vector3, color: Color) -> MeshInstance3D:
@@ -64,16 +71,22 @@ func _part(parent: Node3D, name: String, mesh: Mesh, at: Vector3, color: Color) 
     return p
 
 func _sphere(radius: float) -> SphereMesh:
+    if _sphere_cache.has(radius):
+        return _sphere_cache[radius]
     var m := SphereMesh.new()
     m.radius = radius
     m.height = radius * 2.0
     m.radial_segments = 8
     m.rings = 4
+    _sphere_cache[radius] = m
     return m
 
 func _box(size: Vector3) -> BoxMesh:
+    if _box_cache.has(size):
+        return _box_cache[size]
     var m := BoxMesh.new()
     m.size = size
+    _box_cache[size] = m
     return m
 
 func _sample_lawn() -> Vector3:
@@ -271,8 +284,11 @@ func _update_animals(delta: float, indoor: bool, rain: bool, night: bool) -> voi
             var state: Dictionary = collection[i]
             var node: Node3D = state["node"]
             var base: Vector3 = state["base"]
-            var distance: float = player.global_position.distance_to(base)
-            node.visible = not indoor and distance < 85.0
+            var distance_sq: float = player.global_position.distance_squared_to(base)
+            node.visible = not indoor and distance_sq < 7225.0
+            if not node.visible:
+                continue
+            var distance: float = sqrt(distance_sq)
             if kind == "butterflies":
                 node.visible = node.visible and not rain and not night
                 node.position = base + Vector3(sin(clock * 1.3 + float(state["phase"])) * 0.4,
