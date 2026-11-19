@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://scripts/utown_challenge.gd" id="8"]
 [ext_resource type="Script" path="res://scripts/utown_weather.gd" id="9"]
 [ext_resource type="Script" path="res://scripts/utown_campus_life.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/utown_indoor_npcs.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/utown_visual_polish.gd" id="12"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -51,6 +53,12 @@ script = ExtResource("9")
 
 [node name="CampusLife" type="Node" parent="."]
 script = ExtResource("10")
+
+[node name="IndoorNPCs" type="Node" parent="."]
+script = ExtResource("11")
+
+[node name="VisualPolish" type="Node" parent="."]
+script = ExtResource("12")
 
 [node name="ExportSelfTest" type="Node" parent="."]
 script = ExtResource("6")
