@@ -1,3 +1,93 @@
+<div align="center">
+
+# NUS-3D
+
+### Campus chaos, one deadline at a time.
+
+**一款以新加坡国立大学校园为灵感的低多边形、搞笑解压 3D 探索游戏。**
+
+Explore campus. Survive coursework. Miss the bus. Repeat.
+
+[![Godot](https://img.shields.io/badge/Godot-4.4.1%2B-478CBF?logo=godot-engine&logoColor=white)](godot/project.godot)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Godot-30343B)](docs/M4_WINDOWS_BUILD.md)
+[![Status](https://img.shields.io/badge/Status-Experimental%20prototype-F2B94B)](docs/INTEGRATION_QA_2026-11-19.md)
+[![Build](https://github.com/stloendays/NUS-3D/actions/workflows/windows_build.yml/badge.svg)](https://github.com/stloendays/NUS-3D/actions/workflows/windows_build.yml)
+
+**[Get the Windows preview](https://github.com/stloendays/NUS-3D/actions/workflows/windows_build.yml)** · **[Run in Godot](#-quick-start--快速开始)** · **[Gameplay](#-gameplay--玩法)** · **[Roadmap](#-roadmap--开发路线)** · **[Contribute](#-development--参与开发)**
+
+</div>
+
+---
+
+## 🎮 Gameplay / 玩法
+
+| Explore / 校园探索 | Survive / 校园生存 | Unwind / 解压玩法 |
+| :--- | :--- | :--- |
+| Low-poly UTown, stylized buildings, day/night, weather and campus NPCs | Coursework, presentations, DDL satire, faculty choice and comic campus events | Coins, shops, bicycles, casual challenges, leisure activities and post-course unlocks |
+| Walk, discover interiors, photograph campus and follow a minimap | Build progression through missions rather than endless grinding | Find absurd encounters and revisit the campus after the main tasks |
+
+**The tone:** playful, exaggerated, colorful and approachable — recognizable NUS-inspired spaces, not a serious campus simulator.
+
+> **Development status (19 November 2026):** The experimental `main` build includes UTown and a **schematic** Kent Ridge/Science expansion, Frontier canteen, a sports ground, selectable D1/D2 game shuttle travel, an MD1 landmark, bilingual oral-presentation tasks, a redesigned minimap and an optional F11 Campus AI/links panel. Real-world scale, routes, building geometry and performance on physical Windows GPUs remain unverified. More interiors, terrain, NPCs and cosmetics are under active development.
+
+## 🚀 Quick start / 快速开始
+
+**Option A — Windows portable preview**
+
+1. Open [Windows portable preview workflow](https://github.com/stloendays/NUS-3D/actions/workflows/windows_build.yml).
+2. Choose a **successful** workflow run and download its Windows artifact.
+3. Extract the ZIP and keep the `.exe` and `.pck` together; launch the EXE.
+
+The preview is unsigned and experimental. A successful CI export is **not** a guarantee of performance on every GPU. See [Windows build notes](docs/M4_WINDOWS_BUILD.md).
+
+**Option B — Godot editor**
+
+```bash
+git clone https://github.com/stloendays/NUS-3D.git
+cd NUS-3D
+godot --editor --path godot
+```
+
+Use **Godot 4.4.1 or newer**. Import the project, open the main scene, and press **F5**. The core controls are **WASD** to move, mouse to look, **Shift** to run, **M** for minimap, **P** for coursework, **F5** for the in-game cosmetic wardrobe, **F6** for the GIS geometry overlay, **F11** for optional Campus AI, and **Esc** to release the mouse. See the [full control guide](docs/M1_GREYBOX.md) and in-game prompts for context-sensitive actions.
+
+## 🗺️ World / 游戏世界
+
+**Available on `main`:** UTown Town Green, Town Plaza, ERC and SRC; schematic Kent Ridge districts including Science/Frontier, sports facilities, MD1, campus game buses, time/weather, course challenges, an F5 cosmetic character wardrobe preview and optional F11 Campus AI links.
+
+**In draft / pending verification:** more detailed faculty-specific facilities, optimized 3D props, advanced terrain elevations, richer NPC interactions and a verified Windows auto-update path. All campus geometry and game transit links are stylized interpretations, **not surveyed buildings or official shuttle navigation**.
+
+[Official campus map reference](https://map.nus.edu.sg/) · [Science / Frontier integration #48](https://github.com/stloendays/NUS-3D/pull/48) · [MD1 #49](https://github.com/stloendays/NUS-3D/pull/49) · [Map art #50](https://github.com/stloendays/NUS-3D/pull/50) · [Campus AI #66](https://github.com/stloendays/NUS-3D/pull/66)
+
+## 🧭 Roadmap / 开发路线
+
+| Area | Direction |
+| :--- | :--- |
+| Campus fidelity | Recognizable buildings, landscape, covered walkways, lighting and natural map edges |
+| Player experience | Tactile menus, 3D UI depth, sound design, contextual prompts and better onboarding |
+| Campus comedy | DDL story arcs, coursework, presentation challenges, distinct NPC personalities |
+| Open-world systems | More districts, transit, canteens, sports and optional minigames |
+| Reliability | Stable input ownership, low-memory assets, graphics scalability, save compatibility |
+| Multiplayer readiness | Modular network-friendly systems; multiplayer is **planned**, not a released feature |
+
+## 🛠️ Development / 参与开发
+
+Built primarily with **Godot 4 / GDScript**, procedural low-poly geometry, structured campus data and GitHub Actions. New features should be scoped to independent branches/PRs, preserve existing input and save systems, and include focused smoke tests.
+
+- [Issues & tasks](https://github.com/stloendays/NUS-3D/issues)
+- [Open pull requests](https://github.com/stloendays/NUS-3D/pulls)
+- [Project plan](docs/PROJECT_PLAN.md) · [Technical design](docs/TECHNICAL_DESIGN.md)
+- [Reference sources and licensing](docs/REFERENCE_SOURCES.md)
+- [Integration QA](docs/INTEGRATION_QA_2026-11-19.md)
+
+## ℹ️ Disclaimer
+
+NUS-3D is an **independent fan-made, unofficial project**. It is not affiliated with, endorsed by, or operated by the National University of Singapore. Campus names and layouts are used for creative reference. No Google Maps/Street View imagery or proprietary 3D assets are redistributed as game content. Any external assets must have verifiable usage rights.
+
+---
+
+<details>
+<summary><strong>Historical technical README / 早期技术说明（展开查看；旧版本状态不代表当前 main）</strong></summary>
+
 # NUS-3D — University Town (UTown)
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
@@ -206,3 +296,6 @@ A **12-second Godot-rendered opening** now plays when launching the UTown game: 
 - Godot CI includes four actual viewport frames from the animated opening, plus tests for camera takeover, scripted beats, skipping and UI handoff.
 
 Read [M3.7 intro documentation](docs/M3_7_CINEMATIC_INTRO.md). This original intro is artistic/fictional and does not show surveyed campus navigation or actual NUS coursework.
+
+
+</details>
