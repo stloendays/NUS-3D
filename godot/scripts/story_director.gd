@@ -28,6 +28,7 @@ var stress: int = 0
 var save_path: String = ""
 var active: bool = false
 
+var cutscenes: NUS3DEndingCutscenes
 var layer: CanvasLayer
 var cover: Control
 var heading: Label
@@ -412,6 +413,8 @@ func resolve_ending(final_choice: String) -> String:
     if accounts != null:
         accounts.award_once("story:ending:" + result, int(story.get("settings", {}).get("finale_xp", 150)))
     ending_unlocked.emit(result)
+    if cutscenes != null:
+        cutscenes.play(result)
     campaign_changed.emit()
     if cover.visible:
         selected_id = "ending:" + result
