@@ -1,0 +1,529 @@
+{
+  "schema_version": 1,
+  "unofficial_fictional": true,
+  "settings": {
+    "required_quests_for_finale": 3,
+    "quest_xp": 70,
+    "finale_xp": 150
+  },
+  "finale": {
+    "title": {
+      "zh": "终章：最后一秒的 DDL",
+      "en": "Finale: One Second to Deadline"
+    },
+    "intro": {
+      "zh": "教室里的时钟已经走到 23:59，Canvas 红点闪烁。你准备交上什么样的一学期？",
+      "en": "The clock reads 23:59 and the Canvas alert blinks. What kind of semester are you ready to submit?"
+    },
+    "choices": [
+      {
+        "id": "submit",
+        "title": {
+          "zh": "提交真实的自己",
+          "en": "Submit your real work"
+        }
+      },
+      {
+        "id": "quit",
+        "title": {
+          "zh": "明天一定做（大概）",
+          "en": "I'll do it tomorrow (probably)"
+        }
+      }
+    ]
+  },
+  "quests": [
+    {
+      "id": "coffee_protocol",
+      "title": {
+        "zh": "咖啡能量守恒",
+        "en": "Conservation of Coffee"
+      },
+      "intro": {
+        "zh": "Mei 声称一杯咖啡可以挽救整个学期。先和她聊聊，再找一份散落的笔记。",
+        "en": "Mei claims one coffee can rescue an entire semester. Talk to her, then find a lost Field Note."
+      },
+      "objectives": [
+        {
+          "event": "talk:Mei",
+          "count": 1,
+          "title": {
+            "zh": "与 Mei 聊天（Q）",
+            "en": "Talk to Mei (Q)"
+          }
+        },
+        {
+          "event": "note:",
+          "count": 1,
+          "title": {
+            "zh": "收集一份探索笔记（C）",
+            "en": "Collect a Field Note (C)"
+          }
+        }
+      ],
+      "choices": [
+        {
+          "id": "sleep",
+          "title": {
+            "zh": "早点睡：CPU 需要散热",
+            "en": "Go to sleep: the CPU needs cooling"
+          },
+          "result": {
+            "zh": "Mei 为你颁发一张‘正常作息稀有生物’奖状。",
+            "en": "Mei awards you a certificate for being a rare creature with a sleep schedule."
+          },
+          "effects": {
+            "stress": -2,
+            "kindness": 0,
+            "integrity": 1
+          }
+        },
+        {
+          "id": "espresso",
+          "title": {
+            "zh": "四倍浓缩：对 DDL 宣战",
+            "en": "Quad espresso: declare war on the deadline"
+          },
+          "result": {
+            "zh": "你的手速提高了，心跳和风扇转速也同步提高。",
+            "en": "You type faster. Your pulse and laptop fan also reach escape velocity."
+          },
+          "effects": {
+            "stress": 2,
+            "kindness": 0,
+            "integrity": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "group_assignment",
+      "title": {
+        "zh": "消失的组员",
+        "en": "The Vanishing Teammate"
+      },
+      "intro": {
+        "zh": "Maya 说有队友两周没回消息。问问 Ethan，再决定要不要帮忙。",
+        "en": "Maya says a teammate has been missing from the chat for two weeks. Ask Ethan, then decide what to do."
+      },
+      "objectives": [
+        {
+          "event": "talk:Maya",
+          "count": 1,
+          "title": {
+            "zh": "听 Maya 吐槽",
+            "en": "Hear Maya's complaint"
+          }
+        },
+        {
+          "event": "talk:Ethan",
+          "count": 1,
+          "title": {
+            "zh": "找 Ethan 了解情况",
+            "en": "Talk to Ethan"
+          }
+        }
+      ],
+      "choices": [
+        {
+          "id": "help",
+          "title": {
+            "zh": "一起补救小组作业",
+            "en": "Help rescue the group project"
+          },
+          "result": {
+            "zh": "他们给你在致谢里加了名字，你终于出现在小组群消息中。",
+            "en": "They add you to the acknowledgements. Someone finally replies in the group chat."
+          },
+          "effects": {
+            "kindness": 3,
+            "integrity": 1,
+            "stress": 1
+          }
+        },
+        {
+          "id": "ghost",
+          "title": {
+            "zh": "假装 Wi-Fi 断线",
+            "en": "Pretend the Wi-Fi died"
+          },
+          "result": {
+            "zh": "你躲过了消息，却没躲过小组互评。",
+            "en": "You escape the messages, but not the peer evaluation."
+          },
+          "effects": {
+            "kindness": -3,
+            "integrity": -1,
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "shuttle_rescue",
+      "title": {
+        "zh": "末班校车生存游戏",
+        "en": "The Last Shuttle"
+      },
+      "intro": {
+        "zh": "Aisha 说末班校车又是大学生的有氧考场。找到她，然后上车。",
+        "en": "Aisha calls the last shuttle a compulsory cardio assessment. Talk to her, then board it."
+      },
+      "objectives": [
+        {
+          "event": "talk:Aisha",
+          "count": 1,
+          "title": {
+            "zh": "问 Aisha 赶车秘诀",
+            "en": "Ask Aisha about the shuttle"
+          }
+        },
+        {
+          "event": "ride:shuttle",
+          "count": 1,
+          "title": {
+            "zh": "在校车附近按 X 乘车",
+            "en": "Board a shuttle with X"
+          }
+        }
+      ],
+      "choices": [
+        {
+          "id": "share",
+          "title": {
+            "zh": "给赶来的同学让座",
+            "en": "Share your seat with a late student"
+          },
+          "result": {
+            "zh": "你收获了一句谢谢，而校车广播宣布你是本周优秀人类。",
+            "en": "You earn a thank-you, and the shuttle declares you Human of the Week."
+          },
+          "effects": {
+            "kindness": 3,
+            "integrity": 0,
+            "stress": 1
+          }
+        },
+        {
+          "id": "grab",
+          "title": {
+            "zh": "占住最后一个座位",
+            "en": "Claim the final seat"
+          },
+          "result": {
+            "zh": "你获得座位一张，校园人缘减三，良心在下一站下车。",
+            "en": "You gain one seat. Your conscience gets off at the next stop."
+          },
+          "effects": {
+            "kindness": -3,
+            "integrity": 0,
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "lost_lab_notes",
+      "title": {
+        "zh": "实验报告去哪了",
+        "en": "The Missing Lab Notebook"
+      },
+      "intro": {
+        "zh": "实验记录神秘失踪。收集三份散落的笔记，再去 ERC 的概念室内看看。",
+        "en": "The lab record has vanished. Collect three Field Notes and explore the ERC concept interior."
+      },
+      "objectives": [
+        {
+          "event": "note:",
+          "count": 3,
+          "title": {
+            "zh": "累计收集三份笔记（C）",
+            "en": "Collect three different notes (C)"
+          }
+        },
+        {
+          "event": "entered:ERC",
+          "count": 1,
+          "title": {
+            "zh": "进入 ERC 室内（I）",
+            "en": "Enter the ERC interior (I)"
+          }
+        }
+      ],
+      "choices": [
+        {
+          "id": "return",
+          "title": {
+            "zh": "归还记录并如实署名",
+            "en": "Return the notebook with proper credit"
+          },
+          "result": {
+            "zh": "实验没变完美，但研究诚信保住了。打印机为你鼓掌了一秒。",
+            "en": "The experiment isn't perfect, but the record is honest. Even the printer applauds."
+          },
+          "effects": {
+            "integrity": 3,
+            "kindness": 1,
+            "stress": 1
+          }
+        },
+        {
+          "id": "copy",
+          "title": {
+            "zh": "复制数据当自己的",
+            "en": "Copy the results and claim them"
+          },
+          "result": {
+            "zh": "报告看似完美，查重系统突然睁开了眼睛。",
+            "en": "The report looks flawless. The plagiarism detector suddenly opens its eyes."
+          },
+          "effects": {
+            "integrity": -4,
+            "kindness": -1,
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "ddl_marathon",
+      "title": {
+        "zh": "DDL 紧急救援",
+        "en": "The Deadline Relay"
+      },
+      "intro": {
+        "zh": "校园四站盖章与 Sprint 竞速将成为你对抗 DDL 的证据：至少你真的动过。",
+        "en": "The four campus checkpoints and a Sprint run prove you can move when a deadline approaches."
+      },
+      "objectives": [
+        {
+          "event": "tour:",
+          "count": 4,
+          "title": {
+            "zh": "完成四站探索打卡（E）",
+            "en": "Visit all four checkpoints (E)"
+          }
+        },
+        {
+          "event": "sprint:finish",
+          "count": 1,
+          "title": {
+            "zh": "完成一次校园竞速（V）",
+            "en": "Finish a Campus Sprint (V)"
+          }
+        }
+      ],
+      "choices": [
+        {
+          "id": "truth",
+          "title": {
+            "zh": "按真实进度提交报告",
+            "en": "Submit an honest progress report"
+          },
+          "result": {
+            "zh": "你提交了真实的结果。老师说：‘很好，下周继续。’",
+            "en": "You submit honest results. Your supervisor says, 'Great. More next week.'"
+          },
+          "effects": {
+            "integrity": 3,
+            "kindness": 1,
+            "stress": 2
+          }
+        },
+        {
+          "id": "fake",
+          "title": {
+            "zh": "把‘未完成’写成‘基本完成’",
+            "en": "Call unfinished work 'basically complete'"
+          },
+          "result": {
+            "zh": "数据在 PPT 上一片大好，现实在底下默默保存了截图。",
+            "en": "The PowerPoint looks perfect. Reality quietly takes screenshots."
+          },
+          "effects": {
+            "integrity": -4,
+            "kindness": 0,
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "clock_mystery",
+      "title": {
+        "zh": "凌晨 03:00 的校园怪谈",
+        "en": "The 3 A.M. Time Loop"
+      },
+      "intro": {
+        "zh": "Daniel 说 UTown 的时钟会吞掉 DDL。雨夜去找他、收集六份笔记，再夺一枚竞速金牌。",
+        "en": "Daniel claims the UTown clock eats deadlines. Find him, collect six notes, witness the rain and win Sprint gold."
+      },
+      "objectives": [
+        {
+          "event": "talk:Daniel",
+          "count": 1,
+          "title": {
+            "zh": "与 Daniel 讨论时间悖论",
+            "en": "Discuss time paradoxes with Daniel"
+          }
+        },
+        {
+          "event": "note:",
+          "count": 6,
+          "title": {
+            "zh": "累计收集六份笔记",
+            "en": "Collect six Field Notes"
+          }
+        },
+        {
+          "event": "weather:rain",
+          "count": 1,
+          "title": {
+            "zh": "经历下雨或雷暴（Y）",
+            "en": "Witness rain or thunderstorm (Y)"
+          }
+        },
+        {
+          "event": "sprint:gold",
+          "count": 1,
+          "title": {
+            "zh": "获得一次 Sprint 金牌",
+            "en": "Win a Campus Sprint gold medal"
+          }
+        }
+      ],
+      "choices": [
+        {
+          "id": "break_loop",
+          "title": {
+            "zh": "打破时间循环",
+            "en": "Break the time loop"
+          },
+          "result": {
+            "zh": "你让 03:00 变成了 03:01。整个校园感动得差点交上作业。",
+            "en": "You turn 3:00 into 3:01. The campus almost submits its assignments in gratitude."
+          },
+          "effects": {
+            "integrity": 2,
+            "kindness": 2,
+            "stress": -2
+          }
+        },
+        {
+          "id": "hoard_time",
+          "title": {
+            "zh": "把无限延期留给自己",
+            "en": "Keep unlimited extensions for yourself"
+          },
+          "result": {
+            "zh": "DDL 不再来临，但周一重复了四百次。",
+            "en": "The deadline never arrives. Unfortunately, Monday repeats four hundred times."
+          },
+          "effects": {
+            "integrity": -2,
+            "kindness": -2,
+            "stress": 2
+          }
+        }
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "id": "loop_breaker",
+      "type": "secret",
+      "title": {
+        "zh": "隐藏结局 · 时间管理员",
+        "en": "Secret Ending · The Timekeeper"
+      },
+      "story": {
+        "zh": "你解开了 03:00 的时间循环，向全校发了一封‘DDL 不会自动延期’的公告。Daniel 神秘地消失，只留下一张写着‘明早八点见’的纸条。你成功毕业，也终于知道早八才是最终 Boss。",
+        "en": "You break the 3:00 a.m. time loop and announce that deadlines do not extend themselves. Daniel disappears, leaving a note: 'See you at 8 a.m.' You graduate, only to discover that 8 a.m. lectures were the final boss."
+      },
+      "hint": {
+        "zh": "完成时间怪谈，并保持诚信与人缘。",
+        "en": "Solve the clock mystery while protecting honesty and friendships."
+      }
+    },
+    {
+      "id": "campus_hero",
+      "type": "good",
+      "title": {
+        "zh": "好结局 · 校园救星",
+        "en": "Good Ending · Campus Hero"
+      },
+      "story": {
+        "zh": "你救回了小组作业、归还实验笔记，还在末班校车上让了座。毕业典礼上，校长准备发表长篇演讲，你递上了一份一页版总结。全场起立鼓掌。",
+        "en": "You save the group project, return the missing research notes and make room on the final shuttle. At graduation you hand the chancellor a one-page summary instead of a two-hour speech. Standing ovation."
+      },
+      "hint": {
+        "zh": "做出善意的选择，并保持学术诚信。",
+        "en": "Make generous choices and maintain academic integrity."
+      }
+    },
+    {
+      "id": "ddl_survivor",
+      "type": "good",
+      "title": {
+        "zh": "好结局 · DDL 幸存者",
+        "en": "Good Ending · Deadline Survivor"
+      },
+      "story": {
+        "zh": "你没有拯救世界，也没打败所有 DDL，但至少在最后一刻交出了自己的作业。邮件提示：‘提交成功。’下一秒跳出：‘新学期选课开始。’",
+        "en": "You don't save the world or defeat every deadline, but you submit your own assignment on time. An email says 'Submission successful.' One second later: 'Course registration is now open.'"
+      },
+      "hint": {
+        "zh": "坚持交作业且未触发其他重大危机。",
+        "en": "Submit your work without triggering a major crisis."
+      }
+    },
+    {
+      "id": "burnout",
+      "type": "bad",
+      "title": {
+        "zh": "坏结局 · 咖啡机继承人",
+        "en": "Bad Ending · Heir to the Coffee Machine"
+      },
+      "story": {
+        "zh": "你靠四杯浓缩赶完报告，却忘了自己上次睡觉是哪一年。咖啡厅把你列为了永久会员，电脑风扇获得了最佳协作奖。",
+        "en": "You finish the report on four espressos and forget which year you last slept. The cafe names you its lifetime patron, and your laptop fan wins Best Supporting Actor."
+      },
+      "hint": {
+        "zh": "压力过高、缺少支持时继续硬撑。",
+        "en": "Push on under extreme stress without support."
+      }
+    },
+    {
+      "id": "integrity_alarm",
+      "type": "bad",
+      "title": {
+        "zh": "坏结局 · 学术诚信警报",
+        "en": "Bad Ending · Integrity Alarm"
+      },
+      "story": {
+        "zh": "你用完美的 PPT 遮住了不完美的数据。查重系统开始播放警报，Dr. Plot Twist 说：‘反转来了，请重做实验。’你获得了终身免费返工券。",
+        "en": "You hide imperfect data behind perfect slides. The integrity alarm sounds and Dr. Plot Twist announces: 'Plot twist! Repeat the experiment.' You win a lifetime supply of rework."
+      },
+      "hint": {
+        "zh": "多次选择不诚实的捷径。",
+        "en": "Take too many dishonest shortcuts."
+      }
+    },
+    {
+      "id": "ddl_blackhole",
+      "type": "bad",
+      "title": {
+        "zh": "坏结局 · DDL 黑洞",
+        "en": "Bad Ending · The Deadline Black Hole"
+      },
+      "story": {
+        "zh": "你选择‘明天再说’。电脑日历把明天复制成了 9999 年，Canvas 的红点缓缓升起，成为校园第二颗太阳。你的毕业论文标题：《论永远的明天》。",
+        "en": "You decide to do it tomorrow. Your calendar copies tomorrow into the year 9999, Canvas notifications become a second sun, and your thesis is titled 'On the Eternal Tomorrow'."
+      },
+      "hint": {
+        "zh": "最后的 DDL 事件中选择彻底摆烂。",
+        "en": "Choose to give up at the final deadline."
+      }
+    }
+  ]
+}
