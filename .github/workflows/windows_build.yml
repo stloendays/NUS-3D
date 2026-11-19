@@ -109,6 +109,15 @@ jobs:
           path: build/download
       - name: Check archive and source manifest again on Windows
         run: python tools/package_windows_build.py --verify build/download/NUS3D-UTown-Windows-Experimental.zip
+      - name: Validate bundled updater with stock Windows PowerShell before launching
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $archive = (Resolve-Path "build/download/NUS3D-UTown-Windows-Experimental.zip").Path
+          $digest = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          $version = (Get-Content "godot/data/app_version.json" -Raw | ConvertFrom-Json).version
+          & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "tools/windows_updater/NUS3D-Updater.ps1" -VerifyOnly -Package $archive -ExpectedSha256 $digest -ExpectedVersion $version
+          if ($LASTEXITCODE -ne 0) { throw "Updater refused a correctly packaged Windows release archive." }
       - name: Execute packaged runtime integrity test
         shell: pwsh
         run: |
