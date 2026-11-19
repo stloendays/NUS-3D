@@ -28,7 +28,7 @@ Explore campus. Survive coursework. Miss the bus. Repeat.
 
 **The tone:** playful, exaggerated, colorful and approachable — recognizable NUS-inspired spaces, not a serious campus simulator.
 
-> **Development status (19 November 2026):** The experimental `main` build includes UTown and a **schematic** Kent Ridge/Science expansion, Frontier canteen, a sports ground, selectable D1/D2 game shuttle travel, an MD1 landmark, bilingual oral-presentation tasks, a redesigned minimap and an optional F11 Campus AI/links panel. Real-world scale, routes, building geometry and performance on physical Windows GPUs remain unverified. More interiors, terrain, NPCs and cosmetics are under active development.
+> **Development status (19 November 2026):** The experimental `main` build includes UTown and a **schematic** Kent Ridge/Science expansion, Frontier canteen, a sports ground, selectable D1/D2 game shuttle travel, an MD1 landmark, bilingual oral-presentation tasks, a redesigned minimap, 27 decorative facility clusters across nine campus districts, and an optional F11 Campus AI/links panel. Real-world scale, routes, building geometry and performance on physical Windows GPUs remain unverified. More interiors, terrain, NPCs and cosmetics are under active development.
 
 ## 🚀 Quick start / 快速开始
 
@@ -52,9 +52,9 @@ Use **Godot 4.4.1 or newer**. Import the project, open the main scene, and press
 
 ## 🗺️ World / 游戏世界
 
-**Available on `main`:** UTown Town Green, Town Plaza, ERC and SRC; schematic Kent Ridge districts including Science/Frontier, sports facilities, MD1, campus game buses, time/weather, course challenges, an F5 cosmetic character wardrobe preview and optional F11 Campus AI links.
+**Available on `main`:** UTown Town Green, Town Plaza, ERC and SRC; schematic Kent Ridge districts including Science/Frontier, sports facilities, MD1, campus game buses, time/weather, course challenges, nine district-specific prop zones with shared mesh geometry (#70), an F5 cosmetic character wardrobe preview and optional F11 Campus AI links.
 
-**In draft / pending verification:** more detailed faculty-specific facilities, optimized 3D props, advanced terrain elevations, richer NPC interactions and a verified Windows auto-update path. All campus geometry and game transit links are stylized interpretations, **not surveyed buildings or official shuttle navigation**.
+**In draft / pending verification:** continuous terrain elevations and walkable gradients, more interactive interiors, richer NPC interactions, real in-world player outfit swapping, and a verified Windows auto-update path. All campus geometry and game transit links are stylized interpretations, **not surveyed buildings or official shuttle navigation**.
 
 [Official campus map reference](https://map.nus.edu.sg/) · [Science / Frontier integration #48](https://github.com/stloendays/NUS-3D/pull/48) · [MD1 #49](https://github.com/stloendays/NUS-3D/pull/49) · [Map art #50](https://github.com/stloendays/NUS-3D/pull/50) · [Campus AI #66](https://github.com/stloendays/NUS-3D/pull/66)
 
