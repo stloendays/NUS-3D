@@ -1,5 +1,7 @@
 extends Node
 class_name UTownCampusLife
+const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
+const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
 ## bicycle mode and a looping shuttle. Positions reuse schematic project data only.
 
@@ -31,6 +33,8 @@ var shuttle_passengers: Array[Node3D] = []
 var shuttle_stop_names: PackedStringArray = PackedStringArray(["Town Green", "ERC", "SRC", "Town Plaza"])
 var entry_positions: Dictionary = {}
 var interiors: Dictionary = {}
+var activity_spots: Dictionary = {}
+var visited_activities: Dictionary = {}
 var interior_anchors: Dictionary = {"ERC": Vector3(900.0, 0.0, 0.0), "SRC": Vector3(940.0, 0.0, 0.0)}
 var interior_active: bool = false
 var interior_floor: int = 0
@@ -57,6 +61,7 @@ func _ready() -> void:
     _build_interiors()
     _build_bicycle()
     _build_shuttle()
+    _load_activities()
 
 func _load_waypoints() -> void:
     for raw in world.layout.get("loop", []):
@@ -208,12 +213,13 @@ func _build_interiors() -> void:
             _build_study_room(room)
         else:
             _build_recreation_room(room)
+        activity_spots[id] = INTERIOR_KIT.decorate(room, id)
         interiors[id] = room
 
 func _build_room_shell(room: Node3D, id: String) -> void:
-    var wall := _mat("#d9dedb" if id == "ERC" else "#c5cbc9")
-    var floor := _mat("#a9b4b0" if id == "ERC" else "#747f82")
-    var glass := _mat("#7da6b6", 0.34)
+    var wall := _mat("#b0c0bc" if id == "ERC" else "#a6b6b4")
+    var floor := _mat("#7d9490" if id == "ERC" else "#617c83")
+    var glass := _mat("#719eaa", 0.34)
     var trim := _mat("#506d78")
     _box(room, "Floor", Vector3(0, -0.15, 0), Vector3(24, 0.3, 18), floor, true)
     _box(room, "WestWall", Vector3(-12, 3.25, 0), Vector3(0.3, 6.5, 18), wall, true)
@@ -235,15 +241,15 @@ func _build_room_shell(room: Node3D, id: String) -> void:
     var light := OmniLight3D.new()
     light.position = Vector3(0, 5.2, 0)
     light.light_color = Color("#ffe2b5")
-    light.light_energy = 1.35
-    light.omni_range = 28
+    light.light_energy = 0.52
+    light.omni_range = 25
     light.shadow_enabled = false
     room.add_child(light)
     var lower_light := OmniLight3D.new()
     lower_light.position = Vector3(0, 2.6, 0)
     lower_light.light_color = Color("#e6f0ef")
-    lower_light.light_energy = 0.65
-    lower_light.omni_range = 24
+    lower_light.light_energy = 0.32
+    lower_light.omni_range = 22
     lower_light.shadow_enabled = false
     room.add_child(lower_light)
     var exit_label := Label3D.new()
@@ -268,7 +274,19 @@ func _build_mezzanine(room: Node3D, id: String) -> void:
     for step in range(16):
         var rise: float = float(step + 1) * 0.205
         var z: float = 3.5 - float(step) * 0.49
-        _box(room, "StairStep_%02d" % step, Vector3(9.25, rise, z), Vector3(1.8, 0.22, 0.5), deck, true)
+        # Non-solid treads sit on one continuous walkable slope collision.
+        # Individual box colliders made 0.205 m risers impassable for the player.
+        _box(room, "StairStep_%02d" % step, Vector3(9.25, rise, z), Vector3(1.8, 0.22, 0.5), deck)
+    var stair_ramp := StaticBody3D.new()
+    stair_ramp.name = "WalkableStairSlope"
+    stair_ramp.position = Vector3(9.25, 1.745, -0.20)
+    stair_ramp.rotation.x = atan(0.205 / 0.49)
+    room.add_child(stair_ramp)
+    var stair_collider := CollisionShape3D.new()
+    var ramp_shape := BoxShape3D.new()
+    ramp_shape.size = Vector3(1.84, 0.22, 8.05)
+    stair_collider.shape = ramp_shape
+    stair_ramp.add_child(stair_collider)
     _box(room, "LiftCallPanel", Vector3(-9.2, 1.55, -6.45), Vector3(0.16, 1.0, 0.5), metal)
     var lift_label := Label3D.new()
     lift_label.text = "LIFT / PRESS L"
@@ -283,12 +301,13 @@ func _build_study_room(room: Node3D) -> void:
     var table := _mat("#8b6f55")
     var dark := _mat("#46545a")
     var seat := _mat("#6e8f91")
-    for x in [-5.0, 0.0, 5.0]:
-        for z in [-3.5, 1.0]:
-            _box(room, "StudyTable", Vector3(x, 0.92, z), Vector3(3, 0.16, 1.25), table)
+    # Move desks into four bays to preserve a 2.5 m central circulation aisle.
+    for x in [-7.0, -3.5, 3.5, 7.0]:
+        for z in [-3.5, 0.9]:
+            _box(room, "StudyTable", Vector3(x, 0.92, z), Vector3(2.5, 0.16, 1.25), table, true)
             for side in [-1.0, 1.0]:
-                _box(room, "TableLeg", Vector3(x + side * 1.25, 0.44, z), Vector3(0.12, 0.92, 0.12), dark)
-                _box(room, "StudySeat", Vector3(x + side * 1.85, 0.55, z), Vector3(0.78, 0.12, 0.72), seat)
+                _box(room, "TableLeg", Vector3(x + side * 1.06, 0.44, z), Vector3(0.12, 0.92, 0.12), dark)
+                _box(room, "StudySeat", Vector3(x, 0.55, z + side * 1.0), Vector3(0.72, 0.12, 0.72), seat, true)
     for z in [-5.5, -2.0, 1.5, 5.0]:
         _box(room, "Bookcase", Vector3(-10.4, 1.35, z), Vector3(1.2, 2.7, 2.6), dark)
         for shelf in [0.55, 1.25, 1.95]:
@@ -743,11 +762,68 @@ func alight_shuttle() -> void:
     message = "You have left the shuttle."
     message_time = 2.5
 
+func _load_activities() -> void:
+    visited_activities.clear()
+    var save := ConfigFile.new()
+    if save.load(ACTIVITY_SAVE_PATH) != OK:
+        return
+    var ids: PackedStringArray = save.get_value("activities", "visited", PackedStringArray())
+    for id in ids:
+        visited_activities[id] = true
+
+func _save_activities() -> void:
+    var save := ConfigFile.new()
+    var ids := PackedStringArray()
+    for id in visited_activities:
+        ids.append(str(id))
+    ids.sort()
+    save.set_value("activities", "visited", ids)
+    var error: Error = save.save(ACTIVITY_SAVE_PATH)
+    if error != OK:
+        push_warning("Could not persist local fictional campus activity progress")
+
+func nearest_activity() -> Dictionary:
+    if not interior_active or not activity_spots.has(active_interior):
+        return {}
+    var closest: Dictionary = {}
+    var best_distance: float = 3.1
+    var room: Node3D = interiors[active_interior]
+    for activity in activity_spots[active_interior]:
+        var world_position: Vector3 = room.to_global(activity["position"])
+        var distance: float = player.global_position.distance_to(world_position)
+        if distance < best_distance:
+            closest = activity
+            best_distance = distance
+    return closest
+
+func interact_nearby() -> bool:
+    var activity: Dictionary = nearest_activity()
+    if activity.is_empty():
+        if interior_active:
+            message = "Move closer to a cafe, reading area or activity station."
+            message_time = 3.0
+        return false
+    var activity_id: String = "%s/%s" % [active_interior, str(activity["id"])]
+    var was_visited: bool = visited_activities.has(activity_id)
+    if not was_visited:
+        visited_activities[activity_id] = true
+        _save_activities()
+    var prefix: String = "DISCOVERED" if not was_visited else "REVISITED"
+    message = "%s: %s  |  %s" % [prefix, str(activity["name"]), str(activity["text"])]
+    message_time = 6.0
+    return true
+
+func activity_progress_count() -> int:
+    return visited_activities.size()
+
 func status_text() -> String:
     var lines := PackedStringArray()
     lines.append("CAMPUS LIFE  |  %d pedestrians  |  [Q] talk" % pedestrians.size())
     if interior_active:
-        lines.append("INDOORS: %s / %s floor  |  [L] lift  [I] exit" % [active_interior, "MEZZANINE" if interior_floor == 1 else "GROUND"])
+        lines.append("INDOORS: %s / %s  |  [L] lift  [I] exit" % [active_interior, "MEZZANINE" if interior_floor == 1 else "GROUND"])
+        var nearby_activity: Dictionary = nearest_activity()
+        var available: String = str(nearby_activity["name"]) if not nearby_activity.is_empty() else "explore cafe / lounge / gallery"
+        lines.append("LIFE EXPERIENCES %d / 6  |  [F] %s" % [activity_progress_count(), available])
     elif on_shuttle:
         lines.append("ON UTOWN SHUTTLE  |  [X] alight")
     else:
@@ -769,6 +845,8 @@ func _unhandled_input(event: InputEvent) -> void:
                 enter_nearest_interior()
             KEY_L:
                 toggle_interior_floor()
+            KEY_F:
+                interact_nearby()
             KEY_Q:
                 talk_to_nearest()
             KEY_B:
