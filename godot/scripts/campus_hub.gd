@@ -1,7 +1,7 @@
 extends "res://scripts/campus_ai_panel.gd"
 class_name NUS3DCampusHub
 ## Adapter for the existing integration branch's game-shell modal contract.
-## GameShell owns pause/resume, account gating and F8. This component owns UI
+## GameShell owns pause/resume, account gating and F11. This component owns UI
 ## and networking only; no gameplay, account, NPC or save-file mutations.
 
 signal close_requested
