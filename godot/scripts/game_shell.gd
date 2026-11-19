@@ -281,6 +281,7 @@ func _on_language_changed(_language: String) -> void:
     GameLanguage.apply_static_ui(login_cover)
     GameLanguage.apply_static_ui(mail_cover)
     GameLanguage.apply_static_ui(profile_card)
+    GameLanguage.refresh_world_labels(game.get_node("World") as UTownWorld)
     _refresh_auth_text()
     var button_text: String = "English / 中文" if GameLanguage.is_chinese() else "中文 / English"
     language_login_button.text = button_text
