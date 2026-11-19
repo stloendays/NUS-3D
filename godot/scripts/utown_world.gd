@@ -226,7 +226,8 @@ func _build_buildings() -> void:
             var z: float = -north
             _add_box(group, Vector3(dx, h / 2.0, z), Vector3(w, h, d), wall, true)
             _add_box(group, Vector3(dx, h + 0.24, z), Vector3(w + 0.65, 0.48, d + 0.65), roof)
-            var bands: int = mini(int(h / 3.6), 11)
+            # Confirmed high-rises use the batched floor-by-floor facade instead.
+            var bands: int = 0 if priority != "P0" and record.has("confirmed_storeys") else mini(int(h / 3.6), 11)
             for floor_index in range(bands):
                 var yf: float = 2.4 + 3.5 * float(floor_index)
                 if yf + 0.7 >= h:
