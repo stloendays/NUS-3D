@@ -3,7 +3,11 @@ name: Publish verified NUS-3D stable Windows release
 # Maintainer bumps app_version.json, merges to main, then pushes matching vMAJOR.MINOR.PATCH.
 on:
   push:
+    # Bootstrap v0.1.0 when this workflow first lands on main.
+    # Future releases still use manually pushed SemVer tags.
+    branches: ["main"]
     tags: ["v*.*.*"]
+    paths: [".github/workflows/stable_release.yml"]
 
 permissions:
   contents: read
@@ -13,6 +17,8 @@ jobs:
     name: Build stable Windows package from main
     runs-on: ubuntu-24.04
     timeout-minutes: 35
+    outputs:
+      release_tag: ${{ steps.release_meta.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,21 +26,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Enforce stable tag, canonical version and main ancestry
+      - name: Pin release version and enforce main-ancestor source commit
+        id: release_meta
         shell: bash
         run: |
           set -euo pipefail
-          [[ "$GITHUB_REF_NAME" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || exit 1
+          tag="v$(python -c 'from tools.package_windows_build import load_release_version; print(load_release_version())')"
+          [[ "$tag" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || exit 1
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            [[ "$GITHUB_REF_NAME" == "$tag" ]] || { echo "Tag/version mismatch"; exit 1; }
+          elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            # One-time bootstrap, not automatic tagging of later feature merges.
+            [[ "$tag" == "v0.1.0" ]] || { echo "Bootstrap is only for v0.1.0"; exit 1; }
+          else
+            echo "Unexpected release trigger: $GITHUB_REF"; exit 1
+          fi
           git fetch origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
-            echo "Refusing tag not present on main"; exit 1;
+            echo "Refusing release commit not on main"; exit 1;
           }
-          python - <<'PY'
-          import os
-          from tools.package_windows_build import load_release_version
-          assert os.environ["GITHUB_REF_NAME"] == "v" + load_release_version()
-          print("PASS: stable release tag matches bundled version")
-          PY
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Validated official NUS-3D release $tag at $GITHUB_SHA"
       - name: Validate offline game content and archive contract
         run: |
           python tools/validate_utown_data.py
@@ -106,7 +118,7 @@ jobs:
           $expected = ((Get-Content "release/SHA256SUMS.txt" -Raw).Split(' ')[0]).ToLowerInvariant()
           $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($expected -ne $actual) { throw "Stable release checksum mismatch" }
-          $version = $env:GITHUB_REF_NAME.Substring(1)
+          $version = '${{ needs.build-stable.outputs.release_tag }}'.Substring(1)
           & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "tools/windows_updater/NUS3D-Updater.ps1" -VerifyOnly -Package $archive -ExpectedSha256 $expected -ExpectedVersion $version
           if ($LASTEXITCODE -ne 0) { throw "Updater rejected release archive" }
           New-Item -ItemType Directory -Path "build/run" -Force | Out-Null
@@ -163,9 +175,23 @@ jobs:
           automatically; installation is offered after explicit restart consent.
           SHA-256 checksums and BUILD_MANIFEST.json record release provenance.
           EOF
-          gh release create "$GITHUB_REF_NAME" \
+          tag="${{ needs.build-stable.outputs.release_tag }}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Refusing to overwrite existing Release $tag"
+            exit 1
+          fi
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            flags=(--verify-tag)
+          else
+            if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+              echo "Refusing to re-use existing tag $tag for bootstrap"
+              exit 1
+            fi
+            flags=(--target "$GITHUB_SHA")
+          fi
+          gh release create "$tag" \
             "release/NUS3D-UTown-Windows-Portable.zip" \
             "release/SHA256SUMS.txt" \
-            --repo "$GITHUB_REPOSITORY" --verify-tag \
-            --title "NUS-3D $GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" "${flags[@]}" \
+            --title "NUS-3D $tag" \
             --notes-file /tmp/nus3d-release-notes.txt --latest
