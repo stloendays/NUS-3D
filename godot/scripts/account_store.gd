@@ -333,3 +333,11 @@ func delete_message(message_id: String) -> void:
             if _save_profile():
                 mailbox_changed.emit()
             return
+
+
+func save_tour_ids(ids: Array) -> void:
+    if not is_logged_in():
+        return
+    profile["tour_ids"] = ids.duplicate()
+    if not _save_profile():
+        push_warning("Could not save local exploration progress.")
