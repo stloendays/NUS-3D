@@ -1,0 +1,1073 @@
+{
+  "schema": "nus3d-voice-presentations-v1",
+  "language": "en",
+  "offline": true,
+  "unofficial": true,
+  "status": "fictional original practice prompts, not NUS official coursework or a speech-recognition examination",
+  "privacy": "Voice samples are consumed in RAM only to estimate activity. No audio recording, transcript, upload, file, or remote model is used.",
+  "scoring": {
+    "first_pass_xp": 70,
+    "first_pass_credits": 20,
+    "all_slides_required": true,
+    "min_slide_voice_seconds": 5,
+    "audience_question_bonus_points": 20
+  },
+  "presentations": [
+    {
+      "id": "presentation_chemistry",
+      "exam_paper_id": "chemistry",
+      "faculty_id": "science",
+      "major": "Chemistry",
+      "title": "Why Reaction Rates Matter",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce an exothermic reaction and explain the distinction between reaction energy and speed."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Describe how temperature or concentration changes collision frequency, while a catalyst lowers the activation barrier."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with a safe experimental plan using controlled conditions and a clear result."
+        }
+      ],
+      "audience_question": {
+        "prompt": "What does a catalyst normally change?",
+        "options": [
+          "Equilibrium constant at fixed temperature",
+          "Activation energy",
+          "Conservation of mass"
+        ],
+        "correct_index": 1,
+        "explanation": "Catalysts provide a lower-energy pathway without changing the equilibrium constant."
+      }
+    },
+    {
+      "id": "presentation_physics",
+      "exam_paper_id": "physics",
+      "faculty_id": "science",
+      "major": "Physics",
+      "title": "A Satellite That Refuses to Fall",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Open with the puzzle of why an orbiting satellite is constantly falling yet never hits the ground."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Use gravity, velocity and centripetal acceleration to explain circular orbital motion."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Summarize which assumptions make the simple orbit model valid."
+        }
+      ],
+      "audience_question": {
+        "prompt": "What provides centripetal force to an ideal orbiting satellite?",
+        "options": [
+          "Thrust every second",
+          "Atmospheric friction",
+          "Gravity"
+        ],
+        "correct_index": 2,
+        "explanation": "Gravity bends the satellite's motion toward Earth."
+      }
+    },
+    {
+      "id": "presentation_biological_sciences",
+      "exam_paper_id": "biological_sciences",
+      "faculty_id": "science",
+      "major": "Biological Sciences",
+      "title": "A Cell Under Deadline Pressure",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce the role of ATP when a cell needs energy fast."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Describe oxidative phosphorylation across the inner mitochondrial membrane."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Explain why reducing oxygen supply could limit aerobic ATP production."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Where does most aerobic ATP production occur?",
+        "options": [
+          "Inner mitochondrial membrane",
+          "Nucleolus",
+          "Golgi apparatus"
+        ],
+        "correct_index": 0,
+        "explanation": "ATP synthase and the electron transport chain occupy the inner mitochondrial membrane."
+      }
+    },
+    {
+      "id": "presentation_chemical_engineering",
+      "exam_paper_id": "chemical_engineering",
+      "faculty_id": "cde",
+      "major": "Chemical Engineering",
+      "title": "Save the Reactor Before 23:59",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a continuous process with two outlets and explain why the inlet flow must balance the total outlet flow."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Walk through a steady-state mass balance before discussing heat removal from an exothermic reactor."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Recommend monitoring temperature and flow rather than trusting a beautifully colored process diagram."
+        }
+      ],
+      "audience_question": {
+        "prompt": "For a steady-state reactor with no mass accumulation, total mass outflow equals what?",
+        "options": [
+          "Reaction enthalpy alone",
+          "Total mass inflow",
+          "Reactor volume"
+        ],
+        "correct_index": 1,
+        "explanation": "Overall conservation of mass requires equal incoming and outgoing mass rates."
+      }
+    },
+    {
+      "id": "presentation_mechanical_engineering",
+      "exam_paper_id": "mechanical_engineering",
+      "faculty_id": "cde",
+      "major": "Mechanical Engineering",
+      "title": "The Bolt That Wanted a Vacation",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Describe a loaded mechanical bracket and define the risk of overstress."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain stress as force divided by area and how a factor of safety adds design margin."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Recommend checking load cases and material properties before manufacturing."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Mechanical stress is force divided by what?",
+        "options": [
+          "Time",
+          "Temperature",
+          "Area"
+        ],
+        "correct_index": 2,
+        "explanation": "Normal stress is force per unit area."
+      }
+    },
+    {
+      "id": "presentation_electrical_engineering",
+      "exam_paper_id": "electrical_engineering",
+      "faculty_id": "cde",
+      "major": "Electrical Engineering",
+      "title": "The Circuit With Zero Social Skills",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a basic resistive circuit and the expected current."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Use Ohm's law to compute current for a given voltage and resistance."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with an appropriate fuse or current limit to protect a circuit."
+        }
+      ],
+      "audience_question": {
+        "prompt": "At 12 V across 4 ohms, the current is:",
+        "options": [
+          "3 A",
+          "48 A",
+          "0.33 A"
+        ],
+        "correct_index": 0,
+        "explanation": "Ohm's law gives 12 / 4 = 3 amperes."
+      }
+    },
+    {
+      "id": "presentation_architecture",
+      "exam_paper_id": "architecture",
+      "faculty_id": "cde",
+      "major": "Architecture",
+      "title": "The Courtyard That Ate the Floor Plan",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce shade and ventilation challenges in a tropical campus courtyard."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Compare west-facing solar gain, shading and cross-ventilation paths."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Recommend an accessible, shaded pedestrian circulation route."
+        }
+      ],
+      "audience_question": {
+        "prompt": "What usually reduces direct solar heat entering glazing?",
+        "options": [
+          "More unshaded glass",
+          "External shading",
+          "Removing all insulation"
+        ],
+        "correct_index": 1,
+        "explanation": "External shading blocks incident solar radiation before it reaches the glazing."
+      }
+    },
+    {
+      "id": "presentation_computer_science",
+      "exam_paper_id": "computer_science",
+      "faculty_id": "computing",
+      "major": "Computer Science",
+      "title": "The Algorithm That Missed Its Deadline",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a search problem in a sorted array."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Contrast linear search with binary search and explain why halving the interval changes complexity."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with a test covering empty arrays and missing targets."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Binary search in a sorted array is usually:",
+        "options": [
+          "O(n^2)",
+          "O(n log n)",
+          "O(log n)"
+        ],
+        "correct_index": 2,
+        "explanation": "Binary search halves the remaining interval each step."
+      }
+    },
+    {
+      "id": "presentation_cybersecurity",
+      "exam_paper_id": "cybersecurity",
+      "faculty_id": "computing",
+      "major": "Cybersecurity",
+      "title": "The Password That Became a Group Project",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Explain why a stolen password should not grant an attacker complete account access."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Discuss multi-factor authentication and the principle of least privilege."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Close with an actionable security checklist for a fictional university portal."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Which control adds independent evidence of identity?",
+        "options": [
+          "Multi-factor authentication",
+          "Plaintext password storage",
+          "Shared admin accounts"
+        ],
+        "correct_index": 0,
+        "explanation": "Authentication factors reduce reliance on a single compromised credential."
+      }
+    },
+    {
+      "id": "presentation_data_science",
+      "exam_paper_id": "data_science",
+      "faculty_id": "computing",
+      "major": "Data Science",
+      "title": "How Not to Leak the Answer Key",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a classifier with suspiciously high accuracy."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain data leakage and why a held-out test set matters for final evaluation."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with a reproducible split and independent evaluation plan."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Why must the final test set remain untouched during tuning?",
+        "options": [
+          "To make the training set larger",
+          "To estimate generalization fairly",
+          "To avoid collecting labels"
+        ],
+        "correct_index": 1,
+        "explanation": "Repeated tuning on test data biases the final estimate."
+      }
+    },
+    {
+      "id": "presentation_finance",
+      "exam_paper_id": "finance",
+      "faculty_id": "business",
+      "major": "Finance",
+      "title": "The Investment Pitch With Negative Coffee",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a project paying 110 dollars next year and a 10 percent required return."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Show the present-value calculation and distinguish it from nominal future value."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Discuss positive net present value as a decision criterion with risk caveats."
+        }
+      ],
+      "audience_question": {
+        "prompt": "What is the present value of 110 dollars in one year at 10 percent?",
+        "options": [
+          "121 dollars",
+          "110 dollars",
+          "100 dollars"
+        ],
+        "correct_index": 2,
+        "explanation": "Present value equals 110 / 1.10 = 100."
+      }
+    },
+    {
+      "id": "presentation_accounting",
+      "exam_paper_id": "accounting",
+      "faculty_id": "business",
+      "major": "Accounting",
+      "title": "The Ledger That Ran Away",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce the accounting equation with a simple purchase funded by debt."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain how the balance sheet and cash flow statement report different information."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with why reconciled figures matter for management decisions."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Which fundamental equation should a balance sheet satisfy?",
+        "options": [
+          "Assets = Liabilities + Equity",
+          "Assets = Revenue - Expenses",
+          "Cash = Net income"
+        ],
+        "correct_index": 0,
+        "explanation": "Resources are financed by liabilities and owner claims."
+      }
+    },
+    {
+      "id": "presentation_marketing",
+      "exam_paper_id": "marketing",
+      "faculty_id": "business",
+      "major": "Marketing",
+      "title": "The Advertisement Nobody Clicked",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Start with a fictional marketing campaign that gets impressions but few clicks."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Define click-through rate and describe a randomized A/B test of two messages."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Explain how to interpret results without mistaking clicks for long-term value."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Click-through rate is clicks divided by:",
+        "options": [
+          "Gross profit",
+          "Impressions",
+          "Total employees"
+        ],
+        "correct_index": 1,
+        "explanation": "CTR quantifies how often an ad impression results in a click."
+      }
+    },
+    {
+      "id": "presentation_economics",
+      "exam_paper_id": "economics",
+      "faculty_id": "fass",
+      "major": "Economics",
+      "title": "The Campus Food Price Mystery",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a popular food stall facing rising demand."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Use a supply-demand diagram to predict the equilibrium price response."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Discuss one possible policy trade-off if a price ceiling is imposed."
+        }
+      ],
+      "audience_question": {
+        "prompt": "When demand rises and supply is unchanged, equilibrium price tends to:",
+        "options": [
+          "Fall to zero",
+          "Remain fixed by definition",
+          "Rise"
+        ],
+        "correct_index": 2,
+        "explanation": "The demand curve shifts outward relative to fixed supply."
+      }
+    },
+    {
+      "id": "presentation_psychology",
+      "exam_paper_id": "psychology",
+      "faculty_id": "fass",
+      "major": "Psychology",
+      "title": "The Memory Experiment That Forgot Itself",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Describe a study comparing two revision strategies."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain control groups, random assignment and confirmation bias."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Finish with an ethical informed-consent plan."
+        }
+      ],
+      "audience_question": {
+        "prompt": "What is confirmation bias?",
+        "options": [
+          "Favoring evidence consistent with existing beliefs",
+          "An automatic boost to working memory",
+          "Random assignment"
+        ],
+        "correct_index": 0,
+        "explanation": "Confirmation bias affects which evidence is noticed and believed."
+      }
+    },
+    {
+      "id": "presentation_sociology",
+      "exam_paper_id": "sociology",
+      "faculty_id": "fass",
+      "major": "Sociology",
+      "title": "Who Took the Group Project Credit?",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce unequal participation within a fictional class team."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Apply social norms and social stratification to discuss group dynamics."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Suggest an interview approach to investigate the experience without blaming individuals."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Social norms are:",
+        "options": [
+          "Formal tax schedules",
+          "Shared expectations for acceptable behavior",
+          "Chemical rules"
+        ],
+        "correct_index": 1,
+        "explanation": "Norms shape behavior through shared expectations."
+      }
+    },
+    {
+      "id": "presentation_environmental_studies",
+      "exam_paper_id": "environmental_studies",
+      "faculty_id": "chs",
+      "major": "Environmental Studies",
+      "title": "The Carbon Footprint of a Deadline",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce the environmental footprint of a consumer product."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain system boundaries in life-cycle assessment and identify one emissions hotspot."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude by distinguishing measurable reduction from greenwashing."
+        }
+      ],
+      "audience_question": {
+        "prompt": "A life-cycle assessment examines:",
+        "options": [
+          "Only product color",
+          "Only the factory address",
+          "Impacts across product life stages"
+        ],
+        "correct_index": 2,
+        "explanation": "LCA considers impacts across extraction, production, use and end-of-life."
+      }
+    },
+    {
+      "id": "presentation_interdisciplinary_studies",
+      "exam_paper_id": "interdisciplinary_studies",
+      "faculty_id": "chs",
+      "major": "Interdisciplinary Studies",
+      "title": "When a Dataset Meets an Interview",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Present a research question where statistics and interviews give apparently conflicting results."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Compare sampling and measurement definitions across quantitative and qualitative methods."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Propose a mixed-methods explanation with limitations."
+        }
+      ],
+      "audience_question": {
+        "prompt": "A study combining surveys and interviews is:",
+        "options": [
+          "Mixed-methods research",
+          "A single-variable simulation",
+          "Only theoretical modeling"
+        ],
+        "correct_index": 0,
+        "explanation": "Mixed methods integrate numerical patterns and contextual accounts."
+      }
+    },
+    {
+      "id": "presentation_clinical_medicine",
+      "exam_paper_id": "clinical_medicine",
+      "faculty_id": "medicine",
+      "major": "Clinical Medicine",
+      "title": "The Ward Round Before Breakfast",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Present a fictional patient handover and the importance of clear vital signs."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Discuss respiratory rate, medication allergy review and informed consent."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Close with a safety checklist for effective clinical communication."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Which vital sign counts breaths per minute?",
+        "options": [
+          "Body mass index",
+          "Respiratory rate",
+          "Blood glucose"
+        ],
+        "correct_index": 1,
+        "explanation": "Respiratory rate measures breathing cycles per minute."
+      }
+    },
+    {
+      "id": "presentation_biomedical_sciences",
+      "exam_paper_id": "biomedical_sciences",
+      "faculty_id": "medicine",
+      "major": "Biomedical Sciences",
+      "title": "The PCR Machine That Loved Repetition",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a question about identifying a target DNA fragment."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain how repeated temperature cycles amplify specific sequences by PCR."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with why negative controls are essential in an assay."
+        }
+      ],
+      "audience_question": {
+        "prompt": "PCR is mainly used to:",
+        "options": [
+          "Separate liquids by volatility",
+          "Measure tooth enamel hardness",
+          "Amplify selected DNA sequences"
+        ],
+        "correct_index": 2,
+        "explanation": "PCR uses primers and polymerase to amplify DNA."
+      }
+    },
+    {
+      "id": "presentation_contract_law",
+      "exam_paper_id": "contract_law",
+      "faculty_id": "law",
+      "major": "Contract Law",
+      "title": "The Contract That Ate the Appendix",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Describe a fictional dispute over a promised group project deliverable."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain offer, acceptance and consideration under common-law principles."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Distinguish possible remedies from a guaranteed outcome under all jurisdictions."
+        }
+      ],
+      "audience_question": {
+        "prompt": "In a typical common-law contract, consideration refers to:",
+        "options": [
+          "Bargained-for value",
+          "An email subject line",
+          "A court filing fee"
+        ],
+        "correct_index": 0,
+        "explanation": "Consideration is a bargained exchange supporting a promise."
+      }
+    },
+    {
+      "id": "presentation_public_law",
+      "exam_paper_id": "public_law",
+      "faculty_id": "law",
+      "major": "Public Law",
+      "title": "Judicial Review of the Impossible Rule",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Present a fictional administrative decision affecting student club access."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Discuss rule of law, legality and procedural fairness."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Recommend a transparent review process rather than promising a particular verdict."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Judicial review primarily considers:",
+        "options": [
+          "Popularity of a campus poster",
+          "Legality of public decision-making",
+          "The number of lawyers hired"
+        ],
+        "correct_index": 1,
+        "explanation": "Judicial review evaluates whether public power was exercised lawfully."
+      }
+    },
+    {
+      "id": "presentation_restorative_dentistry",
+      "exam_paper_id": "restorative_dentistry",
+      "faculty_id": "dentistry",
+      "major": "Restorative Dentistry",
+      "title": "The Crown That Left Before Finals",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a damaged tooth needing a restoration."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain preservation of sound tissue and why moisture control supports adhesive bonding."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with a patient communication plan for risks and alternatives."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Why is moisture control important when bonding composite?",
+        "options": [
+          "Water always increases bond strength",
+          "It removes the need for curing",
+          "Contamination can weaken adhesion"
+        ],
+        "correct_index": 2,
+        "explanation": "Adhesive bonds depend on a suitable surface condition."
+      }
+    },
+    {
+      "id": "presentation_oral_biology",
+      "exam_paper_id": "oral_biology",
+      "faculty_id": "dentistry",
+      "major": "Oral Biology",
+      "title": "The Biofilm That Stole the Toothbrush",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce how dental plaque develops and interacts with diet."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain acid generation, remineralization and the protective role of saliva."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with preventive habits based on biological mechanisms."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Which factor can contribute to tooth demineralization?",
+        "options": [
+          "Acids produced by plaque bacteria",
+          "Normal saliva buffering only",
+          "The color of a toothbrush"
+        ],
+        "correct_index": 0,
+        "explanation": "Bacterial sugar metabolism can create acidic conditions that dissolve tooth minerals."
+      }
+    },
+    {
+      "id": "presentation_music_theory",
+      "exam_paper_id": "music_theory",
+      "faculty_id": "music",
+      "major": "Music Theory",
+      "title": "The Key Signature That Disappeared",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a short melody whose key signature is missing."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain relative minor relationships and major-triad intervals."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude by identifying the suitable key signature and supporting it with harmony."
+        }
+      ],
+      "audience_question": {
+        "prompt": "What is the relative minor of C major?",
+        "options": [
+          "C minor",
+          "A minor",
+          "E major"
+        ],
+        "correct_index": 1,
+        "explanation": "A minor shares the same key signature as C major."
+      }
+    },
+    {
+      "id": "presentation_composition",
+      "exam_paper_id": "composition",
+      "faculty_id": "music",
+      "major": "Music Composition",
+      "title": "The Fugue With Three Group Leaders",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a musical motif shared among several voices."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Show how melodic inversion or counterpoint can develop a motif."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude by explaining instrumental balance when orchestrating the final phrase."
+        }
+      ],
+      "audience_question": {
+        "prompt": "What does melodic inversion change?",
+        "options": [
+          "Only the tempo number",
+          "A recording sample rate",
+          "Directions of melodic intervals"
+        ],
+        "correct_index": 2,
+        "explanation": "Inversion reverses the direction of intervals."
+      }
+    },
+    {
+      "id": "presentation_global_studies",
+      "exam_paper_id": "global_studies",
+      "faculty_id": "nusc",
+      "major": "Global Studies",
+      "title": "A Supply Chain That Crossed Every Border",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a hypothetical multi-country product supply chain."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Compare trade-offs among cost, resilience and social impacts."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Recommend evidence-informed sourcing under uncertainty."
+        }
+      ],
+      "audience_question": {
+        "prompt": "A global supply chain connects:",
+        "options": [
+          "Production and distribution across countries",
+          "Only one local store shelf",
+          "Only a government election"
+        ],
+        "correct_index": 0,
+        "explanation": "Global supply chains coordinate cross-border inputs, operations and logistics."
+      }
+    },
+    {
+      "id": "presentation_science_and_society",
+      "exam_paper_id": "science_and_society",
+      "faculty_id": "nusc",
+      "major": "Science and Society",
+      "title": "An Algorithm With Too Much Confidence",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Describe a fictional classifier used on a new population."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain distribution shift, reproducibility and responsible data handling."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Conclude with a transparent evaluation and ethical review plan."
+        }
+      ],
+      "audience_question": {
+        "prompt": "A model trained on a narrow population may show:",
+        "options": [
+          "Guaranteed accuracy for everyone",
+          "Poor generalization on new groups",
+          "No risk of unfair outcomes"
+        ],
+        "correct_index": 1,
+        "explanation": "Distribution shifts can reduce model validity in new groups."
+      }
+    },
+    {
+      "id": "presentation_epidemiology",
+      "exam_paper_id": "epidemiology",
+      "faculty_id": "public_health",
+      "major": "Epidemiology",
+      "title": "The Outbreak Curve at 23:59",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a hypothetical cluster of new cases."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Explain incidence, prevalence and the role of confounding."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Outline a sensible investigation and communications response."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Incidence counts:",
+        "options": [
+          "All buildings in the area",
+          "Only people already recovered",
+          "New cases over a defined period"
+        ],
+        "correct_index": 2,
+        "explanation": "Incidence measures new occurrence in a population over time."
+      }
+    },
+    {
+      "id": "presentation_health_policy",
+      "exam_paper_id": "health_policy",
+      "faculty_id": "public_health",
+      "major": "Health Policy",
+      "title": "How to Prioritize a Vaccine Queue",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a fictional vaccination access problem."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Compare primary prevention and equity criteria across populations."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Propose a transparent decision framework acknowledging limited resources."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Vaccination before infection is an example of:",
+        "options": [
+          "Primary prevention",
+          "Long-term rehabilitation",
+          "Only tertiary care"
+        ],
+        "correct_index": 0,
+        "explanation": "Primary prevention seeks to avert disease before it occurs."
+      }
+    },
+    {
+      "id": "presentation_policy_analysis",
+      "exam_paper_id": "policy_analysis",
+      "faculty_id": "public_policy",
+      "major": "Policy Analysis",
+      "title": "The Brief That Arrived After the Meeting",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Present a campus mobility proposal and define its policy problem."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Compare possible interventions using a counterfactual and costs versus benefits."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Recommend an implementable option with stated uncertainty."
+        }
+      ],
+      "audience_question": {
+        "prompt": "A counterfactual in impact evaluation asks:",
+        "options": [
+          "What the proposal is named",
+          "What would happen without the intervention",
+          "How long the slide deck is"
+        ],
+        "correct_index": 1,
+        "explanation": "A counterfactual is the unobserved outcome in the absence of the intervention."
+      }
+    },
+    {
+      "id": "presentation_public_administration",
+      "exam_paper_id": "public_administration",
+      "faculty_id": "public_policy",
+      "major": "Public Administration",
+      "title": "The Public Service Office That Lost Its Forms",
+      "timer_seconds": 150,
+      "minimum_voiced_seconds_per_slide": 5,
+      "slides": [
+        {
+          "title": "1 / OPENING",
+          "talk_prompt": "Introduce a fictional office facing complaints about delays."
+        },
+        {
+          "title": "2 / EXPLAIN YOUR EVIDENCE",
+          "talk_prompt": "Use accountability and performance indicators to diagnose operations."
+        },
+        {
+          "title": "3 / CONCLUDE",
+          "talk_prompt": "Recommend an interdepartmental process improvement and explain the governance safeguards."
+        }
+      ],
+      "audience_question": {
+        "prompt": "Public accountability requires officials to:",
+        "options": [
+          "Avoid all reporting",
+          "Ignore stakeholders",
+          "Explain and justify their actions"
+        ],
+        "correct_index": 2,
+        "explanation": "Accountability means answerability and oversight for public action."
+      }
+    }
+  ]
+}
