@@ -69,21 +69,24 @@ func _run() -> void:
         return
     event.keycode = KEY_F1
     event.pressed = true
-    hud._unhandled_input(event)
-    if not help.visible or not hud.help_backdrop.visible:
+    hud.call("_unhandled_input", event)
+    var help_backdrop: PanelContainer = hud.get_node("HelpBackdrop") as PanelContainer
+    if not help.visible or not help_backdrop.visible:
         _fail("F1 help overlay did not become visible")
         return
-    hud._unhandled_input(event)
+    hud.call("_unhandled_input", event)
     if help.visible:
         _fail("F1 help overlay did not close")
         return
 
-    hud._show_toast("UI TEST")
-    if not hud.toast_card.visible or hud.toast_label.text != "UI TEST":
+    hud.call("_show_toast", "UI TEST")
+    var toast_card: PanelContainer = hud.get_node("FeedbackToast") as PanelContainer
+    var toast_label: Label = toast_card.get_child(0) as Label
+    if not toast_card.visible or toast_label.text != "UI TEST":
         _fail("Milestone toast is not available")
         return
-    hud.sync_feedback_state()
-    if hud.toast_card.visible:
+    hud.call("sync_feedback_state")
+    if toast_card.visible:
         _fail("Restored account progress should not retain a toast")
         return
 
