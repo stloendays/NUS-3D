@@ -42,6 +42,12 @@ func _run() -> void:
                 _fail("A tutorial paragraph is missing Chinese or English")
                 return
 
+    # Ambient chatter must not consume the fixed introduction on the first Q press.
+    DialogueBank.reset_session()
+    var ambient_line: String = DialogueBank.next_line("outdoor", "Maya", 0, true)
+    if ambient_line.is_empty():
+        _fail("Ambient chatter needs a usable random line")
+        return
     var outdoor_intro: String = DialogueBank.next_line("outdoor", "Maya")
     if not outdoor_intro.contains("DDL"):
         _fail("First outdoor NPC introduction must be the fixed Chinese DDL joke")
