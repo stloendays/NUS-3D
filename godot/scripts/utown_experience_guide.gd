@@ -37,7 +37,7 @@ const EXPERIENCE_ZH: Dictionary = {
     "BOARD UTOWN SHUTTLE": "乘坐校园校车",
     "A suspiciously convenient commute": "好得可疑的便利交通",
     "Beat the clock  •  Keep moving": "与时间赛跑 · 继续前进",
-    _l("IN RANGE  •  Your next action is ready"): "已抵达 · 可以操作了",
+    "IN RANGE  •  Your next action is ready": "已抵达 · 可以操作了",
     "INTERACT": "互动", "Approach to use": "靠近互动",
     "NEXT OBJECTIVE": "下一个目标", "Schematic direction only": "仅供游戏引导",
     "AREA DISCOVERED": "发现新区域",
