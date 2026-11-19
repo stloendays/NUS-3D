@@ -4,7 +4,7 @@
 >
 > Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M3.4 sheltered interiors/rain + M3.5 visual finishing + M3.6 Coursework + M3.7 skippable cinematic entrance + M4 alpha Windows portable build pipeline (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M3.6 选择学院与 Coursework 任务](docs/M3_6_COURSEWORK_FACULTY.md) · [M3.7 入场动画](docs/M3_7_CINEMATIC_INTRO.md) · [M3.8 课后社团与棋牌聚会](docs/M3_8_POSTCOURSE_CLUB.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M3.6 选择学院与 Coursework 任务](docs/M3_6_COURSEWORK_FACULTY.md) · [M3.7 入场动画](docs/M3_7_CINEMATIC_INTRO.md) · [M3.8 课后社团与棋牌聚会](docs/M3_8_POSTCOURSE_CLUB.md) · [M3.9 3D 棋牌桌、NPC 与隐藏剧情](docs/M3_9_3D_CLUB_INTERACTIONS.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -202,7 +202,7 @@ Read [M3.7 intro documentation](docs/M3_7_CINEMATIC_INTRO.md). This original int
 
 Finish **all three Coursework chapters in any one faculty** to unlock the Post-Course Club permanently. Changing faculties preserves this unlock; completing all 39 fictional chapters grants a cosmetic all-faculty master title.
 
-- **P** opens or closes the club while on foot. Play a real **9 × 9 Gomoku** match against an NPC with immediate-win/block tactics, or a replayable **five-round high-card duel** using a 52-card shuffled deck. No wagers, cash prizes or gambling.
+- Enter the fictional **SRC interior**, walk beside the relevant game table or social counter and press **P**. Play a real **9 × 9 Gomoku** match against an NPC with immediate-win/block tactics, or a replayable **five-round high-card duel** using a 52-card shuffled deck. No wagers, cash prizes or gambling.
 - A third tab offers an original fictional after-class social scene with rotating NPC dialogue. Mocktails and tea/juice are always available; an optional adult toast requires a non-persistent declaration of local legal drinking age. There is no XP, currency or story advantage to the adult beverage.
 - After the optional adult scene, fictional bicycle and shuttle use are briefly restricted. No personal age, consumption history or payment information is stored.
 - Three decorative low-poly club stations appear in the existing *illustrative SRC room*, without altering walkable collisions or original quests.
@@ -210,3 +210,14 @@ Finish **all three Coursework chapters in any one faculty** to unlock the Post-C
 - Windows runtime and Godot smoke checks assert chess rules, card rounds, age acknowledgement, save/reload and faculty switching. Three actual Godot preview screenshots demonstrate the unlock screens.
 
 [Read M3.8 QA and rules](docs/M3_8_POSTCOURSE_CLUB.md). This original game venue is not a real NUS service.
+
+
+## M3.9: physical walk-up club, animated opponents and hidden ending
+
+The post-course club is now a **place inside the illustrative SRC scene, not an everywhere-available P-key menu**. After earning the three-chapter faculty unlock, visit the ground floor, walk next to the chess table, card table or social counter and press P. The player-facing station gets a subtle contextual glow rather than an intrusive direction sign; other activities require walking to the other table. Existing users keep their M3.8 win stats and faculty saves.
+
+Three original low-poly NPCs sit at the tables, idle, move their arms and celebrate the outcome. The scene board now shows actual black/white pieces from the current 9×9 Gomoku game, and the card table shows recent played-card results. Match wins add a compact animated confetti overlay, **original synthesized cheering and short UI cues**, with a sound toggle. These are runtime-generated tones/noise, not copied music or commercial recordings.
+
+A three-beat hidden comedy epilogue becomes available after **two chess wins, one card match win and a social visit**. Finishing all 39 Coursework chapters extends the secret final line. No drinking, wagering or transactions are required. Only anonymous game/epilogue counters are saved locally; old files remain compatible.
+
+See [M3.9 interaction and QA guide](docs/M3_9_3D_CLUB_INTERACTIONS.md) for exact unlocks and manual GPU playtest limitations.
