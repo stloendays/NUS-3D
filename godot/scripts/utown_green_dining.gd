@@ -143,7 +143,9 @@ func _build_lawn_tufts() -> void:
             rng.randf_range(bounds.position.x, bounds.end.x),
             rng.randf_range(bounds.position.y, bounds.end.y)
         )
-        if is_clear_lawn_point(candidate):
+        # Keep a small buffer for float32 MultiMesh transform quantisation:
+        # a generated point must remain clear after the GPU transform is stored.
+        if is_clear_lawn_point(candidate, 0.20):
             positions.append(candidate)
     generated_tuft_count = positions.size()
     if generated_tuft_count == 0:
