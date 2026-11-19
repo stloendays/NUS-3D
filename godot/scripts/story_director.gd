@@ -246,7 +246,19 @@ func load_account() -> void:
     if int(loaded.get("schema_version", 0)) == 1:
         events = loaded.get("events", {}) if typeof(loaded.get("events", {})) == TYPE_DICTIONARY else {}
         decisions = loaded.get("decisions", {}) if typeof(loaded.get("decisions", {})) == TYPE_DICTIONARY else {}
-        archive = loaded.get("archive", {}) if typeof(loaded.get("archive", {})) == TYPE_DICTIONARY else {}
+        # JSON.decode returns numeric counters as floats. Normalize to bounded
+        # integers so the in-memory ending gallery survives round trips exactly.
+        archive = {}
+        var loaded_archive: Variant = loaded.get("archive", {})
+        if typeof(loaded_archive) == TYPE_DICTIONARY:
+            for raw_ending_id in loaded_archive.keys():
+                var stored_id: String = str(raw_ending_id)
+                var value: Variant = loaded_archive[raw_ending_id]
+                if get_ending(stored_id).is_empty() or (typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT):
+                    continue
+                var restored_count: int = clampi(int(value), 0, MAX_ARCHIVE_COUNT)
+                if restored_count > 0:
+                    archive[stored_id] = restored_count
         ending_id = str(loaded.get("ending", ""))
         kindness = clampi(int(loaded.get("kindness", 0)), -15, 15)
         integrity = clampi(int(loaded.get("integrity", 0)), -15, 15)
