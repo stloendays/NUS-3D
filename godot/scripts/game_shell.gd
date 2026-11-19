@@ -322,6 +322,8 @@ func _enter_game() -> void:
         tour.discovered_ids.append(str(entry))
         tour.current_index += 1
     tour.completed = tour.current_index == tour.stops.size()
+    # The account's saved progress should not look like fresh pickups in HUD.
+    game.get_node("HUD").call("sync_feedback_state")
 
     observed_tour_ids.clear()
     observed_note_ids.clear()
