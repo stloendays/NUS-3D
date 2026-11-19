@@ -112,21 +112,8 @@ func _make_screen() -> void:
     add_child(screen)
 
 
-func _panel_style(background: Color, trim: Color, radius: int = 12, margin: int = 10) -> StyleBoxFlat:
-    var style: StyleBoxFlat = StyleBoxFlat.new()
-    style.bg_color = background
-    style.border_color = trim
-    style.set_border_width_all(1)
-    style.border_width_top = 2
-    style.set_corner_radius_all(radius)
-    style.content_margin_left = margin
-    style.content_margin_right = margin
-    style.content_margin_top = margin
-    style.content_margin_bottom = margin
-    style.shadow_color = Color(0.01, 0.025, 0.04, 0.67)
-    style.shadow_size = 7
-    style.shadow_offset = Vector2(0, 4)
-    return style
+func _panel_style(_legacy_background: Color, trim: Color, radius: int = 12, margin: int = 10) -> StyleBoxFlat:
+    return NUS3DUISkin.glass(trim.darkened(0.25), maxi(radius, 18), margin)
 
 
 func _panel(name: String, from_left: float, to_right: float, from_top: float, to_bottom: float, anchor_x: float, anchor_y: float, background: Color, trim: Color) -> PanelContainer:
@@ -151,7 +138,8 @@ func _label(text_value: String, size_value: int, color: Color) -> Label:
     label.text = text_value
     label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     label.add_theme_font_size_override("font_size", size_value)
-    label.add_theme_color_override("font_color", color)
+    label.add_theme_color_override("font_color",
+        NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color)
     label.clip_text = true
     return label
 
