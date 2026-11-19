@@ -15,7 +15,7 @@ The cinema-style overlay features a live progress bar, changeable captions, lett
 
 ## Accessibility and skipping
 
-- The intro plays once at every game launch. Skip at any time with Space, Esc, Enter or the top-right 跳过 button.
+- The intro plays once at every game launch. Skip at any time with Space, Esc, Enter, left mouse-click anywhere, or the top-right 跳过 button.
 - Gameplay keypresses and mouse-look are swallowed while the cinematic camera is current.
 - Player movement and the fictional DDL timer pause during the intro.
 - If the player has not selected a faculty, the film hands off to the first-run faculty picker.
