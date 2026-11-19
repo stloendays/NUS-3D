@@ -1,6 +1,6 @@
 extends Control
-var language_service: NUS3DGameLanguage
 class_name NUS3DTutorial
+var language_service: NUS3DGameLanguage
 ## Standalone, data-driven startup guide. This panel works while SceneTree is paused.
 ## Content is maintained in res://data/startup_tutorial.json, not in gameplay scripts.
 

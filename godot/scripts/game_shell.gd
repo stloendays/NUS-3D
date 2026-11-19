@@ -1,6 +1,6 @@
 extends Node
-var language_service: NUS3DGameLanguage
 class_name NUS3DGameShell
+var language_service: NUS3DGameLanguage
 ## Application shell: a separate login, profile and mailbox layer around main.tscn.
 ## The original 3D world and its hotkeys remain in their own scene.
 
