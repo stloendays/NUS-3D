@@ -1,0 +1,119 @@
+extends CanvasLayer
+class_name NUS3DEndingCutscenes
+## Lightweight vector/cartoon ending sequences. No external textures or gameplay mutation.
+signal finished
+
+const PALETTES := {
+    "loop_breaker": ["#202c58", "#f8d56c", "03:01", "TIME LOOP BROKEN"],
+    "campus_hero": ["#27645b", "#ffe1a1", "NUS", "CAMPUS HERO"],
+    "ddl_survivor": ["#244f6a", "#b3e8b5", "100%", "SUBMITTED!"],
+    "burnout": ["#674350", "#f2b080", "COFFEE", "SYSTEM OVERHEAT"],
+    "integrity_alarm": ["#772f40", "#ffb7a5", "!", "PLOT TWIST!"],
+    "ddl_blackhole": ["#322a60", "#d9a5ee", "9999", "TOMORROW FOREVER"]
+}
+const SHOTS := {
+    "loop_breaker": ["03:00", "03:01", "8 AM IS THE FINAL BOSS"],
+    "campus_hero": ["GROUP PROJECT SAVED", "LAB NOTES RETURNED", "ONE-PAGE SPEECH"],
+    "ddl_survivor": ["UPLOAD 99%", "UPLOAD 100%", "NEW SEMESTER UNLOCKED"],
+    "burnout": ["ESPRESSO x4", "LAPTOP FAN: MAX", "COFFEE MACHINE HEIR"],
+    "integrity_alarm": ["SLIDES: PERFECT", "DATA: NOT SO MUCH", "REPEAT THE EXPERIMENT"],
+    "ddl_blackhole": ["I'LL DO IT TOMORROW", "TOMORROW x9999", "THE DEADLINE BLACK HOLE"]
+}
+
+var curtain: ColorRect
+var actor: Control
+var actor_face: Label
+var headline: Label
+var subline: Label
+var skip: Button
+var active: bool = false
+var generation: int = 0
+var timeline: Tween
+
+
+func _ready() -> void:
+    layer = 90
+    process_mode = Node.PROCESS_MODE_ALWAYS
+    curtain = ColorRect.new()
+    curtain.name = "EndingCutscene"
+    curtain.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    curtain.mouse_filter = Control.MOUSE_FILTER_STOP
+    add_child(curtain)
+    var center := CenterContainer.new()
+    center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    curtain.add_child(center)
+    var column := VBoxContainer.new()
+    column.custom_minimum_size = Vector2(480, 330)
+    column.add_theme_constant_override("separation", 18)
+    center.add_child(column)
+    headline = Label.new()
+    headline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    headline.add_theme_font_size_override("font_size", 32)
+    column.add_child(headline)
+    actor = Control.new()
+    actor.custom_minimum_size = Vector2(320, 155)
+    column.add_child(actor)
+    actor_face = Label.new()
+    actor_face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    actor_face.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    actor_face.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    actor_face.add_theme_font_size_override("font_size", 65)
+    actor.add_child(actor_face)
+    subline = Label.new()
+    subline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    subline.add_theme_font_size_override("font_size", 23)
+    column.add_child(subline)
+    skip = Button.new()
+    skip.text = "SKIP / CONTINUE  [ESC]"
+    skip.custom_minimum_size.y = 44
+    skip.pressed.connect(stop)
+    column.add_child(skip)
+    curtain.hide()
+
+
+func play(ending_id: String) -> void:
+    if not PALETTES.has(ending_id):
+        return
+    stop()
+    active = true
+    generation += 1
+    var current: int = generation
+    var palette: Array = PALETTES[ending_id]
+    curtain.color = Color.html(str(palette[0]))
+    actor_face.add_theme_color_override("font_color", Color.html(str(palette[1])))
+    headline.text = str(palette[3])
+    curtain.show()
+    # Three small, readable beats; every sequence is skippable.
+    var shots: Array = SHOTS[ending_id]
+    for i in range(shots.size()):
+        if not active or generation != current:
+            return
+        subline.text = str(shots[i])
+        actor_face.text = str(palette[2]) if i == 2 else ("..." if i == 0 else "!")
+        actor.pivot_offset = actor.size * 0.5
+        actor.scale = Vector2(0.82, 0.82)
+        actor.rotation = -0.08 if i % 2 == 0 else 0.08
+        timeline = create_tween()
+        timeline.set_parallel(true)
+        timeline.tween_property(actor, "scale", Vector2.ONE, 0.38).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+        timeline.tween_property(actor, "rotation", 0.0, 0.38).set_trans(Tween.TRANS_BACK)
+        await get_tree().create_timer(1.15, true).timeout
+    if active and generation == current:
+        stop()
+
+
+func stop() -> void:
+    if not active:
+        return
+    active = false
+    generation += 1
+    if timeline != null and timeline.is_running():
+        timeline.kill()
+    curtain.hide()
+    finished.emit()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+    if active and event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+        stop()
+        get_viewport().set_input_as_handled()
