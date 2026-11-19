@@ -1,0 +1,594 @@
+{
+  "schema_version": 1,
+  "default_locale": "en",
+  "locales": [
+    "zh",
+    "en"
+  ],
+  "ui": {
+    "NUS-3D": "NUS-3D",
+    "UTOWN EXPLORER  /  OFFLINE ALPHA": "UTOWN 探索者 / 离线测试版",
+    "Explore an original, unofficial campus world.": "走进脑洞大开的非官方校园，DDL 正在追你。",
+    "SIGN IN": "登录",
+    "CREATE ACCOUNT": "创建账号",
+    "Local username (3-20 characters)": "本机用户名（3–20 位英数字符）",
+    "Password (at least 8 characters)": "密码（至少 8 位）",
+    "Sign in and explore": "登录并进入校园",
+    "Register and explore": "注册并进入校园",
+    "Create a new local account": "注册本机账号",
+    "Already have an account? Sign in": "已有账号？返回登录",
+    "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.": "仅支持本机账号，不是 NUS 官方登录，也不会自动跨设备同步。\n进度与游戏邮件保存在此设备。",
+    "新手教程  /  HOW TO PLAY": "新手教程 / 玩法说明",
+    "Mail [J]": "游戏邮箱 [J]",
+    "Log out": "退出登录",
+    "CAMPUS POST  /  LOCAL MAILBOX": "校园邮局 / 本地邮箱",
+    "Only accounts registered on this installation can exchange messages.": "只能给本机已注册的游戏账号寄信，不会发送真实邮件。",
+    "Close [J]": "关闭邮箱 [J]",
+    "Inbox": "收件箱",
+    "Sent": "已发送",
+    "Compose": "写邮件",
+    "Select a message.": "请选择一封邮件",
+    "Sent mail": "已发送邮件",
+    "Delete selected message": "删除所选邮件",
+    "New local message": "写一封游戏邮件",
+    "Recipient username on this computer": "本机收件人用户名",
+    "Subject": "主题",
+    "Write your message (up to 2,000 characters)": "写点什么（最多 2,000 字符）",
+    "Send local message": "发送本地邮件",
+    "Message delivered to the recipient's local inbox.": "已投递到对方的本机收件箱。",
+    "Incorrect account name or password.": "账号或密码错误。",
+    "Name: 3-20 lowercase letters, numbers or underscores.": "用户名需要 3–20 位英文字母、数字或下划线。",
+    "Password must have 8-128 characters.": "密码需要 8–128 位。",
+    "That local account already exists.": "本机已存在这个账号。",
+    "Cannot create local profile.": "无法创建本地存档。",
+    "Cannot save local account registry.": "账号信息无法保存。",
+    "Account record is invalid.": "账号记录无效。",
+    "Local profile data is missing.": "账号存档不存在或损坏。",
+    "Sign in to send a message.": "请先登录再发邮件。",
+    "Recipient must be an account registered on this device.": "收件人必须是本机已注册账号。",
+    "Subject: 1-80 characters.": "主题必须为 1–80 字符。",
+    "Body: 1-2000 characters.": "正文必须为 1–2000 字符。",
+    "Recipient mailbox unavailable.": "无法打开收件人的邮箱。",
+    "Could not deliver message.": "消息投递失败。",
+    "THE CAMPUS IS AN UNOFFICIAL ART PROJECT": "校园场景属于非官方创作",
+    "NUS / UTOWN — UNOFFICIAL 3D": "NUS / UTOWN — 非官方 3D 校园",
+    "Architectural study · not surveyed / not official NUS data": "概念建筑 / 未实测 / 非 NUS 官方数据",
+    "GIS comparison loading...": "GIS 对比加载中…",
+    "SCHEMATIC EXPLORATION — not a real route.": "概念路线，不可用于实际导航。",
+    "WASD move  ·  Mouse look  ·  Shift sprint": "WASD 移动 · 鼠标视角 · Shift 奔跑",
+    "Nearest landmark: Town Green": "最近地标：Town Green",
+    "Next: Education Resource Centre": "下个目标：ERC",
+    "FIELD NOTE": "探索笔记",
+    "WEATHER  CLEAR  |  [Y] change\nCAMPUS LIFE": "天气 晴天 [Y] 切换\n校园生活",
+    "Level up!": "升级啦！",
+    "Welcome to NUS-3D!": "欢迎来到 NUS-3D！",
+    "Campus Office": "校园事务处（虚构）"
+  },
+  "fragments": [
+    {
+      "en": "Find the glowing Field Notes along the schematic paths.",
+      "zh": "沿路寻找发光的探索笔记，千万别把 DDL 也捡走。"
+    },
+    {
+      "en": "No Field Note in reach. Look for a glowing marker.",
+      "zh": "附近没有探索笔记，继续找发光标记。"
+    },
+    {
+      "en": "Campus Sprint is unavailable: route data is incomplete.",
+      "zh": "校园竞速暂不可用：路线数据不完整。"
+    },
+    {
+      "en": "Return to the Town Green start area, then press V.",
+      "zh": "返回 Town Green 起点并按 V 开始竞速。"
+    },
+    {
+      "en": "Campus Sprint started. Reach ERC first.",
+      "zh": "竞速开始！先冲向 ERC，DDL 在你身后！"
+    },
+    {
+      "en": "Campus Sprint cancelled.",
+      "zh": "已取消校园竞速。"
+    },
+    {
+      "en": "No campus character is close enough to talk.",
+      "zh": "附近没有可以交谈的 NPC。"
+    },
+    {
+      "en": "Move closer to an indoor character before pressing Q.",
+      "zh": "走近室内 NPC 后再按 Q。"
+    },
+    {
+      "en": "Pure cartoon: nobody gets hurt.",
+      "zh": "纯卡通胡闹，没人会真正受伤。"
+    },
+    {
+      "en": "Try bicycle mode if you want to cover the map faster.",
+      "zh": "想逛得快一点就按 B 骑自行车。"
+    },
+    {
+      "en": "The weather presets are artistic effects, not a live Singapore forecast.",
+      "zh": "天气只是游戏特效，不是实时天气预报。"
+    },
+    {
+      "en": "Campus Sprint:",
+      "zh": "校园竞速："
+    },
+    {
+      "en": "UTOWN FIELD NOTES",
+      "zh": "UTOWN 探索笔记"
+    },
+    {
+      "en": "Find the glowing",
+      "zh": "寻找发光的"
+    },
+    {
+      "en": "Press E to check in.",
+      "zh": "按 E 打卡。"
+    },
+    {
+      "en": "Press G to explore again.",
+      "zh": "按 G 再玩一次。"
+    },
+    {
+      "en": "Continue to your next checkpoint.",
+      "zh": "前往下一个打卡点。"
+    },
+    {
+      "en": "EXPLORER COMPLETE",
+      "zh": "探索任务完成"
+    },
+    {
+      "en": "DISCOVERED",
+      "zh": "已发现"
+    },
+    {
+      "en": "DISCOVERY STOP",
+      "zh": "探索打卡点"
+    },
+    {
+      "en": "TOUR COMPLETE",
+      "zh": "探索完成"
+    },
+    {
+      "en": "Tour complete",
+      "zh": "探索完成"
+    },
+    {
+      "en": "Tour unavailable",
+      "zh": "探索任务不可用"
+    },
+    {
+      "en": "Tour ",
+      "zh": "探索 "
+    },
+    {
+      "en": "Nearest landmark:",
+      "zh": "最近地标："
+    },
+    {
+      "en": "Near:",
+      "zh": "附近："
+    },
+    {
+      "en": "Nearby:",
+      "zh": "附近："
+    },
+    {
+      "en": "WASD move",
+      "zh": "WASD 移动"
+    },
+    {
+      "en": "Mouse look",
+      "zh": "鼠标转向"
+    },
+    {
+      "en": "Shift sprint",
+      "zh": "Shift 奔跑"
+    },
+    {
+      "en": "Next:",
+      "zh": "目标："
+    },
+    {
+      "en": "Notes [C]",
+      "zh": "笔记 [C]"
+    },
+    {
+      "en": "Sprint [V]",
+      "zh": "竞速 [V]"
+    },
+    {
+      "en": "WEATHER",
+      "zh": "天气"
+    },
+    {
+      "en": "THUNDERSTORM",
+      "zh": "雷暴"
+    },
+    {
+      "en": "OVERCAST",
+      "zh": "阴天"
+    },
+    {
+      "en": "CLOUDY",
+      "zh": "多云"
+    },
+    {
+      "en": "CLEAR",
+      "zh": "晴天"
+    },
+    {
+      "en": "RAIN",
+      "zh": "下雨"
+    },
+    {
+      "en": "change",
+      "zh": "切换"
+    },
+    {
+      "en": "CAMPUS LIFE",
+      "zh": "校园生活"
+    },
+    {
+      "en": "pedestrians",
+      "zh": "位行人"
+    },
+    {
+      "en": "talk",
+      "zh": "交谈"
+    },
+    {
+      "en": "INDOORS:",
+      "zh": "室内："
+    },
+    {
+      "en": "MEZZANINE",
+      "zh": "夹层"
+    },
+    {
+      "en": "GROUND",
+      "zh": "底层"
+    },
+    {
+      "en": "lift",
+      "zh": "换层"
+    },
+    {
+      "en": "exit",
+      "zh": "离开"
+    },
+    {
+      "en": "LIFE EXPERIENCES",
+      "zh": "生活体验"
+    },
+    {
+      "en": "explore cafe / lounge / gallery",
+      "zh": "探索咖啡厅／休息区／展廊"
+    },
+    {
+      "en": "ON UTOWN SHUTTLE",
+      "zh": "正在乘坐校园校车"
+    },
+    {
+      "en": "alight",
+      "zh": "下车"
+    },
+    {
+      "en": "ERC / SRC interiors",
+      "zh": "ERC / SRC 室内"
+    },
+    {
+      "en": "bicycle",
+      "zh": "自行车"
+    },
+    {
+      "en": "Bicycle",
+      "zh": "自行车"
+    },
+    {
+      "en": "shuttle",
+      "zh": "校车"
+    },
+    {
+      "en": "FOUND:",
+      "zh": "获得："
+    },
+    {
+      "en": "Nearby",
+      "zh": "附近"
+    },
+    {
+      "en": "press C to collect",
+      "zh": "按 C 收集"
+    },
+    {
+      "en": "Checkpoint reached:",
+      "zh": "通过检查点："
+    },
+    {
+      "en": "Checkpoint",
+      "zh": "检查点"
+    },
+    {
+      "en": "start near Town Green",
+      "zh": "在 Town Green 附近开始"
+    },
+    {
+      "en": "cancel sprint",
+      "zh": "取消竞速"
+    },
+    {
+      "en": "SPRINT",
+      "zh": "竞速"
+    },
+    {
+      "en": "NEXT",
+      "zh": "下一站"
+    },
+    {
+      "en": "LAST",
+      "zh": "上次"
+    },
+    {
+      "en": "PB",
+      "zh": "个人最佳"
+    },
+    {
+      "en": "FINISH",
+      "zh": "完成"
+    },
+    {
+      "en": "BRONZE",
+      "zh": "铜牌"
+    },
+    {
+      "en": "SILVER",
+      "zh": "银牌"
+    },
+    {
+      "en": "GOLD",
+      "zh": "金牌"
+    },
+    {
+      "en": "OFF",
+      "zh": "关"
+    },
+    {
+      "en": "ON",
+      "zh": "开"
+    },
+    {
+      "en": "Daylight",
+      "zh": "白天"
+    },
+    {
+      "en": "Golden Hour",
+      "zh": "黄金时刻"
+    },
+    {
+      "en": "Blue Hour",
+      "zh": "蓝调时刻"
+    },
+    {
+      "en": "Evening",
+      "zh": "夜晚"
+    },
+    {
+      "en": "MAP",
+      "zh": "地图"
+    },
+    {
+      "en": "MAP VIEW",
+      "zh": "地图视图"
+    },
+    {
+      "en": "PHOTO",
+      "zh": "拍照"
+    },
+    {
+      "en": "reference",
+      "zh": "参考"
+    },
+    {
+      "en": "UNOFFICIAL",
+      "zh": "非官方"
+    },
+    {
+      "en": "NOT real accuracy",
+      "zh": "并非真实测绘精度"
+    },
+    {
+      "en": "not a real route",
+      "zh": "不是实际道路"
+    },
+    {
+      "en": "not real directions",
+      "zh": "不可用于实地导航"
+    },
+    {
+      "en": "WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   L lift floors   F indoor activity   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD",
+      "zh": "WASD 移动   Shift 奔跑   B 骑车   X 校车   I 进出建筑   L 换楼层   F 室内互动   Q 交谈   Y 天气   E 打卡   G 重玩   C 收集   V 竞速   M 地图   T 光线   F2 建筑细节   F3 视角   F4 截图   F6 OSM   F7 隐藏 HUD"
+    },
+    {
+      "en": "M2 ",
+      "zh": "M2 "
+    },
+    {
+      "en": "UTOWN EXPLORER COMPLETE",
+      "zh": "UTOWN 探索全部完成"
+    },
+    {
+      "en": "UTOWN EXPLORER",
+      "zh": "UTOWN 探索者"
+    },
+    {
+      "en": "ALL",
+      "zh": "全部"
+    },
+    {
+      "en": "Press E to check in. Schematic route; not real directions.",
+      "zh": "按 E 打卡。这是示意路线，不能实地导航。"
+    },
+    {
+      "en": "Original unofficial exploration complete. Press G to replay.",
+      "zh": "非官方校园探索完成，按 G 可以重玩。"
+    },
+    {
+      "en": "Drying pavement",
+      "zh": "路面正在变干"
+    },
+    {
+      "en": "Rain / wet ground",
+      "zh": "雨天 / 地面湿滑"
+    },
+    {
+      "en": "Storm / wet ground",
+      "zh": "雷暴 / 地面湿滑"
+    },
+    {
+      "en": "Returned to the schematic outdoor scene.",
+      "zh": "回到概念化的室外校园。"
+    },
+    {
+      "en": "Approach the ERC or SRC study entrance, then press I.",
+      "zh": "靠近 ERC / SRC 的游戏入口，再按 I。"
+    },
+    {
+      "en": "Approach the moving UTown shuttle and press X to board.",
+      "zh": "靠近游戏校车后按 X 上车。"
+    },
+    {
+      "en": "On board. Press X to alight.",
+      "zh": "上车成功，按 X 下车。"
+    },
+    {
+      "en": "You have left the shuttle.",
+      "zh": "已从校车下车。"
+    },
+    {
+      "en": "Entered ",
+      "zh": "进入 "
+    },
+    {
+      "en": "illustrative interior. Press I to return.",
+      "zh": " 概念室内，按 I 返回。"
+    },
+    {
+      "en": "Bicycle mode ",
+      "zh": "自行车模式 "
+    },
+    {
+      "en": "Speed is increased.",
+      "zh": "速度提升！"
+    },
+    {
+      "en": "Move closer to a cafe, reading area or activity station.",
+      "zh": "靠近咖啡厅、阅读区或活动站后再按 F。"
+    },
+    {
+      "en": "REVISITED",
+      "zh": "再次探索"
+    },
+    {
+      "en": "M2 ON",
+      "zh": "M2 开"
+    },
+    {
+      "en": "M2 OFF",
+      "zh": "M2 关"
+    },
+    {
+      "en": "Dry",
+      "zh": "干燥"
+    },
+    {
+      "en": "rain",
+      "zh": "下雨"
+    },
+    {
+      "en": "Cloudy",
+      "zh": "多云"
+    },
+    {
+      "en": "Overcast",
+      "zh": "阴天"
+    },
+    {
+      "en": "Clear",
+      "zh": "晴天"
+    },
+    {
+      "en": "Thunderstorm",
+      "zh": "雷暴"
+    },
+    {
+      "en": "Rain",
+      "zh": "下雨"
+    },
+    {
+      "en": "Level up! LV",
+      "zh": "升级啦！LV"
+    },
+    {
+      "en": "CAMPUS POST",
+      "zh": "校园邮局"
+    },
+    {
+      "en": "LV ",
+      "zh": "等级 "
+    }
+  ],
+  "note": "Static UI uses exact English keys; game HUD fragments apply only to built-in gameplay text, never user-authored mail.",
+  "tour_zh": {
+    "GREEN": {
+      "title": "Town Green 草坪",
+      "observation": "找一找校园中央的草地。这里很适合放空，前提是 DDL 不追过来。",
+      "discovery": "Town Green 是开放草地区域的概念模型，草坪边缘与树木并未实测。别真的在这里按 E 寻找学分。"
+    },
+    "ERC": {
+      "title": "教育资源中心（ERC）",
+      "observation": "看看浅色建筑和玻璃立面，按 F2 比较建筑表现层。",
+      "discovery": "这里展示了 ERC 的玻璃、遮阳与弧形体量概念模型。所有尺寸都是估计的，毕竟我们没把测量卷尺带进游戏。"
+    },
+    "SRC": {
+      "title": "Stephen Riady Centre（SRC）",
+      "observation": "朝大型建筑群及抬升的论坛空间看一看。",
+      "discovery": "SRC 有概念化的论坛圆盘及连廊。按 F6 对比 OSM 轮廓与估计建筑模型，这不是实地测绘。"
+    },
+    "PLAZA": {
+      "title": "Town Plaza 广场",
+      "observation": "寻找 CREATE 附近的铺装广场，四站任务即将完成！",
+      "discovery": "Town Plaza 是四站探索的终点。这些道路和广场仅为示意，请别把游戏导航用作真实无障碍路线。"
+    }
+  },
+  "world_names": {
+    "Town Green": "Town Green 草坪",
+    "Town Plaza": "Town Plaza 广场",
+    "Education Resource Centre": "教育资源中心 ERC",
+    "Stephen Riady Centre": "Stephen Riady Centre（SRC）",
+    "UTown Residence": "UTown 宿舍",
+    "Tembusu College": "Tembusu 学院",
+    "College of Alice & Peter Tan": "Alice & Peter Tan 学院",
+    "Residential College 4": "RC4 学院",
+    "Cinnamon College": "Cinnamon 学院",
+    "CREATE": "CREATE 科研区"
+  },
+  "item_zh": {
+    "Local Coordinate Frame": "局部坐标系",
+    "The scene uses a local east/north coordinate frame: east is +X and north is -Z.": "场景采用局部东西/南北坐标系：东为 +X，北为 -Z。",
+    "Procedural Green": "程序化草地",
+    "Town Green is an approximate outline. Its grass, trees and small props are procedural interpretations.": "Town Green 的轮廓是估计的，草、树和小道具由程序生成。",
+    "ERC Facade Study": "ERC 立面研究",
+    "The ERC glazing, sunshades and curved bay are estimated architectural studies, not measured construction drawings.": "ERC 玻璃立面、遮阳和弧形体量是建筑概念研究，非现场测绘或施工图。",
+    "Schematic Walkway": "示意步行道",
+    "This connector is a game-world proxy. It is not a surveyed pedestrian route or accessibility recommendation.": "这段连廊只是游戏示意，并非实测步行路线或无障碍指南。",
+    "SRC Forum Study": "SRC 论坛空间研究",
+    "The SRC forum disc and stacked connector volumes are provisional visual studies.": "SRC 论坛圆盘与连廊体量仍是概念化视觉研究。",
+    "GIS Reference Layer": "GIS 参考图层",
+    "OpenStreetMap outlines are comparison references, not certified building footprints or verified 3D geometry.": "OpenStreetMap 轮廓仅用于模型对比，不是认证建筑轮廓或核实的 3D 几何。",
+    "Lighting Presets": "光照预设",
+    "Daylight, golden-hour, blue-hour and evening modes are artistic presets, not a solar or weather simulation.": "白天、黄金时刻、蓝调和夜晚只是艺术光照，并非真实日照或天气模拟。",
+    "Photo Review": "拍摄视角对比",
+    "Camera viewpoints support visual comparison, but heading, elevation and building alignment still need manual review.": "相机视角可帮助比较，但航向、高差和建筑位置仍需人工核验。"
+  }
+}
