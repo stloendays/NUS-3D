@@ -30,9 +30,12 @@ Both NUS3D-UTown.exe and NUS3D-UTown.pck MUST remain in the same directory.
 Extract the ZIP and launch NUS3D-UTown.exe. No Godot editor is required.
 
 Controls: WASD walk, mouse look, Shift sprint, Space jump, Esc release mouse,
-R reset, M map, E discover nearby checkpoint, G replay completed tour,
-F1 help, F2 facade study, F3 viewpoints, F4 screenshot,
-F6 OSM reference, F7 hide HUD, T lighting cycle.
+R reset, M map, E discover checkpoint, G replay tour, C collect Field Notes,
+V Campus Sprint, B bicycle, X shuttle, I enter interiors, L change floor,
+F interact at activities, Q talk to fictional NPCs, Y weather, T lighting,
+O choose/change faculty, J coursework journal, K take/submit coursework,
+F1 help, F2 facade study, F3 viewpoints, F4 screenshot, F6 OSM reference,
+F7 hide HUD. Deadlines/grades are fictional game mechanics.
 
 The executable is unsigned; provenance and SHA-256 digests are in
 BUILD_MANIFEST.json. Rebuild from the GitHub source rather than overriding
