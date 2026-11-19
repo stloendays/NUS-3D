@@ -96,10 +96,10 @@ func _run() -> void:
         return
 
     # GPT-generated proposals are untrusted suggestions, never auto-executed.
-    if not console.validate_ai_proposal('{"action":"execute_script","value":1,"reason":"danger"}').is_empty():
+    if not NUS3DAdminConsole.validate_ai_proposal('{"action":"execute_script","value":1,"reason":"danger"}').is_empty():
         _fail("Unsafe GPT proposal action accepted")
         return
-    if not console.validate_ai_proposal('{"action":"grant_coins","value":999999,"reason":"too high"}').is_empty():
+    if not NUS3DAdminConsole.validate_ai_proposal('{"action":"grant_coins","value":999999,"reason":"too high"}').is_empty():
         _fail("Out-of-range GPT proposal accepted")
         return
     var light_now: int = (shell.game.get_node("World") as UTownWorld).lighting_mode
