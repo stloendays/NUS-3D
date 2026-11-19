@@ -26,7 +26,22 @@ $Names = @($ExeName, $PackName, $HelperName, $ManifestName, $ReadmeName)
 $Staging = ""
 $Backup = ""
 $OldMoved = $false
+$Phase = "validation"
 
+function Copy-WithRetry([string]$from, [string]$to) {
+    # Antivirus scanners and just-exited game processes can hold Windows EXE
+    # handles briefly. Retry only local, fixed-path file copies; never force-kill
+    # another process or elevate.
+    for ($attempt = 1; $attempt -le 20; $attempt++) {
+        try {
+            [System.IO.File]::Copy($from, $to, $true)
+            return
+        } catch {
+            if ($attempt -eq 20) { throw }
+            Start-Sleep -Milliseconds 400
+        }
+    }
+}
 function Assert-Input($condition, [string]$reason) {
     if (-not $condition) { throw $reason }
 }
@@ -147,26 +162,33 @@ try {
             }
         }
     }
+    $Phase = "staging"
     $token = [Guid]::NewGuid().ToString("N")
     $Staging = Join-Path $root (".nus3d-stage-" + $token)
     $Backup = Join-Path $root (".nus3d-backup-" + $token)
     Extract-Verified $zipPath $Staging $manifest
+    $Phase = "candidate self-test"
     Smoke-Stage $Staging
+    $Phase = "backing up"
     [System.IO.Directory]::CreateDirectory($Backup) | Out-Null
     # Preserve the previous version until both payload files and the update
     # helper have been replaced successfully. Never touch user:// saves.
     foreach ($name in @($ExeName,$PackName,$HelperName)) {
         $old = Join-Path $root $name
         if ([System.IO.File]::Exists($old)) {
-            Copy-Item -LiteralPath $old -Destination (Join-Path $Backup $name) -Force
+            Copy-WithRetry $old (Join-Path $Backup $name)
         }
     }
     $OldMoved = $true
+    $Phase = "replacing executable and resource pack"
     foreach ($name in @($ExeName,$PackName,$HelperName)) {
-        Move-Item -LiteralPath (Join-Path $Staging $name) -Destination (Join-Path $root $name) -Force
+        $installed = Join-Path $root $name
+        Copy-WithRetry (Join-Path $Staging $name) $installed
+        Assert-Input ((Sha256 $installed) -ceq $manifest.files.PSObject.Properties[$name].Value.sha256) "Installed file checksum mismatch: $name"
     }
     # If relaunch fails, the previous files can still be restored from Backup.
     # -NoLaunch is a CI-only acceptance test; the game updater never uses it.
+    $Phase = "launching new game"
     if (-not $NoLaunch) {
         Start-Process -FilePath (Join-Path $root $ExeName) -WorkingDirectory $root -ErrorAction Stop
     }
@@ -185,12 +207,12 @@ try {
     Write-Output "NUS3D_UPDATE_INSTALLED $ExpectedVersion"
     exit 0
 } catch {
-    $reason = [string]$_
+    $reason = "$Phase : " + [string]$_
     if ($OldMoved -and $Backup -and (Test-Path -LiteralPath $Backup)) {
         foreach ($name in @($ExeName,$PackName,$HelperName)) {
             $older = Join-Path $Backup $name
             if (Test-Path -LiteralPath $older) {
-                try { Copy-Item -LiteralPath $older -Destination (Join-Path $root $name) -Force }
+                try { Copy-WithRetry $older (Join-Path $root $name) }
                 catch { Write-Warning "Could not restore $name : $_" }
             }
         }
