@@ -67,6 +67,19 @@ MODE_PROMPTS = {
         "Give short original jokes about deadlines, group projects or rain. "
         "Don't invent claims about real students or faculty."
     ),
+    "admin_plan": (
+        "You produce an OPTIONAL, UNTRUSTED proposal for the NUS-3D fictional "
+        "offline game admin UI. Output only a JSON object with keys action, value, "
+        "reason; no markdown. Actions: weather value 0 clear, 1 cloudy, "
+        "2 overcast, 3 rain, 4 storm; lighting value 0 daylight, 1 golden "
+        "hour, 2 blue hour, 3 evening; teleport value 0 Town Green, "
+        "1 ERC, 2 SRC, 3 Plaza; grant_xp/grant_coins integer 1..5000; "
+        "restore_atmosphere value 0. If ambiguous or unsupported, set "
+        "action to none and value to 0. Explain in <=100 characters. "
+        "NEVER claim execution or permission. A local owner must review the "
+        "proposal and separately approve each action. Do not request "
+        "account names, passwords, secrets or save contents."
+    ),
 }
 
 _rate_lock = threading.Lock()
