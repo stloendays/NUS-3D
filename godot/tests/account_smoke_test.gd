@@ -124,7 +124,8 @@ func _run() -> void:
         return
     for _index in range(tutorial.pages.size() - 1):
         tutorial.next_page()
-    if tutorial.current_page != tutorial.pages.size() - 1 or tutorial.next_button.text.find("返回") == -1:
+    var finish_label: String = "返回" if GameLanguage.is_chinese() else "Back"
+    if tutorial.current_page != tutorial.pages.size() - 1 or tutorial.next_button.text.find(finish_label) == -1:
         _fail("Guide final page or finish button missing")
         return
     tutorial.next_page()
