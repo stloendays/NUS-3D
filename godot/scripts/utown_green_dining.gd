@@ -145,7 +145,7 @@ func _build_lawn_tufts() -> void:
         )
         # MultiMesh stores transforms in float32; use a conservative buffer so
         # quantization cannot move edge tufts onto paths or outside Town Green.
-        if is_clear_lawn_point(candidate, 0.18):
+        if is_clear_lawn_point(candidate, 0.6):
             positions.append(candidate)
     generated_tuft_count = positions.size()
     if generated_tuft_count == 0:

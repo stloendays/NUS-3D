@@ -441,6 +441,12 @@ func _build_bicycle() -> void:
 func set_bicycle(value: bool) -> bool:
     if value and (interior_active or on_shuttle):
         return false
+    if value:
+        var club: UTownLeisure = get_parent().get_node_or_null("Leisure") as UTownLeisure
+        if club != null and not club.safe_to_ride():
+            message = "Club cooldown: walk or take a break before riding."
+            message_time = 4.0
+            return false
     bicycle_enabled = value
     bicycle.visible = value
     player.set_bicycle_mode(value)
@@ -744,6 +750,11 @@ func board_or_alight() -> bool:
         alight_shuttle()
         return true
     if interior_active or bicycle_enabled or shuttle == null:
+        return false
+    var club: UTownLeisure = get_parent().get_node_or_null("Leisure") as UTownLeisure
+    if club != null and not club.safe_to_ride():
+        message = "Club cooldown: don't travel immediately after the adult social scene."
+        message_time = 4.0
         return false
     var d: float = Vector2(player.global_position.x, player.global_position.z).distance_to(Vector2(shuttle.global_position.x, shuttle.global_position.z))
     if d > BOARD_RADIUS:

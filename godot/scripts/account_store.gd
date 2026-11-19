@@ -182,7 +182,7 @@ func challenge_save_path() -> String:
 
 func feature_save_path(feature: String) -> String:
     # Keep profile-owned game saves separate from shared language and sound settings.
-    if not is_logged_in() or not ["arcade", "coursework", "coins", "activities", "ddl_story"].has(feature):
+    if not is_logged_in() or not ["arcade", "coursework", "coins", "activities", "ddl_story", "leisure"].has(feature):
         return ""
     var record: Dictionary = accounts.get(active_username, {})
     var path: String = storage_root.path_join("features").path_join(
@@ -226,7 +226,8 @@ func _migrate_legacy_progress() -> void:
         "coursework": "user://nus3d_coursework.cfg",
         "coins": "user://nus3d_coins.cfg",
         "activities": "user://nus3d_campus_activities.cfg",
-        "ddl_story": "user://nus3d_ddl_story.cfg"
+        "ddl_story": "user://nus3d_ddl_story.cfg",
+        "leisure": "user://nus3d_leisure.cfg"
     }
     for feature in old_saves.keys():
         var old_path: String = str(old_saves[feature])

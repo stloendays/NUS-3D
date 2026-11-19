@@ -431,6 +431,9 @@ func _logout() -> void:
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
         coins.save_progress()
+    var leisure: UTownLeisure = game.get_node_or_null("Leisure") as UTownLeisure
+    if leisure != null:
+        leisure._save_stats()
     accounts.sign_out()
     _show_login()
 
@@ -577,6 +580,10 @@ func _restore_game_features() -> void:
     if story != null:
         story.save_path = accounts.feature_save_path("ddl_story")
         story.load_progress()
+    var leisure: UTownLeisure = game.get_node_or_null("Leisure") as UTownLeisure
+    if leisure != null:
+        leisure.save_path = accounts.feature_save_path("leisure")
+        leisure._load_stats()
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
         coins.save_path = accounts.feature_save_path("coins")

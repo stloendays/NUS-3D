@@ -252,7 +252,12 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
-    if intro_blocked or not (event is InputEventKey):
+    if intro_blocked:
+        return
+    var leisure_ui: UTownLeisureUI = get_parent().get_node_or_null("LeisureUI") as UTownLeisureUI
+    if leisure_ui != null and leisure_ui.is_open:
+        return
+    if not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
     if not key.pressed or key.echo:
@@ -271,7 +276,7 @@ func _input(event: InputEvent) -> void:
             KEY_W, KEY_A, KEY_S, KEY_D, KEY_K, KEY_Q, KEY_B, KEY_X, KEY_I,
             KEY_F, KEY_L, KEY_Y, KEY_T, KEY_C, KEY_V, KEY_G, KEY_E, KEY_R,
             KEY_M, KEY_SPACE, KEY_SHIFT, KEY_J, KEY_O, KEY_N, KEY_Z, KEY_U,
-            KEY_H, KEY_1, KEY_2, KEY_3
+            KEY_H, KEY_TAB, KEY_1, KEY_2, KEY_3
         ]:
             get_viewport().set_input_as_handled()
     elif key.keycode == KEY_P:
