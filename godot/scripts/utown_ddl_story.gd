@@ -51,6 +51,7 @@ var focus_accents: Array[MeshInstance3D] = []
 var display_layer: CanvasLayer
 var display_label: Label
 var countdown_label: Label
+var tracker_panel: PanelContainer
 var near_prompt_panel: PanelContainer
 var near_prompt_label: Label
 var toast_panel: PanelContainer
@@ -152,12 +153,13 @@ func _build_ui() -> void:
     # Always-on tracker occupies a small area at top center, not a big bottom box.
     var tracker := PanelContainer.new()
     tracker.name = "SlimDeadlineTracker"
+    tracker_panel = tracker
     tracker.anchor_left = 0.5
     tracker.anchor_right = 0.5
     tracker.offset_left = -205.0
     tracker.offset_right = 205.0
-    tracker.offset_top = 14.0
-    tracker.offset_bottom = 82.0
+    tracker.offset_top = 120.0
+    tracker.offset_bottom = 188.0
     tracker.mouse_filter = Control.MOUSE_FILTER_IGNORE
     var style := StyleBoxFlat.new()
     style.bg_color = Color(0.075, 0.09, 0.13, 0.81)
@@ -190,8 +192,8 @@ func _build_ui() -> void:
     compass_control.anchor_right = 0.5
     compass_control.offset_left = -65.0
     compass_control.offset_right = 65.0
-    compass_control.offset_top = 88.0
-    compass_control.offset_bottom = 184.0
+    compass_control.offset_top = 192.0
+    compass_control.offset_bottom = 288.0
     compass_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
     display_layer.add_child(compass_control)
     compass_control.update_ping(0.0, 0.0, 0.0)
@@ -373,6 +375,10 @@ func _process(delta: float) -> void:
 func _refresh() -> void:
     if display_label == null or countdown_label == null or stage_points.is_empty():
         return
+    if tracker_panel != null:
+        tracker_panel.visible = hud.visible and (
+            running or (not completed and _distance_to(stage_points[_current_goal_index()]) < 24.0)
+        )
     var total_seconds: int = maxi(0, ceili(deadline_left))
     var minutes: int = floori(float(total_seconds) / 60.0)
     var seconds: int = total_seconds % 60

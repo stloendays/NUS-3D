@@ -137,12 +137,14 @@ func _build_status_panel() -> void:
     add_child(status_layer)
     var card := PanelContainer.new()
     card.name = "ArcadeCard"
-    card.anchor_left = 0.5
-    card.anchor_right = 0.5
-    card.offset_left = -208.0
-    card.offset_right = 208.0
-    card.offset_top = 18.0
-    card.offset_bottom = 152.0
+    # Keep combat stats below the weather card, above the tour card. Never
+    # cover the account strip, mission tracker or top-right campus map.
+    card.anchor_left = 0.0
+    card.anchor_right = 0.0
+    card.offset_left = 18.0
+    card.offset_right = 430.0
+    card.offset_top = 352.0
+    card.offset_bottom = 453.0
     card.mouse_filter = Control.MOUSE_FILTER_IGNORE
     var style := StyleBoxFlat.new()
     style.bg_color = Color(0.18, 0.14, 0.25, 0.92)

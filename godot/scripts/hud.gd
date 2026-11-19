@@ -76,8 +76,8 @@ func _ready() -> void:
 
 func _help_text() -> String:
     if language_service.is_chinese():
-        return "WASD 移动  Shift 冲刺  Space 跳跃  B 骑车  X 校车  I 进出室内  L 楼层  Q 对话\n[P] 作业手册  [Shift+P] 学院  [K] 接/交任务  [U] 老师  [LMB] 扔玩具\n[O] 商店  [Z] 金币  [N] 食堂外送  [H] DDL 支线  [J] 邮箱\n[M] 地图  [Y] 天气  [T] 时段  [F7] 拍照  [F9] 声音  [F10] 语言  [F1] 帮助"
-    return "WASD move  Shift sprint  Space jump  B bike  X shuttle  I indoors  L floor  Q talk\n[P] coursework  [Shift+P] faculty  [K] task  [U] professor  [LMB] throw toy\n[O] shop  [Z] coins  [N] food delivery  [H] DDL story  [J] mailbox\n[M] map  [Y] weather  [T] time  [F7] photo  [F9] sound  [F10] language  [F1] help"
+        return "WASD 移动  Shift 冲刺  Space 跳跃  B 骑车  X 校车  I 进出室内  L 楼层  Q 对话\n[P] 作业手册  [Shift+P] 学院  [K] 接/交任务  [U] 老师  [LMB] 扔玩具\n[O] 商店  [Z] 金币  [N] 食堂外送  [H] DDL 支线  [Tab] 课后社团  [J] 邮箱\n[M] 地图  [Y] 天气  [T] 时段  [F7] 拍照  [F9] 声音  [F10] 语言  [F1] 帮助"
+    return "WASD move  Shift sprint  Space jump  B bike  X shuttle  I indoors  L floor  Q talk\n[P] coursework  [Shift+P] faculty  [K] task  [U] professor  [LMB] throw toy\n[O] shop  [Z] coins  [N] food delivery  [H] DDL story  [Tab] club  [J] mailbox\n[M] map  [Y] weather  [T] time  [F7] photo  [F9] sound  [F10] language  [F1] help"
 
 
 func _apply_language(_locale: String) -> void:
@@ -148,8 +148,8 @@ func _make_toast() -> void:
     toast_card.anchor_right = 0.5
     toast_card.offset_left = -265.0
     toast_card.offset_right = 265.0
-    toast_card.offset_top = 113.0
-    toast_card.offset_bottom = 165.0
+    toast_card.offset_top = 306.0
+    toast_card.offset_bottom = 358.0
     toast_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
     toast_card.add_theme_stylebox_override("panel", NUS3DUISkin.panel(Color("#17494c"), Color("#9bf2d2"), 14, 10))
     add_child(toast_card)

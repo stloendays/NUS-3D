@@ -389,7 +389,6 @@ func _submit_login() -> void:
 
 
 func _enter_game() -> void:
-    _restore_game_features()
     challenge.sprint_active = false
     challenge.sprint_elapsed = 0
     challenge.sprint_last_time = -1
@@ -407,6 +406,9 @@ func _enter_game() -> void:
         tour.current_index += 1
     tour.completed = tour.current_index == tour.stops.size()
 
+    # Feature rewards must read the newly restored tour and challenge, never the
+    # previous user's objects during account switching.
+    _restore_game_features()
     observed_tour_ids.clear()
     observed_note_ids.clear()
     observed_sprint_time = -1
@@ -418,7 +420,9 @@ func _enter_game() -> void:
     game.get_node("Player").call("reset_player")
     _play_ui_sound("confirm")
     get_tree().paused = false
-    Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+    var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
+    var course_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if (intro != null and intro.playing) or (course_ui != null and course_ui.modal_visible) else Input.MOUSE_MODE_CAPTURED
 
 
 func _logout() -> void:
@@ -434,6 +438,9 @@ func _logout() -> void:
     var leisure: UTownLeisure = game.get_node_or_null("Leisure") as UTownLeisure
     if leisure != null:
         leisure._save_stats()
+    var leisure_ui: UTownLeisureUI = game.get_node_or_null("LeisureUI") as UTownLeisureUI
+    if leisure_ui != null and leisure_ui.is_open:
+        leisure_ui.close_lounge()
     accounts.sign_out()
     _show_login()
 
@@ -562,8 +569,12 @@ func _restore_game_features() -> void:
         coursework._load_progress()
         coursework._refresh_marker()
     var ui_course: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
     if ui_course != null:
-        if coursework != null and coursework.current_faculty_id.is_empty():
+        if intro != null and intro.playing:
+            # The cinematic owns the screen until it calls end_intro().
+            ui_course.begin_intro()
+        elif coursework != null and coursework.current_faculty_id.is_empty():
             ui_course.show_selector()
         elif ui_course.modal_visible:
             ui_course.hide_modal()

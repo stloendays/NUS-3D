@@ -442,8 +442,8 @@ func set_bicycle(value: bool) -> bool:
     if value and (interior_active or on_shuttle):
         return false
     if value:
-        var club: UTownLeisure = get_parent().get_node_or_null("Leisure") as UTownLeisure
-        if club != null and not club.safe_to_ride():
+        var club: Node = get_parent().get_node_or_null("Leisure")
+        if club != null and not bool(club.call("safe_to_ride")):
             message = "Club cooldown: walk or take a break before riding."
             message_time = 4.0
             return false
@@ -751,8 +751,8 @@ func board_or_alight() -> bool:
         return true
     if interior_active or bicycle_enabled or shuttle == null:
         return false
-    var club: UTownLeisure = get_parent().get_node_or_null("Leisure") as UTownLeisure
-    if club != null and not club.safe_to_ride():
+    var club: Node = get_parent().get_node_or_null("Leisure")
+    if club != null and not bool(club.call("safe_to_ride")):
         message = "Club cooldown: don't travel immediately after the adult social scene."
         message_time = 4.0
         return false

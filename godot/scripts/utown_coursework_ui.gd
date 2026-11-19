@@ -254,8 +254,8 @@ func _process(_delta: float) -> void:
 func _input(event: InputEvent) -> void:
     if intro_blocked:
         return
-    var leisure_ui: UTownLeisureUI = get_parent().get_node_or_null("LeisureUI") as UTownLeisureUI
-    if leisure_ui != null and leisure_ui.is_open:
+    var leisure_ui: Node = get_parent().get_node_or_null("LeisureUI")
+    if leisure_ui != null and bool(leisure_ui.get("is_open")):
         return
     if not (event is InputEventKey):
         return

@@ -135,12 +135,13 @@ func _build_interface() -> void:
     add_child(interface)
     var card := PanelContainer.new()
     card.name = "WalletPanel"
-    card.anchor_left = 0.5
-    card.anchor_right = 0.5
-    card.offset_left = -217.0
-    card.offset_right = 217.0
-    card.offset_top = 164.0
-    card.offset_bottom = 254.0
+    # Wallet occupies the right-hand gap under the map, and yields to F6 GIS.
+    card.anchor_left = 1.0
+    card.anchor_right = 1.0
+    card.offset_left = -435.0
+    card.offset_right = -18.0
+    card.offset_top = 259.0
+    card.offset_bottom = 344.0
     card.mouse_filter = Control.MOUSE_FILTER_IGNORE
     var card_style := StyleBoxFlat.new()
     card_style.bg_color = Color(0.14, 0.16, 0.21, 0.88)
@@ -515,6 +516,11 @@ func load_progress() -> void:
     _refresh_display()
 
 func _process(delta: float) -> void:
+    # F6 map validation has its own panel in the same region.
+    if interface != null:
+        var wallet: PanelContainer = interface.get_node_or_null("WalletPanel") as PanelContainer
+        if wallet != null:
+            wallet.visible = not world.osm_reference_visible
     notice_time = maxf(0.0, notice_time - delta)
     delivery_cooldown = maxf(0.0, delivery_cooldown - delta)
     if delivery_active:
