@@ -334,6 +334,16 @@ func _decorate_building(parent: Node3D, info: Dictionary, width_m: float, depth_
         for bay in range(1, bays):
             var x: float = -width_m * 0.43 + width_m * 0.86 * float(bay) / float(bays)
             _box(parent, "CurtainMullion_%02d" % bay, Vector3(x, height_m * 0.52, depth_m * 0.5 + 0.27), Vector3(0.12, height_m * 0.82, 0.12), "#d9e4df")
+    elif kind == "md1_research":
+        # Stylized MD1 massing: podium, vertical glazed bays, shaded entrance.
+        # Dimensions and orientation are provisional, not surveyed geometry.
+        _box(parent, "MD1_Podium", Vector3(0, 3.0, depth_m * 0.5 + 0.7), Vector3(width_m * 0.96, 6.0, 1.7), "#d2d3cf")
+        _box(parent, "MD1_GlazedFacade", Vector3(0, height_m * 0.54, depth_m * 0.5 + 0.36), Vector3(width_m * 0.78, height_m * 0.73, 0.15), "#719da7")
+        for bay in range(1, 7):
+            var x: float = -width_m * 0.39 + width_m * 0.78 * float(bay) / 7.0
+            _box(parent, "MD1_Fin_%02d" % bay, Vector3(x, height_m * 0.55, depth_m * 0.5 + 0.57), Vector3(0.22, height_m * 0.76, 0.42), "#e4e5e0")
+        _box(parent, "MD1_EntranceCanopy", Vector3(0, 5.0, depth_m * 0.5 + 2.7), Vector3(width_m * 0.62, 0.44, 4.8), "#a6b6b8")
+        _box(parent, "MD1_EntranceGlazing", Vector3(0, 2.1, depth_m * 0.5 + 1.6), Vector3(width_m * 0.44, 3.8, 0.12), "#467987")
     elif kind == "library":
         _box(parent, "LibrarySunshade", Vector3(0, height_m * 0.58, depth_m * 0.5 + 1.5), Vector3(width_m * 0.88, 0.55, 3.0), "#b7a58b")
     elif kind == "residence":
