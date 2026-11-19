@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -15,6 +15,8 @@
 [ext_resource type="Script" path="res://scripts/utown_coursework.gd" id="13"]
 [ext_resource type="Script" path="res://scripts/utown_coursework_ui.gd" id="14"]
 [ext_resource type="Script" path="res://scripts/utown_intro.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/utown_leisure.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/utown_leisure_ui.gd" id="17"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -77,6 +79,12 @@ script = ExtResource("14")
 
 [node name="Intro" type="Node" parent="."]
 script = ExtResource("15")
+
+[node name="Leisure" type="Node" parent="."]
+script = ExtResource("16")
+
+[node name="LeisureUI" type="CanvasLayer" parent="."]
+script = ExtResource("17")
 
 [node name="Info" type="PanelContainer" parent="HUD"]
 offset_left = 18.0
@@ -204,4 +212,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD move  B bike  X bus  I indoors  L floor  F activity  Q talk  O faculty  J coursework  K pickup/submit  Y weather  C notes  V sprint  M map  F7 photo  F1 help"
+text = "WASD move  B bike  X bus  I indoors  L floor  F activity  Q talk  O faculty  J coursework  K submit  P leisure  Y weather  C notes  V sprint  M map  F7 photo  F1 help"
