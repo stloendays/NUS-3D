@@ -7,6 +7,8 @@ const DATA_PATH: String = "res://data/utown_core.json"
 const M2_DATA_PATH: String = "res://data/m2_profiles.json"
 const FACADE_KIT = preload("res://scripts/utown_facades.gd")
 const OSM_KIT = preload("res://scripts/osm_reference.gd")
+const COMIC_LAWN_PATH: String = "res://assets/materials/comic_lawn.svg"
+const COMIC_PAVERS_PATH: String = "res://assets/materials/comic_pavers.svg"
 const METRES_PER_DEG_LAT: float = 110574.0
 const METRES_PER_DEG_LON: float = 111320.0
 
@@ -80,6 +82,18 @@ func _mat(hex: String, rough: float = 0.9) -> StandardMaterial3D:
     material.roughness = rough
     return material
 
+func _repeat_texture(material: StandardMaterial3D, texture_path: String, metres_per_tile: float) -> void:
+    # World-space tiling on the rectangular terrain / path meshes, no stretched atlas.
+    var texture: Texture2D = load(texture_path) as Texture2D
+    if texture == null:
+        push_warning("M3.7 tiling texture missing: " + texture_path)
+        return
+    material.albedo_texture = texture
+    material.uv1_triplanar = true
+    material.uv1_world_triplanar = true
+    var repeats_per_metre: float = 1.0 / maxf(metres_per_tile, 0.5)
+    material.uv1_scale = Vector3.ONE * repeats_per_metre
+
 func _add_box(parent: Node3D, at: Vector3, size_m: Vector3, material: Material, solid: bool = false) -> Node3D:
     var part: Node3D = Node3D.new()
     part.position = at
@@ -123,7 +137,8 @@ func _build_ground() -> void:
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    var terrain_material: StandardMaterial3D = _mat("#819e7a")
+    var terrain_material: StandardMaterial3D = _mat("#ecf7e8")
+    _repeat_texture(terrain_material, COMIC_LAWN_PATH, 5.5)
     weather_reactive_grass.append(terrain_material)
     _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), terrain_material, true)
 
@@ -143,11 +158,13 @@ func _build_green() -> void:
     surface.begin(Mesh.PRIMITIVE_TRIANGLES)
     for i in indices:
         surface.set_normal(Vector3.UP)
+        surface.set_uv(Vector2(poly[i].x / 5.5, poly[i].y / 5.5))
         surface.add_vertex(Vector3(poly[i].x, 0.025, poly[i].y))
     var grass: MeshInstance3D = MeshInstance3D.new()
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
-    var grass_mat: StandardMaterial3D = _mat("#8aba75")
+    var grass_mat: StandardMaterial3D = _mat("#effbea")
+    grass_mat.albedo_texture = load(COMIC_LAWN_PATH) as Texture2D
     weather_reactive_grass.append(grass_mat)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
     grass.material_override = grass_mat
@@ -161,7 +178,8 @@ func _build_plaza() -> void:
     root.position = at
     root.rotation.y = deg_to_rad(float(plaza.get("rotation_deg", 0.0)))
     add_child(root)
-    var plaza_surface: StandardMaterial3D = _mat("#b9bcb5")
+    var plaza_surface: StandardMaterial3D = _mat("#eef3ec")
+    _repeat_texture(plaza_surface, COMIC_PAVERS_PATH, 3.2)
     weather_reactive_materials.append(plaza_surface)
     _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), plaza_surface)
     for i in range(4):
@@ -172,7 +190,8 @@ func _build_walkways() -> void:
     var root: Node3D = Node3D.new()
     root.name = "ConceptualFootpaths_NotSurveyed"
     add_child(root)
-    var path_material: StandardMaterial3D = _mat("#c8c7bd")
+    var path_material: StandardMaterial3D = _mat("#eff5ed")
+    _repeat_texture(path_material, COMIC_PAVERS_PATH, 3.0)
     weather_reactive_materials.append(path_material)
     for way in layout.get("walkways", []):
         var points: Array = way.get("lonlat", [])
