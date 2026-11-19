@@ -209,6 +209,8 @@ func open_console() -> void:
 
 func close_console() -> void:
     hide()
+    if confirm != null:
+        confirm.hide()
     if authority != null:
         authority.lock()
     password_field.clear()
