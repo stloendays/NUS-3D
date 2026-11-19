@@ -424,6 +424,78 @@ func _render() -> void:
         return
     count += 1
 
+    # M3.7: dedicated real-engine viewport captures, never fabricated reference renders.
+    # Cloud image planes and street furniture are camera-reviewed in the same CI artifact.
+    var streetscape: UTownStreetscape = instance.get_node_or_null("Streetscape") as UTownStreetscape
+    var ddl_story: UTownDDLStory = instance.get_node_or_null("DDLStory") as UTownDDLStory
+    if streetscape == null or ddl_story == null or ddl_story.stage_points.size() != 4:
+        push_error("Cannot prepare M3.7 visual QA viewpoints")
+        quit(1)
+        return
+    world.set_lighting_mode(0)
+    weather.set_mode(0)
+    hud.visible = false
+    player.global_position = ddl_story.stage_points[0] + Vector3(0.0, 0.18, 4.0)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(player.global_position + Vector3(0.0, 42.0, -95.0), Vector3.UP)
+    for sky_frame in range(24):
+        await process_frame
+    if not await _capture_frame(output, "M3_7_SKY_CLEAR_STATIC_CLOUDS.png"):
+        push_error("Cannot capture M3.7 fixed clear-sky SVG cloud sprites")
+        quit(1)
+        return
+    count += 1
+    weather.set_mode(2)
+    for overcast_frame in range(24):
+        await process_frame
+    if not await _capture_frame(output, "M3_7_SKY_OVERCAST_STATIC_CLOUDS.png"):
+        push_error("Cannot capture M3.7 overcast sky composition")
+        quit(1)
+        return
+    count += 1
+    weather.set_mode(4)
+    for storm_sky_frame in range(24):
+        await process_frame
+    if not await _capture_frame(output, "M3_7_SKY_STORM_STATIC_CLOUDS.png"):
+        push_error("Cannot capture M3.7 storm cloud illustration")
+        quit(1)
+        return
+    count += 1
+    weather.set_mode(0)
+    var street_root: Node3D = streetscape.get_node_or_null("StreetFurniture_OriginalComicArt") as Node3D
+    if street_root == null or streetscape.cluster_count < 1:
+        push_error("Cannot review generated M3.7 street furniture")
+        quit(1)
+        return
+    var detail_scene: Node3D = street_root.get_child(0) as Node3D
+    player.global_position = detail_scene.global_position + Vector3(3.5, 0.18, 6.5)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(detail_scene.global_position + Vector3(0.0, 1.3, 0.0), Vector3.UP)
+    if not await _capture_frame(output, "M3_7_STREET_FURNITURE_CLOSEUP.png"):
+        push_error("Cannot capture M3.7 tiled street props")
+        quit(1)
+        return
+    count += 1
+    player.global_position = detail_scene.global_position + Vector3(8.0, 0.18, 15.0)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(detail_scene.global_position + Vector3(0.0, 1.1, 0.0), Vector3.UP)
+    if not await _capture_frame(output, "M3_7_STREET_DENSITY_OVERVIEW.png"):
+        push_error("Cannot capture M3.7 street density overview")
+        quit(1)
+        return
+    count += 1
+    player.global_position = ddl_story.stage_points[0] + Vector3(0.0, 0.18, 6.0)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(ddl_story.stage_points[0] + Vector3(0.0, 2.0, 0.0), Vector3.UP)
+    hud.visible = true
+    for hud_frame in range(4):
+        await process_frame
+    if not await _capture_frame(output, "M3_7_DDL_DOOM_QUEST_START_HUD.png"):
+        push_error("Cannot capture the DDL story start with real game HUD")
+        quit(1)
+        return
+    count += 1
+    # Restore photo-friendly state; rendering should not award XP or alter mission saves.
     hud.visible = false
     world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
@@ -440,6 +512,10 @@ func _render() -> void:
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
         "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
+        "m37_showcase": ["sky_clear_static", "sky_overcast_static", "sky_storm_static", "street_furniture", "street_density", "ddl_quest_hud"],
+        "m37_cloud_sprites": 33,
+        "m37_street_clusters": streetscape.cluster_count,
+        "m37_paper_instances": streetscape.scrap_count,
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
