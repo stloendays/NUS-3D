@@ -526,6 +526,9 @@ func _enter_game() -> void:
     # Feature rewards must read the newly restored tour and challenge, never the
     # previous user's objects during account switching.
     _restore_game_features()
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.load_account(accounts.feature_save_path("relationships"))
     observed_tour_ids.clear()
     observed_note_ids.clear()
     observed_sprint_time = -1
@@ -547,6 +550,9 @@ func _enter_game() -> void:
 func _logout() -> void:
     if not accounts.is_logged_in():
         return
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.clear_account()
     if campus_hub != null:
         campus_hub.clear_session()
         campus_hub.close_hub()
