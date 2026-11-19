@@ -397,11 +397,12 @@ func _refresh() -> void:
     var seconds: int = total_seconds % 60
     var clock: String = "%02d:%02d" % [minutes, seconds]
     countdown_label.text = _t("截止 %s", "DDL %s") % clock if running         else _t("已提交", "DDL SUBMITTED") if completed else _t("任务待领取", "DDL READY")
-    var timer_color: Color = Color.html("#ffe5a3")
+    # Reserve amber/pink pastels for borders, not small text over white glass.
+    var timer_color: Color = Color.html("#8E6129")
     if running and deadline_left <= 20.0:
-        timer_color = Color.html("#ff6569") if int(marker_time * 3.0) % 2 == 0 else Color.html("#ffe5a3")
+        timer_color = Color.html("#BF4050") if int(marker_time * 3.0) % 2 == 0 else Color.html("#8E6129")
     elif running and deadline_left <= 60.0:
-        timer_color = Color.html("#ffad78")
+        timer_color = Color.html("#AB612F")
     countdown_label.add_theme_color_override("font_color", timer_color)
     var goal_index: int = _current_goal_index()
     var distance: float = _distance_to(stage_points[goal_index])

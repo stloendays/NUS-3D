@@ -395,7 +395,8 @@ func _update_goal(goal: Dictionary) -> void:
     else:
         objective_detail.text = str(goal["detail"])
     objective_distance.text = "%d m" % roundi(distance_m)
-    var indicator_color: Color = Color("#91f3b2") if arrived else Color("#ff9f86") if urgent else Color("#f5d98d")
+    # Dark, semantic glyphs on the pearly compass surface: never pastel-on-white.
+    var indicator_color: Color = Color("#267F66") if arrived else Color("#B94C40") if urgent else Color("#98691F")
     objective_arrow.add_theme_color_override("font_color", indicator_color)
     objective_distance.add_theme_color_override("font_color", indicator_color)
     if id_value != _active_goal or not objective_card.visible:
@@ -432,7 +433,7 @@ func _update_zone() -> void:
     _visited_zones[current_zone] = true
     zone_heading.text = _t("进入区域：", "NOW ENTERING: ") + _place_name(current_zone)
     zone_caption.text = _zone_text(current_zone)
-    _zone_remaining = 4.5
+    _zone_remaining = 3.6
     _fade_in(zone_card, "zone")
 
 

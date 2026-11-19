@@ -77,6 +77,32 @@ func _run() -> void:
     if NUS3DUISkin.TEXT.get_luminance() > 0.30:
         _fail("Text ink is too pale for the bright cards")
         return
+    # The former arcade and area cards were stacked on the same pixels; a
+    # translucent surface cannot make overlapping lines readable.
+    var arcade: UTownArcade = shell.game.get_node_or_null("Arcade") as UTownArcade
+    var guide: UTownExperienceGuide = shell.game.get_node_or_null("ExperienceGuide") as UTownExperienceGuide
+    var arcade_card: PanelContainer = arcade.status_layer.get_node_or_null("ArcadeCard") as PanelContainer if arcade != null and arcade.status_layer != null else null
+    if arcade_card == null or guide == null or guide.zone_card == null:
+        _fail("Area or arcade card vanished")
+        return
+    var combat_rect: Rect2 = Rect2(arcade_card.offset_left, arcade_card.offset_top,
+        arcade_card.offset_right - arcade_card.offset_left,
+        arcade_card.offset_bottom - arcade_card.offset_top)
+    var zone_rect: Rect2 = Rect2(guide.zone_card.offset_left, guide.zone_card.offset_top,
+        guide.zone_card.offset_right - guide.zone_card.offset_left,
+        guide.zone_card.offset_bottom - guide.zone_card.offset_top)
+    if combat_rect.intersects(zone_rect):
+        _fail("Zone postcard and arcade stats are again overlapping")
+        return
+    var ddl: UTownDDLStory = shell.game.get_node_or_null("DDLStory") as UTownDDLStory
+    if ddl == null or ddl.countdown_label == null:
+        _fail("DDL deadline status is absent")
+        return
+    ddl._refresh()
+    var deadline_ink: Color = ddl.countdown_label.get_theme_color("font_color")
+    if deadline_ink.get_luminance() > 0.43:
+        _fail("DDL timer has pale text on an opaque white card")
+        return
     # UI refresh is style-only: network, account data, input bindings and
     # gameplay quest state are not touched.
     print("PASS: bright iOS-inspired soft glass, readable labels, keycap actions, map and tutorial")
