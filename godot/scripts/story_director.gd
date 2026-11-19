@@ -34,6 +34,8 @@ var cover: Control
 var heading: Label
 var overview: Label
 var subtitle: Label
+var quest_tab: Button
+var endings_tab: Button
 var listing: ItemList
 var details: Label
 var action_list: VBoxContainer
@@ -143,8 +145,10 @@ func _build_ui() -> void:
     frame.add_child(HSeparator.new())
     var tabs: HBoxContainer = HBoxContainer.new()
     frame.add_child(tabs)
-    tabs.add_child(_btn(_local({"zh": "任务", "en": "Quests"}), func() -> void: _set_mode("quests")))
-    tabs.add_child(_btn(_local({"zh": "结局图鉴", "en": "Endings"}), func() -> void: _set_mode("endings")))
+    quest_tab = _btn(_local({"zh": "任务", "en": "Quests"}), func() -> void: _set_mode("quests"))
+    endings_tab = _btn(_local({"zh": "结局图鉴", "en": "Endings"}), func() -> void: _set_mode("endings"))
+    tabs.add_child(quest_tab)
+    tabs.add_child(endings_tab)
     subtitle = _label("", 13, Color.html("#9bd6db"))
     subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     tabs.add_child(subtitle)
@@ -180,6 +184,10 @@ func _build_ui() -> void:
 
 
 func _on_language_changed(_new: String) -> void:
+    if quest_tab != null:
+        quest_tab.text = _local({"zh": "任务", "en": "Quests"})
+    if endings_tab != null:
+        endings_tab.text = _local({"zh": "结局图鉴", "en": "Endings"})
     if active and cover != null and cover.visible:
         _render()
 
