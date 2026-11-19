@@ -470,7 +470,7 @@ func _build_canteen_terrace() -> void:
         return
     var terrace: Node3D = Node3D.new()
     terrace.name = "FrontierCanteenTerrace"
-    terrace.position = science["position"] + Vector3(43.0, 0.0, -28.0)
+    terrace.position = science["position"] + Vector3(43.0, 0.0, -66.0)
     add_child(terrace)
     _box(terrace, "TerracePaving", Vector3(0, 0.09, 0), Vector3(55, 0.18, 42), "#c6c1ad")
     _box(terrace, "Awning", Vector3(0, 4.2, 0), Vector3(48, 0.48, 27), "#e0d4bb")
