@@ -120,16 +120,6 @@ func _make_item_marker(item_id: String) -> Node3D:
     ring.material_override = ring_material
     root.add_child(ring)
 
-    var label: Label3D = Label3D.new()
-    label.text = "FIELD NOTE"
-    label.font_size = 24
-    label.pixel_size = 0.012
-    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    label.no_depth_test = true
-    label.modulate = Color.html("#e7fff7")
-    label.outline_size = 5
-    label.position = Vector3(0.0, 0.95, 0.0)
-    root.add_child(label)
     return root
 
 func _build_sprint_route() -> void:

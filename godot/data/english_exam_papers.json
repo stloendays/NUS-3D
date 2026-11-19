@@ -1,0 +1,2255 @@
+{
+  "schema": "nus3d-english-exams-v1",
+  "language": "en",
+  "unofficial": true,
+  "offline": true,
+  "status": "fictional original educational game questions; no official NUS exam, module or academic assessment",
+  "scoring": {
+    "points_per_correct": 20,
+    "pass_mark": 60,
+    "first_pass_xp": 90,
+    "first_pass_credits": 25
+  },
+  "papers": [
+    {
+      "id": "chemistry",
+      "faculty_id": "science",
+      "major": "Chemistry",
+      "title": "Chemistry: The Beaker Strikes Back",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "chemistry_q1",
+          "prompt": "Which particle determines the identity of a chemical element?",
+          "options": [
+            "The proton",
+            "The neutron",
+            "The electron",
+            "The photon"
+          ],
+          "correct_index": 0,
+          "explanation": "An element is defined by its atomic number, which is its proton count."
+        },
+        {
+          "id": "chemistry_q2",
+          "prompt": "At constant temperature, increasing the concentration of a reactant usually changes the reaction rate by affecting what?",
+          "options": [
+            "Atomic mass",
+            "The equilibrium constant alone",
+            "Electron charge",
+            "Collision frequency"
+          ],
+          "correct_index": 3,
+          "explanation": "More reacting particles per volume generally create more opportunities for effective collisions."
+        },
+        {
+          "id": "chemistry_q3",
+          "prompt": "For an exothermic reaction, which statement is correct?",
+          "options": [
+            "The system must absorb heat.",
+            "The activation energy is zero.",
+            "The system releases heat to its surroundings.",
+            "The reaction cannot be reversible."
+          ],
+          "correct_index": 2,
+          "explanation": "An exothermic reaction has a negative enthalpy change for the system."
+        },
+        {
+          "id": "chemistry_q4",
+          "prompt": "A solution at pH 3 is how many times more acidic in hydrogen ion concentration than one at pH 5?",
+          "options": [
+            "2 times",
+            "100 times",
+            "10 times",
+            "1,000 times"
+          ],
+          "correct_index": 1,
+          "explanation": "The pH scale is logarithmic: two pH units represent a factor of 10 squared."
+        },
+        {
+          "id": "chemistry_q5",
+          "prompt": "Which technique is most suitable for identifying functional groups in an organic molecule?",
+          "options": [
+            "Infrared spectroscopy",
+            "A stopwatch",
+            "A graduated cylinder alone",
+            "Simple filtration"
+          ],
+          "correct_index": 0,
+          "explanation": "Characteristic bond vibrations produce diagnostic infrared absorption bands."
+        }
+      ]
+    },
+    {
+      "id": "physics",
+      "faculty_id": "science",
+      "major": "Physics",
+      "title": "Physics: The Gravity Deadline",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "physics_q1",
+          "prompt": "A 2 kg object accelerates at 3 m/s^2. What is the net force?",
+          "options": [
+            "1.5 N",
+            "5 N",
+            "9 N",
+            "6 N"
+          ],
+          "correct_index": 3,
+          "explanation": "Newton's second law gives F = ma = 2 x 3 = 6 N."
+        },
+        {
+          "id": "physics_q2",
+          "prompt": "Which quantity is conserved in an isolated elastic collision?",
+          "options": [
+            "Velocity of each object",
+            "Kinetic energy only",
+            "Both momentum and kinetic energy",
+            "Temperature only"
+          ],
+          "correct_index": 2,
+          "explanation": "An elastic collision conserves both total momentum and total kinetic energy."
+        },
+        {
+          "id": "physics_q3",
+          "prompt": "A wave travels at 300 m/s and has a frequency of 100 Hz. Its wavelength is:",
+          "options": [
+            "0.33 m",
+            "3 m",
+            "30 m",
+            "300 m"
+          ],
+          "correct_index": 1,
+          "explanation": "The wave relationship v = f times wavelength gives 300/100 = 3 m."
+        },
+        {
+          "id": "physics_q4",
+          "prompt": "Which change increases the capacitance of an ideal parallel-plate capacitor?",
+          "options": [
+            "Reducing the plate separation",
+            "Increasing the plate separation",
+            "Removing the dielectric",
+            "Decreasing the plate area"
+          ],
+          "correct_index": 0,
+          "explanation": "For fixed area and dielectric, capacitance is inversely proportional to plate separation."
+        },
+        {
+          "id": "physics_q5",
+          "prompt": "Why can a satellite orbit Earth without continuously firing its engines?",
+          "options": [
+            "There is no gravity in orbit.",
+            "Its mass becomes zero.",
+            "Air pushes it around Earth.",
+            "Gravity provides centripetal acceleration."
+          ],
+          "correct_index": 3,
+          "explanation": "Gravitational force curves the satellite's inertial motion into an orbit."
+        }
+      ]
+    },
+    {
+      "id": "biological_sciences",
+      "faculty_id": "science",
+      "major": "Biological Sciences",
+      "title": "Biology: Mitochondria on Strike",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "biological_sciences_q1",
+          "prompt": "Where does most ATP production by oxidative phosphorylation occur in a eukaryotic cell?",
+          "options": [
+            "The Golgi apparatus",
+            "The nucleolus",
+            "The inner mitochondrial membrane",
+            "The plasma membrane alone"
+          ],
+          "correct_index": 2,
+          "explanation": "The electron transport chain and ATP synthase are embedded in the inner mitochondrial membrane."
+        },
+        {
+          "id": "biological_sciences_q2",
+          "prompt": "In DNA, which base pairs with adenine?",
+          "options": [
+            "Guanine",
+            "Thymine",
+            "Cytosine",
+            "Uracil"
+          ],
+          "correct_index": 1,
+          "explanation": "Standard DNA base pairing is A-T and G-C; uracil appears in RNA instead of thymine."
+        },
+        {
+          "id": "biological_sciences_q3",
+          "prompt": "What is the primary role of enzymes?",
+          "options": [
+            "Lowering activation energy",
+            "Changing the equilibrium constant",
+            "Being consumed permanently",
+            "Adding energy to every product"
+          ],
+          "correct_index": 0,
+          "explanation": "Catalysts speed reactions by lowering activation barriers without changing equilibrium."
+        },
+        {
+          "id": "biological_sciences_q4",
+          "prompt": "Which process produces two genetically identical daughter cells under normal conditions?",
+          "options": [
+            "Meiosis I",
+            "Fertilization",
+            "Crossing over",
+            "Mitosis"
+          ],
+          "correct_index": 3,
+          "explanation": "Mitosis generally partitions replicated chromosomes into two genetically equivalent nuclei."
+        },
+        {
+          "id": "biological_sciences_q5",
+          "prompt": "What does natural selection act on directly?",
+          "options": [
+            "A species' future needs",
+            "Mutations chosen by organisms",
+            "Heritable differences in phenotype that affect survival or reproduction",
+            "Only changes occurring after reproduction"
+          ],
+          "correct_index": 2,
+          "explanation": "Selection changes frequencies of heritable variants through differences in reproductive success."
+        }
+      ]
+    },
+    {
+      "id": "chemical_engineering",
+      "faculty_id": "cde",
+      "major": "Chemical Engineering",
+      "title": "Chemical Engineering: Reactor Meltdown",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "chemical_engineering_q1",
+          "prompt": "A steady-state process has 10 kg/s entering and 8 kg/s leaving through one outlet. What else must be true if total mass does not accumulate?",
+          "options": [
+            "Mass is being created.",
+            "Another outlet removes 2 kg/s.",
+            "The inlet is actually 8 kg/s.",
+            "Temperature must be zero."
+          ],
+          "correct_index": 1,
+          "explanation": "Steady-state overall mass balance requires total inlet and outlet mass flow rates to match."
+        },
+        {
+          "id": "chemical_engineering_q2",
+          "prompt": "Which dimensionless number compares inertial and viscous forces in fluid flow?",
+          "options": [
+            "Reynolds number",
+            "Nusselt number",
+            "Prandtl number",
+            "Schmidt number"
+          ],
+          "correct_index": 0,
+          "explanation": "The Reynolds number measures the ratio of inertial to viscous effects."
+        },
+        {
+          "id": "chemical_engineering_q3",
+          "prompt": "In an ideal countercurrent heat exchanger, which flow arrangement is used?",
+          "options": [
+            "Both streams travel in the same direction.",
+            "Both streams are perfectly mixed in one vessel.",
+            "Heat transfer occurs without a temperature difference.",
+            "The two streams travel in opposite directions."
+          ],
+          "correct_index": 3,
+          "explanation": "Countercurrent flow places hot and cold streams in opposite flow directions."
+        },
+        {
+          "id": "chemical_engineering_q4",
+          "prompt": "A first-order batch reaction has rate -dC/dt = kC. Its concentration decays in what form?",
+          "options": [
+            "Linear with time forever",
+            "Quadratic growth",
+            "Exponential",
+            "Independent of time"
+          ],
+          "correct_index": 2,
+          "explanation": "Integration gives C(t) = C0 exp(-kt)."
+        },
+        {
+          "id": "chemical_engineering_q5",
+          "prompt": "What is the main function of a distillation column?",
+          "options": [
+            "Removing solids by particle size",
+            "Separating components using differences in volatility",
+            "Measuring electrical resistance",
+            "Destroying all dissolved components"
+          ],
+          "correct_index": 1,
+          "explanation": "Vapor-liquid equilibrium allows relatively volatile components to enrich in the vapor phase."
+        }
+      ]
+    },
+    {
+      "id": "mechanical_engineering",
+      "faculty_id": "cde",
+      "major": "Mechanical Engineering",
+      "title": "Mechanical Engineering: The Missing Bolt",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "mechanical_engineering_q1",
+          "prompt": "For a linearly elastic spring, the restoring force magnitude equals:",
+          "options": [
+            "k times displacement",
+            "Mass times temperature",
+            "Pressure divided by area",
+            "Velocity squared"
+          ],
+          "correct_index": 0,
+          "explanation": "Hooke's law gives F = kx within the linear elastic range."
+        },
+        {
+          "id": "mechanical_engineering_q2",
+          "prompt": "In a closed thermodynamic system, energy may cross the boundary as:",
+          "options": [
+            "Mass only",
+            "Mass and no heat",
+            "Neither heat nor work under any condition",
+            "Heat or work"
+          ],
+          "correct_index": 3,
+          "explanation": "A closed system exchanges energy but not mass with its surroundings."
+        },
+        {
+          "id": "mechanical_engineering_q3",
+          "prompt": "Which unit is used for mechanical stress?",
+          "options": [
+            "Watt",
+            "Joule",
+            "Pascal",
+            "Newton-second"
+          ],
+          "correct_index": 2,
+          "explanation": "Stress is force per unit area, measured in N/m^2 or pascals."
+        },
+        {
+          "id": "mechanical_engineering_q4",
+          "prompt": "For an ideal frictionless lever, what is conserved in static equilibrium?",
+          "options": [
+            "All forces act only upward.",
+            "The sum of moments about a pivot is zero.",
+            "Angular velocity must be positive.",
+            "Mass must vanish."
+          ],
+          "correct_index": 1,
+          "explanation": "Rotational equilibrium requires the net torque about any axis to be zero."
+        },
+        {
+          "id": "mechanical_engineering_q5",
+          "prompt": "What is the purpose of a factor of safety in design?",
+          "options": [
+            "To provide margin against uncertainty and failure",
+            "To eliminate the need for testing",
+            "To make materials perfectly rigid",
+            "To guarantee infinite service life"
+          ],
+          "correct_index": 0,
+          "explanation": "Safety factors account for uncertain loads, strengths, manufacturing and operating conditions."
+        }
+      ]
+    },
+    {
+      "id": "electrical_engineering",
+      "faculty_id": "cde",
+      "major": "Electrical Engineering",
+      "title": "Electrical Engineering: Short Circuit Surprise",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "electrical_engineering_q1",
+          "prompt": "A 12 V source across a 4 ohm resistor gives a current of:",
+          "options": [
+            "48 A",
+            "0.33 A",
+            "16 A",
+            "3 A"
+          ],
+          "correct_index": 3,
+          "explanation": "Ohm's law gives current I = V/R = 12 V / 4 ohms = 3 amperes."
+        },
+        {
+          "id": "electrical_engineering_q2",
+          "prompt": "Which component ideally stores energy in a magnetic field?",
+          "options": [
+            "A resistor",
+            "A diode",
+            "An inductor",
+            "A fuse"
+          ],
+          "correct_index": 2,
+          "explanation": "Inductors store magnetic energy when current flows through a coil."
+        },
+        {
+          "id": "electrical_engineering_q3",
+          "prompt": "What does a low-pass filter ideally allow through?",
+          "options": [
+            "Only the highest frequencies",
+            "Low-frequency signals",
+            "Only DC and no other frequency",
+            "All frequencies equally"
+          ],
+          "correct_index": 1,
+          "explanation": "A low-pass filter transmits low frequencies while attenuating frequencies above its cutoff."
+        },
+        {
+          "id": "electrical_engineering_q4",
+          "prompt": "Which binary number represents the decimal value 13?",
+          "options": [
+            "1101",
+            "1010",
+            "1110",
+            "1001"
+          ],
+          "correct_index": 0,
+          "explanation": "13 = 8 + 4 + 1, giving the binary digits 1101."
+        },
+        {
+          "id": "electrical_engineering_q5",
+          "prompt": "Why is three-phase AC widely used for large motors?",
+          "options": [
+            "It requires no conductors.",
+            "It always has zero current.",
+            "It only works with batteries.",
+            "It supports a rotating magnetic field and smooth power delivery."
+          ],
+          "correct_index": 3,
+          "explanation": "Balanced three-phase currents produce a rotating magnetic field useful for efficient motor operation."
+        }
+      ]
+    },
+    {
+      "id": "architecture",
+      "faculty_id": "cde",
+      "major": "Architecture",
+      "title": "Architecture: The Wandering Floor Plan",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "architecture_q1",
+          "prompt": "What does a building section drawing primarily show?",
+          "options": [
+            "Only a street address",
+            "Only a roof viewed from above",
+            "A vertical cut through spaces and structural elements",
+            "Only the final paint color"
+          ],
+          "correct_index": 2,
+          "explanation": "A section reveals relationships between floor levels, heights and interior spaces."
+        },
+        {
+          "id": "architecture_q2",
+          "prompt": "Which design strategy generally reduces direct solar heat gain on a west-facing glazed facade in a hot climate?",
+          "options": [
+            "More unshaded glass",
+            "Appropriate external shading",
+            "A black roof without insulation",
+            "Removing all ventilation"
+          ],
+          "correct_index": 1,
+          "explanation": "External solar shading intercepts direct radiation before it enters through glazing."
+        },
+        {
+          "id": "architecture_q3",
+          "prompt": "What is the purpose of an accessible ramp?",
+          "options": [
+            "To allow users to move between different levels without stairs",
+            "To make corridors narrower",
+            "To replace all fire exits",
+            "To increase the structural load only"
+          ],
+          "correct_index": 0,
+          "explanation": "Ramps can provide step-free circulation when appropriately designed."
+        },
+        {
+          "id": "architecture_q4",
+          "prompt": "What is a building's floor area ratio?",
+          "options": [
+            "Roof height divided by floor thickness",
+            "Number of windows divided by doors",
+            "Volume divided by building density",
+            "Total gross floor area divided by site area"
+          ],
+          "correct_index": 3,
+          "explanation": "Floor area ratio measures development intensity relative to the site."
+        },
+        {
+          "id": "architecture_q5",
+          "prompt": "Why does cross-ventilation require openings exposed to different pressure conditions?",
+          "options": [
+            "To eliminate all heat transfer",
+            "To make the facade airtight",
+            "To drive airflow through occupied spaces",
+            "To guarantee identical indoor and outdoor temperatures"
+          ],
+          "correct_index": 2,
+          "explanation": "Wind and pressure differences can promote airflow between separate openings."
+        }
+      ]
+    },
+    {
+      "id": "computer_science",
+      "faculty_id": "computing",
+      "major": "Computer Science",
+      "title": "Computer Science: Segmentation Fault at 23:59",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "computer_science_q1",
+          "prompt": "What is the average-case time complexity of binary search on a sorted array?",
+          "options": [
+            "O(n^2)",
+            "O(log n)",
+            "O(n)",
+            "O(1) for all arrays"
+          ],
+          "correct_index": 1,
+          "explanation": "Binary search repeatedly halves the remaining search range."
+        },
+        {
+          "id": "computer_science_q2",
+          "prompt": "Which data structure follows last-in, first-out order?",
+          "options": [
+            "Stack",
+            "Queue",
+            "Priority queue",
+            "Hash set"
+          ],
+          "correct_index": 0,
+          "explanation": "A stack removes the most recently inserted item first."
+        },
+        {
+          "id": "computer_science_q3",
+          "prompt": "What is the purpose of a unit test?",
+          "options": [
+            "Guarantee every possible bug is absent",
+            "Replace version control",
+            "Increase the CPU frequency",
+            "Verify a small, isolated behavior of software"
+          ],
+          "correct_index": 3,
+          "explanation": "Unit tests exercise small units against expected outputs."
+        },
+        {
+          "id": "computer_science_q4",
+          "prompt": "Which database operation is often accelerated by an appropriate index?",
+          "options": [
+            "The speed of every write without cost",
+            "The amount of free disk space",
+            "Lookup speed for indexed queries",
+            "The meaning of stored data"
+          ],
+          "correct_index": 2,
+          "explanation": "Indexes can accelerate reads but cost storage and maintenance on writes."
+        },
+        {
+          "id": "computer_science_q5",
+          "prompt": "What does a Git merge conflict indicate?",
+          "options": [
+            "The repository has no commits.",
+            "Git cannot automatically reconcile some competing changes.",
+            "All tests passed.",
+            "Only binary files may be committed."
+          ],
+          "correct_index": 1,
+          "explanation": "Overlapping or incompatible edits can require a developer to choose the correct combined result."
+        }
+      ]
+    },
+    {
+      "id": "cybersecurity",
+      "faculty_id": "computing",
+      "major": "Cybersecurity",
+      "title": "Cybersecurity: Password Panic",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "cybersecurity_q1",
+          "prompt": "What is the primary purpose of multi-factor authentication?",
+          "options": [
+            "Require independent evidence of identity",
+            "Make passwords appear longer on screen",
+            "Encrypt every file automatically",
+            "Remove account permissions"
+          ],
+          "correct_index": 0,
+          "explanation": "Different factors reduce reliance on one compromised credential."
+        },
+        {
+          "id": "cybersecurity_q2",
+          "prompt": "Which practice helps protect stored user passwords?",
+          "options": [
+            "Saving plaintext in a JSON file",
+            "Encrypting with a hard-coded shared key only",
+            "Logging passwords for debugging",
+            "Salted, slow password hashing"
+          ],
+          "correct_index": 3,
+          "explanation": "Purpose-built password hashing with unique salts limits offline guessing and precomputed attacks."
+        },
+        {
+          "id": "cybersecurity_q3",
+          "prompt": "What is the principle of least privilege?",
+          "options": [
+            "Grant every account administrator access",
+            "Disable all audit logs",
+            "Grant only the access needed for a task",
+            "Share one account across all users"
+          ],
+          "correct_index": 2,
+          "explanation": "Limiting permissions reduces the impact of mistakes or compromise."
+        },
+        {
+          "id": "cybersecurity_q4",
+          "prompt": "A phishing email typically attempts to:",
+          "options": [
+            "Optimize a CPU scheduler",
+            "Trick a recipient into exposing data or taking an unsafe action",
+            "Measure packet latency accurately",
+            "Improve physical network cabling"
+          ],
+          "correct_index": 1,
+          "explanation": "Phishing relies on deceptive messages and social engineering."
+        },
+        {
+          "id": "cybersecurity_q5",
+          "prompt": "Which security control primarily provides integrity against accidental or malicious changes?",
+          "options": [
+            "A cryptographic message authentication code",
+            "A screen brightness setting",
+            "A longer power cable",
+            "An unprotected backup"
+          ],
+          "correct_index": 0,
+          "explanation": "A MAC lets authorized parties detect tampering when secret keys remain protected."
+        }
+      ]
+    },
+    {
+      "id": "data_science",
+      "faculty_id": "computing",
+      "major": "Data Science",
+      "title": "Data Science: The Overfitting Monster",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "data_science_q1",
+          "prompt": "Which dataset should be kept separate for the final unbiased evaluation of a predictive model?",
+          "options": [
+            "The training set",
+            "The feature list",
+            "The model checkpoint name",
+            "The held-out test set"
+          ],
+          "correct_index": 3,
+          "explanation": "A held-out test set estimates generalization only if it is not used to tune decisions."
+        },
+        {
+          "id": "data_science_q2",
+          "prompt": "What does a positive Pearson correlation indicate?",
+          "options": [
+            "A proof of causation",
+            "Identical distributions",
+            "A tendency for two variables to increase together linearly",
+            "No statistical uncertainty"
+          ],
+          "correct_index": 2,
+          "explanation": "Positive correlation captures linear association, not a causal relationship."
+        },
+        {
+          "id": "data_science_q3",
+          "prompt": "Why is data leakage dangerous in machine learning?",
+          "options": [
+            "It always reduces accuracy to zero.",
+            "It can inflate evaluation scores using information unavailable at prediction time.",
+            "It increases the amount of training data legitimately.",
+            "It prevents feature engineering."
+          ],
+          "correct_index": 1,
+          "explanation": "Leakage lets a model exploit information it would not truly have during deployment."
+        },
+        {
+          "id": "data_science_q4",
+          "prompt": "A classification model correctly predicts 90 of 100 cases. What is its accuracy?",
+          "options": [
+            "90%",
+            "10%",
+            "50%",
+            "110%"
+          ],
+          "correct_index": 0,
+          "explanation": "Accuracy is correct predictions divided by all predictions."
+        },
+        {
+          "id": "data_science_q5",
+          "prompt": "Which operation is commonly used to scale a feature by subtracting its mean and dividing by its standard deviation?",
+          "options": [
+            "One-hot encoding",
+            "Random shuffling",
+            "Tokenization",
+            "Standardization"
+          ],
+          "correct_index": 3,
+          "explanation": "Z-score standardization centers a feature and scales it by its standard deviation."
+        }
+      ]
+    },
+    {
+      "id": "finance",
+      "faculty_id": "business",
+      "major": "Finance",
+      "title": "Finance: The Budget Black Hole",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "finance_q1",
+          "prompt": "What is the present value of $110 received in one year at a 10% annual discount rate?",
+          "options": [
+            "$121",
+            "$110",
+            "$100",
+            "$90"
+          ],
+          "correct_index": 2,
+          "explanation": "Discounting the future cash flow gives present value PV = $110 / 1.10 = $100."
+        },
+        {
+          "id": "finance_q2",
+          "prompt": "What does diversification primarily reduce in a broad investment portfolio?",
+          "options": [
+            "All systematic market risk",
+            "Firm-specific risk",
+            "The need for returns",
+            "The time value of money"
+          ],
+          "correct_index": 1,
+          "explanation": "Combining imperfectly correlated holdings can diversify idiosyncratic risk."
+        },
+        {
+          "id": "finance_q3",
+          "prompt": "What does a positive net present value generally imply?",
+          "options": [
+            "The project's discounted benefits exceed its discounted costs.",
+            "The project's cash flows are all negative.",
+            "The project requires no capital.",
+            "Its risk is exactly zero."
+          ],
+          "correct_index": 0,
+          "explanation": "Positive NPV means expected value creation at the stated discount rate."
+        },
+        {
+          "id": "finance_q4",
+          "prompt": "A bond's price generally moves in which direction when market yields rise, all else equal?",
+          "options": [
+            "Up",
+            "It stays constant",
+            "It becomes negative by definition",
+            "Down"
+          ],
+          "correct_index": 3,
+          "explanation": "Fixed bond cash flows are discounted more heavily as yields increase."
+        },
+        {
+          "id": "finance_q5",
+          "prompt": "In corporate financial reporting, how is gross profit calculated?",
+          "options": [
+            "Revenue minus income tax only",
+            "Cash balance plus debt",
+            "Revenue minus cost of goods sold",
+            "Equity minus liabilities"
+          ],
+          "correct_index": 2,
+          "explanation": "Gross profit subtracts direct cost of sales from revenue."
+        }
+      ]
+    },
+    {
+      "id": "accounting",
+      "faculty_id": "business",
+      "major": "Accounting",
+      "title": "Accounting: The Vanishing Ledger",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "accounting_q1",
+          "prompt": "Which equation must a basic balance sheet satisfy?",
+          "options": [
+            "Assets = Revenue + Expenses",
+            "Assets = Liabilities + Equity",
+            "Cash = Profit",
+            "Debt = Sales + Tax"
+          ],
+          "correct_index": 1,
+          "explanation": "The accounting equation balances resources against claims on those resources."
+        },
+        {
+          "id": "accounting_q2",
+          "prompt": "In accrual accounting, revenue is generally recognized when:",
+          "options": [
+            "It is earned under the applicable recognition rules.",
+            "Cash is always deposited, regardless of performance.",
+            "The CEO requests it.",
+            "The fiscal year ends, regardless of service."
+          ],
+          "correct_index": 0,
+          "explanation": "Accrual accounting focuses on economic activity rather than cash timing alone."
+        },
+        {
+          "id": "accounting_q3",
+          "prompt": "In financial accounting, depreciation normally allocates which cost?",
+          "options": [
+            "All company debt to shareholders",
+            "Revenue to bank accounts",
+            "Tax refunds to customers",
+            "A long-lived asset's cost over its useful life"
+          ],
+          "correct_index": 3,
+          "explanation": "Depreciation distributes a depreciable asset cost across periods that benefit."
+        },
+        {
+          "id": "accounting_q4",
+          "prompt": "Which financial statement reports cash inflows and outflows?",
+          "options": [
+            "Balance sheet only",
+            "Statement of changes in equity only",
+            "Statement of cash flows",
+            "Trial balance only"
+          ],
+          "correct_index": 2,
+          "explanation": "The cash flow statement groups cash movements into operating, investing and financing activities."
+        },
+        {
+          "id": "accounting_q5",
+          "prompt": "If current assets are $200 and current liabilities are $100, the current ratio equals:",
+          "options": [
+            "0.5",
+            "2.0",
+            "1.0",
+            "3.0"
+          ],
+          "correct_index": 1,
+          "explanation": "The current ratio is current assets divided by current liabilities, or 200/100."
+        }
+      ]
+    },
+    {
+      "id": "marketing",
+      "faculty_id": "business",
+      "major": "Marketing",
+      "title": "Marketing: The Unclickable Campaign",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "marketing_q1",
+          "prompt": "What does market segmentation mean?",
+          "options": [
+            "Dividing a broad market into groups with shared characteristics",
+            "Setting one price for every product forever",
+            "Removing all competitors",
+            "Buying every media channel"
+          ],
+          "correct_index": 0,
+          "explanation": "Segmentation helps tailor offers to meaningful customer groups."
+        },
+        {
+          "id": "marketing_q2",
+          "prompt": "Which metric is calculated as clicks divided by ad impressions?",
+          "options": [
+            "Gross margin",
+            "Inventory turnover",
+            "Current ratio",
+            "Click-through rate"
+          ],
+          "correct_index": 3,
+          "explanation": "CTR measures how often an impression leads to a click."
+        },
+        {
+          "id": "marketing_q3",
+          "prompt": "What is the primary goal of A/B testing in a marketing campaign?",
+          "options": [
+            "Guarantee every user buys",
+            "Eliminate the need for measurement",
+            "Compare outcomes between randomized alternatives",
+            "Measure a person's age exactly"
+          ],
+          "correct_index": 2,
+          "explanation": "Random allocation helps isolate the effect of different messages or experiences."
+        },
+        {
+          "id": "marketing_q4",
+          "prompt": "A product's value proposition describes:",
+          "options": [
+            "Only its factory address",
+            "Why a target customer should choose it",
+            "Only its manufacturing date",
+            "Its tax registration number"
+          ],
+          "correct_index": 1,
+          "explanation": "A value proposition states customer benefits and competitive relevance."
+        },
+        {
+          "id": "marketing_q5",
+          "prompt": "Which action can help reduce bias in a customer survey?",
+          "options": [
+            "Using neutral questions and a representative sample",
+            "Asking only leading questions",
+            "Sampling only loyal customers",
+            "Changing survey questions mid-response"
+          ],
+          "correct_index": 0,
+          "explanation": "Neutral wording and appropriate sampling improve the credibility of insights."
+        }
+      ]
+    },
+    {
+      "id": "economics",
+      "faculty_id": "fass",
+      "major": "Economics",
+      "title": "Economics: Supply, Demand, and No Sleep",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "economics_q1",
+          "prompt": "If demand increases while supply stays fixed, what normally happens to the equilibrium price?",
+          "options": [
+            "It falls to zero.",
+            "It must remain unchanged.",
+            "It becomes negative.",
+            "It rises."
+          ],
+          "correct_index": 3,
+          "explanation": "Higher demand generally shifts the demand curve outward, raising equilibrium price."
+        },
+        {
+          "id": "economics_q2",
+          "prompt": "In economics, what is meant by the opportunity cost of a decision?",
+          "options": [
+            "Only the monetary amount paid",
+            "A sunk cost that cannot be recovered",
+            "The value of the next-best forgone alternative",
+            "A government tax"
+          ],
+          "correct_index": 2,
+          "explanation": "Choosing an option sacrifices the benefit of the next-best alternative."
+        },
+        {
+          "id": "economics_q3",
+          "prompt": "Which measure counts the value of final goods and services produced within a country?",
+          "options": [
+            "Consumer price index",
+            "Gross domestic product",
+            "Government budget deficit",
+            "Interest rate spread"
+          ],
+          "correct_index": 1,
+          "explanation": "GDP measures the value of final domestic production over a period."
+        },
+        {
+          "id": "economics_q4",
+          "prompt": "A price ceiling below the market equilibrium typically causes:",
+          "options": [
+            "A shortage, other things equal",
+            "An automatic surplus",
+            "An exact balance at all prices",
+            "An increase in productive capacity"
+          ],
+          "correct_index": 0,
+          "explanation": "At an artificially low maximum price, quantity demanded can exceed quantity supplied."
+        },
+        {
+          "id": "economics_q5",
+          "prompt": "In economics, a negative externality occurs when:",
+          "options": [
+            "A producer earns no revenue.",
+            "A product is imported.",
+            "A market has many suppliers.",
+            "An activity imposes costs on others not reflected in the decision-maker's price."
+          ],
+          "correct_index": 3,
+          "explanation": "Pollution is a common external cost borne by parties outside the transaction."
+        }
+      ]
+    },
+    {
+      "id": "psychology",
+      "faculty_id": "fass",
+      "major": "Psychology",
+      "title": "Psychology: The Attention Span Incident",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "psychology_q1",
+          "prompt": "In an experiment, which group does not receive the treatment being tested?",
+          "options": [
+            "The intervention group",
+            "The observation bias",
+            "The control group",
+            "The sampling frame"
+          ],
+          "correct_index": 2,
+          "explanation": "A control group supplies a comparison for estimating treatment effects."
+        },
+        {
+          "id": "psychology_q2",
+          "prompt": "In cognitive psychology, which description best explains confirmation bias?",
+          "options": [
+            "Perfectly remembering all events",
+            "Favoring information that supports existing beliefs",
+            "Random assignment to conditions",
+            "A requirement for informed consent"
+          ],
+          "correct_index": 1,
+          "explanation": "Confirmation bias distorts evidence gathering and interpretation toward prior expectations."
+        },
+        {
+          "id": "psychology_q3",
+          "prompt": "Which memory system temporarily holds and manipulates information for tasks?",
+          "options": [
+            "Working memory",
+            "Procedural long-term memory only",
+            "Sensory receptors only",
+            "Genetic inheritance"
+          ],
+          "correct_index": 0,
+          "explanation": "Working memory supports short-term storage and active manipulation."
+        },
+        {
+          "id": "psychology_q4",
+          "prompt": "Why is informed consent important in human research?",
+          "options": [
+            "It allows researchers to skip ethical review.",
+            "It guarantees no risk of harm.",
+            "It removes confidentiality requirements.",
+            "Participants should understand relevant information and participate voluntarily."
+          ],
+          "correct_index": 3,
+          "explanation": "Informed consent respects autonomy and informs participants of procedures and risks."
+        },
+        {
+          "id": "psychology_q5",
+          "prompt": "In clinical research, what is meant by the placebo effect?",
+          "options": [
+            "The absence of any response",
+            "A treatment's chemical dosage",
+            "A response influenced by expectations or treatment context",
+            "An experiment with no participants"
+          ],
+          "correct_index": 2,
+          "explanation": "Expectations and context can influence symptoms and measured outcomes."
+        }
+      ]
+    },
+    {
+      "id": "sociology",
+      "faculty_id": "fass",
+      "major": "Sociology",
+      "title": "Sociology: The Group Project Census",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "sociology_q1",
+          "prompt": "Which concept describes shared expectations about acceptable behavior in a group?",
+          "options": [
+            "Atomic mass",
+            "Social norms",
+            "Market capitalization",
+            "A random variable"
+          ],
+          "correct_index": 1,
+          "explanation": "Social norms guide conduct through shared expectations and sanctions."
+        },
+        {
+          "id": "sociology_q2",
+          "prompt": "In sociology, what is meant by the concept of social stratification?",
+          "options": [
+            "Structured inequality among groups in society",
+            "The study of earthquakes",
+            "The process of protein folding",
+            "An accounting procedure"
+          ],
+          "correct_index": 0,
+          "explanation": "Stratification refers to patterned inequality in resources, status and opportunities."
+        },
+        {
+          "id": "sociology_q3",
+          "prompt": "Which research approach can capture participants' lived experiences in depth?",
+          "options": [
+            "Only a stopwatch",
+            "A currency exchange table",
+            "A heat exchanger",
+            "Qualitative interviews"
+          ],
+          "correct_index": 3,
+          "explanation": "Interviews can explore meanings, experiences and social contexts."
+        },
+        {
+          "id": "sociology_q4",
+          "prompt": "Why is sampling important in survey research?",
+          "options": [
+            "It guarantees all answers are truthful.",
+            "It eliminates measurement error entirely.",
+            "It affects how well findings generalize to a target population.",
+            "It makes research ethics unnecessary."
+          ],
+          "correct_index": 2,
+          "explanation": "Sampling procedures shape selection bias and representativeness."
+        },
+        {
+          "id": "sociology_q5",
+          "prompt": "What does the term socialization generally refer to?",
+          "options": [
+            "The chemical separation of liquids",
+            "Learning social norms, roles and values",
+            "A method for wireless encryption",
+            "The value of an asset"
+          ],
+          "correct_index": 1,
+          "explanation": "Socialization is how people acquire social practices and expectations."
+        }
+      ]
+    },
+    {
+      "id": "environmental_studies",
+      "faculty_id": "chs",
+      "major": "Environmental Studies",
+      "title": "Environmental Studies: The Carbon Deadline",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "environmental_studies_q1",
+          "prompt": "Which gas is a major direct contributor to anthropogenic global warming?",
+          "options": [
+            "Carbon dioxide",
+            "Argon",
+            "Neon",
+            "Helium"
+          ],
+          "correct_index": 0,
+          "explanation": "Human-emitted carbon dioxide absorbs outgoing infrared radiation and changes Earth's energy balance."
+        },
+        {
+          "id": "environmental_studies_q2",
+          "prompt": "What is the purpose of a life-cycle assessment?",
+          "options": [
+            "Measure only product color",
+            "Calculate stock market volatility",
+            "Determine a legal verdict",
+            "Evaluate environmental impacts across stages of a product's life"
+          ],
+          "correct_index": 3,
+          "explanation": "LCA follows a system from material extraction through use and end-of-life stages."
+        },
+        {
+          "id": "environmental_studies_q3",
+          "prompt": "Which process removes dissolved salts from water using a selective membrane and pressure?",
+          "options": [
+            "Simple sedimentation",
+            "Dry sieving",
+            "Reverse osmosis",
+            "Magnetic separation"
+          ],
+          "correct_index": 2,
+          "explanation": "Reverse osmosis uses pressure to overcome osmotic pressure across a semipermeable membrane."
+        },
+        {
+          "id": "environmental_studies_q4",
+          "prompt": "Which forms of biological variation are included in biodiversity?",
+          "options": [
+            "Only the number of buildings",
+            "Variation at genetic, species and ecosystem levels",
+            "Only domestic animals",
+            "Only soil temperature"
+          ],
+          "correct_index": 1,
+          "explanation": "Biodiversity spans genes, organisms and ecosystems."
+        },
+        {
+          "id": "environmental_studies_q5",
+          "prompt": "Which policy tool puts an explicit price on greenhouse gas emissions?",
+          "options": [
+            "A carbon tax",
+            "A parking map",
+            "A library membership",
+            "A land title"
+          ],
+          "correct_index": 0,
+          "explanation": "A carbon tax creates a financial incentive to reduce covered emissions."
+        }
+      ]
+    },
+    {
+      "id": "interdisciplinary_studies",
+      "faculty_id": "chs",
+      "major": "Interdisciplinary Studies",
+      "title": "Interdisciplinary Studies: The Mixed-Methods Mayhem",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "interdisciplinary_studies_q1",
+          "prompt": "What is the central value of an interdisciplinary approach?",
+          "options": [
+            "Avoiding all specialist knowledge",
+            "Using only one type of evidence",
+            "Choosing the shortest citation style",
+            "Combining relevant methods and insights from different fields"
+          ],
+          "correct_index": 3,
+          "explanation": "Complex problems often benefit from multiple complementary disciplinary perspectives."
+        },
+        {
+          "id": "interdisciplinary_studies_q2",
+          "prompt": "Which study design combines quantitative surveys and qualitative interviews?",
+          "options": [
+            "Purely archival indexing",
+            "Only randomized image classification",
+            "Mixed-methods research",
+            "Single-variable optimization"
+          ],
+          "correct_index": 2,
+          "explanation": "Mixed-methods research integrates numerical and contextual forms of evidence."
+        },
+        {
+          "id": "interdisciplinary_studies_q3",
+          "prompt": "Why should a project define its research question before selecting methods?",
+          "options": [
+            "It guarantees a positive result.",
+            "Methods should be appropriate to the question and required evidence.",
+            "It makes data cleaning unnecessary.",
+            "It removes the need for ethics review."
+          ],
+          "correct_index": 1,
+          "explanation": "A well-scoped question guides sampling, analysis and interpretation."
+        },
+        {
+          "id": "interdisciplinary_studies_q4",
+          "prompt": "When two datasets disagree, what is a defensible first action?",
+          "options": [
+            "Check definitions, measurement methods and sampling differences.",
+            "Average all values without checking.",
+            "Delete the dataset with smaller numbers.",
+            "Assume one discipline is always right."
+          ],
+          "correct_index": 0,
+          "explanation": "Different measurement constructs and samples can produce apparently contradictory findings."
+        },
+        {
+          "id": "interdisciplinary_studies_q5",
+          "prompt": "What makes a policy recommendation evidence-informed?",
+          "options": [
+            "It uses only one headline.",
+            "It ignores stakeholder effects.",
+            "It guarantees that trade-offs disappear.",
+            "It considers credible evidence, uncertainty, values and feasibility."
+          ],
+          "correct_index": 3,
+          "explanation": "Good recommendations synthesize evidence while acknowledging uncertainty and practical constraints."
+        }
+      ]
+    },
+    {
+      "id": "clinical_medicine",
+      "faculty_id": "medicine",
+      "major": "Clinical Medicine",
+      "title": "Clinical Medicine: The Night-Shift Quiz",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "clinical_medicine_q1",
+          "prompt": "Which vital sign directly reports the number of breaths taken per minute?",
+          "options": [
+            "Blood glucose",
+            "Body mass index",
+            "Respiratory rate",
+            "Heart sound intensity"
+          ],
+          "correct_index": 2,
+          "explanation": "Respiratory rate counts breathing cycles per minute."
+        },
+        {
+          "id": "clinical_medicine_q2",
+          "prompt": "Which organ is primarily responsible for filtering blood to form urine?",
+          "options": [
+            "Lung",
+            "Kidney",
+            "Stomach",
+            "Spleen"
+          ],
+          "correct_index": 1,
+          "explanation": "Nephrons in the kidneys filter plasma and regulate fluid and electrolyte balance."
+        },
+        {
+          "id": "clinical_medicine_q3",
+          "prompt": "Why should clinicians review medication allergies before prescribing?",
+          "options": [
+            "To reduce the risk of preventable adverse reactions",
+            "To guarantee a faster appointment",
+            "To replace patient history",
+            "To determine a patient's height"
+          ],
+          "correct_index": 0,
+          "explanation": "Allergy history can identify potentially harmful immune-mediated drug reactions."
+        },
+        {
+          "id": "clinical_medicine_q4",
+          "prompt": "What does an elevated heart rate describe?",
+          "options": [
+            "Bradycardia",
+            "Hypothermia",
+            "Hyperglycemia",
+            "Tachycardia"
+          ],
+          "correct_index": 3,
+          "explanation": "Tachycardia refers to a faster-than-normal heart rate, interpreted in clinical context."
+        },
+        {
+          "id": "clinical_medicine_q5",
+          "prompt": "What is a key reason to obtain a patient's informed consent?",
+          "options": [
+            "Ensure treatment can never fail",
+            "Avoid documenting the consultation",
+            "Respect autonomy after discussing risks, benefits and alternatives",
+            "Remove professional accountability"
+          ],
+          "correct_index": 2,
+          "explanation": "Valid consent requires sufficient information and voluntary decision-making."
+        }
+      ]
+    },
+    {
+      "id": "biomedical_sciences",
+      "faculty_id": "medicine",
+      "major": "Biomedical Sciences",
+      "title": "Biomedical Sciences: The Lab Report Escape",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "biomedical_sciences_q1",
+          "prompt": "Which method commonly amplifies a specific DNA sequence?",
+          "options": [
+            "Thin-layer chromatography",
+            "Polymerase chain reaction",
+            "Steam distillation",
+            "Gas compression"
+          ],
+          "correct_index": 1,
+          "explanation": "PCR uses iterative heating cycles and a DNA polymerase to amplify selected DNA."
+        },
+        {
+          "id": "biomedical_sciences_q2",
+          "prompt": "What does an antibody generally bind to?",
+          "options": [
+            "A specific antigenic epitope",
+            "Any molecule with equal affinity",
+            "Only red blood cells",
+            "A strand of RNA without specificity"
+          ],
+          "correct_index": 0,
+          "explanation": "Antibodies recognize molecular features called epitopes."
+        },
+        {
+          "id": "biomedical_sciences_q3",
+          "prompt": "Which cell type is responsible for oxygen transport in human blood?",
+          "options": [
+            "Platelets alone",
+            "Neurons",
+            "Keratinocytes",
+            "Red blood cells"
+          ],
+          "correct_index": 3,
+          "explanation": "Erythrocytes carry oxygen through hemoglobin."
+        },
+        {
+          "id": "biomedical_sciences_q4",
+          "prompt": "Why include negative controls in laboratory assays?",
+          "options": [
+            "To force a positive result",
+            "To increase reagent cost only",
+            "To detect background signals and contamination",
+            "To remove the need for calibration"
+          ],
+          "correct_index": 2,
+          "explanation": "Negative controls estimate signals observed without the target condition."
+        },
+        {
+          "id": "biomedical_sciences_q5",
+          "prompt": "What type of molecule is a typical enzyme?",
+          "options": [
+            "Triglyceride exclusively",
+            "Protein",
+            "Simple mineral salt",
+            "Noble gas"
+          ],
+          "correct_index": 1,
+          "explanation": "Most enzymes are proteins, although some catalytic RNA molecules also exist."
+        }
+      ]
+    },
+    {
+      "id": "contract_law",
+      "faculty_id": "law",
+      "major": "Contract Law",
+      "title": "Contract Law: The Case File Ultimatum",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "contract_law_q1",
+          "prompt": "Which element is commonly required for an enforceable contract under common-law principles?",
+          "options": [
+            "Offer and acceptance",
+            "A notarized handwritten signature in every case",
+            "A witness from both parties in all cases",
+            "A company seal in all cases"
+          ],
+          "correct_index": 0,
+          "explanation": "Offer and acceptance are core elements, alongside other applicable requirements such as consideration and intent."
+        },
+        {
+          "id": "contract_law_q2",
+          "prompt": "What is consideration in a common-law contract?",
+          "options": [
+            "Only the politeness of negotiations",
+            "The parties' age difference",
+            "An optional marketing slogan",
+            "Something of value exchanged as part of the bargain"
+          ],
+          "correct_index": 3,
+          "explanation": "Consideration identifies the bargained-for value supporting a promise in many common-law contracts."
+        },
+        {
+          "id": "contract_law_q3",
+          "prompt": "Which remedy generally aims to put the injured party in the position it would have occupied if a contract were performed?",
+          "options": [
+            "A criminal prison sentence",
+            "Automatic specific performance in all cases",
+            "Expectation damages",
+            "A new tax"
+          ],
+          "correct_index": 2,
+          "explanation": "Expectation damages compensate for the benefit of the bargain, subject to legal limitations."
+        },
+        {
+          "id": "contract_law_q4",
+          "prompt": "What does a material breach usually indicate?",
+          "options": [
+            "A minor formatting error in every context",
+            "A failure serious enough to affect the bargain substantially",
+            "That a contract was never discussed",
+            "An automatically void statute"
+          ],
+          "correct_index": 1,
+          "explanation": "Material breach concerns a substantial contractual failure; legal consequences depend on jurisdiction and facts."
+        },
+        {
+          "id": "contract_law_q5",
+          "prompt": "Why is the governing law clause important in a cross-border agreement?",
+          "options": [
+            "It identifies which jurisdiction's substantive law generally applies.",
+            "It sets the printing font.",
+            "It guarantees a dispute cannot occur.",
+            "It replaces all mandatory local laws."
+          ],
+          "correct_index": 0,
+          "explanation": "Choice-of-law clauses can improve predictability but do not override every mandatory rule."
+        }
+      ]
+    },
+    {
+      "id": "public_law",
+      "faculty_id": "law",
+      "major": "Public Law",
+      "title": "Public Law: The Judicial Review Maze",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "public_law_q1",
+          "prompt": "Which doctrine generally requires public authorities to exercise powers within legal limits?",
+          "options": [
+            "Unlimited executive discretion",
+            "Strict liability for every decision",
+            "Private ordering only",
+            "Rule of law"
+          ],
+          "correct_index": 3,
+          "explanation": "The rule of law constrains government action through publicly applicable legal standards."
+        },
+        {
+          "id": "public_law_q2",
+          "prompt": "What is judicial review primarily concerned with?",
+          "options": [
+            "Rewriting every statute based on popularity",
+            "Computing financial ratios",
+            "The legality of public decisions",
+            "Issuing all business licenses"
+          ],
+          "correct_index": 2,
+          "explanation": "Judicial review evaluates whether public bodies acted within applicable legal requirements."
+        },
+        {
+          "id": "public_law_q3",
+          "prompt": "What is a constitution's fundamental function?",
+          "options": [
+            "Listing every private invoice",
+            "Establishing core institutions, powers and legal principles",
+            "Defining chemical elements",
+            "Setting hourly bus schedules"
+          ],
+          "correct_index": 1,
+          "explanation": "Constitutions organize government and articulate fundamental legal rules."
+        },
+        {
+          "id": "public_law_q4",
+          "prompt": "Why is procedural fairness relevant to administrative decisions?",
+          "options": [
+            "Affected persons may be entitled to a fair process.",
+            "It guarantees a favorable outcome.",
+            "It makes evidence optional.",
+            "It applies only to commercial advertisements."
+          ],
+          "correct_index": 0,
+          "explanation": "Fair decision-making procedures can require impartiality and an appropriate chance to be heard."
+        },
+        {
+          "id": "public_law_q5",
+          "prompt": "What does separation of powers aim to reduce?",
+          "options": [
+            "The number of legal professions",
+            "All public debate",
+            "Every disagreement between courts",
+            "Excessive concentration of governmental power"
+          ],
+          "correct_index": 3,
+          "explanation": "Dividing functions among branches can provide checks on the exercise of power."
+        }
+      ]
+    },
+    {
+      "id": "restorative_dentistry",
+      "faculty_id": "dentistry",
+      "major": "Restorative Dentistry",
+      "title": "Restorative Dentistry: The Crown Came Loose",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "restorative_dentistry_q1",
+          "prompt": "What is the main purpose of a dental restoration?",
+          "options": [
+            "Increase plaque accumulation",
+            "Remove healthy enamel unnecessarily",
+            "Restore tooth function and structure",
+            "Replace all routine oral care"
+          ],
+          "correct_index": 2,
+          "explanation": "Restorations address lost or damaged tooth structure and help restore function."
+        },
+        {
+          "id": "restorative_dentistry_q2",
+          "prompt": "Why is moisture control important during adhesive composite placement?",
+          "options": [
+            "Water always strengthens every adhesive.",
+            "Contamination can compromise bonding.",
+            "It removes the need for curing.",
+            "It guarantees a perfect shade match."
+          ],
+          "correct_index": 1,
+          "explanation": "Adhesive performance depends on surface conditions and the bonding protocol."
+        },
+        {
+          "id": "restorative_dentistry_q3",
+          "prompt": "In oral health, which mechanism best describes dental caries?",
+          "options": [
+            "Acid-mediated loss of mineral from tooth tissue associated with biofilms",
+            "A fracture caused only by chewing",
+            "Growth of enamel after adulthood",
+            "An infection of the external ear"
+          ],
+          "correct_index": 0,
+          "explanation": "Bacterial metabolism in dental plaque can produce acids that demineralize enamel and dentine."
+        },
+        {
+          "id": "restorative_dentistry_q4",
+          "prompt": "Which tooth layer lies immediately beneath enamel in the crown?",
+          "options": [
+            "Pulp chamber",
+            "Periodontal ligament",
+            "Alveolar bone",
+            "Dentine"
+          ],
+          "correct_index": 3,
+          "explanation": "Dentine makes up much of the tooth and sits below enamel."
+        },
+        {
+          "id": "restorative_dentistry_q5",
+          "prompt": "Which principle helps preserve tooth vitality during preparation?",
+          "options": [
+            "Always remove the entire crown",
+            "Avoid evaluating existing decay",
+            "Minimize unnecessary removal of sound tissue",
+            "Apply maximum heat"
+          ],
+          "correct_index": 2,
+          "explanation": "Conservative preparation preserves healthy tissue while meeting restorative requirements."
+        }
+      ]
+    },
+    {
+      "id": "oral_biology",
+      "faculty_id": "dentistry",
+      "major": "Oral Biology",
+      "title": "Oral Biology: The Plaque Laboratory",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "oral_biology_q1",
+          "prompt": "Which tissue attaches a tooth root to surrounding alveolar bone?",
+          "options": [
+            "Enamel",
+            "Periodontal ligament",
+            "Dental pulp",
+            "Salivary duct"
+          ],
+          "correct_index": 1,
+          "explanation": "The periodontal ligament contains connective fibers that support tooth attachment."
+        },
+        {
+          "id": "oral_biology_q2",
+          "prompt": "What is saliva's role in oral health?",
+          "options": [
+            "Lubrication, buffering and antimicrobial defense",
+            "Only causing tooth erosion",
+            "Eliminating the need for brushing",
+            "Changing tooth number"
+          ],
+          "correct_index": 0,
+          "explanation": "Saliva supports lubrication, acid neutralization, remineralization and defense."
+        },
+        {
+          "id": "oral_biology_q3",
+          "prompt": "What is the outermost highly mineralized tissue of the tooth crown?",
+          "options": [
+            "Dentine",
+            "Cementum",
+            "Pulp",
+            "Enamel"
+          ],
+          "correct_index": 3,
+          "explanation": "Enamel covers the anatomical crown and has high mineral content."
+        },
+        {
+          "id": "oral_biology_q4",
+          "prompt": "Why can frequent sugar exposure increase caries risk?",
+          "options": [
+            "Sugar instantly creates a cavity without bacteria.",
+            "It makes enamel regenerate faster.",
+            "Plaque bacteria can repeatedly produce acids after metabolizing sugars.",
+            "It eliminates plaque formation."
+          ],
+          "correct_index": 2,
+          "explanation": "Repeated acid challenges can shift the balance toward net tooth demineralization."
+        },
+        {
+          "id": "oral_biology_q5",
+          "prompt": "In dentistry, what condition is described by the term gingivitis?",
+          "options": [
+            "A fracture of the jawbone",
+            "Inflammation of the gingiva",
+            "The normal eruption of an adult tooth",
+            "Growth of new enamel"
+          ],
+          "correct_index": 1,
+          "explanation": "Gingivitis is inflammation of gum tissue, commonly associated with dental plaque."
+        }
+      ]
+    },
+    {
+      "id": "music_theory",
+      "faculty_id": "music",
+      "major": "Music Theory",
+      "title": "Music Theory: The Missing Key Signature",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "music_theory_q1",
+          "prompt": "How many semitones are there in an octave in standard twelve-tone equal temperament?",
+          "options": [
+            "12",
+            "7",
+            "8",
+            "24"
+          ],
+          "correct_index": 0,
+          "explanation": "An octave spans twelve equal-tempered semitone steps."
+        },
+        {
+          "id": "music_theory_q2",
+          "prompt": "A major triad consists of which intervals above its root?",
+          "options": [
+            "A minor third and a diminished fifth",
+            "A perfect fourth and a major sixth",
+            "Two octaves only",
+            "A major third and a perfect fifth"
+          ],
+          "correct_index": 3,
+          "explanation": "The root, major third and perfect fifth form a major triad."
+        },
+        {
+          "id": "music_theory_q3",
+          "prompt": "What does a time signature of 3/4 indicate?",
+          "options": [
+            "Four groups of three eighth notes only",
+            "Three half-note beats per measure",
+            "Three quarter-note beats per measure",
+            "A mandatory tempo of 75 BPM"
+          ],
+          "correct_index": 2,
+          "explanation": "The numerator is 3 beats and the denominator denotes a quarter-note beat."
+        },
+        {
+          "id": "music_theory_q4",
+          "prompt": "What is a relative minor key of C major?",
+          "options": [
+            "C minor",
+            "A minor",
+            "D minor",
+            "E major"
+          ],
+          "correct_index": 1,
+          "explanation": "A minor and C major share the same key signature."
+        },
+        {
+          "id": "music_theory_q5",
+          "prompt": "What does a crescendo marking ask a performer to do?",
+          "options": [
+            "Gradually increase loudness",
+            "Gradually slow down",
+            "Play one octave lower",
+            "Stop immediately"
+          ],
+          "correct_index": 0,
+          "explanation": "Crescendo is a dynamic direction to grow louder over time."
+        }
+      ]
+    },
+    {
+      "id": "composition",
+      "faculty_id": "music",
+      "major": "Music Composition",
+      "title": "Composition: The Fugue Has Escaped",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "composition_q1",
+          "prompt": "What is a motif in musical composition?",
+          "options": [
+            "A requirement to use one instrument",
+            "A fixed recording format",
+            "A type of microphone",
+            "A short recognizable musical idea"
+          ],
+          "correct_index": 3,
+          "explanation": "Composers develop motifs through repetition, variation and transformation."
+        },
+        {
+          "id": "composition_q2",
+          "prompt": "What is counterpoint primarily concerned with?",
+          "options": [
+            "Only the loudness of a single drum",
+            "The price of a concert ticket",
+            "The relationship among independent melodic lines",
+            "Only instrument tuning"
+          ],
+          "correct_index": 2,
+          "explanation": "Counterpoint studies how simultaneously moving melodic voices interact."
+        },
+        {
+          "id": "composition_q3",
+          "prompt": "In musical composition, what does the term orchestration describe?",
+          "options": [
+            "Writing concert reviews",
+            "Assigning musical material to instruments and their combinations",
+            "Setting copyright law",
+            "Changing audio sample rates"
+          ],
+          "correct_index": 1,
+          "explanation": "Orchestration determines timbre, range, balance and instrumental color."
+        },
+        {
+          "id": "composition_q4",
+          "prompt": "Which compositional technique reverses a melody's interval directions?",
+          "options": [
+            "Inversion",
+            "Augmentation",
+            "Retrograde",
+            "Pedal point"
+          ],
+          "correct_index": 0,
+          "explanation": "Melodic inversion turns ascending intervals into descending intervals and vice versa."
+        },
+        {
+          "id": "composition_q5",
+          "prompt": "Which term describes sustaining or repeating one pitch while harmonies change?",
+          "options": [
+            "Cadence only",
+            "Picardy third",
+            "Canon at the unison",
+            "Pedal point"
+          ],
+          "correct_index": 3,
+          "explanation": "A pedal point maintains a note, often in the bass, across changing harmony."
+        }
+      ]
+    },
+    {
+      "id": "global_studies",
+      "faculty_id": "nusc",
+      "major": "Global Studies",
+      "title": "Global Studies: The Borderless Group Project",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "global_studies_q1",
+          "prompt": "Which international organization is primarily associated with the global framework for public health cooperation?",
+          "options": [
+            "International Maritime Organization",
+            "World Intellectual Property Organization",
+            "World Health Organization",
+            "International Telecommunication Union"
+          ],
+          "correct_index": 2,
+          "explanation": "The WHO coordinates international public health work and technical guidance."
+        },
+        {
+          "id": "global_studies_q2",
+          "prompt": "What does the term global supply chain describe?",
+          "options": [
+            "Only a firm's local reception desk",
+            "Linked production and distribution activities spanning countries",
+            "A single domestic retail invoice",
+            "A country's voting rules"
+          ],
+          "correct_index": 1,
+          "explanation": "Global supply chains connect suppliers, production and logistics across borders."
+        },
+        {
+          "id": "global_studies_q3",
+          "prompt": "Which factor can complicate cross-cultural research?",
+          "options": [
+            "Differences in language, norms and measurement meanings",
+            "Exactly identical social contexts",
+            "Uniform laws across all countries",
+            "No variation in interview responses"
+          ],
+          "correct_index": 0,
+          "explanation": "Constructs and survey instruments may not translate identically between contexts."
+        },
+        {
+          "id": "global_studies_q4",
+          "prompt": "What is a comparative case study useful for?",
+          "options": [
+            "Guaranteeing causation without assumptions",
+            "Eliminating data collection",
+            "Determining chemical concentration from color alone",
+            "Examining similarities and differences across contexts"
+          ],
+          "correct_index": 3,
+          "explanation": "Comparative cases can reveal patterns and context-specific mechanisms."
+        },
+        {
+          "id": "global_studies_q5",
+          "prompt": "Which statement best describes sustainability in international development?",
+          "options": [
+            "Maximizing short-term profit regardless of consequences",
+            "Replacing every local policy",
+            "Balancing environmental, social and economic considerations over time",
+            "Ignoring future generations"
+          ],
+          "correct_index": 2,
+          "explanation": "Sustainable development considers long-term needs and multiple dimensions of well-being."
+        }
+      ]
+    },
+    {
+      "id": "science_and_society",
+      "faculty_id": "nusc",
+      "major": "Science and Society",
+      "title": "Science and Society: The Ethical Algorithm",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "science_and_society_q1",
+          "prompt": "Why is reproducibility important in research?",
+          "options": [
+            "It ensures every hypothesis is true.",
+            "It allows independent verification of methods and findings.",
+            "It makes a study free of uncertainty.",
+            "It eliminates peer review."
+          ],
+          "correct_index": 1,
+          "explanation": "Reproducibility lets others examine whether an analysis can be repeated."
+        },
+        {
+          "id": "science_and_society_q2",
+          "prompt": "Which principle is central to responsible use of personal research data?",
+          "options": [
+            "Data minimization and appropriate consent or legal basis",
+            "Publishing every identifier openly",
+            "Using data for any purpose without notice",
+            "Ignoring access controls"
+          ],
+          "correct_index": 0,
+          "explanation": "Responsible data use limits collection and access to justified purposes."
+        },
+        {
+          "id": "science_and_society_q3",
+          "prompt": "What is a potential limitation of an AI model trained on a narrow population?",
+          "options": [
+            "Automatic universal accuracy",
+            "Guaranteed absence of bias",
+            "No need for validation",
+            "Poor generalization to different populations"
+          ],
+          "correct_index": 3,
+          "explanation": "Distribution shifts can reduce accuracy and create inequitable outcomes."
+        },
+        {
+          "id": "science_and_society_q4",
+          "prompt": "Why should researchers disclose conflicts of interest?",
+          "options": [
+            "To replace the methods section",
+            "To avoid replicating results",
+            "To help readers evaluate possible influences on research",
+            "To increase sample size"
+          ],
+          "correct_index": 2,
+          "explanation": "Disclosures improve transparency about financial or personal influences."
+        },
+        {
+          "id": "science_and_society_q5",
+          "prompt": "What is a falsifiable scientific hypothesis?",
+          "options": [
+            "A statement true by definition",
+            "A claim that could be contradicted by possible evidence",
+            "An opinion with no observable implications",
+            "A claim immune to testing"
+          ],
+          "correct_index": 1,
+          "explanation": "Falsifiability requires conditions under which evidence could count against the claim."
+        }
+      ]
+    },
+    {
+      "id": "epidemiology",
+      "faculty_id": "public_health",
+      "major": "Epidemiology",
+      "title": "Epidemiology: The Outbreak Spreadsheet",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "epidemiology_q1",
+          "prompt": "In epidemiology, what quantity is measured by incidence?",
+          "options": [
+            "New cases occurring in a population over a defined period",
+            "All existing cases at a point in time",
+            "The number of hospital buildings",
+            "Only mortality among newborns"
+          ],
+          "correct_index": 0,
+          "explanation": "Incidence counts newly occurring cases and is often expressed as a rate."
+        },
+        {
+          "id": "epidemiology_q2",
+          "prompt": "In epidemiology, what quantity is measured by prevalence?",
+          "options": [
+            "Only new cases this morning",
+            "The effectiveness of a vaccine alone",
+            "An individual's blood pressure",
+            "The proportion or number of existing cases in a population"
+          ],
+          "correct_index": 3,
+          "explanation": "Prevalence captures the burden of existing disease at a specified time or interval."
+        },
+        {
+          "id": "epidemiology_q3",
+          "prompt": "Why can confounding bias an observational association?",
+          "options": [
+            "Randomization is always perfect.",
+            "Confounding creates a new disease.",
+            "A third factor may relate to both exposure and outcome.",
+            "The outcome variable has no variance."
+          ],
+          "correct_index": 2,
+          "explanation": "A confounder can distort the estimated relationship between an exposure and an outcome."
+        },
+        {
+          "id": "epidemiology_q4",
+          "prompt": "What does a relative risk of 2 indicate?",
+          "options": [
+            "Every exposed person develops disease.",
+            "The exposed group has twice the risk of the comparison group.",
+            "The risk difference is exactly 2 percentage points.",
+            "There is no association."
+          ],
+          "correct_index": 1,
+          "explanation": "Relative risk is the ratio of risks between groups; 2 denotes a twofold ratio."
+        },
+        {
+          "id": "epidemiology_q5",
+          "prompt": "What is the main purpose of an outbreak investigation?",
+          "options": [
+            "Identify cases, sources, transmission and effective control actions",
+            "Guarantee no further cases immediately",
+            "Avoid contact with public agencies",
+            "Estimate only hospital revenue"
+          ],
+          "correct_index": 0,
+          "explanation": "Outbreak investigations guide detection, causal assessment and containment."
+        }
+      ]
+    },
+    {
+      "id": "health_policy",
+      "faculty_id": "public_health",
+      "major": "Health Policy",
+      "title": "Health Policy: The Vaccine Queue",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "health_policy_q1",
+          "prompt": "What does cost-effectiveness analysis compare?",
+          "options": [
+            "Only hospital room colors",
+            "Only the number of employees",
+            "A patient's handwriting style",
+            "Costs and health outcomes of alternative interventions"
+          ],
+          "correct_index": 3,
+          "explanation": "Cost-effectiveness analysis relates resources used to health benefits achieved."
+        },
+        {
+          "id": "health_policy_q2",
+          "prompt": "In population health policy, what principle does health equity emphasize?",
+          "options": [
+            "Giving everyone identical treatments regardless of need",
+            "Maximizing revenue alone",
+            "Avoiding unfair and remediable differences in health",
+            "Removing geographic information from all planning"
+          ],
+          "correct_index": 2,
+          "explanation": "Equity addresses avoidable and unjust differences across populations."
+        },
+        {
+          "id": "health_policy_q3",
+          "prompt": "Which intervention is an example of primary prevention?",
+          "options": [
+            "Rehabilitation after long-term injury",
+            "Vaccination before infection",
+            "Treatment of established disease only",
+            "End-of-life symptom care"
+          ],
+          "correct_index": 1,
+          "explanation": "Primary prevention acts before a condition develops."
+        },
+        {
+          "id": "health_policy_q4",
+          "prompt": "What is a key use of population health surveillance?",
+          "options": [
+            "Detect trends and guide public health responses",
+            "Replace all clinical diagnosis",
+            "Reveal every individual's private identity",
+            "Guarantee the absence of outbreaks"
+          ],
+          "correct_index": 0,
+          "explanation": "Surveillance systematically collects and analyzes information for public health action."
+        },
+        {
+          "id": "health_policy_q5",
+          "prompt": "Why should public health guidance communicate uncertainty?",
+          "options": [
+            "It makes recommendations automatically invalid.",
+            "It eliminates accountability.",
+            "It guarantees perfect public compliance.",
+            "Evidence and estimates can change as new information becomes available."
+          ],
+          "correct_index": 3,
+          "explanation": "Transparent uncertainty can support informed and adaptive decisions."
+        }
+      ]
+    },
+    {
+      "id": "policy_analysis",
+      "faculty_id": "public_policy",
+      "major": "Policy Analysis",
+      "title": "Policy Analysis: The Last-Minute Brief",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "policy_analysis_q1",
+          "prompt": "What is a policy problem statement meant to do?",
+          "options": [
+            "Guarantee the selected policy wins",
+            "List only the department logo",
+            "Define the issue, affected groups and decision context",
+            "Replace evidence with slogans"
+          ],
+          "correct_index": 2,
+          "explanation": "Clear problem definition identifies what a policy seeks to change and why."
+        },
+        {
+          "id": "policy_analysis_q2",
+          "prompt": "What does a counterfactual refer to in program evaluation?",
+          "options": [
+            "An already observed outcome only",
+            "What would likely have happened without the intervention",
+            "The budget total",
+            "An unrelated historical event"
+          ],
+          "correct_index": 1,
+          "explanation": "Causal evaluation compares observed outcomes against an estimated no-intervention scenario."
+        },
+        {
+          "id": "policy_analysis_q3",
+          "prompt": "Which tool is useful for identifying groups affected by a proposed policy?",
+          "options": [
+            "Stakeholder analysis",
+            "A stopwatch alone",
+            "An electrical circuit diagram",
+            "A music tuner"
+          ],
+          "correct_index": 0,
+          "explanation": "Stakeholder analysis maps interests, influence and potential effects."
+        },
+        {
+          "id": "policy_analysis_q4",
+          "prompt": "What does a cost-benefit analysis attempt to compare?",
+          "options": [
+            "Only the number of policy pages",
+            "Only the opinion of one official",
+            "A policy's font style",
+            "Monetized benefits and costs of alternatives over time"
+          ],
+          "correct_index": 3,
+          "explanation": "Cost-benefit analysis can compare alternatives by placing outcomes on a common monetary scale."
+        },
+        {
+          "id": "policy_analysis_q5",
+          "prompt": "Why is implementation feasibility important in policy design?",
+          "options": [
+            "Every policy is automatically implemented.",
+            "Feasibility is irrelevant after publication.",
+            "A desirable policy may fail without adequate capacity, funding or compliance.",
+            "Only the title matters."
+          ],
+          "correct_index": 2,
+          "explanation": "Practical institutions, resources and incentives affect whether policy works."
+        }
+      ]
+    },
+    {
+      "id": "public_administration",
+      "faculty_id": "public_policy",
+      "major": "Public Administration",
+      "title": "Public Administration: Bureaucracy Boss Fight",
+      "duration_seconds": 180,
+      "pass_mark": 60,
+      "questions": [
+        {
+          "id": "public_administration_q1",
+          "prompt": "In governance, what does the concept of public accountability mean?",
+          "options": [
+            "The absence of all reporting",
+            "The obligation of public bodies to explain and justify their actions",
+            "A private firm's product launch",
+            "Only a building's annual rent"
+          ],
+          "correct_index": 1,
+          "explanation": "Accountability involves answerability, oversight and possible consequences."
+        },
+        {
+          "id": "public_administration_q2",
+          "prompt": "Why do public agencies use performance indicators?",
+          "options": [
+            "To monitor outputs, outcomes and service quality",
+            "To avoid evaluating programs",
+            "To eliminate public feedback",
+            "To replace legal duties"
+          ],
+          "correct_index": 0,
+          "explanation": "Indicators can help assess progress when they reflect meaningful objectives."
+        },
+        {
+          "id": "public_administration_q3",
+          "prompt": "What is an example of a conflict of interest in administration?",
+          "options": [
+            "An agency publishes a timetable.",
+            "Two agencies share open data.",
+            "A staff member completes mandatory training.",
+            "An official's private interest could improperly influence an official decision."
+          ],
+          "correct_index": 3,
+          "explanation": "Conflicts arise when private interests may affect impartial public duties."
+        },
+        {
+          "id": "public_administration_q4",
+          "prompt": "What is the role of a public procurement process?",
+          "options": [
+            "Avoid all supplier competition",
+            "Guarantee the cheapest item is always suitable",
+            "Acquire goods or services using lawful, accountable procedures",
+            "Eliminate contract management"
+          ],
+          "correct_index": 2,
+          "explanation": "Procurement frameworks aim for value, fairness and integrity in public purchasing."
+        },
+        {
+          "id": "public_administration_q5",
+          "prompt": "Why is coordination between agencies sometimes necessary?",
+          "options": [
+            "All agencies always have identical mandates.",
+            "Complex public problems span multiple responsibilities and services.",
+            "Coordination removes every trade-off.",
+            "It allows agencies to ignore privacy rules."
+          ],
+          "correct_index": 1,
+          "explanation": "Interagency collaboration can address cross-cutting challenges while respecting distinct roles."
+        }
+      ]
+    }
+  ]
+}

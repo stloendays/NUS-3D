@@ -33,6 +33,7 @@ var faculty_progress: Dictionary = {}
 var total_xp: int = 0
 var credits: int = 0
 var last_grade: String = ""
+var exam_reward_ids: PackedStringArray = PackedStringArray()
 var feedback: String = ""
 var feedback_left: float = 0.0
 var current_time_left: float = 0.0
@@ -122,6 +123,7 @@ func _load_progress() -> void:
     total_xp = 0
     credits = 0
     last_grade = ""
+    exam_reward_ids.clear()
     active_quest_index = 0
     active_stage = STAGE_BRIEF
     current_time_left = 0.0
@@ -130,6 +132,12 @@ func _load_progress() -> void:
         return
     total_xp = clampi(int(save.get_value("player", "xp", 0)), 0, 100000000)
     credits = clampi(int(save.get_value("player", "credits", 0)), 0, 100000000)
+    var past_exams: Variant = save.get_value("player", "exam_reward_ids", PackedStringArray())
+    if typeof(past_exams) == TYPE_ARRAY or typeof(past_exams) == TYPE_PACKED_STRING_ARRAY:
+        for raw in past_exams:
+            var reward_key: String = str(raw)
+            if reward_key.begins_with("exam:") and reward_key.length() <= 100 and not exam_reward_ids.has(reward_key):
+                exam_reward_ids.append(reward_key)
     var state_data: Variant = save.get_value("coursework", "progress", {})
     if typeof(state_data) == TYPE_DICTIONARY:
         var records: Dictionary = state_data
@@ -148,6 +156,7 @@ func _save_progress() -> bool:
     save.set_value("player", "faculty", current_faculty_id)
     save.set_value("player", "xp", total_xp)
     save.set_value("player", "credits", credits)
+    save.set_value("player", "exam_reward_ids", exam_reward_ids)
     save.set_value("player", "last_grade", last_grade)
     save.set_value("coursework", "progress", faculty_progress)
     var err: Error = save.save(save_path)
@@ -155,6 +164,28 @@ func _save_progress() -> bool:
         push_warning("Local coursework progress could not be saved")
         return false
     return true
+
+## English practice rewards are isolated to the current local account.
+func claim_exam_reward_once(paper_id: String, gained_xp: int, gained_credits: int) -> bool:
+    if paper_id.is_empty() or paper_id.length() > 90 or gained_xp < 0 or gained_credits < 0:
+        return false
+    if not paper_id.is_valid_identifier():
+        return false
+    var reward_id: String = "exam:" + paper_id
+    if exam_reward_ids.has(reward_id):
+        return false
+    var previous_xp: int = total_xp
+    var previous_credits: int = credits
+    exam_reward_ids.append(reward_id)
+    total_xp = mini(100000000, total_xp + gained_xp)
+    credits = mini(100000000, credits + gained_credits)
+    if _save_progress():
+        return true
+    exam_reward_ids.remove_at(exam_reward_ids.size() - 1)
+    total_xp = previous_xp
+    credits = previous_credits
+    return false
+
 
 func _restore_active_state() -> void:
     var state: Dictionary = _valid_state(current_faculty_id, faculty_progress.get(current_faculty_id, {}))
@@ -265,12 +296,12 @@ func format_ddl() -> String:
 
 func status_text() -> String:
     if current_faculty_id.is_empty():
-        return "COURSEWORK  |  选择自己的学院，开启疯狂 DDL 之旅\n[J] 任务手册  [O] 学院选择"
+        return "COURSEWORK  |  选择自己的学院，开启疯狂 DDL 之旅\n[P] 任务手册  [Shift+P] 学院选择"
     var current: Dictionary = current_quest()
     var header: String = "%s  |  Lv.%d  XP %d  $%d" % [faculty_name(), level(), total_xp, credits]
     if current.is_empty():
-        return "COURSEWORK  |  " + header + "\n学院任务已完成！[P] 五子棋/打牌/聚会  [O] 切换学院"
-    return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[J] 任务手册  [O] 切换学院" % [
+        return "COURSEWORK  |  " + header + "\n学院任务全部完成！[P] 查看成绩  [Shift+P] 切换学院"
+    return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[P] 任务手册  [Shift+P] 切换学院" % [
         active_quest_index + 1, header, str(current["title"]), format_ddl(), objective_description()
     ]
 
@@ -425,10 +456,6 @@ func _complete_quest() -> void:
     active_quest_index += 1
     active_stage = STAGE_BRIEF
     current_time_left = 0.0
-    var chapters: Array = faculty_by_id[current_faculty_id]["quests"]
-    if active_quest_index >= chapters.size():
-        feedback += "\n解锁：下课后社团 [P] — 五子棋、牌局和聚会！"
-        feedback_left = 9.0
     _save_progress()
     _refresh_marker()
 

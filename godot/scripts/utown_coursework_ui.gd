@@ -69,7 +69,7 @@ func _build_status() -> void:
     status_card.add_child(column)
     status_title = _label("COURSEWORK // THE DDL APOCALYPSE", 14, Color.html("#f3c372"))
     column.add_child(status_title)
-    status_body = _label("Choose your faculty. [O] Faculty  [J] Coursework", 12, Color.html("#edf2ed"))
+    status_body = _label("Choose your faculty. [Shift+P] Faculty  [P] Coursework", 12, Color.html("#edf2ed"))
     column.add_child(status_body)
     status_feedback = _label("", 12, Color.html("#a9e4b7"))
     column.add_child(status_feedback)
@@ -131,6 +131,12 @@ func _build_modal() -> void:
     journal_text = _label("", 15, Color.html("#e7ede9"))
     journal_text.custom_minimum_size = Vector2(520, 210)
     journal_box.add_child(journal_text)
+    var exam_button := Button.new()
+    exam_button.name = "OpenEnglishMajorExams"
+    exam_button.text = "模拟专业考试 / ENGLISH MAJOR EXAMS [F8]"
+    exam_button.custom_minimum_size.y = 43.0
+    exam_button.pressed.connect(_open_major_exams)
+    journal_box.add_child(exam_button)
     var switch_button := Button.new()
     switch_button.text = "切换学院 / CHANGE FACULTY"
     switch_button.custom_minimum_size.y = 37.0
@@ -197,6 +203,15 @@ func _confirm_faculty() -> void:
     if coursework.select_faculty(faculty_id):
         hide_modal()
 
+func _open_major_exams() -> void:
+    if coursework.current_faculty_id.is_empty():
+        return
+    hide_modal()
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    if exams != null:
+        exams.call("open_library")
+
+
 func show_journal() -> void:
     if coursework.current_faculty_id.is_empty():
         show_selector()
@@ -234,7 +249,7 @@ func _refresh_journal() -> void:
         ]
     if not coursework.last_grade.is_empty():
         line += "\n最近评分：" + coursework.last_grade
-    line += "\n\n[J] 返回  [O] 切换学院   |   进度已存于本地"
+    line += "\n\n[P] 返回  [Shift+P] 切换学院   |   进度已存于本地"
     journal_text.text = line
 
 func set_hud_enabled(enabled: bool) -> void:
@@ -252,31 +267,39 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    if exams != null and bool(exams.get("is_open")):
+        return
     if intro_blocked:
         return
-    var club: UTownLeisureUI = get_parent().get_node_or_null("LeisureUI") as UTownLeisureUI
-    if club != null and club.is_open:
-        return  # Do not stack faculty/journal modal on top of the leisure menu.
+    var leisure_ui: Node = get_parent().get_node_or_null("LeisureUI")
+    if leisure_ui != null and bool(leisure_ui.get("is_open")):
+        return
     if not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
     if not key.pressed or key.echo:
         return
-    if key.keycode == KEY_O:
-        show_selector()
-        get_viewport().set_input_as_handled()
-    elif key.keycode == KEY_J:
-        if modal_visible and not selection_visible:
+    if modal_visible:
+        if key.keycode == KEY_ESCAPE:
             hide_modal()
-        elif not modal_visible:
+            get_viewport().set_input_as_handled()
+        elif key.keycode == KEY_P:
+            if key.shift_pressed:
+                show_selector()
+            else:
+                hide_modal()
+            get_viewport().set_input_as_handled()
+        elif key.keycode in [
+            KEY_W, KEY_A, KEY_S, KEY_D, KEY_K, KEY_Q, KEY_B, KEY_X, KEY_I,
+            KEY_F, KEY_L, KEY_Y, KEY_T, KEY_C, KEY_V, KEY_G, KEY_E, KEY_R,
+            KEY_M, KEY_SPACE, KEY_SHIFT, KEY_J, KEY_O, KEY_N, KEY_Z, KEY_U,
+            KEY_H, KEY_TAB, KEY_1, KEY_2, KEY_3
+        ]:
+            get_viewport().set_input_as_handled()
+    elif key.keycode == KEY_P:
+        if key.shift_pressed:
+            show_selector()
+        else:
             show_journal()
-        get_viewport().set_input_as_handled()
-    elif key.keycode == KEY_ESCAPE and modal_visible:
-        hide_modal()
-        get_viewport().set_input_as_handled()
-    elif modal_visible and key.keycode in [
-        KEY_W, KEY_A, KEY_S, KEY_D, KEY_K, KEY_Q, KEY_B, KEY_X, KEY_I,
-        KEY_F, KEY_L, KEY_Y, KEY_T, KEY_C, KEY_V, KEY_G, KEY_E, KEY_R,
-        KEY_M, KEY_SPACE, KEY_SHIFT
-    ]:
         get_viewport().set_input_as_handled()

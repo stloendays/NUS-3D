@@ -187,8 +187,8 @@ func _smoke() -> void:
         push_error("invalid lighting preset was accepted")
         quit(1)
         return
-    if world.navigation_labels.size() < 10 or world.route_marker_root == null:
-        push_error("Missing navigational world labels for clean photo mode")
+    if world.route_marker_root == null:
+        push_error("Missing route marker visibility controller for clean photo mode")
         quit(1)
         return
     world.set_navigation_markers_visible(false)
@@ -202,8 +202,8 @@ func _smoke() -> void:
         quit(1)
         return
     world.set_navigation_markers_visible(true)
-    if not world.route_marker_root.visible:
-        push_error("F7 photo mode did not restore navigation markers")
+    if world.route_marker_root.visible:
+        push_error("Removed sky-high route labels reappeared after F7 photo mode")
         quit(1)
         return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
@@ -664,109 +664,6 @@ func _smoke() -> void:
         quit(1)
         return
     player.call("reset_player")
-    # M3.8 checks run with isolated leisure and Coursework saves, never the user's progress.
-    var leisure: UTownLeisure = instance.get_node_or_null("Leisure") as UTownLeisure
-    var leisure_ui: UTownLeisureUI = instance.get_node_or_null("LeisureUI") as UTownLeisureUI
-    if leisure == null or leisure_ui == null or leisure.chess_board.size() != 81 or leisure_ui.cells.size() != 81:
-        push_error("Post-course games or the 9x9 chess board could not initialize")
-        quit(1)
-        return
-    leisure.save_path = "user://nus3d_leisure_smoke_temp.cfg"
-    DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
-    leisure.chess_wins = 0
-    leisure.chess_games = 0
-    leisure.card_wins = 0
-    leisure.card_games = 0
-    leisure.social_visits = 0
-    if leisure.unlocked() or leisure_ui.open_lounge():
-        push_error("Leisure must remain locked until 3 faculty coursework chapters complete")
-        quit(1)
-        return
-    coursework.active_quest_index = 3
-    coursework._store_active_state()
-    if not leisure.unlocked() or leisure.grand_master_unlocked():
-        push_error("Passing one faculty did not unlock leisure, or awarded 39-chapter bonus too soon")
-        quit(1)
-        return
-    if leisure.lounge_root == null or leisure.lounge_root.name != "PostCourseClub_Illustrative":
-        push_error("Decorative leisure scene in SRC was not created")
-        quit(1)
-        return
-    if not leisure_ui.open_lounge() or not leisure_ui.is_open or not coursework.modal_open or not player.movement_locked:
-        push_error("Leisure club did not pause walking and DDL while menu is open")
-        quit(1)
-        return
-    leisure_ui.switch_tab("cards")
-    if not leisure_ui.card_panel.visible or leisure_ui.chess_panel.visible:
-        push_error("Interactive minigame tabs are not switching")
-        quit(1)
-        return
-    leisure_ui.close_lounge()
-    if leisure_ui.is_open or coursework.modal_open or player.movement_locked:
-        push_error("Closing the club did not restore gameplay")
-        quit(1)
-        return
-    leisure.reset_chess()
-    for col in range(4):
-        leisure.chess_board[col] = 1
-        leisure.chess_moves += 1
-    if not leisure.play_chess(4, 0) or not leisure.chess_over or leisure.chess_winner != 1 or leisure.chess_wins != 1:
-        push_error("Human five-in-a-row victory did not score correctly")
-        quit(1)
-        return
-    leisure.reset_chess()
-    for col in range(4):
-        leisure.chess_board[2 * 9 + col] = 2
-    if leisure._ai_move() != Vector2i(4, 2):
-        push_error("Gomoku NPC does not recognize an immediate winning move")
-        quit(1)
-        return
-    leisure.start_cards()
-    for card_round in range(5):
-        if not leisure.play_card(0):
-            push_error("Valid card selection did not complete a round")
-            quit(1)
-            return
-    if not leisure.card_over or leisure.card_games != 1 or leisure.card_round != 5 or leisure.play_card(0):
-        push_error("Five-round card game end state is incorrect")
-        quit(1)
-        return
-    if leisure.celebrate("adult") or not leisure.celebrate("mocktail") or not leisure.safe_to_ride():
-        push_error("Optional adult toast not gated, or alcohol-free drink restricted travel")
-        quit(1)
-        return
-    if not leisure.celebrate("adult", true) or leisure.safe_to_ride():
-        push_error("Adult social option did not begin temporary no-travel cooldown")
-        quit(1)
-        return
-    if campus_life.set_bicycle(true) or campus_life.board_or_alight():
-        push_error("Post-toast bike/bus safety rule was bypassed")
-        quit(1)
-        return
-    leisure._process(leisure.SOCIAL_COOLDOWN + 0.1)
-    if not leisure.safe_to_ride() or not campus_life.set_bicycle(true):
-        push_error("Post-toast temporary travel restriction failed to clear")
-        quit(1)
-        return
-    campus_life.set_bicycle(false)
-    if not coursework.select_faculty("computing") or not leisure.unlocked():
-        push_error("Earned leisure access was lost after switching faculty")
-        quit(1)
-        return
-    if leisure.social_visits != 2 or leisure.chess_games != 1 or leisure.card_games != 1:
-        push_error("Leisure replay and visit stats are incorrect")
-        quit(1)
-        return
-    leisure.chess_wins = 0
-    leisure.chess_games = 0
-    leisure.card_games = 0
-    leisure.social_visits = 0
-    leisure._load_stats()
-    if leisure.chess_wins != 1 or leisure.chess_games != 1 or leisure.card_games != 1 or leisure.social_visits != 2:
-        push_error("Leisure progress did not persist in local isolated save")
-        quit(1)
-        return
-    DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
     DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D

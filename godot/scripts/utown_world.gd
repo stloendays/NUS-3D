@@ -7,6 +7,8 @@ const DATA_PATH: String = "res://data/utown_core.json"
 const M2_DATA_PATH: String = "res://data/m2_profiles.json"
 const FACADE_KIT = preload("res://scripts/utown_facades.gd")
 const OSM_KIT = preload("res://scripts/osm_reference.gd")
+const COMIC_LAWN_PATH: String = "res://assets/materials/comic_lawn.svg"
+const COMIC_PAVERS_PATH: String = "res://assets/materials/comic_pavers.svg"
 const METRES_PER_DEG_LAT: float = 110574.0
 const METRES_PER_DEG_LON: float = 111320.0
 
@@ -80,6 +82,18 @@ func _mat(hex: String, rough: float = 0.9) -> StandardMaterial3D:
     material.roughness = rough
     return material
 
+func _repeat_texture(material: StandardMaterial3D, texture_path: String, metres_per_tile: float) -> void:
+    # World-space tiling on the rectangular terrain / path meshes, no stretched atlas.
+    var texture: Texture2D = load(texture_path) as Texture2D
+    if texture == null:
+        push_warning("M3.7 tiling texture missing: " + texture_path)
+        return
+    material.albedo_texture = texture
+    material.uv1_triplanar = true
+    material.uv1_world_triplanar = true
+    var repeats_per_metre: float = 1.0 / maxf(metres_per_tile, 0.5)
+    material.uv1_scale = Vector3.ONE * repeats_per_metre
+
 func _add_box(parent: Node3D, at: Vector3, size_m: Vector3, material: Material, solid: bool = false) -> Node3D:
     var part: Node3D = Node3D.new()
     part.position = at
@@ -123,7 +137,8 @@ func _build_ground() -> void:
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    var terrain_material: StandardMaterial3D = _mat("#819e7a")
+    var terrain_material: StandardMaterial3D = _mat("#ecf7e8")
+    _repeat_texture(terrain_material, COMIC_LAWN_PATH, 5.5)
     weather_reactive_grass.append(terrain_material)
     _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), terrain_material, true)
 
@@ -143,11 +158,13 @@ func _build_green() -> void:
     surface.begin(Mesh.PRIMITIVE_TRIANGLES)
     for i in indices:
         surface.set_normal(Vector3.UP)
+        surface.set_uv(Vector2(poly[i].x / 5.5, poly[i].y / 5.5))
         surface.add_vertex(Vector3(poly[i].x, 0.025, poly[i].y))
     var grass: MeshInstance3D = MeshInstance3D.new()
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
-    var grass_mat: StandardMaterial3D = _mat("#8aba75")
+    var grass_mat: StandardMaterial3D = _mat("#effbea")
+    grass_mat.albedo_texture = load(COMIC_LAWN_PATH) as Texture2D
     weather_reactive_grass.append(grass_mat)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
     grass.material_override = grass_mat
@@ -161,7 +178,8 @@ func _build_plaza() -> void:
     root.position = at
     root.rotation.y = deg_to_rad(float(plaza.get("rotation_deg", 0.0)))
     add_child(root)
-    var plaza_surface: StandardMaterial3D = _mat("#b9bcb5")
+    var plaza_surface: StandardMaterial3D = _mat("#eef3ec")
+    _repeat_texture(plaza_surface, COMIC_PAVERS_PATH, 3.2)
     weather_reactive_materials.append(plaza_surface)
     _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), plaza_surface)
     for i in range(4):
@@ -172,7 +190,8 @@ func _build_walkways() -> void:
     var root: Node3D = Node3D.new()
     root.name = "ConceptualFootpaths_NotSurveyed"
     add_child(root)
-    var path_material: StandardMaterial3D = _mat("#c8c7bd")
+    var path_material: StandardMaterial3D = _mat("#eff5ed")
+    _repeat_texture(path_material, COMIC_PAVERS_PATH, 3.0)
     weather_reactive_materials.append(path_material)
     for way in layout.get("walkways", []):
         var points: Array = way.get("lonlat", [])
@@ -226,7 +245,7 @@ func _build_buildings() -> void:
             var z: float = -north
             _add_box(group, Vector3(dx, h / 2.0, z), Vector3(w, h, d), wall, true)
             _add_box(group, Vector3(dx, h + 0.24, z), Vector3(w + 0.65, 0.48, d + 0.65), roof)
-            var bands: int = mini(int(h / 3.6), 11)
+            var bands: int = 0 if priority != "P0" and record.has("confirmed_storeys") else mini(int(h / 3.6), 11)
             for floor_index in range(bands):
                 var yf: float = 2.4 + 3.5 * float(floor_index)
                 if yf + 0.7 >= h:
@@ -240,7 +259,7 @@ func _build_buildings() -> void:
             m2_detail_nodes.append(detail)
             generated_facade_count += 1
         generated_building_count += 1
-        _add_sign(group, str(record.get("name", group.name)), Vector3(0.0, max_height + 6.0, 0.0), "#fbfbf8")
+        # Building identities belong in the minimap, not floating above roofs.
 
 func _build_osm_reference() -> void:
     var overlay: UTownOSMReference = OSM_KIT.new()
@@ -259,12 +278,10 @@ func set_m2_details_visible(enabled: bool) -> void:
     for detail in m2_detail_nodes:
         detail.visible = enabled
 
-func set_navigation_markers_visible(enabled: bool) -> void:
-    # Clean photo mode hides source-generated labels and waypoint spheres as well as HUD.
-    for label in navigation_labels:
-        label.visible = enabled
+func set_navigation_markers_visible(_enabled: bool) -> void:
+    # Keep the F7-compatible callable API but never reactivate removed overhead signs.
     if route_marker_root != null:
-        route_marker_root.visible = enabled
+        route_marker_root.visible = false
 
 func lighting_name() -> String:
     return str(LIGHTING_NAMES[lighting_mode])
@@ -316,19 +333,6 @@ func _unhandled_input(event: InputEvent) -> void:
             set_osm_reference_visible(not osm_reference_visible)
         elif event.keycode == KEY_T:
             set_lighting_mode((lighting_mode + 1) % LIGHTING_NAMES.size())
-
-func _add_sign(parent: Node3D, title: String, at: Vector3, color_hex: String) -> void:
-    var sign: Label3D = Label3D.new()
-    sign.text = title
-    sign.font_size = 34
-    sign.pixel_size = 0.025
-    sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    sign.no_depth_test = true
-    sign.modulate = Color.html(color_hex)
-    sign.outline_size = 5
-    sign.position = at
-    parent.add_child(sign)
-    navigation_labels.append(sign)
 
 func _distance_to_segment(point: Vector2, start: Vector2, finish: Vector2) -> float:
     var segment: Vector2 = finish - start
@@ -473,20 +477,13 @@ func _build_waypoints() -> void:
     root.name = "RouteBeacons_Conceptual"
     add_child(root)
     route_marker_root = root
-    var tint: Material = _mat("#e7ca75", 0.38)
-    var ball: SphereMesh = SphereMesh.new()
-    ball.radius = 0.7
-    ball.height = 1.4
+    # Keep all four logical waypoints for the map, tour, shuttle and gameplay.
+    # Do not add world-space spheres, labels or signposts.
     for stop in layout.get("loop", []):
         var p: Vector3 = lonlat_to_world(float(stop["lon"]), float(stop["lat"]))
         route_points.append(p)
         route_names.append(str(stop["name"]))
-        var marker: MeshInstance3D = MeshInstance3D.new()
-        marker.mesh = ball
-        marker.material_override = tint
-        marker.position = p + Vector3(0.0, 0.9, 0.0)
-        root.add_child(marker)
-        _add_sign(root, str(stop["name"]), p + Vector3(0.0, 3.1, 0.0), "#fff4c4")
+    root.visible = false
 
 func nearest_landmark(position_m: Vector3) -> Dictionary:
     var answer: Dictionary = {"name": "Town Green", "distance": 0.0}

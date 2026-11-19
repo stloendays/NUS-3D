@@ -116,16 +116,20 @@
           "dn": 7,
           "w": 45,
           "d": 30,
-          "h": 12.5
+          "h": 15.2
         },
         {
           "dx": 18,
           "dn": -10,
           "w": 26,
           "d": 28,
-          "h": 11.5
+          "h": 15.2
         }
-      ]
+      ],
+      "confirmed_storeys": 4,
+      "estimated_floor_pitch_m": 3.8,
+      "architecture_evidence": "https://www.mfacade.com/projects/education-resource-centre-nus/",
+      "height_provenance": "Four storeys verified; 15.2 m total and floor pitch are game estimates, not surveyed"
     },
     {
       "id": "SRC",
@@ -175,9 +179,13 @@
           "dn": 0,
           "w": 48,
           "d": 29,
-          "h": 27
+          "h": 56
         }
-      ]
+      ],
+      "confirmed_storeys": 16,
+      "estimated_floor_pitch_m": 3.5,
+      "architecture_evidence": "https://www.dpa.com.sg/projects/createnus-utown/",
+      "height_provenance": "16-storey tower verified; 56.0 m total and floor pitch are game estimates, not surveyed"
     },
     {
       "id": "UTR_N",
@@ -194,9 +202,13 @@
           "dn": 0,
           "w": 30,
           "d": 48,
-          "h": 42
+          "h": 81.25
         }
-      ]
+      ],
+      "confirmed_storeys": 25,
+      "estimated_floor_pitch_m": 3.25,
+      "architecture_evidence": "https://utr.nus.edu.sg/residential-life/neighbourhood/",
+      "height_provenance": "Residential neighbourhoods cover numbered levels 01-25; 81.25 m and floor pitch are game estimates, not surveyed"
     },
     {
       "id": "UTR_S",
@@ -213,9 +225,13 @@
           "dn": 0,
           "w": 30,
           "d": 48,
-          "h": 42
+          "h": 81.25
         }
-      ]
+      ],
+      "confirmed_storeys": 25,
+      "estimated_floor_pitch_m": 3.25,
+      "architecture_evidence": "https://utr.nus.edu.sg/residential-life/neighbourhood/",
+      "height_provenance": "Residential neighbourhoods cover numbered levels 01-25; 81.25 m and floor pitch are game estimates, not surveyed"
     },
     {
       "id": "TEMBUSU",

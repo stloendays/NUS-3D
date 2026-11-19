@@ -3,9 +3,14 @@
 config_version=5
 
 [application]
-config/name="NUS-3D | Coursework: DDL Apocalypse (Unofficial)"
-run/main_scene="res://scenes/main.tscn"
+config/name="NUS-3D | UTown M2 Study"
+run/main_scene="res://scenes/game_shell.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
+
+[autoload]
+GameLanguage="*res://scripts/game_language.gd"
+DialogueBank="*res://scripts/game_dialogue.gd"
+UISound="*res://scripts/ui_sfx.gd"
 
 [display]
 window/size/viewport_width=1280
