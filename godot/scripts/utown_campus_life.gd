@@ -16,6 +16,9 @@ var npc_lines: PackedStringArray = PackedStringArray([
     "The weather presets are artistic effects, not a live Singapore forecast."
 ])
 var npc_colors: PackedStringArray = PackedStringArray(["#d77f69", "#6d93bf", "#9b83bd", "#6eaa91", "#d4a65f", "#8a9da7"])
+## Cosmetic variety is independent of personality, affinity, and gameplay rewards.
+const SKIN_TONES = ["#f3cba8", "#8c553e", "#c98d62", "#e0ac82", "#633d30", "#ae7153"]
+const HAIR_TONES = ["#292c30", "#382923", "#4d342a", "#1f252c", "#624737", "#353136"]
 const TALK_RADIUS: float = 5.5
 const ENTRY_RADIUS: float = 18.0
 const BOARD_RADIUS: float = 7.0
@@ -123,7 +126,7 @@ func _make_person(index: int) -> Node3D:
     var shirt := StandardMaterial3D.new()
     shirt.albedo_color = Color.html(str(npc_colors[index]))
     var skin := StandardMaterial3D.new()
-    skin.albedo_color = Color.html("#d9ad8d")
+    skin.albedo_color = Color.html(SKIN_TONES[index % SKIN_TONES.size()])
     var trousers := StandardMaterial3D.new()
     trousers.albedo_color = Color.html("#354353")
 
@@ -143,6 +146,19 @@ func _make_person(index: int) -> Node3D:
     head_mesh.position.y = 1.72
     head_mesh.material_override = skin
     root.add_child(head_mesh)
+
+    # Lightweight interchangeable hair silhouettes; no additional textures.
+    var hair := MeshInstance3D.new()
+    hair.name = "Hair"
+    var hair_mesh := SphereMesh.new()
+    hair_mesh.radius = 0.232
+    hair.mesh = hair_mesh
+    hair.position = Vector3(0.0, 1.81, 0.015)
+    hair.scale = Vector3(1.02, 0.43 + float(index % 3) * 0.12, 1.03)
+    var hair_material := StandardMaterial3D.new()
+    hair_material.albedo_color = Color.html(HAIR_TONES[index % HAIR_TONES.size()])
+    hair.material_override = hair_material
+    root.add_child(hair)
 
     for side in [-1.0, 1.0]:
         var suffix: String = "Left" if side < 0.0 else "Right"
