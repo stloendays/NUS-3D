@@ -6,6 +6,9 @@ class_name UTownShopVisuals
 var stand: Node3D
 var previews: Dictionary = {}
 var spin_time: float = 0.0
+var visibility_tick: float = 0.0
+var active_display: bool = false
+var camera: Camera3D
 var _material_cache: Dictionary = {}
 var _box_cache: Dictionary = {}
 var _cylinder_cache: Dictionary = {}
@@ -117,9 +120,16 @@ func _umbrella(root: Node3D) -> void:
 func _process(delta: float) -> void:
     if stand == null:
         return
-    var near: bool = stand.global_position.distance_to(coins.player.global_position) < 65.0
-    stand.visible = near and not coins.campus_life.interior_active
-    if not stand.visible:
+    visibility_tick += delta
+    if visibility_tick >= 0.2:
+        visibility_tick = 0.0
+        if not is_instance_valid(camera) or not camera.is_current():
+            camera = get_viewport().get_camera_3d()
+        var near: bool = stand.global_position.distance_squared_to(coins.player.global_position) < 4225.0
+        var in_view: bool = camera == null or camera.is_position_in_frustum(stand.global_position + Vector3.UP)
+        active_display = near and in_view and not coins.campus_life.interior_active
+        stand.visible = active_display
+    if not active_display:
         return
     spin_time += delta
     for i in range(3):
