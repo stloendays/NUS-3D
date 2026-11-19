@@ -97,6 +97,7 @@ func _apply_language(_locale: String) -> void:
     _process(0.0)
 
 func _load_osm_fit_summary() -> void:
+    gis_metric_count = 0
     if not FileAccess.file_exists(FIT_BASELINE_PATH):
         push_warning("GIS diagnostic card is missing its source-derived metric snapshot")
         return
