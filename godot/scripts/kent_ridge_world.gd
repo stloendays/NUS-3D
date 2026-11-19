@@ -179,6 +179,8 @@ func _build_districts() -> void:
             _label(building, str(info["name"]), Vector3(0.0, height_value + 3.1, 0.0), "#f7f7df", 19)
             _decorate_building(building, info, width_value, depth_value, height_value)
             building_count += 1
+        if str(district["id"]) == "SCIENCE":
+            _build_md1_access(root)
         # Small placemaking accents, no more than six low-poly props per district.
         for i in range(3):
             var x: float = -width_m * 0.35 + float(i) * width_m * 0.35
@@ -193,6 +195,37 @@ func _build_districts() -> void:
             canopy.material_override = _material("#5e966a")
             root.add_child(canopy)
 
+
+
+func _md1_footpath(parent: Node3D, name_value: String, start: Vector3, finish: Vector3) -> void:
+    var delta: Vector3 = finish - start
+    var length_value: float = Vector2(delta.x, delta.z).length()
+    if length_value < 0.1:
+        return
+    var path: Node3D = Node3D.new()
+    path.name = name_value
+    path.position = (start + finish) * 0.5
+    path.rotation.y = atan2(delta.x, delta.z)
+    parent.add_child(path)
+    _box(path, "PedestrianOnly", Vector3.ZERO, Vector3(2.6, 0.12, length_value), "#d1d0c2")
+
+
+func _build_md1_access(science_root: Node3D) -> void:
+    # Schematic pedestrian route, not a surveyed staircase or road geometry.
+    # MD1 front facade is at x=68, z=59. Keep all footpath segments
+    # outside the building's collision box (x=53.5..82.5, z=27..59).
+    var access: Node3D = Node3D.new()
+    access.name = "MD1_PedestrianAccess_Schematic"
+    science_root.add_child(access)
+    var md1_entry: Vector3 = Vector3(68.0, 0.17, 61.8)
+    var md6_approach: Vector3 = Vector3(91.0, 0.17, 70.0)
+    var nuh_approach: Vector3 = Vector3(91.0, 0.17, 82.0)
+    _md1_footpath(access, "MD6_To_MD1_Walk", md6_approach, Vector3(68.0, 0.17, 70.0))
+    _md1_footpath(access, "MD1_Entrance_Walk", Vector3(68.0, 0.17, 70.0), md1_entry)
+    _md1_footpath(access, "NUH_To_MD6_Walk", nuh_approach, md6_approach)
+    _label(access, "MD1  |  PEDESTRIAN ENTRY", Vector3(68.0, 3.1, 64.0), "#e5f1ee", 17)
+    # Science Drive 4 vehicle access is intentionally not represented by a
+    # driveable link here; do not route buses across these footpaths.
 
 func _build_stations() -> void:
     for stop in stops:
