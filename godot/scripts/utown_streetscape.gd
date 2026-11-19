@@ -275,4 +275,13 @@ func _build_distant_fictional_skyline() -> void:
         _box(building, "Roof", Vector3(0, height_m + 0.27, 0), Vector3(width_m + 0.8, 0.54, 9.0), "#647590")
         _box(building, "ComicNeon", Vector3(0, height_m - 2.0, -4.35), Vector3(width_m - 1.8, 0.36, 0.16), "#ffcf81")
         if i % 3 == 0:
+            var slogan: Label3D = Label3D.new()
+            slogan.name = "ComicCampusBillboard"
+            slogan.text = slogans[int(i / 3) % slogans.size()]
+            slogan.font_size = 40
+            slogan.pixel_size = 0.012
+            slogan.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+            slogan.modulate = Color("#ffe1a0")
+            slogan.position = Vector3(0, height_m - 4.0, -4.50)
+            building.add_child(slogan)
         backdrop_count += 1
