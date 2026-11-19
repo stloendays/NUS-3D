@@ -269,7 +269,7 @@ func status_text() -> String:
     var current: Dictionary = current_quest()
     var header: String = "%s  |  Lv.%d  XP %d  $%d" % [faculty_name(), level(), total_xp, credits]
     if current.is_empty():
-        return "COURSEWORK  |  " + header + "\n学院任务全部完成！[J] 查看成绩  [O] 切换学院"
+        return "COURSEWORK  |  " + header + "\n学院任务已完成！[P] 五子棋/打牌/聚会  [O] 切换学院"
     return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[J] 任务手册  [O] 切换学院" % [
         active_quest_index + 1, header, str(current["title"]), format_ddl(), objective_description()
     ]
