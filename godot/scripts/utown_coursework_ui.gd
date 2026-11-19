@@ -69,7 +69,7 @@ func _build_status() -> void:
     status_card.add_child(column)
     status_title = _label("COURSEWORK // THE DDL APOCALYPSE", 14, Color.html("#f3c372"))
     column.add_child(status_title)
-    status_body = _label("Choose your faculty. [O] Faculty  [J] Coursework", 12, Color.html("#edf2ed"))
+    status_body = _label("Choose your faculty. [Shift+P] Faculty  [P] Coursework", 12, Color.html("#edf2ed"))
     column.add_child(status_body)
     status_feedback = _label("", 12, Color.html("#a9e4b7"))
     column.add_child(status_feedback)
@@ -234,7 +234,7 @@ func _refresh_journal() -> void:
         ]
     if not coursework.last_grade.is_empty():
         line += "\n最近评分：" + coursework.last_grade
-    line += "\n\n[J] 返回  [O] 切换学院   |   进度已存于本地"
+    line += "\n\n[P] 返回  [Shift+P] 切换学院   |   进度已存于本地"
     journal_text.text = line
 
 func set_hud_enabled(enabled: bool) -> void:
@@ -252,28 +252,31 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
-    if intro_blocked:
-        return
-    if not (event is InputEventKey):
+    if intro_blocked or not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
     if not key.pressed or key.echo:
         return
-    if key.keycode == KEY_O:
-        show_selector()
-        get_viewport().set_input_as_handled()
-    elif key.keycode == KEY_J:
-        if modal_visible and not selection_visible:
+    if modal_visible:
+        if key.keycode == KEY_ESCAPE:
             hide_modal()
-        elif not modal_visible:
+            get_viewport().set_input_as_handled()
+        elif key.keycode == KEY_P:
+            if key.shift_pressed:
+                show_selector()
+            else:
+                hide_modal()
+            get_viewport().set_input_as_handled()
+        elif key.keycode in [
+            KEY_W, KEY_A, KEY_S, KEY_D, KEY_K, KEY_Q, KEY_B, KEY_X, KEY_I,
+            KEY_F, KEY_L, KEY_Y, KEY_T, KEY_C, KEY_V, KEY_G, KEY_E, KEY_R,
+            KEY_M, KEY_SPACE, KEY_SHIFT, KEY_J, KEY_O, KEY_N, KEY_Z, KEY_U,
+            KEY_H, KEY_1, KEY_2, KEY_3
+        ]:
+            get_viewport().set_input_as_handled()
+    elif key.keycode == KEY_P:
+        if key.shift_pressed:
+            show_selector()
+        else:
             show_journal()
-        get_viewport().set_input_as_handled()
-    elif key.keycode == KEY_ESCAPE and modal_visible:
-        hide_modal()
-        get_viewport().set_input_as_handled()
-    elif modal_visible and key.keycode in [
-        KEY_W, KEY_A, KEY_S, KEY_D, KEY_K, KEY_Q, KEY_B, KEY_X, KEY_I,
-        KEY_F, KEY_L, KEY_Y, KEY_T, KEY_C, KEY_V, KEY_G, KEY_E, KEY_R,
-        KEY_M, KEY_SPACE, KEY_SHIFT
-    ]:
         get_viewport().set_input_as_handled()

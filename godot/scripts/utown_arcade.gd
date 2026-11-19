@@ -125,7 +125,7 @@ func _spawn_professors() -> void:
         _box_part(teacher, "LeftGlasses", Vector3(-0.13, 1.86, -0.23), Vector3(0.22, 0.12, 0.045), "#a6eced")
         _box_part(teacher, "RightGlasses", Vector3(0.13, 1.86, -0.23), Vector3(0.22, 0.12, 0.045), "#a6eced")
         _box_part(teacher, "LectureNotes", Vector3(0.38, 1.18, -0.24), Vector3(0.32, 0.49, 0.065), "#fff0c6")
-        var plate := _nameplate(names[i] + "\n[K] ABSURD HOMEWORK", Color.html("#ffe0a1"))
+        var plate := _nameplate(names[i] + "\n[U] ABSURD HOMEWORK", Color.html("#ffe0a1"))
         plate.position = Vector3(0.0, 2.65, 0.0)
         teacher.add_child(plate)
         professors.append({"node": teacher, "name": names[i], "line": jokes[i], "label": plate})
@@ -386,7 +386,7 @@ func _refresh_status() -> void:
     var lines := PackedStringArray()
     lines.append("CAMPUS ARCADE | LV %d | XP %d/%d" % [level, xp, xp_required()])
     lines.append("Student wins: %d | %s" % [student_wins, str(chosen["name"])])
-    lines.append("[1/2/3] toys  [LMB/J] play  [K] teacher")
+    lines.append("[1/2/3] toys  [LMB] play  [U] teacher")
     lines.append(message if message_time > 0.0 else "Pure cartoon: nobody gets hurt.")
     status_label.text = "\n".join(lines)
 
@@ -444,9 +444,7 @@ func _unhandled_input(event: InputEvent) -> void:
                 choose_weapon(1)
             KEY_3:
                 choose_weapon(2)
-            KEY_J:
-                try_fire()
-            KEY_K:
+            KEY_U:
                 talk_to_professor()
     elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
         try_fire()

@@ -2,6 +2,7 @@ extends Node
 class_name UTownCampusLife
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
+var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
 ## bicycle mode and a looping shuttle. Positions reuse schematic project data only.
 
@@ -663,7 +664,10 @@ func talk_to_nearest() -> bool:
         message_time = 2.5
         return false
     pedestrians[index]["talk_remaining"] = 6.0
-    message = "%s  |  %s" % [str(pedestrians[index]["name"]), str(pedestrians[index]["line"])]
+    var speaker: String = str(pedestrians[index]["name"])
+    var role: String = DialogueBank.role_for("outdoor", speaker)
+    var line: String = DialogueBank.next_line("outdoor", speaker, weather.mode)
+    message = "%s · %s\n%s" % [speaker, role, line]
     message_time = 6.0
     return true
 
@@ -771,7 +775,7 @@ func alight_shuttle() -> void:
 func _load_activities() -> void:
     visited_activities.clear()
     var save := ConfigFile.new()
-    if save.load(ACTIVITY_SAVE_PATH) != OK:
+    if save.load(activity_save_path) != OK:
         return
     var ids: PackedStringArray = save.get_value("activities", "visited", PackedStringArray())
     for id in ids:
@@ -784,7 +788,7 @@ func _save_activities() -> void:
         ids.append(str(id))
     ids.sort()
     save.set_value("activities", "visited", ids)
-    var error: Error = save.save(ACTIVITY_SAVE_PATH)
+    var error: Error = save.save(activity_save_path)
     if error != OK:
         push_warning("Could not persist local fictional campus activity progress")
 

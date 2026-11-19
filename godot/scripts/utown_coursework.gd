@@ -265,12 +265,12 @@ func format_ddl() -> String:
 
 func status_text() -> String:
     if current_faculty_id.is_empty():
-        return "COURSEWORK  |  选择自己的学院，开启疯狂 DDL 之旅\n[J] 任务手册  [O] 学院选择"
+        return "COURSEWORK  |  选择自己的学院，开启疯狂 DDL 之旅\n[P] 任务手册  [Shift+P] 学院选择"
     var current: Dictionary = current_quest()
     var header: String = "%s  |  Lv.%d  XP %d  $%d" % [faculty_name(), level(), total_xp, credits]
     if current.is_empty():
-        return "COURSEWORK  |  " + header + "\n学院任务全部完成！[J] 查看成绩  [O] 切换学院"
-    return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[J] 任务手册  [O] 切换学院" % [
+        return "COURSEWORK  |  " + header + "\n学院任务全部完成！[P] 查看成绩  [Shift+P] 切换学院"
+    return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[P] 任务手册  [Shift+P] 切换学院" % [
         active_quest_index + 1, header, str(current["title"]), format_ddl(), objective_description()
     ]
 

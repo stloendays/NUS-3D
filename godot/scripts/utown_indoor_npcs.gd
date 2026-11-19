@@ -224,7 +224,10 @@ func talk_to_nearest() -> bool:
     var coursework: UTownCoursework = get_parent().get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
         coursework.notify_dialogue(str(actor["id"]))
-    life.message = "%s / %s  |  %s" % [str(actor["name"]), str(actor["role"]), str(actor["dialogue"])]
+    var speaker: String = str(actor["name"])
+    var role: String = DialogueBank.role_for("indoor", speaker)
+    var line: String = DialogueBank.next_line("indoor", speaker, 0)
+    life.message = "%s / %s\n%s" % [speaker, role, line]
     life.message_time = 5.0
     return true
 
