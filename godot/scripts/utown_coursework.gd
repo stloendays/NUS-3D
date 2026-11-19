@@ -24,6 +24,7 @@ const ACTIVITY_LABELS: Dictionary = {
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
 @onready var life: UTownCampusLife = $"../CampusLife"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var save_path: String = SAVE_PATH
 var faculty_options: Array[Dictionary] = []
@@ -52,6 +53,24 @@ func _ready() -> void:
     _build_marker()
     _load_progress()
     _refresh_marker()
+    if language != null:
+        language.language_changed.connect(func(_locale: String) -> void: _refresh_marker())
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func quest_title(quest: Dictionary) -> String:
+    return str(quest.get("title", "")) if language != null and language.is_chinese()         else str(quest.get("title_en", ""))
+
+
+func quest_story(quest: Dictionary) -> String:
+    return str(quest.get("story", "")) if language != null and language.is_chinese()         else str(quest.get("story_en", ""))
+
+
+func faculty_flavor(faculty: Dictionary) -> String:
+    return str(faculty.get("flavor", "")) if language != null and language.is_chinese()         else str(faculty.get("flavor_en", ""))
 
 func _load_data() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -201,15 +220,17 @@ func select_faculty(id: String) -> bool:
     current_faculty_id = id
     _restore_active_state()
     _save_progress()
-    feedback = "欢迎来到 %s！三道课程任务，DDL 正在热身。" % faculty_name()
+    feedback = _t("欢迎来到 %s！三道课程任务，DDL 正在热身。",
+        "Welcome to %s! Three coursework quests await. The deadline is warming up.") % faculty_name()
     feedback_left = 5.5
     _refresh_marker()
     return true
 
 func faculty_name() -> String:
     if not faculty_by_id.has(current_faculty_id):
-        return "未选择学院"
-    return str(faculty_by_id[current_faculty_id]["zh"])
+        return _t("未选择学院", "No faculty selected")
+    var faculty: Dictionary = faculty_by_id[current_faculty_id]
+    return str(faculty.get("zh", "")) if language != null and language.is_chinese()         else str(faculty.get("name", ""))
 
 func current_quest() -> Dictionary:
     if not faculty_by_id.has(current_faculty_id):
@@ -270,25 +291,38 @@ func objective_position() -> Vector3:
 func objective_description() -> String:
     var quest: Dictionary = current_quest()
     if quest.is_empty():
-        return "全部 coursework 完成。换个学院，或者继续探索 UTown。"
+        return _t("本学院课程已完成。换个学院，或者继续探索校园。",
+            "Faculty coursework complete. Choose another school or explore campus.")
     match active_stage:
         STAGE_BRIEF:
-            return "前往 %s，靠近任务告示按 K 领取作业" % waypoint_target()
+            return _t("前往 %s，靠近任务标记按 K 领取作业",
+                "Go to %s and press K near the quest marker to collect your brief.") % waypoint_target()
         STAGE_ACTIVITY:
-            var p: PackedStringArray = str(quest["activity"]).split("/")
-            return "进入 %s 室内，在 %s 活动点按 F" % [p[0], str(ACTIVITY_LABELS.get(str(quest["activity"]), p[1]))]
+            var target: PackedStringArray = str(quest["activity"]).split("/")
+            var activity_id: String = str(quest["activity"])
+            var en_activities: Dictionary = {
+                "ERC/cafe": "cafe", "ERC/reading": "reading corner",
+                "ERC/mezzanine": "upstairs study area", "SRC/refill": "water station",
+                "SRC/warmup": "warm-up area", "SRC/viewing": "spectator seating"}
+            var name: String = _t(str(ACTIVITY_LABELS.get(activity_id, target[1])),
+                str(en_activities.get(activity_id, target[1])))
+            return _t("进入 %s，在%s按 F 完成活动",
+                "Enter %s and press F at the %s activity.") % [target[0], name]
         STAGE_PARTNER:
-            var p: PackedStringArray = str(quest["partner"]).split("/")
-            return "在 %s 寻找队友 %s，靠近按 Q" % [p[0], p[1]]
+            var partner: PackedStringArray = str(quest["partner"]).split("/")
+            return _t("在 %s 寻找队友 %s，靠近按 Q",
+                "Find teammate %s in %s and press Q nearby.") % (
+                [partner[0], partner[1]] if language != null and language.is_chinese() else [partner[1], partner[0]])
         STAGE_SUBMIT:
-            return "冲向 %s 的提交终端，按 K 交作业！" % waypoint_target()
+            return _t("赶往 %s 的提交点，按 K 交作业！",
+                "Rush to the submission terminal at %s and press K!") % waypoint_target()
     return ""
 
 func format_ddl() -> String:
     if active_stage == STAGE_BRIEF:
-        return "尚未开始"
+        return _t("尚未开始", "Not started")
     if current_time_left <= 0.0:
-        return "逾期，但还能交！"
+        return _t("逾期，但还能交！", "Late (submission still allowed)")
     var time_int: int = int(ceil(current_time_left))
     var minutes: int = floori(float(time_int) / 60.0)
     var seconds: int = time_int % 60
@@ -296,14 +330,17 @@ func format_ddl() -> String:
 
 func status_text() -> String:
     if current_faculty_id.is_empty():
-        return "COURSEWORK  |  选择自己的学院，开启疯狂 DDL 之旅\n[P] 任务手册  [Shift+P] 学院选择"
+        return _t("课程任务 | 先选择学院，开始挑战截止时间！\n[P] 任务手册  [Shift+P] 学院",
+            "COURSEWORK | Choose your faculty and beat the deadlines!\n[P] Journal  [Shift+P] Faculty")
     var current: Dictionary = current_quest()
-    var header: String = "%s  |  Lv.%d  XP %d  $%d" % [faculty_name(), level(), total_xp, credits]
+    var header: String = "%s | Lv.%d | XP %d | $%d" % [faculty_name(), level(), total_xp, credits]
     if current.is_empty():
-        return "COURSEWORK  |  " + header + "\n学院任务全部完成！[P] 查看成绩  [Shift+P] 切换学院"
-    return "COURSEWORK %d/3  |  %s\n%s\nDDL %s  |  %s\n[P] 任务手册  [Shift+P] 切换学院" % [
-        active_quest_index + 1, header, str(current["title"]), format_ddl(), objective_description()
-    ]
+        return _t("课程任务 | %s\n本学院全部完成！[P] 成绩  [Shift+P] 切换学院",
+            "COURSEWORK | %s\nAll chapters complete! [P] Grades  [Shift+P] Change faculty") % header
+    return _t("任务 %d/3 | %s\n%s\n截止 %s | %s\n[P] 手册  [Shift+P] 学院",
+        "COURSEWORK %d/3 | %s\n%s\nDeadline %s | %s\n[P] Journal  [Shift+P] Faculty") % [
+            active_quest_index + 1, header, quest_title(current), format_ddl(), objective_description()
+        ]
 
 func _build_marker() -> void:
     marker = Node3D.new()
@@ -364,7 +401,7 @@ func _refresh_marker() -> void:
         return
     var at: Vector3 = objective_position()
     marker.position = at + Vector3(0.0, 0.02, 0.0)
-    marker_label.text = "[K] TAKE BRIEF" if active_stage == STAGE_BRIEF else "ENTER ROOM [I]" if active_stage < STAGE_SUBMIT else "[K] SUBMIT DDL"
+    marker_label.text = _t("[K] 接取作业", "[K] TAKE BRIEF") if active_stage == STAGE_BRIEF         else _t("[I] 进入室内", "[I] ENTER ROOM") if active_stage < STAGE_SUBMIT         else _t("[K] 提交", "[K] SUBMIT")
     marker.visible = not life.interior_active
 
 func _process(delta: float) -> void:
@@ -379,7 +416,7 @@ func _process(delta: float) -> void:
     if active_stage > STAGE_BRIEF and not modal_open and current_time_left > 0.0:
         current_time_left = maxf(0.0, current_time_left - delta)
         if current_time_left <= 0.0:
-            feedback = "DDL 爆炸了！没关系，逾期也能交，奖励会少一点。"
+            feedback = _t("截止时间到了！逾期仍可交，但奖励会降低。", "Deadline reached! You can still submit for a smaller reward.")
             feedback_left = 5.0
     if marker != null:
         marker_ring.rotation.y += delta * 0.85
@@ -392,19 +429,19 @@ func interact_nearby() -> bool:
     if quest.is_empty() or life.interior_active or life.on_shuttle:
         return false
     if active_stage != STAGE_BRIEF and active_stage != STAGE_SUBMIT:
-        feedback = "这一关需要先完成室内活动或队友对话。"
+        feedback = _t("先完成室内活动或队友对话。", "Complete the indoor activity or teammate conversation first.")
         feedback_left = 3.0
         return false
     var distance: float = Vector2(player.global_position.x, player.global_position.z).distance_to(
         Vector2(objective_position().x, objective_position().z))
     if distance > INTERACT_RADIUS:
-        feedback = "任务终端距离 %.0f m，跟着金色任务标记走！" % distance
+        feedback = _t("任务终端距离 %.0f 米，跟着金色标记走！", "The terminal is %.0f m away. Follow the golden marker!") % distance
         feedback_left = 3.0
         return false
     if active_stage == STAGE_BRIEF:
         active_stage = STAGE_ACTIVITY
         current_time_left = float(quest["deadline_s"])
-        feedback = "接到任务：%s。DDL 怪兽已苏醒！" % str(quest["title"])
+        feedback = _t("领取任务：%s。截止时间开始倒数！", "Quest accepted: %s. Your deadline starts now!") % quest_title(quest)
         feedback_left = 5.0
         _save_progress()
         _refresh_marker()
@@ -417,7 +454,7 @@ func notify_activity(id: String) -> bool:
     if quest.is_empty() or active_stage != STAGE_ACTIVITY or str(quest["activity"]) != id:
         return false
     active_stage = STAGE_PARTNER
-    feedback = "资料到手！队友终于回消息了……还是个表情包。"
+    feedback = _t("资料拿到了！队友终于回消息……发来一个表情。", "Materials collected! Your teammate replies with... an emoji.")
     feedback_left = 4.0
     _save_progress()
     _refresh_marker()
@@ -428,7 +465,7 @@ func notify_dialogue(id: String) -> bool:
     if quest.is_empty() or active_stage != STAGE_PARTNER or str(quest["partner"]) != id:
         return false
     active_stage = STAGE_SUBMIT
-    feedback = "队友说他已经做完了……复制粘贴部分。快去交作业！"
+    feedback = _t("队友说自己完成了……复制粘贴的部分。快提交！", "Your teammate finished... the copy-and-paste part. Submit it!")
     feedback_left = 4.0
     _save_progress()
     _refresh_marker()
@@ -451,7 +488,8 @@ func _complete_quest() -> void:
     state["grades"] = grades
     faculty_progress[current_faculty_id] = state
     last_grade = grade
-    feedback = "已提交！%s  |  +%d XP  +%d 积分。DDL 怪兽暂时退散！" % [grade, gained_xp, gained_credits]
+    feedback = _t("提交成功！%s | +%d XP | +%d 积分。截止时间危机解除！",
+        "Submitted! %s | +%d XP | +%d credits. Deadline crisis averted!") % [grade, gained_xp, gained_credits]
     feedback_left = 7.0
     active_quest_index += 1
     active_stage = STAGE_BRIEF
