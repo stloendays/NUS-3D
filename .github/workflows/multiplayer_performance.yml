@@ -22,4 +22,4 @@ jobs:
       - name: Run integrated world smoke
         run: godot --headless --path godot --script res://tests/integration_smoke_test.gd
       - name: Low-spec startup smoke
-        run: godot --headless --path godot -- --nus3d-self-test --nus3d-low-spec --quit-after 40
+        run: godot --headless --path godot --quit-after 40 -- --nus3d-self-test --nus3d-low-spec
