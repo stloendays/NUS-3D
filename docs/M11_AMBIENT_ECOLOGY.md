@@ -13,9 +13,9 @@ This independent scene module adds **illustrative**, non-surveyed campus wildlif
 
 ## Performance and compatibility
 
-`AmbientEcology.detail_level` supports **0 / 1 / 2** for low/normal/high budgets: birds 5/10/14, butterflies 6/12/18, cats 1/2/3, leaves 20/40/64. Default is normal. Movement/animation is ticked every 120 ms; audio and step tracking use a small per-frame update. Distant animals are hidden; weather and interior conditions disable irrelevant effects. All geometry is procedurally generated and collision-free.
+`AmbientEcology.detail_level` supports **0 / 1 / 2** for low/normal/high budgets: birds 5/10/14, butterflies 6/12/18, cats 1/2/3, chickens 3/6/9, leaves 20/40/64. Default is normal. Movement/animation is ticked every 120 ms; audio and step tracking use a small per-frame update. Distant animals are hidden; weather and interior conditions disable irrelevant effects. All geometry is procedurally generated and collision-free.
 
-The branch is based on `integration/nus3d-qa-20261119-v1`, so it avoids editing existing NPC, quests, HUD, login, coins and multiplayer implementations.
+The updated ecology script is forward-ported to current `main` without changing NPC quests, HUD, login, coins, player movement, bus or multiplayer. Time, dining crowds, shop transactions, and external model overrides from the original #25 are handled as separate integration concerns.
 
 ## Validation
 
