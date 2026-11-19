@@ -6,6 +6,8 @@ const MAX_CLUSTERS: int = 56
 const CLUSTER_SPACING: float = 12.0
 const BACKDROP_CAPACITY: int = 12
 const SCRAP_CAPACITY: int = 156
+const SHRUB_CAPACITY: int = 200
+const BLOOM_CAPACITY: int = 72
 const MATERIAL_TEXTURES = {
     "brick": "res://assets/materials/comic_brick.svg",
     "paper": "res://assets/materials/comic_paper.svg",
@@ -21,6 +23,8 @@ var cluster_count: int = 0
 var backdrop_count: int = 0
 var scrap_count: int = 0
 var placard_count: int = 0
+var shrub_count: int = 0
+var bloom_count: int = 0
 
 func _ready() -> void:
     if world.layout.is_empty():
@@ -29,6 +33,7 @@ func _ready() -> void:
     for key in MATERIAL_TEXTURES:
         texture_cache[key] = load(MATERIAL_TEXTURES[key]) as Texture2D
     _build_path_details()
+    _build_verge_details()
     _build_story_signs()
     _build_distant_fictional_skyline()
 
@@ -179,6 +184,91 @@ func _paper_scraps(root: Node3D, transforms: Array[Transform3D], tints: Array[Co
         batch.set_instance_transform(i, transforms[i])
         batch.set_instance_color(i, tints[i])
     scrap_count = transforms.size()
+
+func _build_verge_details() -> void:
+    # Fast scattered vegetation: two MultiMesh draws, no light, physics or runtime spawning.
+    # A higher camera sees different roadside silhouettes instead of one empty green plane.
+    var verge := Node3D.new()
+    verge.name = "RoadsideBushesAndFlowerPops_TwoBatches"
+    add_child(verge)
+    var positions: Array[Vector3] = []
+    var shades: Array[Color] = []
+    var flowers: Array[Vector3] = []
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 2026111903
+    for raw_way in world.layout.get("walkways", []):
+        var way: Dictionary = raw_way
+        var vertices: Array = way.get("lonlat", [])
+        for k in range(vertices.size() - 1):
+            var a: Vector3 = world.lonlat_to_world(float(vertices[k][0]), float(vertices[k][1]))
+            var b: Vector3 = world.lonlat_to_world(float(vertices[k + 1][0]), float(vertices[k + 1][1]))
+            var delta: Vector3 = b - a
+            var segment_length: float = delta.length()
+            if segment_length < 12.0:
+                continue
+            var tangent: Vector3 = delta.normalized()
+            var sideways: Vector3 = Vector3(-tangent.z, 0.0, tangent.x)
+            for idx in range(int(segment_length / 4.6)):
+                if positions.size() >= SHRUB_CAPACITY:
+                    break
+                var t: float = clampf((float(idx) + 0.5 + rng.randf_range(-0.2, 0.2)) * 4.6 / segment_length, 0.0, 1.0)
+                var centre: Vector3 = a.lerp(b, t)
+                var offset: float = (float(way.get("width_m", 3.5)) * 0.5 + rng.randf_range(6.0, 10.0))
+                var sign: float = 1.0 if idx % 2 == 0 else -1.0
+                var candidate: Vector3 = centre + sideways * offset * sign
+                if not _clear_position(candidate):
+                    continue
+                if positions.size() > 0 and positions[positions.size()-1].distance_to(candidate) < 2.6:
+                    continue
+                positions.append(candidate)
+                var tint: Color = Color.html(["#508a62", "#6fa878", "#81b773", "#9abc7a"][int(rng.randi_range(0, 3))])
+                shades.append(tint)
+                if idx % 3 == 0 and flowers.size() < BLOOM_CAPACITY:
+                    flowers.append(candidate + Vector3(0.26, 0.0, -0.14))
+    var bush_mesh := SphereMesh.new()
+    bush_mesh.radius = 0.54
+    bush_mesh.height = 0.88
+    bush_mesh.radial_segments = 8
+    bush_mesh.rings = 4
+    var bush_batch := MultiMesh.new()
+    bush_batch.transform_format = MultiMesh.TRANSFORM_3D
+    bush_batch.use_colors = true
+    bush_batch.mesh = bush_mesh
+    bush_batch.instance_count = positions.size()
+    var bush_material := StandardMaterial3D.new()
+    bush_material.vertex_color_use_as_albedo = true
+    bush_material.roughness = 1.0
+    var bush_node := MultiMeshInstance3D.new()
+    bush_node.name = "LushShrubTufts_MultiMesh"
+    bush_node.multimesh = bush_batch
+    bush_node.material_override = bush_material
+    bush_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+    verge.add_child(bush_node)
+    for i in range(positions.size()):
+        var height_factor: float = 0.78 + float(i % 5) * 0.10
+        bush_batch.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(1.0, height_factor, 1.0)), positions[i] + Vector3(0.0, 0.39 * height_factor, 0.0)))
+        bush_batch.set_instance_color(i, shades[i])
+    shrub_count = positions.size()
+    var bloom_mesh := SphereMesh.new()
+    bloom_mesh.radius = 0.14
+    bloom_mesh.height = 0.22
+    bloom_mesh.radial_segments = 6
+    bloom_mesh.rings = 3
+    var bloom_batch := MultiMesh.new()
+    bloom_batch.transform_format = MultiMesh.TRANSFORM_3D
+    bloom_batch.use_colors = true
+    bloom_batch.mesh = bloom_mesh
+    bloom_batch.instance_count = flowers.size()
+    var bloom_node := MultiMeshInstance3D.new()
+    bloom_node.name = "ComicWildflowers_MultiMesh"
+    bloom_node.multimesh = bloom_batch
+    bloom_node.material_override = bush_material
+    bloom_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+    verge.add_child(bloom_node)
+    for i in range(flowers.size()):
+        bloom_batch.set_instance_transform(i, Transform3D(Basis(), flowers[i] + Vector3(0, 0.85, 0)))
+        bloom_batch.set_instance_color(i, Color.html(["#fadd78", "#ffb88a", "#ffc9d4"][i % 3]))
+    bloom_count = flowers.size()
 
 func _build_story_signs() -> void:
     var labels := PackedStringArray(["YOUR LAST BRAIN CELL", "ACADEMIC APOCALYPSE", "COFFEE EMERGENCY", "UPLOAD OR PERISH"])
