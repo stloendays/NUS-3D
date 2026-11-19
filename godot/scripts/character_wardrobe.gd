@@ -48,7 +48,7 @@ func _make_interface() -> void:
     outer.add_theme_constant_override("separation", 12)
     panel.add_child(outer)
     var title := Label.new()
-    title.text = "CAMPUS WARDROBE   |   F11 to close"
+    title.text = "CAMPUS WARDROBE   |   F5 to close"
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     title.add_theme_color_override("font_color", Color.html("#252b33"))
     title.add_theme_font_size_override("font_size", 22)
@@ -293,6 +293,6 @@ func _toggle() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
-        if event.keycode == KEY_F11 or (is_open and event.keycode == KEY_ESCAPE):
+        if event.keycode == KEY_F5 or (is_open and event.keycode == KEY_ESCAPE):
             _toggle()
             get_viewport().set_input_as_handled()
