@@ -484,6 +484,21 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    var shrub_group: Node3D = streetscape.get_node_or_null("RoadsideBushesAndFlowerPops_TwoBatches") as Node3D
+    if shrub_group == null or streetscape.shrub_count < 1:
+        push_error("Missing new roadside greenery for M3.7 texture screenshot")
+        quit(1)
+        return
+    var shrub_batch: MultiMeshInstance3D = shrub_group.get_child(0) as MultiMeshInstance3D
+    var shrub_at: Vector3 = shrub_batch.multimesh.get_instance_transform(0).origin
+    player.global_position = shrub_at + Vector3(2.5, 0.18, 4.7)
+    player.head.rotation = Vector3.ZERO
+    player.look_at(shrub_at + Vector3(0.0, 0.38, 0.0), Vector3.UP)
+    if not await _capture_frame(output, "M3_7_TILED_LAWN_AND_BUSHES.png"):
+        push_error("Cannot capture original tiled grass, paving and roadside vegetation")
+        quit(1)
+        return
+    count += 1
     player.global_position = ddl_story.stage_points[0] + Vector3(0.0, 0.18, 6.0)
     player.head.rotation = Vector3.ZERO
     player.look_at(ddl_story.stage_points[0] + Vector3(0.0, 2.0, 0.0), Vector3.UP)
@@ -512,10 +527,12 @@ func _render() -> void:
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
         "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
-        "m37_showcase": ["sky_clear_static", "sky_overcast_static", "sky_storm_static", "street_furniture", "street_density", "ddl_quest_hud"],
+        "m37_showcase": ["sky_clear_static", "sky_overcast_static", "sky_storm_static", "street_furniture", "street_density", "tiled_lawn_and_shrubs", "ddl_quest_hud"],
         "m37_cloud_sprites": 33,
         "m37_street_clusters": streetscape.cluster_count,
         "m37_paper_instances": streetscape.scrap_count,
+        "m37_shrub_instances": streetscape.shrub_count,
+        "m37_bloom_instances": streetscape.bloom_count,
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
