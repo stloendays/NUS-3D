@@ -143,7 +143,7 @@ func _build_lawn_tufts() -> void:
             rng.randf_range(bounds.position.x, bounds.end.x),
             rng.randf_range(bounds.position.y, bounds.end.y)
         )
-        if is_clear_lawn_point(candidate):
+        if is_clear_lawn_point(candidate, 0.6):
             positions.append(candidate)
     generated_tuft_count = positions.size()
     if generated_tuft_count == 0:
@@ -201,7 +201,7 @@ func _build_picnic_spots() -> void:
             rng.randf_range(bounds.position.x, bounds.end.x),
             rng.randf_range(bounds.position.y, bounds.end.y)
         )
-        if not is_clear_lawn_point(point, 3.0):
+        if not is_clear_lawn_point(point, 3.6):
             continue
         var isolated: bool = true
         for previous in accepted:
