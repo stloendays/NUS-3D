@@ -7,6 +7,9 @@ config/name="NUS-3D | UTown M2 Study"
 run/main_scene="res://scenes/game_shell.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 
+[autoload]
+UISound="*res://scripts/ui_sfx.gd"
+
 [display]
 window/size/viewport_width=1280
 window/size/viewport_height=720
