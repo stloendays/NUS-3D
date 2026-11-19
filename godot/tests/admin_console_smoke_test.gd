@@ -95,6 +95,32 @@ func _run() -> void:
         _fail("Not all administrator actions were logged")
         return
 
+    # GPT-generated proposals are untrusted suggestions, never auto-executed.
+    if not console.validate_ai_proposal('{"action":"execute_script","value":1,"reason":"danger"}').is_empty():
+        _fail("Unsafe GPT proposal action accepted")
+        return
+    if not console.validate_ai_proposal('{"action":"grant_coins","value":999999,"reason":"too high"}').is_empty():
+        _fail("Out-of-range GPT proposal accepted")
+        return
+    var light_now: int = (shell.game.get_node("World") as UTownWorld).lighting_mode
+    if not console._prepare_ai_proposal('{"action":"lighting","value":2,"reason":"cinematic dusk"}'):
+        _fail("Safe GPT proposal rejected")
+        return
+    if (shell.game.get_node("World") as UTownWorld).lighting_mode != light_now:
+        _fail("GPT proposal changed lighting without owner confirmation")
+        return
+    if console.pending_action != "lighting" or console.pending_value != 2:
+        _fail("GPT proposal was not stored for review")
+        return
+    console.confirm.hide()
+    console._confirm_grant()
+    if (shell.game.get_node("World") as UTownWorld).lighting_mode != 2:
+        _fail("Approved GPT proposal did not execute through admin allowlist")
+        return
+    if console.pending_action != "" or console.pending_value != 0:
+        _fail("Approved GPT proposal remains pending")
+        return
+
     shell._open_admin_console()
     if not paused or not console.visible or shell.profile_card.visible:
         _fail("Admin console did not pause the game")
