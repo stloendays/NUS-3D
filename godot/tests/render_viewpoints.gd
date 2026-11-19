@@ -16,7 +16,9 @@ func _render() -> void:
     var review: UTownViewReview = instance.get_node_or_null("ViewReview") as UTownViewReview
     var world: UTownWorld = instance.get_node_or_null("World") as UTownWorld
     var hud: CanvasLayer = instance.get_node_or_null("HUD") as CanvasLayer
-    if review == null or world == null or hud == null or review.viewpoint_count() != 4:
+    var coursework: UTownCoursework = instance.get_node_or_null("Coursework") as UTownCoursework
+    var course_ui: UTownCourseworkUI = instance.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+    if review == null or world == null or hud == null or coursework == null or course_ui == null or review.viewpoint_count() != 4:
         push_error("Photo-review scene did not initialize")
         quit(1)
         return
@@ -32,6 +34,24 @@ func _render() -> void:
         quit(1)
         return
     var count: int = 0
+    # Screenshot the genuine first-run faculty selector before selecting a profile.
+    # Isolate CI saves so no actual user profile is modified.
+    coursework.save_path = "user://nus3d_coursework_render_temp.cfg"
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
+    coursework._load_progress()
+    course_ui.show_selector()
+    if not await _capture_frame(output, "M3_6_FACULTY_SELECTION.png"):
+        push_error("Cannot capture first-run faculty choice UI")
+        quit(1)
+        return
+    count += 1
+    if not coursework.select_faculty("science"):
+        push_error("Cannot select demo faculty for screenshot review")
+        quit(1)
+        return
+    course_ui.hide_modal()
+    course_ui.set_hud_enabled(false)
+    coursework.set_markers_visible(false)
     for index in range(review.viewpoint_count()):
         if not review.select_view(index):
             push_error("Could not select camera preset")
@@ -424,6 +444,43 @@ func _render() -> void:
         return
     count += 1
 
+    # M3.6: actual gameplay shots of the selected-faculty coursework HUD and journal.
+    world.set_lighting_mode(0)
+    weather.set_mode(0)
+    hud.visible = false
+    course_ui.set_hud_enabled(true)
+    coursework.set_markers_visible(true)
+    var brief_pos: Vector3 = coursework.objective_position()
+    player.global_position = brief_pos + Vector3(5.0, 0.18, 6.0)
+    player.look_at(brief_pos + Vector3(0.0, 1.25, 0.0), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M3_6_COURSEWORK_HUD_AND_MARKER.png"):
+        push_error("Cannot capture coursework mission waypoint and status HUD")
+        quit(1)
+        return
+    count += 1
+    course_ui.show_journal()
+    if not await _capture_frame(output, "M3_6_COURSEWORK_JOURNAL.png"):
+        push_error("Cannot capture fictional coursework journal")
+        quit(1)
+        return
+    count += 1
+    course_ui.hide_modal()
+    player.global_position = coursework.objective_position() + Vector3(0.0, 0.18, 0.0)
+    if not coursework.interact_nearby():
+        push_error("Cannot trigger DDL mission for gameplay screenshot")
+        quit(1)
+        return
+    coursework.current_time_left = 35.0
+    if not await _capture_frame(output, "M3_6_DDL_35_SECONDS.png"):
+        push_error("Cannot capture the game-only DDL countdown")
+        quit(1)
+        return
+    count += 1
+    course_ui.set_hud_enabled(false)
+    coursework.set_markers_visible(false)
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
+
     hud.visible = false
     world.set_osm_reference_visible(false)
     var report: FileAccess = FileAccess.open(output.path_join("manifest.json"), FileAccess.WRITE)
@@ -440,6 +497,7 @@ func _render() -> void:
         "m3_showcase": ["rain", "thunderstorm", "campus_npcs_hud", "erc_ground", "erc_mezzanine", "src_interior", "bicycle", "shuttle"],
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
         "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
+        "m36_showcase": ["faculty_selection", "coursework_hud", "coursework_journal", "ddl_countdown"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
