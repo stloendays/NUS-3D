@@ -10,6 +10,7 @@ const LOCALE_SAVE: String = "user://nus3d_locale.cfg"
 const SUPPORTED: Array[String] = ["en", "zh"]
 
 var locale: String = "en"
+var session_locked: bool = false
 var save_path: String = LOCALE_SAVE
 var catalog: Dictionary = {}
 var fragments: Array = []
@@ -54,18 +55,39 @@ func is_chinese() -> bool:
     return locale == "zh"
 
 
+func choose(chinese: String, english: String) -> String:
+    # Authored gameplay strings are written as explicit pairs. Never combine
+    # the two languages in one visible text widget.
+    return chinese if is_chinese() else english
+
+
+func from_row(row: Dictionary, zh_key: String = "zh", en_key: String = "en") -> String:
+    return str(row.get(zh_key if is_chinese() else en_key, ""))
+
+
+func begin_session() -> void:
+    # Login choice is immutable while logged in. Logout re-enables the chooser.
+    session_locked = true
+
+
+func end_session() -> void:
+    session_locked = false
+
+
 func set_locale(language_code: String) -> bool:
     if not SUPPORTED.has(language_code):
         return false
-    if locale == language_code:
-        return true
+    if session_locked and locale != language_code:
+        return false
+    var changed: bool = locale != language_code
     locale = language_code
     var settings: ConfigFile = ConfigFile.new()
     settings.set_value("settings", "schema_version", 1)
     settings.set_value("settings", "locale", locale)
     if settings.save(save_path) != OK:
         push_warning("Language preference could not be saved")
-    language_changed.emit(locale)
+    if changed:
+        language_changed.emit(locale)
     return true
 
 
@@ -77,7 +99,7 @@ func ui_text(source: String) -> String:
 
 
 func localized_text(chinese: String, english: String) -> String:
-    return chinese if is_chinese() else english
+    return choose(chinese, english)
 
 
 func game_text(source: String) -> String:

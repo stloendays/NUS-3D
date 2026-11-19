@@ -20,8 +20,16 @@ var _tiles: Dictionary = {}
 var _captions: Dictionary = {}
 var _held: Dictionary = {}
 var _animations: Dictionary = {}
+var language: NUS3DGameLanguage
+const RAIL_ZH: Dictionary = {
+    "move": "移动", "run": "奔跑", "discover": "探索",
+    "interact": "互动", "talk": "交谈", "interior": "室内",
+    "notes": "笔记", "map": "地图", "mail": "邮箱",
+    "help": "帮助", "audio": "音效"
+}
 
 func _ready() -> void:
+    language = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
     name = "ActionRail"
     anchor_left = 0.0
     anchor_right = 1.0
@@ -46,7 +54,20 @@ func _ready() -> void:
     panel.add_child(row)
     for action in ACTIONS:
         _add_tile(row, action)
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
+    _on_language_changed(language.locale if language != null else "en")
+
+
+func _on_language_changed(_code: String) -> void:
+    for action in ACTIONS:
+        var id: String = str(action["id"])
+        if _captions.has(id) and id != "audio":
+            (_captions[id] as Label).text = (
+                str(RAIL_ZH.get(id, action["hint"])) if language != null and language.is_chinese()
+                else str(action["hint"]))
     _refresh_audio_hint()
+
 
 func _add_tile(row: HBoxContainer, action: Dictionary) -> void:
     var id: String = str(action["id"])
@@ -128,7 +149,10 @@ func _notification(what: int) -> void:
 func _refresh_audio_hint() -> void:
     if _captions.has("audio"):
         var audio: NUS3DUISound = _ui_sound_service()
-        (_captions["audio"] as Label).text = "SOUND" if audio != null and audio.enabled else "MUTED"
+        var active: bool = audio != null and audio.enabled
+        (_captions["audio"] as Label).text = (
+            "音效" if active else "静音") if language != null and language.is_chinese() else (
+            "SOUND" if active else "MUTED")
 
 func key_count() -> int:
     return _tiles.size()

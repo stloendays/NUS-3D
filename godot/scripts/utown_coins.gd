@@ -22,6 +22,7 @@ const DELIVERY_COOLDOWN_SECONDS: float = 32.0
 @onready var arcade: UTownArcade = $"../Arcade"
 @onready var green_dining: UTownGreenDining = $"../GreenDining"
 @onready var hud: CanvasLayer = $"../HUD"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var save_path: String = DEFAULT_SAVE_PATH
 var balance: int = 0
@@ -54,6 +55,8 @@ var interface: CanvasLayer
 var wallet_label: Label
 var shop_panel: PanelContainer
 var shop_status: Label
+var shop_heading: Label
+var shop_buttons: Array[Button] = []
 var shop_open: bool = false
 var capture_mouse_before_shop: bool = false
 var known_hud_visibility: bool = true
@@ -70,7 +73,48 @@ func _ready() -> void:
     for i in range(5):
         _spawn_random_coin(true)
     _poll_mission_rewards()
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
+    _on_language_changed(language.locale if language != null else "en")
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _reason(reason: String) -> String:
+    var names: Dictionary = {
+        "Found a dropped coin": "发现掉落金币",
+        "Campus Explorer checkpoint": "校园探索打卡",
+        "Field Note discovery": "发现探索笔记",
+        "Campus indoor activity": "完成校园活动",
+        "Professor's impossible homework": "完成教授的奇怪作业",
+        "Campus Sprint finished": "校园竞速完成",
+        "Campus Sprint silver": "校园竞速银牌",
+        "Campus Sprint gold": "校园竞速金牌",
+        "Cartoon student duel": "卡通对战胜利",
+        "Lunch Express delivered": "送餐成功"
+    }
+    return _t(str(names.get(reason, reason)), reason)
+
+
+func _shop_text(source: String) -> String:
+    var titles: Dictionary = {
+        "Lucky Badge - 35 C  |  Double next 5 coin pickups": "幸运徽章 · 35 金币 | 下五次拾取翻倍",
+        "Lunch Time Pass - 28 C  |  +35 seconds on next delivery": "送餐加时券 · 28 金币 | 下次配送增加 35 秒",
+        "Golden Tip Pass - 60 C  |  x2 next delivery payment": "双倍小费券 · 60 金币 | 下次配送双倍报酬",
+        "Close  [O]": "关闭 [O]"
+    }
+    return _t(str(titles.get(source, source)), source)
+
+
+func _on_language_changed(_code: String) -> void:
+    if shop_heading != null:
+        shop_heading.text = _t("校园金币商店 | 全天营业", "CAMPUS COIN SHOP | OPEN 24/7")
+    for button in shop_buttons:
+        button.text = _shop_text(str(button.get_meta("shop_original", "")))
     _refresh_display()
+
 
 func _index_spawn_segments() -> void:
     for raw in world.layout.get("walkways", []):
@@ -172,7 +216,9 @@ func _build_interface() -> void:
 
 func _shop_button(parent_node: Node, title: String, callback: Callable) -> Button:
     var button := Button.new()
-    button.text = title
+    button.text = _shop_text(title)
+    button.set_meta("shop_original", title)
+    shop_buttons.append(button)
     button.custom_minimum_size.y = 40.0
     button.pressed.connect(callback)
     parent_node.add_child(button)
@@ -203,10 +249,10 @@ func _build_shop() -> void:
     var contents := VBoxContainer.new()
     contents.add_theme_constant_override("separation", 9)
     shop_panel.add_child(contents)
-    var heading := Label.new()
-    heading.text = "CAMPUS COIN SHOP  |  OPEN 24/7"
-    heading.add_theme_font_size_override("font_size", 20)
-    contents.add_child(heading)
+    shop_heading = Label.new()
+    shop_heading.text = _t("校园金币商店 | 全天营业", "CAMPUS COIN SHOP | OPEN 24/7")
+    shop_heading.add_theme_font_size_override("font_size", 20)
+    contents.add_child(shop_heading)
     shop_status = Label.new()
     shop_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     contents.add_child(shop_status)
@@ -230,22 +276,22 @@ func purchase(item_id: String) -> bool:
         "lucky":
             price = 35
             if lucky_pickups > 0:
-                _notify("Lucky Badge is still active.", 2.5)
+                _notify(_t("幸运徽章仍在生效。", "Lucky Badge is still active."), 2.5)
                 return false
         "lunch":
             price = 28
             if lunch_passes >= 3:
-                _notify("Too many unused lunch passes.", 2.5)
+                _notify(_t("未使用的送餐加时券太多了。", "Too many unused lunch passes."), 2.5)
                 return false
         "tip":
             price = 60
             if double_tip_passes >= 3:
-                _notify("Use an existing Golden Tip first.", 2.5)
+                _notify(_t("请先使用现有的双倍小费券。", "Use an existing Golden Tip first."), 2.5)
                 return false
         _:
             return false
     if balance < price:
-        _notify("Need %d coins. Explore or deliver lunch first!" % price, 3.0)
+        _notify(_t("需要 %d 金币。先探索或送餐！", "Need %d coins. Explore or deliver lunch first!") % price, 3.0)
         return false
     balance -= price
     match item_id:
@@ -256,7 +302,10 @@ func purchase(item_id: String) -> bool:
         "tip":
             double_tip_passes += 1
     _save_progress()
-    _notify("Bought %s for %d C" % [item_id, price], 3.0)
+    _notify(_t("购买成功：%s，花费 %d 金币。", "Bought %s for %d C") % [
+        _t("幸运徽章", "Lucky Badge") if item_id == "lucky" else
+        _t("送餐加时券", "Lunch Time Pass") if item_id == "lunch" else _t("双倍小费券", "Golden Tip Pass"), price
+    ], 3.0)
     return true
 
 func _load_delivery_anchors() -> void:
@@ -325,7 +374,7 @@ func pickup_nearby() -> bool:
             nearest = distance
             best = i
     if best < 0:
-        _notify("No coin nearby. Look for the gold C symbol!", 2.0)
+        _notify(_t("附近没有金币，寻找金色标记！", "No coin nearby. Look for the gold C symbol!"), 2.0)
         return false
     var state: Dictionary = pickups[best]
     var amount: int = int(state["value"])
@@ -349,7 +398,7 @@ func credit(amount: int, reason: String) -> bool:
     balance += gain
     lifetime_earned = mini(MAX_BALANCE * 100, lifetime_earned + gain)
     _save_progress()
-    _notify("+%d C  |  %s" % [gain, reason], 3.0)
+    _notify(_t("+%d 金币 | %s", "+%d C | %s") % [gain, _reason(reason)], 3.0)
     return true
 
 func reward_once(reward_id: String, amount: int, reason: String) -> bool:
@@ -393,7 +442,7 @@ func delivery_interact() -> bool:
         return false
     if delivery_active:
         if _horizontal_distance(player.global_position, delivery_destination) > DELIVERY_FINISH_RADIUS:
-            _notify("Lunch is getting cold! Reach Town Green and press N.", 3.0)
+            _notify(_t("饭快凉了！赶到中央草坪按 N。", "Lunch is getting cold! Reach Town Green and press N."), 3.0)
             return false
         var base_reward: int = 38 + (15 if delivery_time >= 50.0 else 0)
         if double_tip_passes > 0:
@@ -407,13 +456,13 @@ func delivery_interact() -> bool:
         _save_progress()
         return true
     if delivery_cooldown > 0.0:
-        _notify("Food court is preparing the next order (%ds)." % ceili(delivery_cooldown), 2.3)
+        _notify(_t("食堂备餐中（剩余 %d 秒）。", "Food court is preparing the next order (%ds).") % ceili(delivery_cooldown), 2.3)
         return false
     if delivery_origin == Vector3.ZERO or delivery_destination == Vector3.ZERO:
-        _notify("Food-court anchors are unavailable.", 3.0)
+        _notify(_t("食堂配送点暂不可用。", "Food-court anchors are unavailable."), 3.0)
         return false
     if _horizontal_distance(player.global_position, delivery_origin) > DELIVERY_START_RADIUS:
-        _notify("Visit Fine Food at Town Plaza and press N for lunch delivery.", 3.0)
+        _notify(_t("前往中央广场食堂，按 N 开始送餐。", "Visit Fine Food at Town Plaza and press N for lunch delivery."), 3.0)
         return false
     delivery_active = true
     delivery_time = DELIVERY_SECONDS
@@ -421,7 +470,7 @@ func delivery_interact() -> bool:
         lunch_passes -= 1
         delivery_time += 35.0
         _save_progress()
-    _notify("LUNCH EXPRESS! Deliver to Town Green. Press N at destination.", 4.2)
+    _notify(_t("送餐挑战开始！赶往中央草坪，抵达后按 N。", "LUNCH EXPRESS! Deliver to Town Green. Press N at destination."), 4.2)
     return true
 
 func _close_shop() -> void:
@@ -452,22 +501,23 @@ func _notify(value: String, seconds: float) -> void:
 func _refresh_display() -> void:
     if wallet_label != null:
         var lines := PackedStringArray()
-        lines.append("COINS  %d C  |  Earned %d" % [balance, lifetime_earned])
+        lines.append(_t("金币 %d | 累计获得 %d", "COINS %d C | Earned %d") % [balance, lifetime_earned])
         if delivery_active:
-            lines.append("LUNCH EXPRESS  %ds  |  Town Green [N]" % ceili(delivery_time))
+            lines.append(_t("送餐任务 | 剩余 %d 秒 | 中央草坪 [N]",
+                "LUNCH EXPRESS | %ds | Town Green [N]") % ceili(delivery_time))
         elif delivery_cooldown > 0.0:
-            lines.append("Fine Food restocking: %ds" % ceili(delivery_cooldown))
+            lines.append(_t("食堂备餐中：%d 秒", "Food restocking: %ds") % ceili(delivery_cooldown))
         else:
-            lines.append("[Z] collect  [N] Fine Food job  [O] shop")
-        if notice_time > 0.0:
-            lines.append(notice)
-        else:
-            lines.append("Explore, discover and collect for more coins.")
+            lines.append(_t("[Z] 拾取 [N] 送餐任务 [O] 商店",
+                "[Z] collect [N] food delivery [O] shop"))
+        lines.append(notice if notice_time > 0.0 else _t(
+            "探索校园、完成活动来获得金币。",
+            "Explore, discover and collect for more coins."))
         wallet_label.text = "\n".join(lines)
     if shop_status != null:
-        shop_status.text = "Wallet: %d C  |  Lucky %d pickups  |  Lunch %d  |  Tips %d" % [
-            balance, lucky_pickups, lunch_passes, double_tip_passes
-        ]
+        shop_status.text = _t("余额：%d 金币 | 幸运拾取 %d | 加时券 %d | 小费券 %d",
+            "Wallet: %d C | Lucky %d pickups | Lunch %d | Tips %d") % [
+            balance, lucky_pickups, lunch_passes, double_tip_passes]
 
 func save_progress() -> void:
     _save_progress()
@@ -528,7 +578,7 @@ func _process(delta: float) -> void:
         if delivery_time <= 0.0:
             delivery_active = false
             delivery_cooldown = 15.0
-            _notify("Lunch got cold! Try another order at Fine Food.", 3.8)
+            _notify(_t("饭凉了！回食堂领取新订单吧。", "Lunch got cold! Try another order at Fine Food."), 3.8)
     drop_timer += delta
     if drop_timer >= DROP_INTERVAL:
         drop_timer -= DROP_INTERVAL

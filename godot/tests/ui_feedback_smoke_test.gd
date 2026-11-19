@@ -107,8 +107,11 @@ func _run() -> void:
     if sound.enabled == original_sound:
         _fail("Sound preference toggle did not change state")
         return
-    if shell.login_sound_button.text != ("UI sound: ON  [F9]" if sound.enabled else "UI sound: OFF  [F9]"):
-        _fail("Login sound label is not synchronized")
+    var expected_sound: String = (("界面音效：开 [F9]" if sound.enabled else "界面音效：关 [F9]")
+        if shell.language_service.is_chinese() else
+        ("UI sound: ON [F9]" if sound.enabled else "UI sound: OFF [F9]"))
+    if shell.login_sound_button.text != expected_sound:
+        _fail("Login sound label is not synchronized to the chosen language")
         return
     shell._toggle_ui_sound()
     if sound.enabled != original_sound:
