@@ -11,19 +11,19 @@
     "Explore an original, unofficial campus world.": "走进脑洞大开的非官方校园，DDL 正在追你。",
     "SIGN IN": "登录",
     "CREATE ACCOUNT": "创建账号",
-    "Local username (3-20 characters)": "本机用户名（3–20 位）",
+    "Local username (3-20 characters)": "本机用户名（3–20 位英数字符）",
     "Password (at least 8 characters)": "密码（至少 8 位）",
     "Sign in and explore": "登录并进入校园",
     "Register and explore": "注册并进入校园",
     "Create a new local account": "注册本机账号",
     "Already have an account? Sign in": "已有账号？返回登录",
     "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.": "仅支持本机账号，不是 NUS 官方登录，也不会自动跨设备同步。\n进度与游戏邮件保存在此设备。",
-    "新手教程  /  HOW TO PLAY": "新手教程 / HOW TO PLAY",
-    "Mail [J]": "邮箱 [J]",
+    "新手教程  /  HOW TO PLAY": "新手教程 / 玩法说明",
+    "Mail [J]": "游戏邮箱 [J]",
     "Log out": "退出登录",
     "CAMPUS POST  /  LOCAL MAILBOX": "校园邮局 / 本地邮箱",
     "Only accounts registered on this installation can exchange messages.": "只能给本机已注册的游戏账号寄信，不会发送真实邮件。",
-    "Close [J]": "关闭 [J]",
+    "Close [J]": "关闭邮箱 [J]",
     "Inbox": "收件箱",
     "Sent": "已发送",
     "Compose": "写邮件",
@@ -404,7 +404,161 @@
     {
       "en": "not real directions",
       "zh": "不可用于实地导航"
+    },
+    {
+      "en": "WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   L lift floors   F indoor activity   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD",
+      "zh": "WASD 移动   Shift 奔跑   B 骑车   X 校车   I 进出建筑   L 换楼层   F 室内互动   Q 交谈   Y 天气   E 打卡   G 重玩   C 收集   V 竞速   M 地图   T 光线   F2 建筑细节   F3 视角   F4 截图   F6 OSM   F7 隐藏 HUD"
+    },
+    {
+      "en": "M2 ",
+      "zh": "M2 "
+    },
+    {
+      "en": "UTOWN EXPLORER COMPLETE",
+      "zh": "UTOWN 探索全部完成"
+    },
+    {
+      "en": "UTOWN EXPLORER",
+      "zh": "UTOWN 探索者"
+    },
+    {
+      "en": "ALL",
+      "zh": "全部"
+    },
+    {
+      "en": "Press E to check in. Schematic route; not real directions.",
+      "zh": "按 E 打卡。这是示意路线，不能实地导航。"
+    },
+    {
+      "en": "Original unofficial exploration complete. Press G to replay.",
+      "zh": "非官方校园探索完成，按 G 可以重玩。"
+    },
+    {
+      "en": "Drying pavement",
+      "zh": "路面正在变干"
+    },
+    {
+      "en": "Rain / wet ground",
+      "zh": "雨天 / 地面湿滑"
+    },
+    {
+      "en": "Storm / wet ground",
+      "zh": "雷暴 / 地面湿滑"
+    },
+    {
+      "en": "Returned to the schematic outdoor scene.",
+      "zh": "回到概念化的室外校园。"
+    },
+    {
+      "en": "Approach the ERC or SRC study entrance, then press I.",
+      "zh": "靠近 ERC / SRC 的游戏入口，再按 I。"
+    },
+    {
+      "en": "Approach the moving UTown shuttle and press X to board.",
+      "zh": "靠近游戏校车后按 X 上车。"
+    },
+    {
+      "en": "On board. Press X to alight.",
+      "zh": "上车成功，按 X 下车。"
+    },
+    {
+      "en": "You have left the shuttle.",
+      "zh": "已从校车下车。"
+    },
+    {
+      "en": "Entered ",
+      "zh": "进入 "
+    },
+    {
+      "en": "illustrative interior. Press I to return.",
+      "zh": " 概念室内，按 I 返回。"
+    },
+    {
+      "en": "Bicycle mode ",
+      "zh": "自行车模式 "
+    },
+    {
+      "en": "Speed is increased.",
+      "zh": "速度提升！"
+    },
+    {
+      "en": "Move closer to a cafe, reading area or activity station.",
+      "zh": "靠近咖啡厅、阅读区或活动站后再按 F。"
+    },
+    {
+      "en": "REVISITED",
+      "zh": "再次探索"
+    },
+    {
+      "en": "M2 ON",
+      "zh": "M2 开"
+    },
+    {
+      "en": "M2 OFF",
+      "zh": "M2 关"
+    },
+    {
+      "en": "Dry",
+      "zh": "干燥"
+    },
+    {
+      "en": "rain",
+      "zh": "下雨"
+    },
+    {
+      "en": "Cloudy",
+      "zh": "多云"
+    },
+    {
+      "en": "Overcast",
+      "zh": "阴天"
+    },
+    {
+      "en": "Clear",
+      "zh": "晴天"
+    },
+    {
+      "en": "Thunderstorm",
+      "zh": "雷暴"
+    },
+    {
+      "en": "Rain",
+      "zh": "下雨"
+    },
+    {
+      "en": "Level up! LV",
+      "zh": "升级啦！LV"
+    },
+    {
+      "en": "CAMPUS POST",
+      "zh": "校园邮局"
+    },
+    {
+      "en": "LV ",
+      "zh": "等级 "
     }
   ],
-  "note": "Static UI uses exact English keys; game HUD fragments apply only to built-in gameplay text, never user-authored mail."
+  "note": "Static UI uses exact English keys; game HUD fragments apply only to built-in gameplay text, never user-authored mail.",
+  "tour_zh": {
+    "GREEN": {
+      "title": "Town Green 草坪",
+      "observation": "找一找校园中央的草地。这里很适合放空，前提是 DDL 不追过来。",
+      "discovery": "Town Green 是开放草地区域的概念模型，草坪边缘与树木并未实测。别真的在这里按 E 寻找学分。"
+    },
+    "ERC": {
+      "title": "教育资源中心（ERC）",
+      "observation": "看看浅色建筑和玻璃立面，按 F2 比较建筑表现层。",
+      "discovery": "这里展示了 ERC 的玻璃、遮阳与弧形体量概念模型。所有尺寸都是估计的，毕竟我们没把测量卷尺带进游戏。"
+    },
+    "SRC": {
+      "title": "Stephen Riady Centre（SRC）",
+      "observation": "朝大型建筑群及抬升的论坛空间看一看。",
+      "discovery": "SRC 有概念化的论坛圆盘及连廊。按 F6 对比 OSM 轮廓与估计建筑模型，这不是实地测绘。"
+    },
+    "PLAZA": {
+      "title": "Town Plaza 广场",
+      "observation": "寻找 CREATE 附近的铺装广场，四站任务即将完成！",
+      "discovery": "Town Plaza 是四站探索的终点。这些道路和广场仅为示意，请别把游戏导航用作真实无障碍路线。"
+    }
+  }
 }
