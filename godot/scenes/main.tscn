@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=34 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -31,6 +31,8 @@
 [ext_resource type="Script" path="res://scripts/science_campus_activities.gd" id="29"]
 [ext_resource type="Script" path="res://scripts/utown_voice_presentation.gd" id="30"]
 [ext_resource type="Script" path="res://scripts/utown_map_dressing.gd" id="31"]
+
+[ext_resource type="Script" path="res://scripts/character_wardrobe.gd" id="32"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -269,3 +271,6 @@ script = ExtResource("30")
 
 [node name="MapDressing" type="Node3D" parent="."]
 script = ExtResource("31")
+
+[node name="Wardrobe" type="CanvasLayer" parent="."]
+script = ExtResource("32")
