@@ -64,6 +64,9 @@ func _physics_process(delta: float) -> void:
     var input_vector: Vector2 = Vector2(strafe_axis, forward_axis).normalized()
     var direction: Vector3 = (global_transform.basis * Vector3(input_vector.x, 0.0, input_vector.y)).normalized()
     var speed: float = BICYCLE_SPEED if bicycle_mode else RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) else WALK_SPEED
+    var crowds: UTownDiningCrowds = get_parent().get_node_or_null("DiningCrowds") as UTownDiningCrowds
+    if crowds != null and not bicycle_mode and not Input.is_key_pressed(KEY_SHIFT):
+        speed *= crowds.player_slowdown
     var target_x: float = direction.x * speed
     var target_z: float = direction.z * speed
     if bicycle_mode:
