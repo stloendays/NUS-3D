@@ -322,7 +322,7 @@ func _finish_trip() -> void:
         player.velocity = Vector3.ZERO
         player.rotation.y = 0.0
         player.head.rotation = Vector3.ZERO
-        arrival_label.text = "ARRIVED  /  %s\n%s" % [str(destination["name"]), str(destination["tagline"])]
+        arrival_label.text = "ARRIVED  /  %s\n%s" % [str(destination["name"]).to_upper(), str(destination["tagline"])]
         arrival_card.show()
         arrival_remaining = FEEDBACK_SECONDS
     origin_id = ""
