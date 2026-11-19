@@ -23,6 +23,10 @@ var activity: TextEdit
 var confirm: ConfirmationDialog
 var pending_action: String = ""
 var pending_value: int = 0
+var ai_request: HTTPRequest
+var ai_input: LineEdit
+var ai_button: Button
+var ai_pending: bool = false
 
 
 func setup(service: NUS3DAdminAuthority) -> void:
@@ -73,7 +77,7 @@ func _build() -> void:
     center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     add_child(center)
     var panel: PanelContainer = PanelContainer.new()
-    panel.custom_minimum_size = Vector2(800, 560)
+    panel.custom_minimum_size = Vector2(850, 620)
     var skin: StyleBoxFlat = StyleBoxFlat.new()
     skin.bg_color = Color("#16232c")
     skin.border_color = Color("#a5b4bf")
@@ -167,6 +171,17 @@ func _build() -> void:
     teleport.add_child(_label("Only predefined game checkpoints. No arbitrary coordinates.", 12))
     teleport.add_child(_button("Lock admin controls", _lock_now))
 
+    tools_box.add_child(_label("OPTIONAL GPT PROPOSAL · REVIEW BEFORE APPLYING", 13))
+    var ai_row: HBoxContainer = HBoxContainer.new()
+    tools_box.add_child(ai_row)
+    ai_input = LineEdit.new()
+    ai_input.max_length = 300
+    ai_input.placeholder_text = "e.g. Make it rainy, set dusk or add 300 coins"
+    ai_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    ai_row.add_child(ai_input)
+    ai_button = _button("Suggest with GPT", _request_ai_proposal)
+    ai_row.add_child(ai_button)
+
     message = _label("", 13)
     tools_box.add_child(message)
     tools_box.add_child(_label("RECENT LOCAL CHANGES", 14))
@@ -181,6 +196,12 @@ func _build() -> void:
     confirm.title = "Confirm local save adjustment"
     confirm.confirmed.connect(_confirm_grant)
     add_child(confirm)
+    ai_request = HTTPRequest.new()
+    ai_request.timeout = 22.0
+    ai_request.body_size_limit = 32768
+    ai_request.max_redirects = 0
+    add_child(ai_request)
+    ai_request.request_completed.connect(_on_ai_response)
     tools_box.hide()
 
 
@@ -193,6 +214,8 @@ func _language_changed(_locale: String) -> void:
         "Local profile and offline world only. No default admin, remote access or command execution."
     )
     password_field.placeholder_text = _t("输入本机管理员密码（至少12字符）", "Enter local owner password (12+ characters)")
+    ai_input.placeholder_text = _t("例如：下雨、切到黄昏、给我增加300金币", "e.g. Make it rainy, set dusk or add 300 coins")
+    ai_button.text = _t("让 GPT 提方案", "Suggest with GPT")
     _refresh_auth_state()
 
 
@@ -208,6 +231,13 @@ func open_console() -> void:
 
 
 func close_console() -> void:
+    if ai_pending and ai_request != null:
+        ai_request.cancel_request()
+    ai_pending = false
+    if ai_button != null:
+        ai_button.disabled = false
+    if ai_input != null:
+        ai_input.clear()
     hide()
     if confirm != null:
         confirm.hide()
@@ -250,6 +280,113 @@ func _authenticate() -> void:
     message.text = _t("管理员权限已激活，仅限此控制台会话。", "Owner tools unlocked for this panel session.")
 
 
+
+static func validate_ai_proposal(raw: String) -> Dictionary:
+    # Untrusted LLM output. Fail closed on any unexpected action or value.
+    if raw.length() > 1800:
+        return {}
+    var parsed: Variant = JSON.parse_string(raw.strip_edges())
+    if typeof(parsed) != TYPE_DICTIONARY:
+        return {}
+    var item: Dictionary = parsed
+    var action: String = str(item.get("action", ""))
+    var raw_value: Variant = item.get("value", -999)
+    if typeof(raw_value) != TYPE_INT:
+        return {}
+    var value: int = int(raw_value)
+    var limits: Dictionary = {
+        "weather": [0, 4],
+        "lighting": [0, 3],
+        "teleport": [0, 3],
+        "grant_xp": [1, 5000],
+        "grant_coins": [1, 5000],
+        "restore_atmosphere": [0, 0]
+    }
+    if not limits.has(action):
+        return {}
+    var bounds: Array = limits[action]
+    if value < int(bounds[0]) or value > int(bounds[1]):
+        return {}
+    var reason: String = str(item.get("reason", "")).strip_edges().substr(0, 150)
+    reason = reason.replace("\n", " ").replace("\r", " ")
+    return {"action": action, "value": value, "reason": reason}
+
+
+func _request_ai_proposal() -> void:
+    if authority == null or not authority.is_unlocked() or ai_pending:
+        return
+    if not authority._offline_game():
+        message.text = _t("联机状态不能使用游戏修改建议。", "Game changes are disabled in multiplayer.")
+        return
+    var prompt_text: String = ai_input.text.strip_edges()
+    if prompt_text.length() < 1 or prompt_text.length() > 300:
+        message.text = _t("请输入 1–300 个字符。", "Enter 1–300 characters.")
+        return
+    # Never submit account identity, passwords, saves or location.
+    var request_json: String = JSON.stringify({
+        "provider": "openai",
+        "mode": "admin_plan",
+        "prompt": prompt_text,
+        "history": []
+    })
+    var err: Error = ai_request.request(
+        "http://127.0.0.1:8765/v1/chat",
+        PackedStringArray(["Content-Type: application/json", "X-NUS3D-Game: 1"]),
+        HTTPClient.METHOD_POST,
+        request_json
+    )
+    if err != OK:
+        message.text = _t(
+            "本地 AI 服务未运行。可继续使用手动控制。",
+            "Local GPT bridge is not running. Manual controls remain available."
+        )
+        return
+    ai_pending = true
+    ai_button.disabled = true
+    message.text = _t("GPT 正在生成建议；不会自动修改游戏。", "GPT is preparing a proposal; no game changes will run automatically.")
+
+
+func _on_ai_response(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+    if not ai_pending:
+        return
+    ai_pending = false
+    ai_button.disabled = false
+    if not visible or authority == null or not authority.is_unlocked():
+        return
+    if result != HTTPRequest.RESULT_SUCCESS or code != 200:
+        message.text = _t(
+            "GPT 暂时不可用，请检查本地服务和 API Key。",
+            "GPT unavailable; check local bridge and API key."
+        )
+        return
+    var response: Variant = JSON.parse_string(body.get_string_from_utf8())
+    if typeof(response) != TYPE_DICTIONARY:
+        message.text = _t("GPT 响应格式无效。", "Invalid GPT response.")
+        return
+    var reply: String = str(response.get("reply", ""))
+    if not _prepare_ai_proposal(reply):
+        message.text = _t(
+            "GPT 建议不在允许的操作范围内，已拒绝。不会执行修改。",
+            "Unrecognized or unsafe GPT proposal rejected without applying changes."
+        )
+
+
+func _prepare_ai_proposal(raw_reply: String) -> bool:
+    if authority == null or not authority.is_unlocked():
+        return false
+    var proposal: Dictionary = validate_ai_proposal(raw_reply)
+    if proposal.is_empty():
+        return false
+    pending_action = str(proposal["action"])
+    pending_value = int(proposal["value"])
+    var reason: String = str(proposal["reason"])
+    confirm.dialog_text = _t(
+        "GPT 仅提出建议，尚未执行。\n操作：%s  参数：%d\n理由：%s\n确认后才修改游戏并写入审计记录。" % [pending_action, pending_value, reason],
+        "GPT PROPOSAL ONLY — not executed.\nAction: %s  Value: %d\nReason: %s\nApply only after your explicit confirmation; the result is audited." % [pending_action, pending_value, reason]
+    )
+    confirm.popup_centered()
+    return true
+
 func _request_grant(action: String, amount: int) -> void:
     if authority == null or not authority.is_unlocked():
         return
@@ -263,7 +400,7 @@ func _request_grant(action: String, amount: int) -> void:
 
 
 func _confirm_grant() -> void:
-    if pending_action in ["grant_xp", "grant_coins"]:
+    if pending_action in ["grant_xp", "grant_coins", "weather", "lighting", "restore_atmosphere", "teleport"]:
         _perform(pending_action, pending_value)
     pending_action = ""
     pending_value = 0
