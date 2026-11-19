@@ -54,6 +54,7 @@ var on_shuttle: bool = false
 
 var message: String = ""
 var message_time: float = 0.0
+var ambient_chatter_timer: float = 18.0
 
 func _ready() -> void:
     _load_waypoints()
@@ -602,6 +603,19 @@ func _process(delta: float) -> void:
         right_arm.rotation.x = -gait * 0.48
         left_leg.rotation.x = -gait * 0.62
         right_leg.rotation.x = gait * 0.62
+
+    # Nearby students occasionally mutter a random joke. Never interrupt an interaction.
+    if not interior_active and not on_shuttle and message_time <= 0.0:
+        ambient_chatter_timer -= delta
+        if ambient_chatter_timer <= 0.0:
+            ambient_chatter_timer = randf_range(20.0, 36.0)
+            var index: int = _nearest_pedestrian()
+            if index >= 0:
+                var name: String = str(pedestrians[index]["name"])
+                var joke: String = DialogueBank.next_line("outdoor", name, weather.mode, true)
+                if not joke.is_empty():
+                    message = "%s · %s\n%s" % [name, DialogueBank.role_for("outdoor", name), joke]
+                    message_time = 4.5
 
     if bicycle_enabled:
         var bike_speed: float = Vector2(player.velocity.x, player.velocity.z).length()
