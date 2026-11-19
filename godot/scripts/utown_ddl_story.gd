@@ -6,6 +6,8 @@ class_name UTownDDLStory
 const SAVE_PATH: String = "user://nus3d_ddl_story.cfg"
 const DEADLINE_SECONDS: float = 300.0
 const INTERACT_RADIUS_M: float = 10.0
+const FOCUS_RADIUS_M: float = 20.0
+const ACTIONS = ["Read overdue email", "Retrieve jammed pages", "Drink emergency coffee", "Upload coursework"]
 const EPISODES = [
     {
         "id": "GREEN", "name": "THE EMAIL OF DOOM",
@@ -45,9 +47,17 @@ var best_seconds: float = -1.0
 var latest_line: String = "The semester is peaceful. This is suspicious."
 var stage_points: Array[Vector3] = []
 var stage_roots: Array[Node3D] = []
+var focus_accents: Array[MeshInstance3D] = []
 var display_layer: CanvasLayer
 var display_label: Label
 var countdown_label: Label
+var near_prompt_panel: PanelContainer
+var near_prompt_label: Label
+var toast_panel: PanelContainer
+var toast_label: Label
+var compass_control: UTownDDLCompass
+var ping_remaining: float = 0.0
+var toast_remaining: float = 0.0
 var elapsed_since_refresh: float = 0.0
 var marker_time: float = 0.0
 var panic_notified: bool = false
@@ -72,38 +82,14 @@ func _ready() -> void:
     _refresh()
 
 func _build_markers() -> void:
-    var mesh := CylinderMesh.new()
-    mesh.top_radius = 0.62
-    mesh.bottom_radius = 0.82
-    mesh.height = 0.20
+    # The four big cartoon machines ARE the discoverable landmarks; no labels or beacons.
     for i in range(EPISODES.size()):
-        var beacon := Node3D.new()
-        beacon.name = "DDLComicCheckpoint_%d" % i
-        beacon.position = stage_points[i] + Vector3(0, 0.62, 0)
-        add_child(beacon)
-        var base := MeshInstance3D.new()
-        base.name = "NeonCheckpointBase"
-        base.mesh = mesh
-        var material := StandardMaterial3D.new()
-        material.albedo_color = Color.html(["#ffe28b", "#ff978b", "#91d4ee", "#bb98e8"][i])
-        material.emission_enabled = true
-        material.emission = material.albedo_color
-        material.emission_energy_multiplier = 0.42
-        base.material_override = material
-        base.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-        beacon.add_child(base)
-        var marker := Label3D.new()
-        marker.name = "FloatingQuestLabel"
-        marker.position = Vector3(0, 2.62, 0)
-        marker.text = "%d / %s\n[H] INTERACT" % [i + 1, EPISODES[i]["name"]]
-        marker.pixel_size = 0.018
-        marker.font_size = 26
-        marker.outline_size = 7
-        marker.modulate = Color.html("#fff6c8")
-        marker.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-        beacon.add_child(marker)
-        _build_stage_prop(beacon, i)
-        stage_roots.append(beacon)
+        var actor := Node3D.new()
+        actor.name = "DDLInteractiveScene_%d" % i
+        actor.position = stage_points[i] + Vector3(0.0, 0.62, 0.0)
+        add_child(actor)
+        _build_stage_prop(actor, i)
+        stage_roots.append(actor)
 
 func _prop_part(parent: Node3D, name_value: String, at: Vector3, dims: Vector3, color_hex: String, with_glow: bool = false) -> MeshInstance3D:
     # Bounded lightweight meshes: one comic silhouette per mission stage, no physics.
@@ -125,17 +111,6 @@ func _prop_part(parent: Node3D, name_value: String, at: Vector3, dims: Vector3, 
     parent.add_child(visual)
     return visual
 
-func _prop_text(parent: Node3D, words: String, at: Vector3, hex: String) -> void:
-    var label := Label3D.new()
-    label.text = words
-    label.position = at
-    label.font_size = 28
-    label.pixel_size = 0.012
-    label.outline_size = 7
-    label.modulate = Color.html(hex)
-    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    parent.add_child(label)
-
 func _build_stage_prop(beacon: Node3D, i: int) -> void:
     # Move decorative props off the center of the walkway. They remain intangible.
     var prop := Node3D.new()
@@ -147,70 +122,171 @@ func _build_stage_prop(beacon: Node3D, i: int) -> void:
             _prop_part(prop, "MailEnvelope", Vector3(0, 1.65, 0), Vector3(2.5, 1.55, 0.25), "#fff4db")
             _prop_part(prop, "EnvelopeFold", Vector3(0, 1.50, -0.17), Vector3(2.10, 0.12, 0.04), "#fba0a5")
             _prop_part(prop, "EmergencyStamp", Vector3(0.8, 2.02, -0.18), Vector3(0.50, 0.42, 0.05), "#e97c80")
-            _prop_text(prop, "02:00 AM\nDUE YESTERDAY", Vector3(0, 3.01, 0), "#ffe8ac")
         1:
             _prop_part(prop, "PrinterHousing", Vector3(0, 1.02, 0), Vector3(2.25, 1.24, 1.05), "#91a8b8")
             _prop_part(prop, "PrinterFeed", Vector3(0, 1.74, 0.05), Vector3(1.58, 0.3, 0.84), "#e2e9df")
             _prop_part(prop, "StuckPages", Vector3(0, 2.22, -0.09), Vector3(1.27, 0.8, 0.07), "#fff9e9")
             _prop_part(prop, "RedErrorLight", Vector3(0.83, 1.2, -0.55), Vector3(0.25, 0.24, 0.06), "#ff666a", true)
-            _prop_text(prop, "PAPER JAM!\nET AL. x37", Vector3(0, 3.25, 0), "#ffcdbd")
         2:
             _prop_part(prop, "CoffeeGiantCup", Vector3(0, 1.37, 0), Vector3(1.65, 2.35, 1.45), "#f7c46d")
             _prop_part(prop, "CoffeeCupSleeve", Vector3(0, 1.55, -0.77), Vector3(1.45, 0.73, 0.09), "#e5eef4")
             _prop_part(prop, "CoffeeLid", Vector3(0, 2.62, 0), Vector3(1.89, 0.25, 1.70), "#ffffff")
             _prop_part(prop, "CartoonSteam", Vector3(0.22, 3.15, 0), Vector3(0.25, 0.72, 0.20), "#fff7c6")
-            _prop_text(prop, "CAFFEINE +99\nSLEEP -999", Vector3(0, 4.04, 0), "#ffe5ac")
         3:
             _prop_part(prop, "UploadComputer", Vector3(0, 1.56, 0), Vector3(2.25, 1.72, 0.40), "#3e566e")
             _prop_part(prop, "PortalScreen", Vector3(0, 1.61, -0.23), Vector3(1.94, 1.38, 0.06), "#a7ecd9", true)
             _prop_part(prop, "PortalFoot", Vector3(0, 0.53, 0), Vector3(0.30, 0.57, 0.26), "#8b9eab")
             _prop_part(prop, "PortalBase", Vector3(0, 0.20, 0), Vector3(1.14, 0.14, 0.71), "#566a78")
-            _prop_text(prop, "UPLOAD FAILED\nRETRY? [H]", Vector3(0, 3.10, 0), "#a9ffdd")
+    # A tiny highlight appears only as the player approaches the ACTIVE stage.
+    # The world is otherwise untouched; no billboard text, no checkpoint rings.
+    var accent: MeshInstance3D = _prop_part(prop, "FocusGlint", Vector3(0.0, 0.43, -0.83), Vector3(1.18, 0.075, 0.07), "#ffe39b", true)
+    accent.visible = false
+    focus_accents.append(accent)
 
 func _build_ui() -> void:
     display_layer = CanvasLayer.new()
-    display_layer.name = "DDLQuestOverlay"
+    display_layer.name = "MinimalMissionHUD"
     display_layer.layer = 2
     add_child(display_layer)
-    var panel := PanelContainer.new()
-    panel.name = "PanicCard"
-    panel.anchor_left = 0.5
-    panel.anchor_right = 0.5
-    panel.anchor_top = 1.0
-    panel.anchor_bottom = 1.0
-    panel.offset_left = -236.0
-    panel.offset_right = 236.0
-    panel.offset_top = -213.0
-    panel.offset_bottom = -52.0
-    panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+    # Always-on tracker occupies a small area at top center, not a big bottom box.
+    var tracker := PanelContainer.new()
+    tracker.name = "SlimDeadlineTracker"
+    tracker.anchor_left = 0.5
+    tracker.anchor_right = 0.5
+    tracker.offset_left = -205.0
+    tracker.offset_right = 205.0
+    tracker.offset_top = 14.0
+    tracker.offset_bottom = 82.0
+    tracker.mouse_filter = Control.MOUSE_FILTER_IGNORE
     var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.24, 0.10, 0.20, 0.94)
-    style.border_color = Color.html("#ffd57c")
-    style.set_border_width_all(2)
-    style.set_corner_radius_all(10)
-    style.content_margin_left = 11.0
-    style.content_margin_right = 11.0
-    style.content_margin_top = 10.0
-    style.content_margin_bottom = 10.0
-    panel.add_theme_stylebox_override("panel", style)
-    display_layer.add_child(panel)
-    var content := VBoxContainer.new()
-    content.name = "PanicCardContents"
-    content.add_theme_constant_override("separation", 3)
-    panel.add_child(content)
+    style.bg_color = Color(0.075, 0.09, 0.13, 0.81)
+    style.set_corner_radius_all(12)
+    style.content_margin_left = 15.0
+    style.content_margin_right = 15.0
+    style.content_margin_top = 8.0
+    style.content_margin_bottom = 7.0
+    tracker.add_theme_stylebox_override("panel", style)
+    display_layer.add_child(tracker)
+    var column := VBoxContainer.new()
+    column.add_theme_constant_override("separation", 3)
+    tracker.add_child(column)
     countdown_label = Label.new()
-    countdown_label.name = "CountdownHeadline"
-    countdown_label.add_theme_font_size_override("font_size", 21)
-    countdown_label.add_theme_color_override("font_color", Color.html("#ffe386"))
-    countdown_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    content.add_child(countdown_label)
+    countdown_label.name = "Deadline"
+    countdown_label.add_theme_font_size_override("font_size", 18)
+    countdown_label.add_theme_color_override("font_color", Color.html("#ffdf9b"))
+    column.add_child(countdown_label)
     display_label = Label.new()
-    display_label.name = "EpisodeDescription"
+    display_label.name = "Objective"
+    display_label.add_theme_font_size_override("font_size", 13)
+    display_label.add_theme_color_override("font_color", Color.html("#d3e4e6"))
     display_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    display_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    display_label.add_theme_font_size_override("font_size", 15)
-    display_label.add_theme_color_override("font_color", Color.html("#fff3d9"))
-    content.add_child(display_label)
+    column.add_child(display_label)
+
+    # Optional three-second direction pulse is a compact 2D UI compass, not a world arrow.
+    compass_control = UTownDDLCompass.new()
+    compass_control.name = "MomentaryDirectionPulse"
+    compass_control.anchor_left = 0.5
+    compass_control.anchor_right = 0.5
+    compass_control.offset_left = -65.0
+    compass_control.offset_right = 65.0
+    compass_control.offset_top = 88.0
+    compass_control.offset_bottom = 184.0
+    compass_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    display_layer.add_child(compass_control)
+    compass_control.update_ping(0.0, 0.0, 0.0)
+
+    # Interaction text is contextual. It never displays at a long distance.
+    near_prompt_panel = PanelContainer.new()
+    near_prompt_panel.name = "NearObjectPrompt"
+    near_prompt_panel.anchor_left = 0.5
+    near_prompt_panel.anchor_right = 0.5
+    near_prompt_panel.anchor_top = 1.0
+    near_prompt_panel.anchor_bottom = 1.0
+    near_prompt_panel.offset_left = -155.0
+    near_prompt_panel.offset_right = 155.0
+    near_prompt_panel.offset_top = -112.0
+    near_prompt_panel.offset_bottom = -75.0
+    near_prompt_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    var prompt_style := StyleBoxFlat.new()
+    prompt_style.bg_color = Color(0.10, 0.15, 0.18, 0.91)
+    prompt_style.set_corner_radius_all(10)
+    prompt_style.content_margin_left = 10.0
+    prompt_style.content_margin_right = 10.0
+    prompt_style.content_margin_top = 6.0
+    prompt_style.content_margin_bottom = 6.0
+    near_prompt_panel.add_theme_stylebox_override("panel", prompt_style)
+    display_layer.add_child(near_prompt_panel)
+    near_prompt_label = Label.new()
+    near_prompt_label.name = "ContextAction"
+    near_prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    near_prompt_label.add_theme_font_size_override("font_size", 15)
+    near_prompt_label.add_theme_color_override("font_color", Color.html("#f3f4eb"))
+    near_prompt_panel.add_child(near_prompt_label)
+    near_prompt_panel.visible = false
+
+    # Dialogues appear briefly as captions rather than permanent floating world text.
+    toast_panel = PanelContainer.new()
+    toast_panel.name = "NarrativeSubtitle"
+    toast_panel.anchor_left = 0.5
+    toast_panel.anchor_right = 0.5
+    toast_panel.anchor_top = 1.0
+    toast_panel.anchor_bottom = 1.0
+    toast_panel.offset_left = -280.0
+    toast_panel.offset_right = 280.0
+    toast_panel.offset_top = -218.0
+    toast_panel.offset_bottom = -126.0
+    toast_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    var toast_style := StyleBoxFlat.new()
+    toast_style.bg_color = Color(0.10, 0.10, 0.12, 0.88)
+    toast_style.set_corner_radius_all(10)
+    toast_style.content_margin_left = 14.0
+    toast_style.content_margin_right = 14.0
+    toast_style.content_margin_top = 10.0
+    toast_style.content_margin_bottom = 10.0
+    toast_panel.add_theme_stylebox_override("panel", toast_style)
+    display_layer.add_child(toast_panel)
+    toast_label = Label.new()
+    toast_label.name = "StorySubtitle"
+    toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    toast_label.add_theme_font_size_override("font_size", 14)
+    toast_label.add_theme_color_override("font_color", Color.html("#fcefcf"))
+    toast_panel.add_child(toast_label)
+    toast_panel.visible = false
+
+func _notify_story(words: String) -> void:
+    latest_line = words
+    toast_remaining = 5.0
+    if toast_label != null:
+        toast_label.text = words
+
+func request_focus() -> bool:
+    if not enabled or not hud.visible or campus_life.interior_active or campus_life.on_shuttle or player.movement_locked:
+        return false
+    ping_remaining = 3.0
+    return true
+
+func _distance_to(point: Vector3) -> float:
+    var delta: Vector3 = point - player.global_position
+    return Vector2(delta.x, delta.z).length()
+
+func _current_goal_index() -> int:
+    return 0 if completed else clampi(stage, 0, EPISODES.size() - 1)
+
+func _update_direction_pulse() -> void:
+    if compass_control == null or stage_points.is_empty():
+        return
+    var goal: Vector3 = stage_points[_current_goal_index()]
+    var vec: Vector3 = goal - player.global_position
+    var flattened := Vector2(vec.x, vec.z)
+    var forward_3: Vector3 = -player.global_transform.basis.z
+    var right_3: Vector3 = player.global_transform.basis.x
+    var forward := Vector2(forward_3.x, forward_3.z).normalized()
+    var right := Vector2(right_3.x, right_3.z).normalized()
+    var target := flattened.normalized()
+    var bearing: float = atan2(target.dot(right), target.dot(forward)) if flattened.length_squared() > 0.0001 else 0.0
+    compass_control.update_ping(bearing, flattened.length(), minf(1.0, ping_remaining / 0.5))
 
 func reset_episode() -> void:
     stage = 0
@@ -219,7 +295,9 @@ func reset_episode() -> void:
     deadline_left = DEADLINE_SECONDS
     panic_notified = false
     final_warning_notified = false
-    latest_line = "A suspicious assignment email is waiting. [H] at Town Green."
+    latest_line = "You have new coursework mail."
+    toast_remaining = 0.0
+    ping_remaining = 0.0
     _refresh()
 
 func interact() -> bool:
@@ -232,7 +310,7 @@ func interact() -> bool:
     if stage >= EPISODES.size() or player.global_position.distance_to(stage_points[stage]) > INTERACT_RADIUS_M:
         return false
     var event: Dictionary = EPISODES[stage]
-    latest_line = str(event["dialogue"])
+    _notify_story(str(event["dialogue"]))
     if stage == 0:
         running = true
         deadline_left = DEADLINE_SECONDS
@@ -246,7 +324,10 @@ func interact() -> bool:
         if not rewarded:
             arcade._award_xp(80)
             rewarded = true
-        latest_line += " +80 XP (first successful submission only)."
+            _notify_story(latest_line + " +80 XP for first submission.")
+        else:
+            _notify_story(latest_line + " Replay complete.")
+    ping_remaining = 2.5 if not completed else 0.0
     _save_progress()
     _refresh()
     return true
@@ -256,57 +337,67 @@ func _process(delta: float) -> void:
         return
     display_layer.visible = hud.visible
     marker_time += delta
+    toast_remaining = maxf(0.0, toast_remaining - delta)
+    ping_remaining = maxf(0.0, ping_remaining - delta)
     for i in range(stage_roots.size()):
-        var marker_root: Node3D = stage_roots[i]
-        marker_root.visible = hud.visible and not campus_life.interior_active and not completed and stage == i
-        if marker_root.visible:
-            # Small visual pulse + non-colliding comic prop wobble, 4 marker nodes total.
-            marker_root.scale = Vector3.ONE * (1.0 + 0.045 * sin(marker_time * 2.2))
-            var prop_root: Node3D = marker_root.get_node_or_null("ComicTaskProp_%d" % i) as Node3D
-            if prop_root != null:
-                prop_root.rotation.y = sin(marker_time * 0.9 + float(i)) * 0.13
+        # Always keep recognizable fictional world objects visible, including F7 photo mode.
+        var obj: Node3D = stage_roots[i]
+        obj.visible = not campus_life.interior_active
+        var accent: MeshInstance3D = focus_accents[i]
+        var focused: bool = i == _current_goal_index() and not completed
+        accent.visible = obj.visible and hud.visible and focused and _distance_to(stage_points[i]) <= FOCUS_RADIUS_M
+        if accent.visible:
+            accent.scale = Vector3.ONE * (0.88 + 0.12 * sin(marker_time * 2.8))
+    _update_direction_pulse()
     if running:
         deadline_left = maxf(0.0, deadline_left - delta)
         if deadline_left < 150.0 and not panic_notified:
-            latest_line = "Ding! Prof. Deadline has emailed: 'Any progress?' Your keyboard begins sweating."
+            _notify_story("Prof. Deadline: 'Any progress?' Your keyboard begins sweating.")
             panic_notified = true
         if deadline_left < 60.0 and not final_warning_notified:
-            latest_line = "ONE MINUTE! The PDF has turned into a 400 MB potato."
+            _notify_story("ONE MINUTE! The PDF has become a 400 MB potato.")
             final_warning_notified = true
         if deadline_left <= 0.0:
             running = false
             fail_count += 1
             stage = 0
-            latest_line = "DDL EXPIRED. The portal exploded into confetti. Return to Town Green for a retry."
+            _notify_story("DDL EXPIRED. The upload portal explodes into confetti. Retry at Town Green.")
             _save_progress()
+    if toast_panel != null:
+        toast_panel.visible = toast_remaining > 0.0 and hud.visible
     elapsed_since_refresh += delta
     if elapsed_since_refresh >= 0.2:
         elapsed_since_refresh = 0.0
         _refresh()
 
 func _refresh() -> void:
-    if display_label == null:
+    if display_label == null or countdown_label == null or stage_points.is_empty():
         return
-    var minutes: int = int(ceil(deadline_left)) / 60
-    var seconds: int = int(ceil(deadline_left)) % 60
-    var timer_label: String = "%02d:%02d" % [minutes, seconds]
-    countdown_label.text = "DDL DOOM   %s   |   RETRIES %d" % [timer_label, fail_count]
-    var timer_color: Color = Color.html("#ffe386")
+    var total_seconds: int = maxi(0, ceili(deadline_left))
+    var minutes: int = floori(float(total_seconds) / 60.0)
+    var seconds: int = total_seconds % 60
+    var clock: String = "%02d:%02d" % [minutes, seconds]
+    countdown_label.text = "DDL   %s" % clock if running else "DDL   SUBMITTED" if completed else "DDL   READY"
+    var timer_color: Color = Color.html("#ffe5a3")
     if running and deadline_left <= 20.0:
-        timer_color = Color.html("#ff6265") if int(marker_time * 3.2) % 2 == 0 else Color.html("#ffe7aa")
+        timer_color = Color.html("#ff6569") if int(marker_time * 3.0) % 2 == 0 else Color.html("#ffe5a3")
     elif running and deadline_left <= 60.0:
-        timer_color = Color.html("#ffae73")
+        timer_color = Color.html("#ffad78")
     countdown_label.add_theme_color_override("font_color", timer_color)
-    var lines := PackedStringArray()
+    var goal_index: int = _current_goal_index()
+    var distance: float = _distance_to(stage_points[goal_index])
     if completed:
-        lines.append("SUBMITTED! Best: %.1f s | [H] at Green to replay" % best_seconds)
+        display_label.text = "Submitted  ·  %.0f m to replay  ·  P focus" % distance
     else:
-        var delta_to_target: Vector3 = player.global_position - stage_points[stage]
-        var metres: float = Vector2(delta_to_target.x, delta_to_target.z).length()
-        lines.append("ACT %d/4   %s  |  %.0f m" % [stage + 1, EPISODES[stage]["name"], metres])
-        lines.append("%s  |  [H] at marker" % EPISODES[stage]["hint"])
-    lines.append(latest_line)
-    display_label.text = "\n".join(lines)
+        display_label.text = "%s  ·  %.0f m  ·  P focus" % [str(EPISODES[goal_index]["name"]), distance]
+    near_prompt_panel.visible = (
+        hud.visible and not campus_life.interior_active and not campus_life.on_shuttle
+        and not player.movement_locked and distance <= INTERACT_RADIUS_M
+    )
+    if near_prompt_panel.visible:
+        near_prompt_label.text = "H   %s" % ("Replay DDL" if completed else ACTIONS[goal_index])
+    if toast_panel != null:
+        toast_panel.visible = toast_remaining > 0.0 and hud.visible
 
 func _save_progress() -> void:
     var config := ConfigFile.new()
@@ -346,5 +437,8 @@ func load_progress() -> void:
     _refresh()
 
 func _unhandled_input(event: InputEvent) -> void:
-    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_H:
-        interact()
+    if event is InputEventKey and event.pressed and not event.echo:
+        if event.keycode == KEY_H:
+            interact()
+        elif event.keycode == KEY_P:
+            request_focus()
