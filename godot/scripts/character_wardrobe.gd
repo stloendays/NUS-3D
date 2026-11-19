@@ -18,9 +18,13 @@ var is_open: bool = false
 var previous_mouse_mode: int = Input.MOUSE_MODE_CAPTURED
 var previous_movement_lock: bool = false
 var previous_coursework_modal: bool = false
+var language: NUS3DGameLanguage
 
 
 func _ready() -> void:
+    language = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+    if language != null:
+        language.language_changed.connect(_apply_ui_locale)
     _load_outfit()
     _make_interface()
     _build_preview()
@@ -48,6 +52,7 @@ func _make_interface() -> void:
     outer.add_theme_constant_override("separation", 12)
     panel.add_child(outer)
     var title := Label.new()
+    title.name = "WardrobeTitle"
     title.text = "CAMPUS WARDROBE   |   F5 to close"
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     title.add_theme_color_override("font_color", Color.html("#252b33"))
@@ -97,16 +102,19 @@ func _make_interface() -> void:
     summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     choices.add_child(summary)
     var close := Button.new()
+    close.name = "WardrobeSave"
     close.text = "SAVE & RETURN"
     close.pressed.connect(_toggle)
     outer.add_child(close)
     var rotate_row := HBoxContainer.new()
     outer.add_child(rotate_row)
     var turn_left := Button.new()
+    turn_left.name = "WardrobeRotateLeft"
     turn_left.text = "ROTATE LEFT"
     rotate_row.add_child(turn_left)
     turn_left.pressed.connect(_rotate_preview.bind(-1.0))
     var turn_right := Button.new()
+    turn_right.name = "WardrobeRotateRight"
     turn_right.text = "ROTATE RIGHT"
     rotate_row.add_child(turn_right)
     turn_right.pressed.connect(_rotate_preview.bind(1.0))
@@ -209,17 +217,51 @@ func _refresh() -> void:
         _box(character, "Backpack", Vector3(0, 1.05, -0.3), Vector3(0.43, 0.62, 0.22), dark)
     elif bag == 2:
         _box(character, "Messenger", Vector3(0.28, 0.83, 0.02), Vector3(0.28, 0.35, 0.25), dark)
+    _apply_ui_locale()
+
+
+func _tr(chinese: String, english: String) -> String:
+    return language.choose(chinese, english) if language != null else english
+
+
+func _apply_ui_locale(_locale: String = "") -> void:
+    if panel == null:
+        return
+    var title: Label = panel.find_child("WardrobeTitle", true, false) as Label
+    if title != null:
+        title.text = _tr("校园衣橱  |  F5 关闭", "CAMPUS WARDROBE   |   F5 to close")
+    var save: Button = panel.find_child("WardrobeSave", true, false) as Button
+    if save != null:
+        save.text = _tr("保存并返回", "SAVE & RETURN")
+    var turn_left: Button = panel.find_child("WardrobeRotateLeft", true, false) as Button
+    if turn_left != null:
+        turn_left.text = _tr("向左旋转", "ROTATE LEFT")
+    var turn_right: Button = panel.find_child("WardrobeRotateRight", true, false) as Button
+    if turn_right != null:
+        turn_right.text = _tr("向右旋转", "ROTATE RIGHT")
+    var zh_titles: Dictionary = {
+        "shirt": "上衣", "pants": "长裤", "skin": "肤色", "hat": "帽子", "bag": "背包"
+    }
+    var en_titles: Dictionary = {
+        "shirt": "Top", "pants": "Trousers", "skin": "Skin tone", "hat": "Headwear", "bag": "Bag"
+    }
+    var zh_hats: Array[String] = ["无", "棒球帽", "针织帽", "学士帽"]
+    var zh_bags: Array[String] = ["无", "双肩包", "斜挎包"]
     for key in ["shirt", "pants", "skin", "hat", "bag"]:
         var label: Label = panel.find_child(key + "Label", true, false) as Label
-        if label != null:
-            var title: String = {"shirt": "Top", "pants": "Trousers", "skin": "Skin tone", "hat": "Headwear", "bag": "Bag"}[key]
-            var selected: String = str(int(outfit[key]) + 1)
-            if key == "hat":
-                selected = HATS[int(outfit[key])]
-            if key == "bag":
-                selected = BAGS[int(outfit[key])]
-            label.text = title + ": " + selected
-    summary.text = "Based on the existing NUS-3D student NPC silhouette. Cosmetic only; no gameplay advantages."
+        if label == null:
+            continue
+        var selected: String = str(int(outfit[key]) + 1)
+        if key == "hat":
+            selected = _tr(zh_hats[int(outfit[key])], HATS[int(outfit[key])])
+        elif key == "bag":
+            selected = _tr(zh_bags[int(outfit[key])], BAGS[int(outfit[key])])
+        label.text = _tr(str(zh_titles[key]), str(en_titles[key])) + ": " + selected
+    if summary != null:
+        summary.text = _tr(
+            "使用游戏现有学生 NPC 的卡通身形。仅为外观预览，不影响游戏属性。",
+            "Based on the existing NUS-3D student NPC silhouette. Cosmetic only; no gameplay advantages."
+        )
 
 
 func _cycle(key: String, direction: int, count: int) -> void:
