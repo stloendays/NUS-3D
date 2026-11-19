@@ -331,7 +331,9 @@ func _render() -> void:
         return
     count += 1
     var barista: Node3D = indoor_npcs.actors[0]["node"]
-    player.global_position = barista.global_position + Vector3(0.0, 0.18, -1.8)
+    player.global_position = barista.global_position + Vector3(1.2, 0.18, -3.4)
+    player.look_at(barista.global_position + Vector3(0.0, 1.35, 0.0), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
     if not campus_life.talk_to_nearest():
         push_error("Cannot capture indoor NPC dialogue scenario")
         quit(1)
