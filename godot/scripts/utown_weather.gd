@@ -72,7 +72,16 @@ func _register_wet_surfaces() -> void:
             "material": material,
             "color": material.albedo_color,
             "roughness": material.roughness,
-            "metallic": material.metallic
+            "metallic": material.metallic,
+            "kind": "paving"
+        })
+    for material in world.weather_reactive_grass:
+        wet_materials.append({
+            "material": material,
+            "color": material.albedo_color,
+            "roughness": material.roughness,
+            "metallic": material.metallic,
+            "kind": "vegetation"
         })
 
 func _advance_atmosphere(delta: float) -> void:
@@ -92,9 +101,15 @@ func _advance_atmosphere(delta: float) -> void:
     for reference in wet_materials:
         var material: StandardMaterial3D = reference["material"]
         var base_color: Color = reference["color"]
-        material.albedo_color = base_color.lerp(Color("#566f7c"), wetness * 0.42)
-        material.roughness = lerpf(float(reference["roughness"]), 0.22, wetness)
-        material.metallic = lerpf(float(reference["metallic"]), 0.12, wetness)
+        if str(reference["kind"]) == "vegetation":
+            # Wet tropical grass absorbs light; dry materials are restored exactly.
+            material.albedo_color = base_color.lerp(Color("#42614e"), wetness * 0.52)
+            material.roughness = lerpf(float(reference["roughness"]), 0.70, wetness)
+            material.metallic = float(reference["metallic"])
+        else:
+            material.albedo_color = base_color.lerp(Color("#566f7c"), wetness * 0.42)
+            material.roughness = lerpf(float(reference["roughness"]), 0.22, wetness)
+            material.metallic = lerpf(float(reference["metallic"]), 0.12, wetness)
     if puddle_water_material != null:
         var water_color: Color = puddle_water_material.albedo_color
         water_color.a = 0.12 + wetness * 0.35
@@ -217,7 +232,8 @@ func _build_puddles() -> void:
         var centre: Vector3 = a.lerp(b, 0.42) + side * (1.2 + float(path_index % 2) * 0.55)
         var puddle := Node3D.new()
         puddle.name = "Puddle_%02d" % path_index
-        puddle.position = centre + Vector3(0.0, 0.035, 0.0)
+        # Conceptual walkway top surface is y=0.113; keep shallow water above it.
+        puddle.position = centre + Vector3(0.0, 0.145, 0.0)
         puddle_root.add_child(puddle)
         var pool := MeshInstance3D.new()
         var pool_mesh := CylinderMesh.new()
@@ -236,13 +252,23 @@ func _build_puddles() -> void:
         ripple_mesh.rings = 6
         ripple_mesh.ring_segments = 20
         ripple.mesh = ripple_mesh
-        ripple.rotation.x = PI * 0.5
-        ripple.scale = Vector3(1.15, 0.68, 1.0)
+        # TorusMesh is horizontal in XZ by default; do not rotate it upright.
+        ripple.rotation.x = 0.0
+        ripple.scale = Vector3(1.15, 1.0, 0.72)
         ripple.position.y = 0.025
         ripple.material_override = ripple_material
         puddle.add_child(ripple)
         puddle_nodes.append(puddle)
         puddle_ripples.append(ripple)
+        # A smaller second pool along the same existing path needs no new GIS data.
+        var second_pool: Node3D = puddle.duplicate()
+        second_pool.name = "Puddle_%02d_Secondary" % path_index
+        second_pool.position = a.lerp(b, 0.72) - side * 0.75 + Vector3(0.0, 0.145, 0.0)
+        second_pool.scale = Vector3(0.72, 1.0, 0.64)
+        puddle_root.add_child(second_pool)
+        puddle_nodes.append(second_pool)
+        var extra_ripple: MeshInstance3D = second_pool.get_child(1) as MeshInstance3D
+        puddle_ripples.append(extra_ripple)
 
 func _process(delta: float) -> void:
     if world.lighting_mode != applied_lighting:
@@ -255,7 +281,7 @@ func _process(delta: float) -> void:
         var ripple: MeshInstance3D = puddle_ripples[i]
         ripple.rotation.y += delta * (0.22 + float(i % 3) * 0.08)
         var pulse: float = 1.0 + sin(float(Time.get_ticks_msec()) * 0.0018 + float(i)) * 0.045
-        ripple.scale = Vector3(1.15 * pulse, 0.68 * pulse, 1.0)
+        ripple.scale = Vector3(1.15 * pulse, 1.0, 0.72 * pulse)
     rain.global_position = player.global_position + Vector3(0.0, 12.0, 0.0)
     rain_streaks.global_position = player.global_position
     if mode >= 3 and not indoor:
