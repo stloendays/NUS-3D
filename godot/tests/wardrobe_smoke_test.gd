@@ -40,6 +40,14 @@ func _run() -> void:
     if wardrobe.get("is_open") == true:
         _fail("wardrobe stole the existing F6 GIS key")
         return
+    # F11 is reserved by the concurrent opt-in Campus AI panel PR #66.
+    var ai_key := InputEventKey.new()
+    ai_key.keycode = KEY_F11
+    ai_key.pressed = true
+    wardrobe.call("_unhandled_input", ai_key)
+    if wardrobe.get("is_open") == true:
+        _fail("wardrobe stole the F11 Campus AI key")
+        return
     var story_key := InputEventKey.new()
     story_key.keycode = KEY_H
     story_key.pressed = true
@@ -75,6 +83,6 @@ func _run() -> void:
             _fail("wardrobe overlaps active English exam modal")
             return
         exams.set("is_open", false)
-    print("PASS: F11-only outfit preview, no story-key conflict, reversible movement/mouse lock and modal isolation")
+    print("PASS: F5-only outfit preview, no story-key conflict, reversible movement/mouse lock and modal isolation")
     game.queue_free()
     quit(0)
