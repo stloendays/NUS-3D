@@ -39,7 +39,6 @@ func _run() -> void:
         _fail("remote avatar not removed")
         return
     var graphics: NUS3DGraphicsSettings = NUS3DGraphicsSettings.new()
-    graphics.set_script(load("res://scripts/performance_profiles.gd"))
     graphics.set("preset", "high")
     root.add_child(graphics)
     for preset in NUS3DGraphicsSettings.ORDER:
