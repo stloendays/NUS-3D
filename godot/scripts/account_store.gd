@@ -219,6 +219,25 @@ func sync_source_xp(source_id: String, cumulative_xp: int) -> int:
 
 
 func _migrate_legacy_progress() -> void:
+    # Preserve pre-account offline progress for the first registered profile only.
+    # The source save is never modified and later accounts never inherit it.
+    var old_saves: Dictionary = {
+        "arcade": "user://nus3d_arcade_progress.cfg",
+        "coursework": "user://nus3d_coursework.cfg",
+        "coins": "user://nus3d_coins.cfg",
+        "activities": "user://nus3d_campus_activities.cfg",
+        "ddl_story": "user://nus3d_ddl_story.cfg"
+    }
+    for feature in old_saves.keys():
+        var old_path: String = str(old_saves[feature])
+        var account_path: String = feature_save_path(str(feature))
+        if account_path.is_empty() or not FileAccess.file_exists(old_path) or FileAccess.file_exists(account_path):
+            continue
+        var result: Error = DirAccess.copy_absolute(
+            ProjectSettings.globalize_path(old_path),
+            ProjectSettings.globalize_path(account_path))
+        if result != OK:
+            push_warning("Legacy offline progress was left intact for " + str(feature))
     var destination: String = challenge_save_path()
     if FileAccess.file_exists(LEGACY_CHALLENGE_SAVE) and not FileAccess.file_exists(destination):
         var status: Error = DirAccess.copy_absolute(
