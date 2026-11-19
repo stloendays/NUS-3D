@@ -560,5 +560,35 @@
       "observation": "寻找 CREATE 附近的铺装广场，四站任务即将完成！",
       "discovery": "Town Plaza 是四站探索的终点。这些道路和广场仅为示意，请别把游戏导航用作真实无障碍路线。"
     }
+  },
+  "world_names": {
+    "Town Green": "Town Green 草坪",
+    "Town Plaza": "Town Plaza 广场",
+    "Education Resource Centre": "教育资源中心 ERC",
+    "Stephen Riady Centre": "Stephen Riady Centre（SRC）",
+    "UTown Residence": "UTown 宿舍",
+    "Tembusu College": "Tembusu 学院",
+    "College of Alice & Peter Tan": "Alice & Peter Tan 学院",
+    "Residential College 4": "RC4 学院",
+    "Cinnamon College": "Cinnamon 学院",
+    "CREATE": "CREATE 科研区"
+  },
+  "item_zh": {
+    "Local Coordinate Frame": "局部坐标系",
+    "The scene uses a local east/north coordinate frame: east is +X and north is -Z.": "场景采用局部东西/南北坐标系：东为 +X，北为 -Z。",
+    "Procedural Green": "程序化草地",
+    "Town Green is an approximate outline. Its grass, trees and small props are procedural interpretations.": "Town Green 的轮廓是估计的，草、树和小道具由程序生成。",
+    "ERC Facade Study": "ERC 立面研究",
+    "The ERC glazing, sunshades and curved bay are estimated architectural studies, not measured construction drawings.": "ERC 玻璃立面、遮阳和弧形体量是建筑概念研究，非现场测绘或施工图。",
+    "Schematic Walkway": "示意步行道",
+    "This connector is a game-world proxy. It is not a surveyed pedestrian route or accessibility recommendation.": "这段连廊只是游戏示意，并非实测步行路线或无障碍指南。",
+    "SRC Forum Study": "SRC 论坛空间研究",
+    "The SRC forum disc and stacked connector volumes are provisional visual studies.": "SRC 论坛圆盘与连廊体量仍是概念化视觉研究。",
+    "GIS Reference Layer": "GIS 参考图层",
+    "OpenStreetMap outlines are comparison references, not certified building footprints or verified 3D geometry.": "OpenStreetMap 轮廓仅用于模型对比，不是认证建筑轮廓或核实的 3D 几何。",
+    "Lighting Presets": "光照预设",
+    "Daylight, golden-hour, blue-hour and evening modes are artistic presets, not a solar or weather simulation.": "白天、黄金时刻、蓝调和夜晚只是艺术光照，并非真实日照或天气模拟。",
+    "Photo Review": "拍摄视角对比",
+    "Camera viewpoints support visual comparison, but heading, elevation and building alignment still need manual review.": "相机视角可帮助比较，但航向、高差和建筑位置仍需人工核验。"
   }
 }
