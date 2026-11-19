@@ -24,6 +24,9 @@ func _run() -> void:
         _fail("Game shell scene is unavailable")
         return
     var shell: NUS3DGameShell = shell_scene.instantiate() as NUS3DGameShell
+    if shell == null:
+        _fail("Game shell could not instantiate (script dependency failed)")
+        return
     print("NUS3D_UI_STAGE_3_ATTACH_SHELL")
     root.add_child(shell)
     print("NUS3D_UI_STAGE_4_WAIT_FRAME")
