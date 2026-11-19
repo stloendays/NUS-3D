@@ -18,6 +18,8 @@ var page_content: VBoxContainer
 var page_scroll: ScrollContainer
 var previous_button: Button
 var next_button: Button
+var close_button: Button
+var instruction_label: Label
 
 
 func _ready() -> void:
@@ -26,6 +28,8 @@ func _ready() -> void:
     mouse_filter = Control.MOUSE_FILTER_STOP
     _load_tutorial()
     _build_view()
+    GameLanguage.language_changed.connect(_on_language_changed)
+    _on_language_changed(GameLanguage.locale)
     hide()
 
 
@@ -109,7 +113,7 @@ func _build_view() -> void:
     main.add_child(header)
     heading_label = _make_label("NUS-3D  /  新手教程", 27, Color.html("#e6f8fc"))
     header.add_child(heading_label)
-    var close_button: Button = _make_button("关闭教程  ×", close_guide)
+    close_button = _make_button("关闭教程  ×", close_guide)
     header.add_child(close_button)
 
     subtitle_label = _make_label(
@@ -146,11 +150,24 @@ func _build_view() -> void:
     main.add_child(footer)
     previous_button = _make_button("上一页", previous_page)
     footer.add_child(previous_button)
-    var instruction: Label = _make_label("阅读完毕后关闭，返回登录界面。", 12, Color.html("#adc0c5"))
-    instruction.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    footer.add_child(instruction)
+    instruction_label = _make_label("阅读完毕后关闭，返回登录界面。", 12, Color.html("#adc0c5"))
+    instruction_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    footer.add_child(instruction_label)
     next_button = _make_button("下一页", next_page)
     footer.add_child(next_button)
+
+
+func _on_language_changed(_locale: String) -> void:
+    heading_label.text = GameLanguage.localized_text("NUS-3D / 新手教程", "NUS-3D / BEGINNER GUIDE")
+    subtitle_label.text = GameLanguage.localized_text(
+        "离线非官方玩法说明。打开教程不需要注册或登录账号。",
+        "Unofficial offline guide. You can read it before creating an account.")
+    close_button.text = GameLanguage.localized_text("关闭教程 ×", "Close guide ×")
+    previous_button.text = GameLanguage.localized_text("上一页", "Previous")
+    instruction_label.text = GameLanguage.localized_text(
+        "读完后返回登录界面。", "Close the guide to return to the sign-in screen.")
+    if not pages.is_empty():
+        _render_page()
 
 
 func open_guide() -> void:
@@ -186,11 +203,11 @@ func _render_page() -> void:
     if current_page < 0 or current_page >= pages.size():
         return
     var item: Dictionary = pages[current_page]
-    page_title_label.text = str(item.get("title", ""))
-    page_tag_label.text = str(item.get("tag", ""))
+    page_title_label.text = str(item.get("title", "")) if GameLanguage.is_chinese() else str(item.get("title_en", item.get("title", "")))
+    page_tag_label.text = str(item.get("tag", "")) if GameLanguage.is_chinese() else str(item.get("tag_en", item.get("tag", "")))
     page_counter_label.text = "%d / %d" % [current_page + 1, pages.size()]
     previous_button.disabled = current_page == 0
-    next_button.text = "完成 · 返回" if current_page == pages.size() - 1 else "下一页"
+    next_button.text = GameLanguage.localized_text("完成 · 返回", "Finish · Back") if current_page == pages.size() - 1 else GameLanguage.localized_text("下一页", "Next")
 
     for old_child in page_content.get_children():
         page_content.remove_child(old_child)
@@ -201,9 +218,11 @@ func _render_page() -> void:
         if typeof(raw_section) != TYPE_DICTIONARY:
             continue
         var section: Dictionary = raw_section
-        var topic: Label = _make_label(str(section.get("heading", "")), 18, Color.html("#e3f0ef"))
+        var heading: String = str(section.get("heading", "")) if GameLanguage.is_chinese() else str(section.get("heading_en", section.get("heading", "")))
+        var topic: Label = _make_label(heading, 18, Color.html("#e3f0ef"))
         page_content.add_child(topic)
-        var explanation: Label = _make_label(str(section.get("body", "")), 15, Color.html("#c3d4d9"))
+        var body: String = str(section.get("body", "")) if GameLanguage.is_chinese() else str(section.get("body_en", section.get("body", "")))
+        var explanation: Label = _make_label(body, 15, Color.html("#c3d4d9"))
         explanation.custom_minimum_size.y = 52
         page_content.add_child(explanation)
     page_scroll.scroll_vertical = 0
