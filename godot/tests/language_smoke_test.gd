@@ -130,6 +130,8 @@ func _run() -> void:
         _fail("Outdoor Q dialogue did not switch to English")
         return
 
+    # Check-in UI is proximity-gated; return to the GREEN waypoint for HUD assertions.
+    player.global_position = shell.tour.stop_world_position(0) + Vector3(0.0, 0.18, 0.0)
     var hud: CanvasLayer = shell.game.get_node("HUD") as CanvasLayer
     var help: Label = hud.get_node("Help") as Label
     var weather: UTownWeather = shell.game.get_node("Weather") as UTownWeather
