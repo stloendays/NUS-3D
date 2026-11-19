@@ -696,11 +696,11 @@ func _smoke() -> void:
         push_error("Three seated opponents, walk-up interaction halos or live chess scene are missing")
         quit(1)
         return
-    if leisure_ui.sound == null or leisure_ui.sound.players.size() != 6 or leisure_ui.fx_sparkles.size() != 19:
+    if leisure_ui.sound == null or leisure_ui.sound.players.size() != 7 or leisure_ui.fx_sparkles.size() != 19:
         push_error("Six original procedural sounds and local win celebration UI must load")
         quit(1)
         return
-    var cheer_stream: AudioStreamWAV = leisure_ui.sound.players["win"].stream
+    var cheer_stream: AudioStreamWAV = leisure_ui.sound.players["cheer"].stream
     if cheer_stream == null or cheer_stream.data.size() < 1000:
         push_error("Original game-win sound has no generated PCM data")
         quit(1)
