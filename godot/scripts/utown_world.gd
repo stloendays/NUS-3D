@@ -117,7 +117,7 @@ func _add_box(parent: Node3D, at: Vector3, size_m: Vector3, material: Material, 
 func _build_sky() -> void:
     var env: Environment = Environment.new()
     env.background_mode = Environment.BG_COLOR
-    env.background_color = Color.html("#c6d8df")
+    env.background_color = Color.html("#ADC9D3")
     env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
     env.ambient_light_color = Color.html("#e8edf0")
     env.ambient_light_energy = 0.78
@@ -137,7 +137,7 @@ func _build_ground() -> void:
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    var terrain_material: StandardMaterial3D = _mat("#B2CCA7")
+    var terrain_material: StandardMaterial3D = _mat("#86A892")
     _repeat_texture(terrain_material, COMIC_LAWN_PATH, 5.5)
     weather_reactive_grass.append(terrain_material)
     _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), terrain_material, true)
@@ -163,7 +163,7 @@ func _build_green() -> void:
     var grass: MeshInstance3D = MeshInstance3D.new()
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
-    var grass_mat: StandardMaterial3D = _mat("#8DBD88")
+    var grass_mat: StandardMaterial3D = _mat("#7BAA85")
     grass_mat.albedo_texture = load(COMIC_LAWN_PATH) as Texture2D
     weather_reactive_grass.append(grass_mat)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -292,7 +292,7 @@ func set_lighting_mode(index: int) -> bool:
     lighting_mode = index
     match lighting_mode:
         0: # Midday: reproduce the previous fixed lighting.
-            sky_environment.background_color = Color.html("#c6d8df")
+            sky_environment.background_color = Color.html("#ADC9D3")
             sky_environment.ambient_light_color = Color.html("#e8edf0")
             sky_environment.ambient_light_energy = 0.78
             sunlight.rotation_degrees = Vector3(-54.0, -38.0, 0.0)

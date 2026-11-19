@@ -3,8 +3,8 @@ class_name UTownGreenDining
 ## Approximate campus-landscape and dining visuals built ONLY from existing UTown anchors.
 ## No third-party photo/texture, new geocoordinates, colliders or streaming assets.
 
-const TUFT_LIMIT: int = 2000
-const TUFT_ATTEMPTS: int = 11000
+const TUFT_LIMIT: int = 900
+const TUFT_ATTEMPTS: int = 8500
 const PICNIC_LIMIT: int = 4
 const PICNIC_ATTEMPTS: int = 500
 const LAWN_EDGE_MARGIN: float = 2.2
@@ -118,12 +118,13 @@ func _lawn_bounds() -> Rect2:
     return rect
 
 func _tuft_mesh() -> ArrayMesh:
-    # Two crossed grass blades, six vertices total. The MultiMesh is one draw call.
+    # Tiny low-contrast sprigs. Reduce the old spiky triangle carpet while
+    # retaining one shared mesh/material and deterministic per-tuft positions.
     var arrays: Array = []
     arrays.resize(Mesh.ARRAY_MAX)
     arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([
-        Vector3(-0.17, 0.00, 0.0), Vector3(0.17, 0.00, 0.0), Vector3(0.0, 0.24, 0.0),
-        Vector3(0.0, 0.00, -0.17), Vector3(0.0, 0.00, 0.17), Vector3(0.0, 0.24, 0.0)
+        Vector3(-0.075, 0.00, 0.0), Vector3(0.075, 0.00, 0.0), Vector3(0.0, 0.11, 0.0),
+        Vector3(0.0, 0.00, -0.075), Vector3(0.0, 0.00, 0.075), Vector3(0.0, 0.11, 0.0)
     ])
     var mesh := ArrayMesh.new()
     mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
@@ -158,7 +159,7 @@ func _build_lawn_tufts() -> void:
     blades.mesh = _tuft_mesh()
     blades.instance_count = generated_tuft_count
     var mat := StandardMaterial3D.new()
-    mat.albedo_color = Color.html("#83b966")
+    mat.albedo_color = Color.html("#769E74")
     mat.vertex_color_use_as_albedo = true
     mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
     mat.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -178,10 +179,10 @@ func _build_lawn_tufts() -> void:
     tuft_batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
     add_child(tuft_batch)
     for i in range(generated_tuft_count):
-        var amount: float = rng.randf_range(0.65, 1.45)
+        var amount: float = rng.randf_range(0.70, 1.14)
         var yaw: float = rng.randf_range(0.0, TAU)
         var transform := Transform3D(
-            Basis(Vector3.UP, yaw).scaled(Vector3(amount, rng.randf_range(0.80, 1.30), amount)),
+            Basis(Vector3.UP, yaw).scaled(Vector3(amount, rng.randf_range(0.88, 1.15), amount)),
             Vector3(positions[i].x, 0.033, positions[i].y)
         )
         blades.set_instance_transform(i, transform)
