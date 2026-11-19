@@ -2,13 +2,13 @@
 
 **Status:** isolated feature branch; not merged into main. Updated 2026-11-19.
 
-This optional bilingual module fits the existing account shell and its reserved F8 Campus AI Hub entry. It does not change the 3D world, quests, NPC combat, XP, local passwords, save structure, or mailbox.
+This optional bilingual module fits the existing account shell and its reserved F11 Campus AI Hub entry. It does not change the 3D world, quests, NPC combat, XP, local passwords, save structure, or mailbox.
 
 ## New functionality
 
 | Feature | What players can do | Network boundary |
 | --- | --- | --- |
-| Campus AI Hub | Open with F8 or the Campus AI button after local login; Esc closes | No automatic network |
+| Campus AI Hub | Open with F11 or the Campus AI button after local login; Esc closes | No automatic network |
 | Offline demo | Ask for deterministic study hints and DDL jokes | Fully offline |
 | OpenAI GPT | Ask a campus helper, fictional study coach, or funny NPC | Explicit local bridge POST only |
 | Gemini and Claude | Same UI and optional providers | Explicit local bridge POST only |
@@ -32,7 +32,7 @@ $env:NUS3D_OPENAI_MODEL = "gpt-4o-mini"
 python tools/campus_ai_bridge.py
 ~~~
 
-Then launch NUS-3D, sign in to a local game account, press F8, select the provider, type a question (max 900 characters), and click Ask AI. The server runs only at http://127.0.0.1:8765. Press Ctrl+C in the terminal to stop it. The game does not automatically launch or install the bridge.
+Then launch NUS-3D, sign in to a local game account, press F11, select the provider, type a question (max 900 characters), and click Ask AI. The server runs only at http://127.0.0.1:8765. Press Ctrl+C in the terminal to stop it. The game does not automatically launch or install the bridge.
 
 To check the bridge without sending anything to a paid provider:
 
@@ -57,7 +57,7 @@ The health response exposes only booleans showing which provider keys have been 
 
 ### Integration boundaries
 
-PR #20 already reserved the F8 Campus AI Hub in the existing paused local-account shell. This feature supplies that missing hub component without editing main.tscn or modifying NPC, coursework, coins or player scripts. F8 and Close/Esc return to normal gameplay; menus remain protected during login, mail reading and modal faculty selection.
+This branch uses F11 for the Campus AI Hub to avoid the multiplayer/graphics branch's F8 shortcut. PR #20 supplies the paused login shell in the existing paused local-account shell. This feature supplies that missing hub component without editing main.tscn or modifying NPC, coursework, coins or player scripts. F11 and Close/Esc return to normal gameplay; menus remain protected during login, mail reading and modal faculty selection.
 
 The existing Godot Windows export includes JSON files, and the runtime self-test now checks that the links catalog is packaged. The optional Python bridge is **not an embedded executable service** and requires a separately started local process to use paid providers.
 
