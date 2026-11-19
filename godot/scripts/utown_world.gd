@@ -103,17 +103,17 @@ func _add_box(parent: Node3D, at: Vector3, size_m: Vector3, material: Material, 
 func _build_sky() -> void:
     var env: Environment = Environment.new()
     env.background_mode = Environment.BG_COLOR
-    env.background_color = Color.html("#c6d8df")
+    env.background_color = Color.html("#b9def2")
     env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-    env.ambient_light_color = Color.html("#e8edf0")
-    env.ambient_light_energy = 0.78
+    env.ambient_light_color = Color.html("#f1f6f4")
+    env.ambient_light_energy = 0.88
     var environment_node: WorldEnvironment = WorldEnvironment.new()
     environment_node.environment = env
     add_child(environment_node)
     sky_environment = env
     var sun: DirectionalLight3D = DirectionalLight3D.new()
     sun.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
-    sun.light_energy = 1.0
+    sun.light_energy = 1.12
     sun.shadow_enabled = true
     add_child(sun)
     sunlight = sun
@@ -123,7 +123,7 @@ func _build_ground() -> void:
     root.name = "Terrain"
     add_child(root)
     var extents: Array = layout.get("ground_size_m", [550, 720])
-    var terrain_material: StandardMaterial3D = _mat("#819e7a")
+    var terrain_material: StandardMaterial3D = _mat("#82aa76")
     weather_reactive_grass.append(terrain_material)
     _add_box(root, Vector3(0.0, -0.22, 0.0), Vector3(float(extents[0]), 0.44, float(extents[1])), terrain_material, true)
 
@@ -147,7 +147,7 @@ func _build_green() -> void:
     var grass: MeshInstance3D = MeshInstance3D.new()
     grass.name = "TownGreen_approximate"
     grass.mesh = surface.commit()
-    var grass_mat: StandardMaterial3D = _mat("#8aba75")
+    var grass_mat: StandardMaterial3D = _mat("#80b967")
     weather_reactive_grass.append(grass_mat)
     grass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
     grass.material_override = grass_mat
@@ -161,18 +161,18 @@ func _build_plaza() -> void:
     root.position = at
     root.rotation.y = deg_to_rad(float(plaza.get("rotation_deg", 0.0)))
     add_child(root)
-    var plaza_surface: StandardMaterial3D = _mat("#b9bcb5")
+    var plaza_surface: StandardMaterial3D = _mat("#d6d1c2")
     weather_reactive_materials.append(plaza_surface)
     _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), plaza_surface)
     for i in range(4):
         _add_box(root, Vector3(-16.0 + float(i) * 10.0, 2.4, -12.0), Vector3(0.8, 4.8, 0.8), _mat("#e8e8e3"))
-    _add_box(root, Vector3(-1.0, 4.9, -12.0), Vector3(44.0, 0.45, 7.0), _mat("#b9c6cb"))
+    _add_box(root, Vector3(-1.0, 4.9, -12.0), Vector3(44.0, 0.45, 7.0), _mat("#d8d7cd"))
 
 func _build_walkways() -> void:
     var root: Node3D = Node3D.new()
     root.name = "ConceptualFootpaths_NotSurveyed"
     add_child(root)
-    var path_material: StandardMaterial3D = _mat("#c8c7bd")
+    var path_material: StandardMaterial3D = _mat("#d7d1c4")
     weather_reactive_materials.append(path_material)
     for way in layout.get("walkways", []):
         var points: Array = way.get("lonlat", [])
@@ -191,22 +191,22 @@ func _build_walkways() -> void:
 func _building_color(role: String) -> StandardMaterial3D:
     match role:
         "academic":
-            return _mat("#c8d0cb")
+            return _mat("#e1dfd6")
         "civic":
-            return _mat("#aabec2")
+            return _mat("#b9d2d6")
         "research":
-            return _mat("#a9aaa0")
+            return _mat("#c7c4b7")
         "residence":
-            return _mat("#c4b7a1")
+            return _mat("#d6c5ab")
     return _mat("#c8c8c8")
 
 func _build_buildings() -> void:
     var root: Node3D = Node3D.new()
     root.name = "BuildingMassing_Estimated"
     add_child(root)
-    var glass: Material = _mat("#688a9c", 0.34)
-    var roof: Material = _mat("#bac6c5", 0.82)
-    var entrance: Material = _mat("#426675", 0.32)
+    var glass: Material = _mat("#7da9b8", 0.34)
+    var roof: Material = _mat("#d7dfd9", 0.82)
+    var entrance: Material = _mat("#5d8390", 0.32)
     for record in layout.get("buildings", []):
         var group: Node3D = Node3D.new()
         group.name = str(record.get("id", "Building"))
@@ -275,32 +275,32 @@ func set_lighting_mode(index: int) -> bool:
     lighting_mode = index
     match lighting_mode:
         0: # Midday: reproduce the previous fixed lighting.
-            sky_environment.background_color = Color.html("#c6d8df")
-            sky_environment.ambient_light_color = Color.html("#e8edf0")
-            sky_environment.ambient_light_energy = 0.78
+            sky_environment.background_color = Color.html("#b9def2")
+            sky_environment.ambient_light_color = Color.html("#f1f6f4")
+            sky_environment.ambient_light_energy = 0.88
             sunlight.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
             sunlight.light_color = Color.WHITE
-            sunlight.light_energy = 1.0
+            sunlight.light_energy = 1.12
         1: # Warm late afternoon; not a simulated Singapore solar ephemeris.
-            sky_environment.background_color = Color.html("#e5c4a9")
-            sky_environment.ambient_light_color = Color.html("#ffddb3")
+            sky_environment.background_color = Color.html("#f5c8a3")
+            sky_environment.ambient_light_color = Color.html("#ffe5c4")
             sky_environment.ambient_light_energy = 0.74
             sunlight.rotation_degrees = Vector3(-22.0, -85.0, 0.0)
-            sunlight.light_color = Color.html("#ffc286")
+            sunlight.light_color = Color.html("#ffd0a0")
             sunlight.light_energy = 0.76
         2: # Blue hour, with a limited number of unshadowed decorative lamps.
-            sky_environment.background_color = Color.html("#607e9c")
-            sky_environment.ambient_light_color = Color.html("#a3b9d0")
+            sky_environment.background_color = Color.html("#8daec7")
+            sky_environment.ambient_light_color = Color.html("#c0d1e2")
             sky_environment.ambient_light_energy = 0.56
             sunlight.rotation_degrees = Vector3(-9.0, -138.0, 0.0)
-            sunlight.light_color = Color.html("#e9bf9f")
+            sunlight.light_color = Color.html("#f6d1ae")
             sunlight.light_energy = 0.32
         3: # Evening remains bright enough to navigate schematic flat ground.
-            sky_environment.background_color = Color.html("#243951")
-            sky_environment.ambient_light_color = Color.html("#96afce")
+            sky_environment.background_color = Color.html("#34475f")
+            sky_environment.ambient_light_color = Color.html("#9fb5ce")
             sky_environment.ambient_light_energy = 0.43
             sunlight.rotation_degrees = Vector3(-5.0, -175.0, 0.0)
-            sunlight.light_color = Color.html("#a0b6db")
+            sunlight.light_color = Color.html("#b7c7e2")
             sunlight.light_energy = 0.14
     sunlight.shadow_enabled = lighting_mode <= 1
     for lamp in lamp_lights:
@@ -416,7 +416,7 @@ func _build_trees() -> void:
     root.name = "Vegetation_Procedural"
     add_child(root)
     var woody: Material = _mat("#6e6455")
-    var canopy: Material = _mat("#457c57")
+    var canopy: Material = _mat("#4e8b60")
     var trunk: CylinderMesh = CylinderMesh.new()
     trunk.top_radius = 0.28
     trunk.bottom_radius = 0.40
