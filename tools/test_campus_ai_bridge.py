@@ -93,6 +93,26 @@ class InputTests(unittest.TestCase):
     def test_openai_output_text_variant(self) -> None:
         self.assertEqual(bridge._extract_openai({"output_text": "quick"}), "quick")
 
+    def test_admin_plan_is_untrusted_proposal_only(self) -> None:
+        value = bridge.validate_payload({
+            "provider": "openai", "mode": "admin_plan",
+            "prompt": "make it rainy", "account_id": "must-not-send",
+            "xp": 2000, "secret": "never send",
+        })
+        self.assertEqual(value["mode"], "admin_plan")
+        self.assertNotIn("secret", value)
+        self.assertIn("approval", bridge.MODE_PROMPTS["admin_plan"].lower())
+        fake = {"output": [{"content": [
+            {"type": "output_text", "text": '{"action":"weather","value":3,"reason":"rain"}'}
+        ]}]}
+        with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "fake-test-key"}):
+            with mock.patch.object(bridge, "_upstream_json", return_value=fake) as upstream:
+                answer = bridge.call_provider(value)
+        self.assertEqual(json.loads(answer["reply"])["action"], "weather")
+        upstream_data = upstream.call_args.args[1]
+        self.assertNotIn("must-not-send", json.dumps(upstream_data))
+        self.assertNotIn("never send", json.dumps(upstream_data))
+
     def test_rate_limit(self) -> None:
         bridge._rate_times.clear()
         for _ in range(bridge.RATE_MAX_REQUESTS):
