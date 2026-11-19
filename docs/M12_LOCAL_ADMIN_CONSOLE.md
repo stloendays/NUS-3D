@@ -16,6 +16,8 @@ The console includes:
 - **Audit trail**: inspect the latest 100 local administration actions (UTC timestamp, owner account ID, action, before/after and scope).
 - **Session lock**: closing the console, switching accounts or logging out revokes the administrator session.
 
+**Optional GPT proposal-only control:** after unlocking F12, you may type a short natural-language change request and press **Suggest with GPT**. The game sends **only your typed request** (not user identities, XP, mail, saves or password) through the existing user-operated local bridge. A separate `admin_plan` prompt constrains GPT to proposing a JSON object with one allowlisted action and integer value. The Godot client parses and bounds that result independently. A **second, explicit in-game confirmation is mandatory** before the already-authorized `AdminAuthority.apply()` is invoked. GPT cannot execute an operation by itself. Invalid, unrecognized, out-of-bounds and unsupported proposals are rejected without any changes. This path needs a locally configured OpenAI API key, may be billed separately, and can fail offline; all manual buttons continue working.
+
 No arbitrary GDScript, shell command, game asset modification, API call, NUS SSO access, NPC identity editing, changing other players' saves or network-side administration is exposed. The game remains an unofficial comedy title.
 
 ## Owner setup — no built-in admin password
