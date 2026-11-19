@@ -40,6 +40,10 @@ func _run() -> void:
     shell._enter_game()
     var modal: UTownCourseworkUI = shell.game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if modal != null and modal.modal_visible:
+        var first_faculty: UTownCoursework = shell.game.get_node("Coursework") as UTownCoursework
+        if not first_faculty.select_faculty(str(first_faculty.faculty_options[0]["id"])):
+            _fail("Mandatory first faculty selection failed")
+            return
         modal.hide_modal()
     var old_env: String = OS.get_environment(ENV_NAME)
     OS.set_environment(ENV_NAME, "")
