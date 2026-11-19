@@ -83,7 +83,10 @@ class InputTests(unittest.TestCase):
                     }))
                 self.assertEqual(result["reply"], expected)
                 self.assertTrue(captured[0][0].startswith(prefix))
-                self.assertEqual(captured[0][1]["model"], result["model"])
+                if provider == "gemini":
+                    self.assertIn(result["model"], captured[0][0])
+                else:
+                    self.assertEqual(captured[0][1]["model"], result["model"])
                 self.assertNotIn("fake-test-key", captured[0][0])
                 self.assertIn("Test", json.dumps(captured[0][1]))
 
@@ -107,7 +110,6 @@ class LinkRegistryTests(unittest.TestCase):
         for item in doc["links"]:
             self.assertTrue(item["url"].startswith("https://"))
             self.assertIn(item["group"], {"ai", "campus", "dev"})
-            self.assertIn(item["id"], seen or {item["id"]})
             self.assertNotIn(item["id"], seen)
             seen.add(item["id"])
             self.assertNotIn("@", item["url"].split("/")[2])
