@@ -230,7 +230,7 @@ func open_lounge() -> bool:
         life.message_time = 4.0
         return false
     var voice: Node = get_parent().get_node_or_null("VoicePresentation")
-    if voice != null and bool(voice.get("is_open")):
+    if voice != null and voice.get("is_open") == true:
         return false
     if intro.playing or course_ui.modal_visible or course_ui.intro_blocked or coursework.current_faculty_id.is_empty():
         return false
@@ -335,10 +335,10 @@ func _process(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
     var exams: Node = get_parent().get_node_or_null("EnglishExams")
-    if exams != null and bool(exams.get("is_open")):
+    if exams != null and exams.get("is_open") == true:
         return
     var voice: Node = get_parent().get_node_or_null("VoicePresentation")
-    if voice != null and bool(voice.get("is_open")):
+    if voice != null and voice.get("is_open") == true:
         return
     if not (event is InputEventKey):
         return
