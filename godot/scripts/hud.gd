@@ -84,6 +84,17 @@ func _ready() -> void:
     campus_message.add_theme_color_override("font_color", Color.html("#edf3ef"))
     campus_message.add_theme_font_size_override("font_size", 13)
     _load_osm_fit_summary()
+    GameLanguage.language_changed.connect(_apply_language)
+    _apply_language(GameLanguage.locale)
+
+
+func _apply_language(_locale: String) -> void:
+    GameLanguage.apply_static_ui(title_label)
+    GameLanguage.apply_static_ui(help_label)
+    _load_osm_fit_summary()
+    if GameLanguage.is_chinese():
+        gis_summary.text = GameLanguage.game_text(gis_summary.text)
+    _process(0.0)
 
 func _load_osm_fit_summary() -> void:
     if not FileAccess.file_exists(FIT_BASELINE_PATH):
@@ -133,6 +144,14 @@ func _process(_delta: float) -> void:
     challenge_card.visible = not challenge_message.text.is_empty()
     campus_message.text = weather.status_text() + "\n" + campus_life.status_text()
     campus_card.visible = true
+    if GameLanguage.is_chinese():
+        hint_label.text = GameLanguage.hud_hint(world)
+        target_label.text = GameLanguage.hud_target(tour)
+        nearest_label.text = GameLanguage.game_text(nearest_label.text)
+        perf_label.text = GameLanguage.game_text(perf_label.text)
+        tour_message.text = GameLanguage.tour_card(tour)
+        challenge_message.text = GameLanguage.challenge_card(challenge)
+        campus_message.text = GameLanguage.weather_card(weather) + "\n" + GameLanguage.game_text(campus_life.status_text())
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
