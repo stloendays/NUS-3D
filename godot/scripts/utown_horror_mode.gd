@@ -326,7 +326,7 @@ func can_start() -> bool:
         return false
     if hud == null or not hud.visible:
         return false
-    var shell: Node = get_parent()
+    var shell: Node = get_parent().get_parent()  # UTown is nested inside GameShell
     var network_overlay: NUS3DSessionOverlay = shell.get_node_or_null("MultiplayerAndGraphics") as NUS3DSessionOverlay
     if network_overlay != null and (network_overlay.is_open or network_overlay.network.state != NUS3DNetworkSession.State.OFFLINE):
         return false
@@ -592,7 +592,7 @@ func _physics_process(delta: float) -> void:
 func _process(delta: float) -> void:
     if not active:
         return
-    var shell: Node = get_parent()
+    var shell: Node = get_parent().get_parent()  # UTown is nested inside GameShell
     var session: NUS3DSessionOverlay = shell.get_node_or_null("MultiplayerAndGraphics") as NUS3DSessionOverlay
     if (session != null and session.network.state != NUS3DNetworkSession.State.OFFLINE) or life.on_shuttle or life.interior_active:
         finish_run(false, "left_zone")
