@@ -436,7 +436,10 @@ func _enter_game() -> void:
         player_actor.reset_player()
         var intro_state: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
         var faculty_state: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
-        player_actor.movement_locked = (intro_state != null and intro_state.playing)             or (faculty_state != null and (faculty_state.modal_visible or faculty_state.intro_blocked))
+        player_actor.movement_locked = (
+            (intro_state != null and intro_state.playing)
+            or (faculty_state != null and (faculty_state.modal_visible or faculty_state.intro_blocked))
+        )
     var coin_session: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coin_session != null:
         coin_session.seed_session_drops()
