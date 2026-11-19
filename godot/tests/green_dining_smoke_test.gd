@@ -44,6 +44,8 @@ func _test() -> void:
             multimesh.get_instance_transform(i).origin.x,
             multimesh.get_instance_transform(i).origin.z
         )):
+            var actual_point := Vector2(multimesh.get_instance_transform(i).origin.x, multimesh.get_instance_transform(i).origin.z)
+            print("TURF_DEBUG index=", i, " position=", actual_point, " lawn_bounds=", environment._lawn_bounds(), " green_root=", environment.global_position, " polygon_vertices=", environment.lawn_polygon.size(), " path_count=", environment.path_corridors.size())
             _fail("grass tuft %d was placed outside lawn or on an existing walkway" % i)
             return
     if environment.picnic_count < 2 or environment.picnic_count > environment.PICNIC_LIMIT:
