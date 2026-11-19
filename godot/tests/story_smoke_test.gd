@@ -168,6 +168,9 @@ func _run() -> void:
     shell._enter_game()
     if director.save_path != alice_story_save or director.archive != archive_copy \
         or director.decisions.get("coffee_protocol", "") != "sleep":
+        print("STORY_RESTORE_DIAG path_before=", alice_story_save, " path_after=", director.save_path)
+        print("STORY_RESTORE_DIAG archive_before=", archive_copy, " archive_after=", director.archive)
+        print("STORY_RESTORE_DIAG decisions_after=", director.decisions, " disk=", FileAccess.get_file_as_string(alice_story_save))
         _fail("Endings and choices did not persist across account switching")
         return
     if not FileAccess.file_exists(alice_story_save):
