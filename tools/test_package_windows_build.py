@@ -8,7 +8,7 @@ import zipfile
 from pathlib import Path
 
 from tools.package_windows_build import (
-    EXE_NAME, MANIFEST_NAME, PACK_NAME, README_NAME,
+    EXE_NAME, MANIFEST_NAME, PACK_NAME, README_NAME, UPDATER_NAME,
     build_archive, verify_archive,
 )
 
@@ -30,8 +30,11 @@ class WindowsPackageTests(unittest.TestCase):
         manifest = build_archive(self.bin_dir, self.output, COMMIT, "4.4.1")
         self.assertEqual(manifest["commit"], COMMIT)
         self.assertEqual(verify_archive(self.output), manifest)
+        self.assertEqual(manifest["schema_version"], 2)
+        self.assertEqual(manifest["release_version"], "0.1.0")
+        self.assertEqual(len(manifest["files"][UPDATER_NAME]["sha256"]), 64)
         with zipfile.ZipFile(self.output) as archive:
-            self.assertEqual(set(archive.namelist()), {EXE_NAME, PACK_NAME, MANIFEST_NAME, README_NAME})
+            self.assertEqual(set(archive.namelist()), {EXE_NAME, PACK_NAME, MANIFEST_NAME, README_NAME, UPDATER_NAME})
             self.assertTrue(archive.read(PACK_NAME).startswith(b"GDPC"))
 
     def test_reject_bad_executable(self) -> None:
@@ -57,6 +60,17 @@ class WindowsPackageTests(unittest.TestCase):
             for name, data in original_members.items():
                 out.writestr(name, data)
         with self.assertRaisesRegex(ValueError, "SHA-256"):
+            verify_archive(self.output)
+
+    def test_update_helper_is_checksum_protected(self) -> None:
+        build_archive(self.bin_dir, self.output, COMMIT, "4.4.1")
+        with zipfile.ZipFile(self.output) as original:
+            files = {name: original.read(name) for name in original.namelist()}
+        files[UPDATER_NAME] = b"# swapped updater with unsafe instructions"
+        with zipfile.ZipFile(self.output, "w") as output:
+            for name, content in files.items():
+                output.writestr(name, content)
+        with self.assertRaisesRegex(ValueError, "Invalid bundled updater helper"):
             verify_archive(self.output)
 
     def test_manifest_checksum_has_expected_length(self) -> None:
