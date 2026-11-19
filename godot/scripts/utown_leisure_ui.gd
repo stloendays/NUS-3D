@@ -356,6 +356,8 @@ func _on_club_event(kind: String) -> void:
         return
     sound.play_cue(kind)
     if kind in ["win", "ending"]:
+        sound.play_cue("cheer")
+    if kind in ["win", "ending"]:
         fx_seconds = 2.4
         fx_label.text = "VICTORY  /  你赢了！" if kind == "win" else "SECRET ENDING  /  彩蛋解锁"
         fx_label.get_parent().visible = true
