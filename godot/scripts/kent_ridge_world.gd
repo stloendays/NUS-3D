@@ -207,6 +207,15 @@ func _build_stations() -> void:
         _label(stand, str(stop["name"]), Vector3(0, 4.2, 0), "#e5f8f6", 19)
         _label(stand, "D1 / D2  •  GAME ROUTES", Vector3(5.3, 3.2, 0), "#ffd78d", 14)
         shelter_count += 1
+    # Visible starting-area guide: the authentic UTown shuttle access is near
+    # Town Plaza, not through residential-college lawns.
+    var guide: Node3D = Node3D.new()
+    guide.name = "TownGreen_ToPlazaBus_Wayfinding"
+    guide.position = Vector3(0.0, 0.0, 0.0)
+    stops_root.add_child(guide)
+    _box(guide, "GuidePole", Vector3(0, 1.45, 0), Vector3(0.18, 2.9, 0.18), "#304953")
+    _box(guide, "GuideBoard", Vector3(0, 2.95, 0), Vector3(4.7, 0.82, 0.16), "#37666d")
+    _label(guide, "BUS  ↘  TOWN PLAZA", Vector3(0, 3.0, 0.23), "#f9e6b4", 18)
 
 
 func _route_points(route_name: String) -> Array[Vector3]:
