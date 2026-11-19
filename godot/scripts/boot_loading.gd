@@ -217,7 +217,7 @@ func _build_ui() -> void:
 func _resize_card() -> void:
     if card == null:
         return
-    var viewport_width: float = get_viewport_rect().size.x
+    var viewport_width: float = get_viewport().get_visible_rect().size.x
     card.custom_minimum_size.x = clampf(viewport_width - 32.0, 280.0, 710.0)
 
 func _show_tip(index: int) -> void:
