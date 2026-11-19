@@ -120,22 +120,10 @@ func _refresh_sound_buttons() -> void:
 
 
 func _panel_style(background: Color) -> StyleBoxFlat:
-    var style: StyleBoxFlat = StyleBoxFlat.new()
-    style.bg_color = background
-    style.border_color = Color.html("#446878")
-    style.set_border_width_all(1)
-    style.set_corner_radius_all(15)
-    style.content_margin_left = 23.0
-    style.content_margin_right = 23.0
-    style.content_margin_top = 22.0
-    style.content_margin_bottom = 22.0
-    style.shadow_color = Color(0.01, 0.035, 0.055, 0.72)
-    style.shadow_size = 9
-    style.shadow_offset = Vector2(0, 5)
-    return style
+    return NUS3DCartoonSkin.panel(background, 15, 16)
 
 
-func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> Label:
+func _label(value: String, font_size: int = 16, color: Color = Color("#30333B")) -> Label:
     var label: Label = Label.new()
     label.text = value
     label.add_theme_font_size_override("font_size", font_size)
@@ -143,14 +131,15 @@ func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> L
     return label
 
 
-func _button(title: String, callback: Callable) -> Button:
+func _button(title: String, callback: Callable, primary: bool = false) -> Button:
     var result: Button = Button.new()
     result.text = title
     result.custom_minimum_size.y = 39.0
-    NUS3DUISkin.button(result)
+    NUS3DCartoonSkin.button(result, primary)
     result.pressed.connect(func() -> void: _play_ui_sound("press"))
     result.pressed.connect(callback)
     return result
+
 
 
 func _cover(name: String) -> Control:
@@ -159,69 +148,96 @@ func _cover(name: String) -> Control:
     cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     cover.mouse_filter = Control.MOUSE_FILTER_STOP
     ui.add_child(cover)
-
-    var backdrop: ColorRect = ColorRect.new()
-    backdrop.color = Color(0.025, 0.067, 0.091, 0.91)
-    backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
-    cover.add_child(backdrop)
+    if name == "Login":
+        # A single cheap CanvasItem is simpler and more stable than a 3D menu scene.
+        var artwork: NUS3DCampusLoginArt = NUS3DCampusLoginArt.new()
+        artwork.name = "CampusCartoon"
+        cover.add_child(artwork)
+        artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    else:
+        var backdrop: ColorRect = ColorRect.new()
+        backdrop.color = Color(0.11, 0.18, 0.22, 0.75)
+        backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+        backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+        cover.add_child(backdrop)
     return cover
 
 
-func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
+
+func _center_panel(cover: Control, size: Vector2, login_right: bool = false) -> VBoxContainer:
     var center: CenterContainer = CenterContainer.new()
     center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    if login_right:
+        center.anchor_left = 0.47 if get_viewport().get_visible_rect().size.x >= 960.0 else 0.0
+        cover.resized.connect(func() -> void:
+            center.anchor_left = 0.47 if cover.size.x >= 960.0 else 0.0
+        )
     cover.add_child(center)
-    var panel: PanelContainer = PanelContainer.new()
-    panel.custom_minimum_size = size
-    panel.add_theme_stylebox_override("panel", _panel_style(Color.html("#10212c")))
-    center.add_child(panel)
+    var card: PanelContainer = PanelContainer.new()
+    card.custom_minimum_size = size
+    card.add_theme_stylebox_override("panel", _panel_style(NUS3DCartoonSkin.PAPER))
+    center.add_child(card)
     var content: VBoxContainer = VBoxContainer.new()
-    content.add_theme_constant_override("separation", 13)
-    panel.add_child(content)
+    content.add_theme_constant_override("separation", 9)
+    card.add_child(content)
     return content
+
 
 
 func _build_login() -> void:
     login_cover = _cover("Login")
-    var box: VBoxContainer = _center_panel(login_cover, Vector2(480, 0))
-    box.add_child(_label("NUS-3D", 42, Color.html("#e8f9ff")))
-    box.add_child(_label("UTOWN EXPLORER  /  OFFLINE ALPHA", 14, Color.html("#75c8d6")))
-    box.add_child(_label("Explore an original, unofficial campus world.", 15, Color.html("#cbdde0")))
-    language_login_button = _button("中文 / English", _toggle_language)
-    box.add_child(language_login_button)
+    var box: VBoxContainer = _center_panel(login_cover, Vector2(420, 0), true)
+    box.add_child(_label("NUS-3D", 39, NUS3DCartoonSkin.INK))
+    box.add_child(_label("CAMPUS CHAOS  /  DDL EDITION", 13, NUS3DCartoonSkin.MUTED))
+    box.add_child(_label("Survive deadlines. Explore campus. Repeat.", 14, NUS3DCartoonSkin.INK))
+
     var spacer: Control = Control.new()
-    spacer.custom_minimum_size.y = 20
+    spacer.custom_minimum_size.y = 9
     box.add_child(spacer)
-    login_title = _label("SIGN IN", 24)
+    login_title = _label("SIGN IN", 21, NUS3DCartoonSkin.INK)
     box.add_child(login_title)
+
     login_name = LineEdit.new()
-    login_name.placeholder_text = "Local username (3-20 characters)"
+    login_name.placeholder_text = "Username (3-20 characters)"
     login_name.max_length = 20
     box.add_child(login_name)
-    NUS3DUISkin.field(login_name)
+    NUS3DCartoonSkin.field(login_name)
+
     login_password = LineEdit.new()
-    login_password.placeholder_text = "Password (at least 8 characters)"
+    login_password.placeholder_text = "Password (8+ characters)"
     login_password.secret = true
     login_password.max_length = 128
     login_password.text_submitted.connect(func(_value: String) -> void: _submit_login())
     box.add_child(login_password)
-    NUS3DUISkin.field(login_password)
-    login_submit = _button("Sign in and explore", _submit_login)
+    NUS3DCartoonSkin.field(login_password)
+
+    login_submit = _button("Sign in and explore", _submit_login, true)
     box.add_child(login_submit)
     login_toggle = _button("Create a new local account", _toggle_register)
     box.add_child(login_toggle)
-    box.add_child(_button("新手教程  /  HOW TO PLAY", _open_tutorial))
+
+    var extras: HBoxContainer = HBoxContainer.new()
+    extras.add_theme_constant_override("separation", 7)
+    box.add_child(extras)
+    var help_button: Button = _button("How to play", _open_tutorial)
+    help_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    extras.add_child(help_button)
+    language_login_button = _button("中文 / English", _toggle_language)
+    language_login_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    extras.add_child(language_login_button)
+
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
+    login_sound_button.add_theme_font_size_override("font_size", 12)
     box.add_child(login_sound_button)
-    login_message = _label("", 13, Color.html("#efb8ad"))
+
+    login_message = _label("", 13, NUS3DCartoonSkin.ERROR)
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
-    var foot: Label = _label(
-        "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.",
-        12, Color.html("#a4c0c6"))
-    foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    box.add_child(foot)
+    var disclaimer: Label = _label(
+        "Offline accounts and local mail only. Not an NUS login.",
+        12, NUS3DCartoonSkin.MUTED)
+    disclaimer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    box.add_child(disclaimer)
 
 
 func _build_tutorial() -> void:
@@ -241,22 +257,28 @@ func _build_profile_card() -> void:
     profile_card.name = "ProfileStatus"
     profile_card.anchor_left = 0.5
     profile_card.anchor_right = 0.5
-    profile_card.offset_left = -410
-    profile_card.offset_right = 410
-    profile_card.offset_top = 10
-    profile_card.offset_bottom = 61
-    profile_card.add_theme_stylebox_override("panel", _panel_style(Color(0.03, 0.14, 0.20, 0.88)))
+    profile_card.offset_left = -205
+    profile_card.offset_right = 365
+    profile_card.offset_top = 8
+    profile_card.offset_bottom = 58
+    profile_card.add_theme_stylebox_override("panel", NUS3DCartoonSkin.panel(NUS3DCartoonSkin.PAPER, 10, 5))
     ui.add_child(profile_card)
+
     var row: HBoxContainer = HBoxContainer.new()
-    row.add_theme_constant_override("separation", 10)
+    row.add_theme_constant_override("separation", 6)
     profile_card.add_child(row)
-    profile_label = _label("LV 1", 13, Color.html("#e4f5f6"))
+    profile_label = _label("LV 1", 13, NUS3DCartoonSkin.INK)
     profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     row.add_child(profile_label)
+
+    # Keep keyboard shortcuts F9 and F10; avoid a cluttered persistent toolbar.
     language_game_button = _button("中文 / English", _toggle_language)
+    language_game_button.hide()
     row.add_child(language_game_button)
     profile_sound_button = _button("Sound ON", _toggle_ui_sound)
+    profile_sound_button.hide()
     row.add_child(profile_sound_button)
+
     row.add_child(_button("Mail [J]", _open_mail))
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
@@ -264,17 +286,17 @@ func _build_profile_card() -> void:
 
 func _build_mail() -> void:
     mail_cover = _cover("Mailbox")
-    var layout: VBoxContainer = _center_panel(mail_cover, Vector2(960, 530))
+    var layout: VBoxContainer = _center_panel(mail_cover, Vector2(875, 500))
     var header: HBoxContainer = HBoxContainer.new()
     layout.add_child(header)
-    var title: Label = _label("CAMPUS POST  /  LOCAL MAILBOX", 23, Color.html("#cff5f2"))
+    var title: Label = _label("CAMPUS POST", 24, NUS3DCartoonSkin.INK)
     title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     header.add_child(title)
     mail_sound_button = _button("Sound ON", _toggle_ui_sound)
     header.add_child(mail_sound_button)
     header.add_child(_button("Close [J]", _close_mail))
     layout.add_child(_label("Only accounts registered on this installation can exchange messages.",
-        12, Color.html("#b0c8cc")))
+        12, NUS3DCartoonSkin.MUTED))
 
     var options: HBoxContainer = HBoxContainer.new()
     layout.add_child(options)
@@ -283,17 +305,17 @@ func _build_mail() -> void:
     options.add_child(_button("Compose", _show_compose))
 
     mail_read_panel = HBoxContainer.new()
-    mail_read_panel.custom_minimum_size.y = 355
+    mail_read_panel.custom_minimum_size.y = 315
     mail_read_panel.add_theme_constant_override("separation", 17)
     layout.add_child(mail_read_panel)
     mail_list = ItemList.new()
-    mail_list.custom_minimum_size.x = 320
+    mail_list.custom_minimum_size.x = 290
     mail_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
     mail_list.item_selected.connect(_select_mail)
     mail_read_panel.add_child(mail_list)
-    NUS3DUISkin.field(mail_list)
+    NUS3DCartoonSkin.field(mail_list)
     var detail: VBoxContainer = VBoxContainer.new()
-    detail.custom_minimum_size.x = 545
+    detail.custom_minimum_size.x = 480
     detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     mail_read_panel.add_child(detail)
     mail_heading = _label("Select a message.", 18)
@@ -304,31 +326,31 @@ func _build_mail() -> void:
     mail_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
     mail_body.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
     detail.add_child(mail_body)
-    NUS3DUISkin.field(mail_body)
+    NUS3DCartoonSkin.field(mail_body)
     mail_delete = _button("Delete selected message", _delete_selected)
     detail.add_child(mail_delete)
 
     mail_compose_panel = VBoxContainer.new()
-    mail_compose_panel.custom_minimum_size.y = 350
+    mail_compose_panel.custom_minimum_size.y = 315
     mail_compose_panel.hide()
     layout.add_child(mail_compose_panel)
     mail_compose_panel.add_child(_label("New local message", 19))
     compose_to = LineEdit.new()
     compose_to.placeholder_text = "Recipient username on this computer"
     mail_compose_panel.add_child(compose_to)
-    NUS3DUISkin.field(compose_to)
+    NUS3DCartoonSkin.field(compose_to)
     compose_subject = LineEdit.new()
     compose_subject.placeholder_text = "Subject"
     compose_subject.max_length = 80
     mail_compose_panel.add_child(compose_subject)
-    NUS3DUISkin.field(compose_subject)
+    NUS3DCartoonSkin.field(compose_subject)
     compose_body = TextEdit.new()
     compose_body.placeholder_text = "Write your message (up to 2,000 characters)"
     compose_body.custom_minimum_size.y = 170
     mail_compose_panel.add_child(compose_body)
-    NUS3DUISkin.field(compose_body)
+    NUS3DCartoonSkin.field(compose_body)
     mail_compose_panel.add_child(_button("Send local message", _send_mail))
-    mail_status = _label("", 13, Color.html("#b8dbdf"))
+    mail_status = _label("", 13, NUS3DCartoonSkin.MUTED)
     layout.add_child(mail_status)
     # User mail, dynamic notices and usernames are never passed through the static translator.
     for dynamic_control in [login_message, login_title, login_submit, login_toggle, profile_label, mail_heading, mail_body, mail_status]:
