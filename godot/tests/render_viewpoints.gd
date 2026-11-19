@@ -34,6 +34,26 @@ func _render() -> void:
         quit(1)
         return
     var count: int = 0
+    var intro: UTownIntro = instance.get_node_or_null("Intro") as UTownIntro
+    if intro == null or not intro.playing:
+        push_error("Intro camera must play for in-engine screenshot review")
+        quit(1)
+        return
+    # True viewport frames from the opening animation, not concept art.
+    var intro_shots: Array[Dictionary] = [
+        {"time": 1.7, "file": "M3_7_INTRO_01_ARRIVAL.png"},
+        {"time": 4.7, "file": "M3_7_INTRO_02_GROUP_PROJECT.png"},
+        {"time": 7.6, "file": "M3_7_INTRO_03_DDL_WARNING.png"},
+        {"time": 10.6, "file": "M3_7_INTRO_04_FACULTY_HANDOFF.png"}
+    ]
+    for shot in intro_shots:
+        intro.seek_preview(float(shot["time"]))
+        if not await _capture_frame(output, str(shot["file"])):
+            push_error("Could not render opening scene: " + str(shot["file"]))
+            quit(1)
+            return
+        count += 1
+    intro.finish_intro()
     # Screenshot the genuine first-run faculty selector before selecting a profile.
     # Isolate CI saves so no actual user profile is modified.
     coursework.save_path = "user://nus3d_coursework_render_temp.cfg"
@@ -498,6 +518,7 @@ func _render() -> void:
         "m34_showcase": ["erc_cafe", "room_map", "erc_atrium", "src_equipment", "wet_walkways", "puddle_closeup", "rain_drying"],
         "m35_showcase": ["erc_cafe_occupants", "erc_dialogue", "erc_evening", "src_active_characters", "erc_facade_day", "erc_facade_evening", "src_facade_golden"],
         "m36_showcase": ["faculty_selection", "coursework_hud", "coursework_journal", "ddl_countdown"],
+        "m37_intro": ["arrival", "group_project", "ddl_warning", "faculty_handoff"],
         "note": "Original Godot software renders, not real reference photos or surveyed geometry. No Windows GPU performance claim."
     }, "  ") + "\n")
     report.close()
