@@ -64,6 +64,8 @@ jobs:
         run: godot --headless --path godot --script res://tests/smoke_test.gd
       - name: Run independent M3.6 arcade progression and bounded-memory regression
         run: godot --headless --path godot --script res://tests/arcade_smoke_test.gd
+      - name: Run M3.7 sky texture, streetscape and DDL-story regression
+        run: godot --headless --path godot --script res://tests/m3_7_smoke_test.gd
       - name: Render own-model viewpoint screenshots in Linux Xvfb
         run: |
           sudo apt-get update -qq
