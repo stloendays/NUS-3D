@@ -177,3 +177,12 @@ The illustrative ERC/SRC interior pockets receive tiled floors, transition grout
 Six fictional interior characters are distributed across two rooms. Their simple looping routines depict cafe service, reading, upper-floor study movement, warm-up, spectating and a water-refill volunteer. Press **Q** near an indoor character to display original dialogue; outside, **Q** still talks to existing walking NPCs. Characters are non-colliding and spawn inside independent fictional room pockets rather than in real NUS spaces.
 
 See [M3.5 gameplay and QA contract](docs/M3_5_MATERIALS_INDOOR_LIFE.md); this remains a low-poly Godot compatibility-renderer prototype, not photorealistic PBR validation or a completed campus digital twin.
+
+
+## M3.7: DDL DOOM — comic campus and fixed illustrated sky (feature branch)
+
+This experimental branch turns the original approximate UTown into an exaggerated fictional campus game, not an official map. Three original SVG cloud textures form 33 stationary (camera-following, non-rotating) sprites and switch with **Y** weather presets; color/brightness also responds to time of day. Original tileable grass/paver SVG materials, 56-max reused small street furniture groups, bounded shrub/flower MultiMeshes, paper scraps, four joke signs and 12 **fictional** skyline silhouettes reduce empty space without adding physics blockers.
+
+The playable four-act **DDL DOOM** quest starts near Town Green with **H** and continues to ERC, SRC and Town Plaza. A five-minute in-game timer, local retry/best-time save and first-time-only +80 XP reward are separate from other systems. The timer and task are displayed in a larger HUD card, and **F7** photo mode hides it.
+
+[Art, story, controls, evidence and safety limitations](docs/M3_7_DDL_DOOM_AND_STATIC_SKY.md). Linux Godot CI now tests cloud-texture loading, material tiling, decoration resource caps, mission persistence/replay and includes seven original new-gameplay screenshot viewpoints. Visual performance still needs a Windows GPU check. This branch intentionally remains separate from M5/M6 account, language and interface branches until integration review.
