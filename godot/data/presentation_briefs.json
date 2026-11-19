@@ -531,7 +531,7 @@
         }
       ],
       "audience_question": {
-        "prompt": "Social norms are:",
+        "prompt": "In sociology, what is meant by social norms?",
         "options": [
           "Formal tax schedules",
           "Shared expectations for acceptable behavior",
@@ -960,7 +960,7 @@
         }
       ],
       "audience_question": {
-        "prompt": "Incidence counts:",
+        "prompt": "In epidemiology, what does incidence count?",
         "options": [
           "All buildings in the area",
           "Only people already recovered",

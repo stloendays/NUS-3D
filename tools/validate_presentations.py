@@ -46,7 +46,7 @@ def validate_presentations(path: Path = DATA, exams_path: Path = EXAMS) -> list[
             paper = papers[exam_id]
             if task.get("faculty_id") != paper.get("faculty_id") or task.get("major") != paper.get("major"):
                 issues.append(f"Faculty or major mismatch on {key}")
-        check_english(task.get("major"), f"{key}.major")
+        check_english(task.get("major"), f"{key}.major", 3)
         check_english(task.get("title"), f"{key}.title", 16)
         if task.get("timer_seconds") != 150 or float(task.get("minimum_voiced_seconds_per_slide", 0)) != 5.0:
             issues.append(f"Wrong time or microphone activity rule on {key}")
