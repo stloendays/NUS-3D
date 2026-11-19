@@ -17,6 +17,7 @@ const PATH_CLEARANCE: float = 1.2
 var lawn_polygon: PackedVector2Array = PackedVector2Array()
 var path_corridors: Array[Dictionary] = []
 var generated_tuft_count: int = 0
+var tuft_positions: Array[Vector2] = [] # Canonical CPU record for placements; headless MultiMesh readback may return identity.
 var picnic_count: int = 0
 var dining_table_count: int = 0
 var food_stall_count: int = 0
@@ -147,6 +148,7 @@ func _build_lawn_tufts() -> void:
         # quantization cannot move edge tufts onto paths or outside Town Green.
         if is_clear_lawn_point(candidate, 0.6):
             positions.append(candidate)
+    tuft_positions = positions.duplicate()
     generated_tuft_count = positions.size()
     if generated_tuft_count == 0:
         return
