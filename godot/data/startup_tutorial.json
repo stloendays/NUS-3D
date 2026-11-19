@@ -91,6 +91,12 @@
           "body": "靠近原创 DDL 道具按 H 互动；距离较远时可按 H 短暂显示方向指引。按 Z 收集路边金币，O 打开游戏商店，N 使用校园外送小游戏。游戏金币不可兑换现实货币。",
           "heading_en": "Other missions / H, N, Z, O",
           "body_en": "Press H near a comic DDL prop to interact; when further away, H briefly shows a bearing hint. Press Z to collect coins, O to open the local shop, and N for the fictional dining-delivery mission. Coins have no real-world value."
+        },
+        {
+          "heading": "支线任务与多结局 / Shift+H",
+          "body": "Shift+H 打开六条支线的剧情任务手册，按任务目标完成互动并选择做法，影响人缘、诚信和压力。完成至少三条支线开启 DDL 终章，获得不同好、坏或隐藏结局。通关后可重开周目，已有的账号经验、收集与结局图鉴不会清空。",
+          "heading_en": "Side quests and endings / Shift+H",
+          "body_en": "Press Shift+H to view six optional side stories. Complete objectives and choose your actions to influence relationships, integrity and stress. Three completed side quests unlock the DDL finale and six good, bad or secret endings. Replay without wiping account XP or the ending gallery."
         }
       ],
       "title_en": "03  Exploration & Quests",

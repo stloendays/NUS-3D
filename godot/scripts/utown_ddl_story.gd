@@ -444,6 +444,7 @@ func load_progress() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
-        if event.keycode == KEY_H:
+        # Shift+H belongs to the optional branching campaign journal.
+        if event.keycode == KEY_H and not event.shift_pressed:
             if not interact():
                 request_focus()

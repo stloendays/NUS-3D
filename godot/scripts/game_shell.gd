@@ -9,6 +9,7 @@ var language_service: NUS3DGameLanguage
 var game: Node3D
 var tour: UTownTour
 var challenge: UTownChallenge
+var story_director: NUS3DStoryDirector
 var ui: CanvasLayer
 var login_cover: Control
 var mail_cover: Control
@@ -74,6 +75,10 @@ func _ready() -> void:
     _build_profile_card()
     _build_mail()
     _build_tutorial()
+    story_director = NUS3DStoryDirector.new()
+    story_director.name = "StoryCampaign"
+    story_director.configure(accounts, game)
+    add_child(story_director)
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
@@ -413,6 +418,8 @@ func _enter_game() -> void:
     observed_note_ids.clear()
     observed_sprint_time = -1
     _scan_rewards() # Backfill already completed exploration and existing Field Notes.
+    if story_director != null:
+        story_director.load_account()
     _refresh_profile()
     login_cover.hide()
     mail_cover.hide()
@@ -429,6 +436,8 @@ func _logout() -> void:
     if not accounts.is_logged_in():
         return
     challenge.sprint_active = false
+    if story_director != null:
+        story_director.on_logout()
     var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
         coursework._save_progress()
@@ -670,6 +679,14 @@ func _unhandled_input(event: InputEvent) -> void:
         return
     var coursework_modal: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if coursework_modal != null and coursework_modal.modal_visible:
+        return
+    if story_director != null and story_director.cover != null and story_director.cover.visible:
+        return
+    if key_event.keycode == KEY_H and key_event.shift_pressed and not mail_cover.visible:
+        var player_actor: UTownPlayer = game.get_node("Player") as UTownPlayer
+        if player_actor != null and not player_actor.movement_locked:
+            story_director.open_journal()
+            get_viewport().set_input_as_handled()
         return
     if key_event.keycode == KEY_J:
         if mail_cover.visible:

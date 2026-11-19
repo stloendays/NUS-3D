@@ -12,7 +12,7 @@
 | P / Shift+P / K | Coursework journal, faculty choice, task pickup/submit |
 | Tab | Post-Course Club, unlocked after any full three-chapter faculty arc |
 | Mouse-left / 1–3 / U | Cartoon toy throwing, switching toys and professor interaction |
-| H | DDL story object interaction or short direction focus pulse |
+| H / Shift+H | DDL world prop / directional pulse; six-quest branching campaign, endings archive |
 | Z / O / N | Coin pickup, game-only shop and fictional lunch delivery |
 | J | Local account mailbox (never the assignment journal or weapon firing) |
 | M / F1 / F7 / F9 / F10 | Map, expanded help, photo HUD, UI sound toggle, language |
@@ -45,3 +45,7 @@ The CI job also runs separate accounts, localization, tactile UI, arcade, DDL, d
 - SRC/ERC interiors and the shuttle route are illustrative, not as-built floors or official service stops.
 - Automatic Linux software rendering and Windows exported EXE headless checks cannot substitute for manual GUI and sound testing.
 - All NPCs, cartoon combat, deadlines, college roles and mail are fictional offline content; no official NUS authentication or external email integration.
+
+## Extended story and wildlife
+- Shift+H opens the independent, per-account branching campaign. Six authored side quests and six outcomes are local fiction, not real NUS events. Gameplay-specific rewards must never replay after changing accounts.
+- M11 original audio and wildlife are ambient only, are bounded in scene count, and create no collision bodies. F9 mutes both tactile UI and ambience.
