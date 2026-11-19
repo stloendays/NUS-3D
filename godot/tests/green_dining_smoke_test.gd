@@ -16,7 +16,6 @@ func _test() -> void:
     var instance: Node3D = scene.instantiate() as Node3D
     root.add_child(instance)
     await process_frame
-    NUS3DServices.enter_test_playmode(instance)
     var environment: UTownGreenDining = instance.get_node_or_null("GreenDining") as UTownGreenDining
     var world: UTownWorld = instance.get_node_or_null("World") as UTownWorld
     var weather: UTownWeather = instance.get_node_or_null("Weather") as UTownWeather
@@ -39,15 +38,13 @@ func _test() -> void:
     if multimesh.instance_count != environment.generated_tuft_count:
         _fail("turf instance accounting does not match MultiMesh")
         return
-    # Validate the actual CPU source positions. MultiMesh get_instance_transform()
-    # can yield identity in headless CI even after set_instance_transform(), so
-    # do not use renderer readback as a substitute for construction geometry.
+    # Verify CPU placement data; headless MultiMesh transform readback can return identity.
     if environment.tuft_positions.size() != multimesh.instance_count:
-        _fail("turf CPU position ledger did not match the GPU instance count")
+        _fail("grass tuft CPU placement ledger differs from the MultiMesh batch")
         return
-    for i in range(environment.tuft_positions.size()):
-        if not environment.is_clear_lawn_point(environment.tuft_positions[i]):
-            _fail("grass tuft %d was selected outside lawn or on a walkway" % i)
+    for position in environment.tuft_positions:
+        if not environment.is_clear_lawn_point(position):
+            _fail("grass tuft was selected outside the lawn or on a walkway")
             return
     if environment.picnic_count < 2 or environment.picnic_count > environment.PICNIC_LIMIT:
         _fail("lawn picnic details missing or unbounded")
