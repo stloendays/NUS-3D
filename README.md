@@ -2,9 +2,9 @@
 
 > A community-made, exploratory 3D reconstruction of the National University of Singapore campus. **Start with University Town; expand only after a playable vertical slice works.**
 >
-> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M3.4 sheltered interiors and rainy-paving response + M4 alpha Windows portable build pipeline (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
+> Status: **M2.3 source-footprint comparison + M3.1 guided exploration + M3.2 playable challenges + M3.3 campus life/weather + M3.4 sheltered interiors/rain + M3.5 material finishing and indoor life + M4 alpha Windows portable build pipeline (2026-11-19)**. Source-driven detail layers are playable in Godot, but building scale, pedestrian routes, terrain and Windows performance have not been verified.
 
-[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
+[Windows 便携版构建与使用](docs/M4_WINDOWS_BUILD.md) · [启动 Godot 原型](docs/M1_GREYBOX.md) · [M2 ERC/SRC 建筑模型](docs/M2_ARCHITECTURE.md) · [M2.1 实景视角核验](docs/M2_1_VIEWPOINT_CALIBRATION.md) · [M2.2 OSM 轮廓对比](docs/M2_2_OSM_REFERENCE.md) · [M2.3 轮廓误差量化](docs/M2_3_FOOTPRINT_FIT.md) · [M3 氛围/拍照模式](docs/M3_ATMOSPHERE.md) · [M3.1 UTown Explorer 互动探索](docs/M3_1_CAMPUS_DISCOVERY.md) · [M3.2 可玩挑战](docs/M3_2_PLAYABLE_CHALLENGES.md) · [M3.3 校园生活与天气](docs/M3_3_CAMPUS_LIFE_WEATHER.md) · [M3.4 室内与雨天升级](docs/M3_4_INTERIOR_WEATHER_POLISH.md) · [M3.5 材质灯光与室内 NPC](docs/M3_5_MATERIALS_INDOOR_LIFE.md) · [M1.5 数据验证](docs/M1_5_DATA_VALIDATION.md) · [M1.6 步行路径碰撞审计](docs/M1_6_ROUTE_CLEARANCE.md) · [中文项目计划](docs/PROJECT_PLAN.md) · [建模与技术规范](docs/TECHNICAL_DESIGN.md) · [参考资料与版权](docs/REFERENCE_SOURCES.md) · [地标清单](data/utown_landmarks.csv) · [任务 Issues](https://github.com/stloendays/NUS-3D/issues)
 
 ## Goal / 项目目标
 
@@ -160,3 +160,14 @@ This original gameplay extension builds on M3.3 without claiming measured NUS in
 - Linux CI captures original in-engine M3.4 indoor and rain-state screenshots, not measurements or performance benchmarks.
 
 See [M3.4 guide and QA limits](docs/M3_4_INTERIOR_WEATHER_POLISH.md). These are separate teleport-accessible game pockets, not reconstructed building floors. Stairs, collision feel and frame rate require a manual 3D GUI playtest.
+
+
+## M3.5: original material finishing and occupied interiors
+
+The two priority-0 conceptual ERC/SRC facade studies now contain a separate, **F2-toggleable** M3.5 visual finish: aluminum mullions, layered reflective-tinted glass, entrance canopy undersides, window sills, roof parapets and warm entrance lights. These are deliberately not measured facade reconstructions.
+
+The illustrative ERC/SRC interior pockets receive tiled floors, transition grout, ribbed wall strips, mezzanine acoustic panels, glass accents and three additional room-local lights (including one shadow-capable light per room). Lighting adapts to the game's existing artistic time-of-day and rain mode; there are **no imported HDRI, textures, commercial 3D assets or real architectural plans**.
+
+Six fictional interior characters are distributed across two rooms. Their simple looping routines depict cafe service, reading, upper-floor study movement, warm-up, spectating and a water-refill volunteer. Press **Q** near an indoor character to display original dialogue; outside, **Q** still talks to existing walking NPCs. Characters are non-colliding and spawn inside independent fictional room pockets rather than in real NUS spaces.
+
+See [M3.5 gameplay and QA contract](docs/M3_5_MATERIALS_INDOOR_LIFE.md); this remains a low-poly Godot compatibility-renderer prototype, not photorealistic PBR validation or a completed campus digital twin.
