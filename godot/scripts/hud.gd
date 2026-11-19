@@ -62,10 +62,18 @@ func _ready() -> void:
     _make_key_rail()
     _make_toast()
     _load_osm_fit_summary()
+    sync_feedback_state()
+
+
+func sync_feedback_state() -> void:
+    # Account/profile restores are not new player actions and should not trigger reward toasts.
     _seen_tour_stops = tour.discovered_ids.size()
     _seen_notes = challenge.collected_ids.size()
     _seen_activities = campus_life.visited_activities.size()
     _seen_sprint_time = challenge.sprint_last_time
+    toast_remaining = 0.0
+    if toast_card != null:
+        toast_card.hide()
 
 
 func _skin_card(card: PanelContainer, background: Color, accent: Color, radius: int, padding: int) -> void:
@@ -94,6 +102,7 @@ func _make_help_overlay() -> void:
     help_label.offset_top = -245.0
     help_label.offset_right = 0.0
     help_label.offset_bottom = -76.0
+    help_label.text = "WASD move  |  Shift sprint  |  Space jump  |  B bicycle  |  X shuttle  |  I enter/exit  |  L lift\nF activity  |  Q talk  |  E discover  |  G replay  |  C field notes  |  V campus sprint\nM map  |  J local mail  |  Y weather  |  T lighting  |  F2 facades  |  F3 camera  |  F4 capture\nF6 OSM  |  F7 photo HUD  |  F9 sound ON/OFF  |  F1 help  |  Esc release mouse"
     help_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     help_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     help_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
@@ -115,8 +124,8 @@ func _make_toast() -> void:
     toast_card.anchor_right = 0.5
     toast_card.offset_left = -265.0
     toast_card.offset_right = 265.0
-    toast_card.offset_top = 82.0
-    toast_card.offset_bottom = 132.0
+    toast_card.offset_top = 113.0
+    toast_card.offset_bottom = 165.0
     toast_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
     toast_card.add_theme_stylebox_override("panel", NUS3DUISkin.panel(Color("#17494c"), Color("#9bf2d2"), 14, 10))
     add_child(toast_card)
