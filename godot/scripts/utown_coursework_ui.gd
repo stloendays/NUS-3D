@@ -225,21 +225,24 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
-    if not (event is InputEventKey) or not event.pressed or event.echo:
+    if not (event is InputEventKey):
         return
-    if event.keycode == KEY_O:
+    var key: InputEventKey = event as InputEventKey
+    if not key.pressed or key.echo:
+        return
+    if key.keycode == KEY_O:
         show_selector()
         get_viewport().set_input_as_handled()
-    elif event.keycode == KEY_J:
+    elif key.keycode == KEY_J:
         if modal_visible and not selection_visible:
             hide_modal()
         elif not modal_visible:
             show_journal()
         get_viewport().set_input_as_handled()
-    elif event.keycode == KEY_ESCAPE and modal_visible:
+    elif key.keycode == KEY_ESCAPE and modal_visible:
         hide_modal()
         get_viewport().set_input_as_handled()
-    elif modal_visible and event.keycode in [
+    elif modal_visible and key.keycode in [
         KEY_W, KEY_A, KEY_S, KEY_D, KEY_K, KEY_Q, KEY_B, KEY_X, KEY_I,
         KEY_F, KEY_L, KEY_Y, KEY_T, KEY_C, KEY_V, KEY_G, KEY_E, KEY_R,
         KEY_M, KEY_SPACE, KEY_SHIFT
