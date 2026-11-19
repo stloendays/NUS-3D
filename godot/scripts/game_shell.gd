@@ -252,7 +252,7 @@ func _show_login() -> void:
     profile_card.hide()
     login_password.clear()
     login_message.text = ""
-    login_name.grab_focus.call_deferred()
+    login_name.call_deferred("grab_focus")
 
 
 func _toggle_register() -> void:
@@ -324,8 +324,6 @@ func _refresh_profile() -> void:
 
 func _on_mailbox_changed() -> void:
     _refresh_profile()
-    if mail_cover != null and mail_cover.visible and mailbox_mode != "compose":
-        _show_mailbox(mailbox_mode)
 
 
 func _open_mail() -> void:
@@ -334,6 +332,7 @@ func _open_mail() -> void:
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     mail_cover.show()
+    profile_card.hide()
     mail_status.text = ""
     _show_mailbox("inbox")
 
@@ -341,6 +340,7 @@ func _open_mail() -> void:
 func _close_mail() -> void:
     mail_cover.hide()
     if accounts.is_logged_in():
+        profile_card.show()
         get_tree().paused = false
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -373,7 +373,7 @@ func _select_mail(index: int) -> void:
     mail_delete.disabled = mailbox_mode != "inbox"
     if mailbox_mode == "inbox":
         accounts.mark_read(selected_message_id)
-        # Updating the unread count refreshes the list; keep the opened message visible.
+        # Do not rebuild the list while an open message is being read.
 
 
 func _delete_selected() -> void:
