@@ -81,6 +81,7 @@ jobs:
             coins_smoke_test.gd \
             experience_guide_smoke_test.gd \
             building_accuracy_smoke_test.gd \
+            kent_ridge_expansion_smoke_test.gd \
             leisure_smoke_test.gd \
             integration_smoke_test.gd
           do
