@@ -176,12 +176,22 @@ func _run() -> void:
     if accounts.profile.get("awards", {}).size() < 5:
         _fail("Story XP was not integrated into account progression")
         return
-    language.set_locale("en")
+    if language.set_locale("en") or language.locale != "zh":
+        _fail("Login-selected Chinese story cannot switch language during the session")
+        return
+    shell._logout()
+    if not language.set_locale("en") or accounts.sign_in("story_a", "private-test-123") != "":
+        _fail("English login was unavailable after logging out")
+        return
+    shell._enter_game()
     director.open_journal()
-    if not director.heading.text.contains("QUEST JOURNAL"):
-        _fail("Quest journal did not respond to English localization")
+    if not director.heading.text.contains("QUEST JOURNAL") or director.quest_tab.text != "Quests":
+        _fail("Story journal did not load the newly selected English login language")
         return
     director.close_journal()
+    if director.archive != archive_copy or director.save_path != alice_story_save:
+        _fail("Switching login language changed story endings or save mapping")
+        return
     shell._logout()
     paused = false
     print("NUS3D_STORY_SMOKE_OK")
