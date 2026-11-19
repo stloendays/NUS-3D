@@ -246,7 +246,17 @@ func load_account() -> void:
     if int(loaded.get("schema_version", 0)) == 1:
         events = loaded.get("events", {}) if typeof(loaded.get("events", {})) == TYPE_DICTIONARY else {}
         decisions = loaded.get("decisions", {}) if typeof(loaded.get("decisions", {})) == TYPE_DICTIONARY else {}
-        archive = loaded.get("archive", {}) if typeof(loaded.get("archive", {})) == TYPE_DICTIONARY else {}
+        # Godot JSON parses all numeric values as floats (1 -> 1.0).
+        # Normalize persisted ending-count entries to the integer schema used
+        # for new unlocks, preserving the gallery across account switching.
+        archive = {}
+        var stored_archive: Dictionary = loaded.get("archive", {}) if typeof(loaded.get("archive", {})) == TYPE_DICTIONARY else {}
+        for raw_id in stored_archive.keys():
+            var id: String = str(raw_id)
+            if not get_ending(id).is_empty():
+                var count: int = clampi(int(stored_archive[raw_id]), 0, MAX_ARCHIVE_COUNT)
+                if count > 0:
+                    archive[id] = count
         ending_id = str(loaded.get("ending", ""))
         kindness = clampi(int(loaded.get("kindness", 0)), -15, 15)
         integrity = clampi(int(loaded.get("integrity", 0)), -15, 15)

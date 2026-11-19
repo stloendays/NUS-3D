@@ -2,6 +2,9 @@ extends Node3D
 class_name UTownAmbientEcology
 ## Decorative wildlife only; no navigation, collision, quests or controls.
 const TICK: float = 0.12
+# Hard upper bounds across low/normal/high graphic profiles.
+const MAX_BIRDS: int = 14
+const MAX_LEAVES: int = 64
 @export_range(0, 2, 1) var detail_level: int = 1
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
