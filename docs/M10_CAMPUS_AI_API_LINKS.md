@@ -80,3 +80,7 @@ The Python tests use mocked responses, not real API calls, and cover provider ma
 - Anthropic Messages API: https://docs.anthropic.com/en/api/messages
 - Open-Meteo API: https://open-meteo.com/en/docs
 - Godot HTTPRequest: https://docs.godotengine.org/en/4.4/classes/class_httprequest.html
+
+## Current main integration
+
+The original bridge and URL registry were already brought into current main with the local admin integration (#44). This follow-up adds only the optional F11 UI, account pause/session guards, dedicated headless AI UI regression and exported-link contract; it **does not overwrite** the newer `tools/campus_ai_bridge.py` or its security tests. F12 local administrator controls remain independent. External AI calls require a separately run localhost bridge with environment-provided provider keys and an explicit user action; the offline demo does not use a paid API.
