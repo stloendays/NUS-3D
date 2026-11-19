@@ -28,6 +28,8 @@ func collect_issues() -> Array[String]:
     var challenge: UTownChallenge = get_parent().get_node_or_null("Challenge") as UTownChallenge
     var weather: UTownWeather = get_parent().get_node_or_null("Weather") as UTownWeather
     var campus_life: UTownCampusLife = get_parent().get_node_or_null("CampusLife") as UTownCampusLife
+    var indoor_npcs: UTownIndoorNPCs = get_parent().get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+    var polish: UTownVisualPolish = get_parent().get_node_or_null("VisualPolish") as UTownVisualPolish
     var hud: CanvasLayer = get_parent().get_node_or_null("HUD") as CanvasLayer
 
     for source_file in REQUIRED_SOURCE_FILES:
@@ -75,6 +77,12 @@ func collect_issues() -> Array[String]:
         issues.append("Campus NPCs, two interior concepts or shuttle did not load")
     if campus_life != null and (campus_life.bicycle_wheels.size() != 2 or campus_life.shuttle_wheels.size() != 4 or campus_life.shuttle_passengers.size() != 3):
         issues.append("Bicycle or shuttle visual components are incomplete")
+    if indoor_npcs == null or indoor_npcs.indoor_count != 6:
+        issues.append("Six M3.5 fictional indoor occupants are missing")
+    if polish == null or polish.facade_groups.size() != 2 or polish.facade_panes < 40:
+        issues.append("Material-study facade layers missing")
+    if polish != null and (polish.indoor_finish_groups.size() != 2 or polish.indoor_lamps.size() != 2 or polish.facade_lamps.size() != 2 or polish.material_panel_count < 100):
+        issues.append("Interior cladding and adaptive light fixtures are incomplete")
     if campus_life != null:
         for id in ["ERC", "SRC"]:
             if not campus_life.interiors.has(id):
@@ -99,6 +107,8 @@ func _run_export_test() -> void:
     var challenge: UTownChallenge = get_parent().get_node_or_null("Challenge") as UTownChallenge
     var weather: UTownWeather = get_parent().get_node_or_null("Weather") as UTownWeather
     var campus_life: UTownCampusLife = get_parent().get_node_or_null("CampusLife") as UTownCampusLife
+    var indoor_npcs: UTownIndoorNPCs = get_parent().get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+    var polish: UTownVisualPolish = get_parent().get_node_or_null("VisualPolish") as UTownVisualPolish
     var results: Dictionary = {
         "schema_version": 1,
         "result": "pass" if issues.is_empty() else "fail",
@@ -121,6 +131,11 @@ func _run_export_test() -> void:
         "rain_streak_count": weather.rain_multimesh.instance_count if weather != null and weather.rain_multimesh != null else 0,
         "bicycle_wheels": campus_life.bicycle_wheels.size() if campus_life != null else 0,
         "shuttle_passengers": campus_life.shuttle_passengers.size() if campus_life != null else 0,
+        "indoor_npc_count": indoor_npcs.indoor_count if indoor_npcs != null else 0,
+        "facade_detail_groups": polish.facade_groups.size() if polish != null else 0,
+        "facade_panes": polish.facade_panes if polish != null else 0,
+        "interior_material_groups": polish.indoor_finish_groups.size() if polish != null else 0,
+        "interior_lighting_rooms": polish.indoor_lamps.size() if polish != null else 0,
         "shuttle_wheels": campus_life.shuttle_wheels.size() if campus_life != null else 0,
         "osm_features": world.osm_reference_layer.feature_count if world != null and world.osm_reference_layer != null else 0,
         "issues": issues,
