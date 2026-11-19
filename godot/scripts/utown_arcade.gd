@@ -16,6 +16,7 @@ const WEAPONS = [
 @onready var player: UTownPlayer = $"../Player"
 @onready var campus_life: UTownCampusLife = $"../CampusLife"
 @onready var hud: CanvasLayer = $"../HUD"
+@onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
 
 var save_path: String = SAVE_PATH
 var students: Array[Dictionary] = []
@@ -49,7 +50,28 @@ func _ready() -> void:
     _build_held_toy()
     _build_projectile_pool()
     load_progress()
+    if language != null:
+        language.language_changed.connect(_on_language_changed)
     _refresh_status()
+
+
+func _t(zh: String, en: String) -> String:
+    return language.choose(zh, en) if language != null else en
+
+
+func _toy_name(index: int) -> String:
+    var localized: Array[String] = ["纸飞机", "粉笔发射器", "橡皮鸡"]
+    return localized[index] if language != null and language.is_chinese()         else str(WEAPONS[index]["name"])
+
+
+func _on_language_changed(_value: String) -> void:
+    for i in range(students.size()):
+        _refresh_student_label(i)
+    for item in professors:
+        var plate: Label3D = item["label"]
+        plate.text = "%s\n%s" % [str(item["name"]), _t("[U] 奇怪作业", "[U] ABSURD HOMEWORK")]
+    _refresh_status()
+
 
 func _shared_material(color: String) -> StandardMaterial3D:
     if not material_cache.has(color):
@@ -125,7 +147,7 @@ func _spawn_professors() -> void:
         _box_part(teacher, "LeftGlasses", Vector3(-0.13, 1.86, -0.23), Vector3(0.22, 0.12, 0.045), "#a6eced")
         _box_part(teacher, "RightGlasses", Vector3(0.13, 1.86, -0.23), Vector3(0.22, 0.12, 0.045), "#a6eced")
         _box_part(teacher, "LectureNotes", Vector3(0.38, 1.18, -0.24), Vector3(0.32, 0.49, 0.065), "#fff0c6")
-        var plate := _nameplate(names[i] + "\n[U] ABSURD HOMEWORK", Color.html("#ffe0a1"))
+        var plate := _nameplate(names[i] + "\n" + _t("[U] 奇怪作业", "[U] ABSURD HOMEWORK"), Color.html("#ffe0a1"))
         plate.position = Vector3(0.0, 2.65, 0.0)
         teacher.add_child(plate)
         professors.append({"node": teacher, "name": names[i], "line": jokes[i], "label": plate})
@@ -201,7 +223,7 @@ func _award_xp(amount: int) -> void:
         upgraded = true
     _save_progress()
     if upgraded:
-        _announce("LEVEL %d! New silly gear available." % level, 4.0)
+        _announce(_t("升级到 %d 级！解锁新玩具。", "LEVEL %d! New silly gear available.") % level, 4.0)
 
 func load_progress() -> void:
     level = 1
@@ -240,11 +262,11 @@ func choose_weapon(index: int) -> bool:
         return false
     var chosen: Dictionary = WEAPONS[index]
     if level < int(chosen["level"]):
-        _announce("%s unlocks at level %d." % [str(chosen["name"]), int(chosen["level"])], 2.5)
+        _announce(_t("%s 在 %d 级解锁。", "%s unlocks at level %d.") % [_toy_name(index), int(chosen["level"])], 2.5)
         return false
     weapon_index = index
     held_toy_body.material_override = _shared_material(str(chosen["color"]))
-    _announce("Equipped %s - a cartoon-only toy." % str(chosen["name"]), 2.8)
+    _announce(_t("装备 %s：只用于卡通搞笑的玩具。", "Equipped %s - a cartoon-only toy.") % _toy_name(index), 2.8)
     return true
 
 func _refresh_student_label(index: int) -> void:
@@ -252,9 +274,9 @@ func _refresh_student_label(index: int) -> void:
     var label: Label3D = state["label"]
     var seconds: int = ceili(float(state["break_seconds"]))
     if seconds > 0:
-        label.text = "%s | SNACK BREAK %ds" % [str(state["name"]), seconds]
+        label.text = _t("%s | 休息 %d 秒", "%s | SNACK BREAK %ds") % [str(state["name"]), seconds]
     else:
-        label.text = "%s | FOCUS %d/%d" % [str(state["name"]), int(state["focus"]), STUDENT_FOCUS]
+        label.text = _t("%s | 专注力 %d/%d", "%s | FOCUS %d/%d") % [str(state["name"]), int(state["focus"]), STUDENT_FOCUS]
 
 func hit_student(index: int, amount: int = 1) -> bool:
     if index < 0 or index >= students.size() or amount <= 0:
@@ -265,7 +287,7 @@ func hit_student(index: int, amount: int = 1) -> bool:
     state["focus"] = maxi(0, int(state["focus"]) - amount)
     if int(state["focus"]) > 0:
         _refresh_student_label(index)
-        _announce("%s: My study notes! Focus %d/%d" % [str(state["name"]), int(state["focus"]), STUDENT_FOCUS], 2.0)
+        _announce(_t("%s：我的笔记！专注力 %d/%d", "%s: My study notes! Focus %d/%d") % [str(state["name"]), int(state["focus"]), STUDENT_FOCUS], 2.0)
         return true
     state["break_seconds"] = BREAK_DURATION
     var actor: Node3D = state["node"]
@@ -274,7 +296,7 @@ func hit_student(index: int, amount: int = 1) -> bool:
     student_wins += 1
     _award_xp(30)
     _refresh_student_label(index)
-    _announce("%s takes a snack break! +30 XP" % str(state["name"]), 3.8)
+    _announce(_t("%s 去吃零食休息了！+30 XP", "%s takes a snack break! +30 XP") % str(state["name"]), 3.8)
     return true
 
 func talk_to_professor() -> bool:
@@ -289,16 +311,19 @@ func talk_to_professor() -> bool:
             best_index = i
             best_distance = distance
     if best_index == -1:
-        _announce("Find a fictional professor to request bizarre homework.", 2.8)
+        _announce(_t("找到虚构教授，领取离谱的作业。", "Find a fictional professor to request bizarre homework."), 2.8)
         return false
     var info: Dictionary = professors[best_index]
     var name: String = str(info["name"])
     if met_professors.has(name):
-        _announce("%s: Did you check the submission deadline?" % name, 3.4)
+        _announce(_t("%s：你检查截止时间了吗？", "%s: Did you check the submission deadline?") % name, 3.4)
         return true
     met_professors.append(name)
     _award_xp(20)
-    _announce("%s: %s" % [name, str(info["line"])], 4.6)
+    _announce("%s：%s" % [name, _t(
+        "作业昨天就截止了。+20 XP！" if best_index == 0 else "开卷考试！书在另一个宇宙。+20 XP！",
+        str(info["line"]))] if language != null and language.is_chinese()
+        else "%s: %s" % [name, str(info["line"])], 4.6)
     return true
 
 func _can_fire() -> bool:
@@ -358,7 +383,7 @@ func _resolve_shot() -> void:
             if best_kind == 1:
                 hit_student(best_index, int(chosen["damage"]))
             else:
-                _announce("Professors have a deadline shield. Press K nearby!", 3.0)
+                _announce(_t("教授拥有截止时间护盾！靠近按 K。", "Professors have a deadline shield. Press K nearby!"), 3.0)
         else:
             best_position = collision["position"]
     _show_pooled_projectile(origin + forward * 0.55, best_position, str(chosen["color"]))
@@ -386,10 +411,14 @@ func _refresh_status() -> void:
         return
     var chosen: Dictionary = WEAPONS[weapon_index]
     var lines := PackedStringArray()
-    lines.append("CAMPUS ARCADE | LV %d | XP %d/%d" % [level, xp, xp_required()])
-    lines.append("Student wins: %d | %s" % [student_wins, str(chosen["name"])])
-    lines.append("[1/2/3] toys  [LMB] play  [U] teacher")
-    lines.append(message if message_time > 0.0 else "Pure cartoon: nobody gets hurt.")
+    lines.append(_t("校园玩具场 | 等级 %d | 经验 %d/%d",
+        "CAMPUS ARCADE | LV %d | XP %d/%d") % [level, xp, xp_required()])
+    lines.append(_t("学生对战胜场：%d | %s", "Student wins: %d | %s") % [student_wins, _toy_name(weapon_index)])
+    lines.append(_t("[1/2/3] 选择玩具 [左键] 游玩 [U] 找老师",
+        "[1/2/3] toys [LMB] play [U] teacher"))
+    lines.append(message if message_time > 0.0 else _t(
+        "仅限卡通搞笑，角色不会受到真实伤害。",
+        "Pure cartoon: nobody gets hurt."))
     status_label.text = "\n".join(lines)
 
 func _process(delta: float) -> void:
