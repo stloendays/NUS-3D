@@ -291,9 +291,13 @@ static func validate_ai_proposal(raw: String) -> Dictionary:
     var item: Dictionary = parsed
     var action: String = str(item.get("action", ""))
     var raw_value: Variant = item.get("value", -999)
-    if typeof(raw_value) != TYPE_INT:
+    # Godot JSON may decode JSON integers as floating-point variants.
+    if typeof(raw_value) != TYPE_INT and typeof(raw_value) != TYPE_FLOAT:
         return {}
-    var value: int = int(raw_value)
+    var numeric: float = float(raw_value)
+    if numeric < 0.0 or numeric > 5000.0 or numeric != floorf(numeric):
+        return {}
+    var value: int = int(numeric)
     var limits: Dictionary = {
         "weather": [0, 4],
         "lighting": [0, 3],
