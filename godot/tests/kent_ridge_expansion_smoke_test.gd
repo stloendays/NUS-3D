@@ -68,9 +68,6 @@ func _run() -> void:
     if str(extension.nearest_stop(player.global_position, 17.0).get("id", "")) != "UTOWN":
         _fail("Unable to find the UTown Town Plaza bus stop")
         return
-    if not bus.offer.mouse_filter == Control.MOUSE_FILTER_STOP:
-        # Child button is clickable, while the compact card is non-modal.
-        pass
     if bus.map_canvas == null or bus.route_list == null:
         _fail("Visual bus route atlas or destination buttons are missing")
         return
