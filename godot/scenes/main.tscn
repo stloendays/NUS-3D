@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -12,6 +12,8 @@
 [ext_resource type="Script" path="res://scripts/utown_campus_life.gd" id="10"]
 [ext_resource type="Script" path="res://scripts/utown_indoor_npcs.gd" id="11"]
 [ext_resource type="Script" path="res://scripts/utown_visual_polish.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/utown_coursework.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/utown_coursework_ui.gd" id="14"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -60,11 +62,17 @@ script = ExtResource("11")
 [node name="VisualPolish" type="Node" parent="."]
 script = ExtResource("12")
 
+[node name="Coursework" type="Node" parent="."]
+script = ExtResource("13")
+
 [node name="ExportSelfTest" type="Node" parent="."]
 script = ExtResource("6")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("3")
+
+[node name="CourseworkUI" type="CanvasLayer" parent="."]
+script = ExtResource("14")
 
 [node name="Info" type="PanelContainer" parent="HUD"]
 offset_left = 18.0
@@ -192,4 +200,4 @@ offset_left = 18.0
 offset_top = -42.0
 offset_right = -18.0
 offset_bottom = -12.0
-text = "WASD move   Shift run   B bicycle   X shuttle   I enter/exit interior   L lift floors   F indoor activity   Q talk   Y weather   E discover   G replay   C collect   V sprint   M map   T lighting   F2 facade   F3 view   F4 photo   F6 OSM   F7 hide HUD"
+text = "WASD move  B bike  X bus  I indoors  L floor  F activity  Q talk  O faculty  J coursework  K pickup/submit  Y weather  C notes  V sprint  M map  F7 photo  F1 help"
