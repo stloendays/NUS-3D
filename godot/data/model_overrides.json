@@ -21,6 +21,27 @@
       "license": "CC0-1.0",
       "scale": 1,
       "offset_y": 0
+    },
+    {
+      "target": "wildlife/chickens",
+      "path": "res://assets/models/chickens.glb",
+      "license": "CC0-1.0",
+      "scale": 1,
+      "offset_y": 0
+    },
+    {
+      "target": "wildlife/cats",
+      "path": "res://assets/models/cats.glb",
+      "license": "CC0-1.0",
+      "scale": 1,
+      "offset_y": 0
+    },
+    {
+      "target": "wildlife/birds",
+      "path": "res://assets/models/birds.glb",
+      "license": "CC0-1.0",
+      "scale": 1,
+      "offset_y": 0
     }
   ]
 }
