@@ -23,6 +23,8 @@ func _run() -> void:
         return
     root.add_child(scene)
     await process_frame
+    # Integration's cinematic/faculty gates must be completed before bus interaction.
+    NUS3DServices.enter_test_playmode(scene)
 
     var world: UTownWorld = scene.get_node_or_null("World") as UTownWorld
     var extension: NUSKentRidgeWorld = scene.get_node_or_null("KentRidgeExpansion") as NUSKentRidgeWorld
