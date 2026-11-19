@@ -177,6 +177,7 @@ func _build_districts() -> void:
             for level in range(mini(int(height_value / 4.6), 6)):
                 _box(building, "Windows_%d" % level, Vector3(0.0, 3.9 + float(level) * 3.3, depth_value * 0.5 + 0.11), Vector3(width_value * 0.72, 1.2, 0.14), "#5b818b")
             _label(building, str(info["name"]), Vector3(0.0, height_value + 3.1, 0.0), "#f7f7df", 19)
+            _decorate_building(building, info, width_value, depth_value, height_value)
             building_count += 1
         # Small placemaking accents, no more than six low-poly props per district.
         for i in range(3):
@@ -299,3 +300,55 @@ func _process(delta: float) -> void:
         else:
             bus.position += direction / distance_m * BUS_SPEED * delta
             bus.rotation.y = atan2(direction.x, direction.z)
+
+
+func _decorate_building(parent: Node3D, info: Dictionary, width_m: float, depth_m: float, height_m: float) -> void:
+    # Facade grammar is procedural and original; no Google 3D meshes or tiles.
+    var kind: String = str(info.get("kind", "academic"))
+    var facade: String = str(info.get("facade", "#d7d1c3"))
+    var floor_count: int = maxi(1, int(info.get("floors", 4)))
+    var floor_height: float = height_m / float(floor_count)
+    var glass: String = "#59899a" if kind == "glass_tower" else "#72929a"
+    var frame: String = "#e7e2d6"
+    if kind == "residence":
+        frame = "#ddcbb0"
+    elif kind == "clinic":
+        frame = "#f0f0e8"
+    elif kind == "station":
+        frame = "#9bb8bc"
+    # Vertical columns create rhythm and a recognizable campus building silhouette.
+    var bays: int = clampi(int(width_m / 6.0), 3, 10)
+    for bay in range(bays + 1):
+        var x: float = -width_m * 0.5 + width_m * float(bay) / float(bays)
+        _box(parent, "FacadeColumn_%02d" % bay, Vector3(x, height_m * 0.5, depth_m * 0.5 + 0.22), Vector3(0.40, height_m, 0.42), frame)
+    for floor_index in range(1, floor_count):
+        var y: float = float(floor_index) * floor_height
+        _box(parent, "FloorSlab_%02d" % floor_index, Vector3(0, y, depth_m * 0.5 + 0.28), Vector3(width_m + 0.8, 0.40, 0.50), facade)
+    # Side windows make buildings legible from both roads and the bus.
+    for floor_index in range(floor_count):
+        var y: float = (float(floor_index) + 0.5) * floor_height
+        for side in [-1.0, 1.0]:
+            _box(parent, "SideGlass_%d_%d" % [floor_index, int(side)], Vector3(side * (width_m * 0.5 + 0.09), y, 0), Vector3(0.18, minf(2.2, floor_height * 0.58), depth_m * 0.62), glass)
+    if kind == "glass_tower":
+        _box(parent, "CurtainWall", Vector3(0, height_m * 0.52, depth_m * 0.5 + 0.13), Vector3(width_m * 0.86, height_m * 0.80, 0.20), "#5a9cae")
+        for bay in range(1, bays):
+            var x: float = -width_m * 0.43 + width_m * 0.86 * float(bay) / float(bays)
+            _box(parent, "CurtainMullion_%02d" % bay, Vector3(x, height_m * 0.52, depth_m * 0.5 + 0.27), Vector3(0.12, height_m * 0.82, 0.12), "#d9e4df")
+    elif kind == "library":
+        _box(parent, "LibrarySunshade", Vector3(0, height_m * 0.58, depth_m * 0.5 + 1.5), Vector3(width_m * 0.88, 0.55, 3.0), "#b7a58b")
+    elif kind == "residence":
+        for bay in range(1, bays):
+            var x: float = -width_m * 0.5 + width_m * float(bay) / float(bays)
+            _box(parent, "Balcony_%02d" % bay, Vector3(x, height_m * 0.55, depth_m * 0.5 + 1.1), Vector3(width_m / float(bays) * 0.85, 0.22, 2.1), "#e0d8c8")
+    elif kind == "auditorium":
+        _box(parent, "AuditoriumEntranceCanopy", Vector3(0, 5.2, depth_m * 0.5 + 3.2), Vector3(width_m * 0.74, 0.58, 6.5), "#e9e3d8")
+    elif kind == "station":
+        _box(parent, "TransitRoof", Vector3(0, height_m + 1.1, 0), Vector3(width_m + 7, 0.6, depth_m + 5), "#8cb5b8")
+    elif kind == "canteen":
+        _box(parent, "OpenAirCanopy", Vector3(0, 5.4, depth_m * 0.5 + 3.0), Vector3(width_m * 0.9, 0.35, 6.0), "#e3ddc7")
+    elif kind == "courtyard":
+        _box(parent, "CourtyardPergola", Vector3(0, height_m + 0.5, depth_m * 0.3), Vector3(width_m * 0.65, 0.20, depth_m * 0.38), "#c4b28e")
+    if bool(info.get("canopy", false)):
+        _box(parent, "CoveredCampusWalk", Vector3(0, 3.4, depth_m * 0.5 + 5.5), Vector3(minf(width_m * 0.76, 26.0), 0.36, 8.5), "#d3d4c6")
+        for x in [-8.0, 8.0]:
+            _box(parent, "WalkColumn", Vector3(x, 1.7, depth_m * 0.5 + 8.4), Vector3(0.35, 3.3, 0.35), "#c7c9c0")
