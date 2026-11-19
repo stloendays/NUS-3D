@@ -13,6 +13,7 @@ func _fail(reason: String) -> void:
 
 
 func _run() -> void:
+    NUS3DServices.ensure_scene_services(self)
     var source: PackedScene = load("res://scenes/main.tscn") as PackedScene
     if source == null:
         _fail("Unable to load base UTown scene")
@@ -23,6 +24,7 @@ func _run() -> void:
         return
     root.add_child(scene)
     await process_frame
+    NUS3DServices.enter_test_playmode(scene)
 
     var world: UTownWorld = scene.get_node_or_null("World") as UTownWorld
     var extension: NUSKentRidgeWorld = scene.get_node_or_null("KentRidgeExpansion") as NUSKentRidgeWorld

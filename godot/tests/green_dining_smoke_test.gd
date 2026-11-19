@@ -39,12 +39,21 @@ func _test() -> void:
     if multimesh.instance_count != environment.generated_tuft_count:
         _fail("turf instance accounting does not match MultiMesh")
         return
+    if environment.tuft_positions.size() != multimesh.instance_count:
+        _fail("grass source positions and rendered batch have different lengths")
+        return
     for i in range(multimesh.instance_count):
-        if not environment.is_clear_lawn_point(Vector2(
-            multimesh.get_instance_transform(i).origin.x,
-            multimesh.get_instance_transform(i).origin.z
-        )):
-            _fail("grass tuft %d was placed outside lawn or on an existing walkway" % i)
+        var expected: Vector2 = environment.tuft_positions[i]
+        var origin: Vector3 = multimesh.get_instance_transform(i).origin
+        var actual: Vector2 = Vector2(origin.x, origin.z)
+        if actual.distance_to(expected) > 0.01:
+            _fail("grass tuft %d transform mismatch expected=%s got=%s" % [i, expected, actual])
+            return
+        if not environment.is_clear_lawn_point(expected):
+            _fail("grass tuft %d generated outside lawn: %s" % [i, expected])
+            return
+        if not environment.is_clear_lawn_point(actual):
+            _fail("grass tuft %d rounded into an obstructed footpath: %s" % [i, actual])
             return
     if environment.picnic_count < 2 or environment.picnic_count > environment.PICNIC_LIMIT:
         _fail("lawn picnic details missing or unbounded")
