@@ -340,11 +340,23 @@ func _update_goal(goal: Dictionary) -> void:
         _active_goal = ""
         return
     var goal_position: Vector3 = goal["position"]
-    objective_arrow.text = _direction_arrow(goal_position)
-    objective_name.text = str(goal["title"])
-    objective_detail.text = str(goal["detail"])
-    objective_distance.text = "%d m" % roundi(_horizontal_distance(player.global_position, goal_position))
+    var distance_m: float = _horizontal_distance(player.global_position, goal_position)
     var id_value: String = str(goal["id"])
+    var finish_radius: float = coins.DELIVERY_FINISH_RADIUS if id_value == "lunch" else challenge.SPRINT_CHECKPOINT_RADIUS_M if id_value.begins_with("sprint:") else tour.check_in_radius_m
+    var arrived: bool = distance_m <= finish_radius
+    var urgent: bool = id_value == "lunch" and coins.delivery_time <= 25.0 and not arrived
+    objective_arrow.text = "✓" if arrived else _direction_arrow(goal_position)
+    objective_name.text = str(goal["title"])
+    if arrived:
+        objective_detail.text = "IN RANGE  •  Your next action is ready"
+    elif urgent:
+        objective_detail.text = "HURRY!  •  %d seconds before cold lunch" % ceili(coins.delivery_time)
+    else:
+        objective_detail.text = str(goal["detail"])
+    objective_distance.text = "%d m" % roundi(distance_m)
+    var indicator_color: Color = Color("#91f3b2") if arrived else Color("#ff9f86") if urgent else Color("#f5d98d")
+    objective_arrow.add_theme_color_override("font_color", indicator_color)
+    objective_distance.add_theme_color_override("font_color", indicator_color)
     if id_value != _active_goal or not objective_card.visible:
         _active_goal = id_value
         _fade_in(objective_card, "goal")
