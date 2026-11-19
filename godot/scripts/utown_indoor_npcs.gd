@@ -231,7 +231,7 @@ func talk_to_nearest() -> bool:
     var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
     var affinity_line: String = ""
     var affinity_status: String = ""
-    if relationships != null:
+    if relationships != null and relationships.is_story_character(speaker):
         var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
         var chinese: bool = language != null and language.is_chinese()
         affinity_status = relationships.conversation(speaker, chinese)
