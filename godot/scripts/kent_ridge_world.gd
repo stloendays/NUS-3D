@@ -187,6 +187,8 @@ func _build_districts() -> void:
             _label(building, str(info["name"]), Vector3(0.0, height_value + 3.1, 0.0), "#f7f7df", 19)
             _decorate_building(building, info, width_value, depth_value, height_value)
             building_count += 1
+        if str(district["id"]) == "SCIENCE":
+            _build_md1_access(root)
         # Small placemaking accents, no more than six low-poly props per district.
         for i in range(3):
             var x: float = -width_m * 0.35 + float(i) * width_m * 0.35
@@ -201,6 +203,37 @@ func _build_districts() -> void:
             canopy.material_override = _material("#5e966a")
             root.add_child(canopy)
 
+
+
+func _md1_footpath(parent: Node3D, name_value: String, start: Vector3, finish: Vector3) -> void:
+    var delta: Vector3 = finish - start
+    var length_value: float = Vector2(delta.x, delta.z).length()
+    if length_value < 0.1:
+        return
+    var path: Node3D = Node3D.new()
+    path.name = name_value
+    path.position = (start + finish) * 0.5
+    path.rotation.y = atan2(delta.x, delta.z)
+    parent.add_child(path)
+    _box(path, "PedestrianOnly", Vector3.ZERO, Vector3(2.6, 0.12, length_value), "#d1d0c2")
+
+
+func _build_md1_access(science_root: Node3D) -> void:
+    # Schematic pedestrian route, not a surveyed staircase or road geometry.
+    # MD1 front facade is at x=68, z=59. Keep all footpath segments
+    # outside the building's collision box (x=53.5..82.5, z=27..59).
+    var access: Node3D = Node3D.new()
+    access.name = "MD1_PedestrianAccess_Schematic"
+    science_root.add_child(access)
+    var md1_entry: Vector3 = Vector3(68.0, 0.17, 61.8)
+    var md6_approach: Vector3 = Vector3(91.0, 0.17, 70.0)
+    var nuh_approach: Vector3 = Vector3(91.0, 0.17, 82.0)
+    _md1_footpath(access, "MD6_To_MD1_Walk", md6_approach, Vector3(68.0, 0.17, 70.0))
+    _md1_footpath(access, "MD1_Entrance_Walk", Vector3(68.0, 0.17, 70.0), md1_entry)
+    _md1_footpath(access, "NUH_To_MD6_Walk", nuh_approach, md6_approach)
+    _label(access, "MD1  |  PEDESTRIAN ENTRY", Vector3(68.0, 3.1, 64.0), "#e5f1ee", 17)
+    # Science Drive 4 vehicle access is intentionally not represented by a
+    # driveable link here; do not route buses across these footpaths.
 
 func _build_stations() -> void:
     for stop in stops:
@@ -346,6 +379,16 @@ func _decorate_building(parent: Node3D, info: Dictionary, width_m: float, depth_
         for bay in range(1, bays):
             var x: float = -width_m * 0.43 + width_m * 0.86 * float(bay) / float(bays)
             _box(parent, "CurtainMullion_%02d" % bay, Vector3(x, height_m * 0.52, depth_m * 0.5 + 0.27), Vector3(0.12, height_m * 0.82, 0.12), "#d9e4df")
+    elif kind == "md1_research":
+        # Stylized MD1 massing: podium, vertical glazed bays, shaded entrance.
+        # Dimensions and orientation are provisional, not surveyed geometry.
+        _box(parent, "MD1_Podium", Vector3(0, 3.0, depth_m * 0.5 + 0.7), Vector3(width_m * 0.96, 6.0, 1.7), "#d2d3cf")
+        _box(parent, "MD1_GlazedFacade", Vector3(0, height_m * 0.54, depth_m * 0.5 + 0.36), Vector3(width_m * 0.78, height_m * 0.73, 0.15), "#719da7")
+        for bay in range(1, 7):
+            var x: float = -width_m * 0.39 + width_m * 0.78 * float(bay) / 7.0
+            _box(parent, "MD1_Fin_%02d" % bay, Vector3(x, height_m * 0.55, depth_m * 0.5 + 0.57), Vector3(0.22, height_m * 0.76, 0.42), "#e4e5e0")
+        _box(parent, "MD1_EntranceCanopy", Vector3(0, 5.0, depth_m * 0.5 + 2.7), Vector3(width_m * 0.62, 0.44, 4.8), "#a6b6b8")
+        _box(parent, "MD1_EntranceGlazing", Vector3(0, 2.1, depth_m * 0.5 + 1.6), Vector3(width_m * 0.44, 3.8, 0.12), "#467987")
     elif kind == "library":
         _box(parent, "LibrarySunshade", Vector3(0, height_m * 0.58, depth_m * 0.5 + 1.5), Vector3(width_m * 0.88, 0.55, 3.0), "#b7a58b")
     elif kind == "residence":
