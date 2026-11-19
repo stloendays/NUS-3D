@@ -2,11 +2,14 @@ name: M5 offline accounts and mailbox
 
 on:
   push:
-    branches: ["feature/m5-local-accounts-levels-inbox"]
+    branches: ["feature/m5-local-accounts-levels-inbox", "feature/m5-startup-tutorial"]
   pull_request:
     paths:
       - "godot/scripts/account_store.gd"
       - "godot/scripts/game_shell.gd"
+      - "godot/scripts/startup_tutorial.gd"
+      - "godot/data/startup_tutorial.json"
+      - "docs/M5_STARTUP_TUTORIAL.md"
       - "godot/scenes/game_shell.tscn"
       - "godot/tests/account_smoke_test.gd"
       - ".github/workflows/accounts.yml"
