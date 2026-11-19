@@ -137,6 +137,12 @@ func _build_modal() -> void:
     exam_button.custom_minimum_size.y = 43.0
     exam_button.pressed.connect(_open_major_exams)
     journal_box.add_child(exam_button)
+    var presentation_button := Button.new()
+    presentation_button.name = "OpenEnglishPresentations"
+    presentation_button.text = "ENGLISH ORAL PRESENTATION  [F9]"
+    presentation_button.custom_minimum_size.y = 43.0
+    presentation_button.pressed.connect(_open_oral_presentations)
+    journal_box.add_child(presentation_button)
     var switch_button := Button.new()
     switch_button.text = "切换学院 / CHANGE FACULTY"
     switch_button.custom_minimum_size.y = 37.0
@@ -212,6 +218,14 @@ func _open_major_exams() -> void:
         exams.call("open_library")
 
 
+func _open_oral_presentations() -> void:
+    if coursework.current_faculty_id.is_empty():
+        return
+    hide_modal()
+    var voice: Node = get_parent().get_node_or_null("VoicePresentation")
+    if voice != null:
+        voice.call("open_library")
+
 func show_journal() -> void:
     if coursework.current_faculty_id.is_empty():
         show_selector()
@@ -267,6 +281,9 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
+    var voice: Node = get_parent().get_node_or_null("VoicePresentation")
+    if voice != null and voice.get("is_open") == true:
+        return
     var exams: Node = get_parent().get_node_or_null("EnglishExams")
     if exams != null and bool(exams.get("is_open")):
         return
