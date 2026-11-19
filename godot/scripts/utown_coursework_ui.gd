@@ -23,6 +23,7 @@ var journal_text: Label
 var journal_button: Button
 var modal_visible: bool = false
 var selection_visible: bool = false
+var intro_blocked: bool = false
 
 func _ready() -> void:
     _build_status()
@@ -155,6 +156,24 @@ func _set_game_input_locked(locked: bool) -> void:
     player.movement_locked = locked or life.on_shuttle
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if locked else Input.MOUSE_MODE_CAPTURED
 
+func begin_intro() -> void:
+    # The cinematic owns the screen before the first-run selector becomes
+    # visible. This keeps the existing picker and its save logic intact.
+    intro_blocked = true
+    shade.visible = false
+    status_card.visible = false
+    _set_game_input_locked(true)
+
+func end_intro() -> void:
+    intro_blocked = false
+    if coursework.current_faculty_id.is_empty():
+        show_selector()
+    elif modal_visible:
+        shade.visible = true
+        _set_game_input_locked(true)
+    else:
+        _set_game_input_locked(false)
+
 func show_selector() -> void:
     modal_visible = true
     selection_visible = true
@@ -222,6 +241,10 @@ func set_hud_enabled(enabled: bool) -> void:
     hud_enabled = enabled
 
 func _process(_delta: float) -> void:
+    if intro_blocked:
+        shade.visible = false
+        status_card.visible = false
+        return
     status_card.visible = hud_enabled and not modal_visible
     status_body.text = coursework.status_text()
     status_feedback.text = coursework.feedback if coursework.feedback_left > 0.0 else ""
@@ -229,6 +252,8 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
+    if intro_blocked:
+        return
     if not (event is InputEventKey):
         return
     var key: InputEventKey = event as InputEventKey
