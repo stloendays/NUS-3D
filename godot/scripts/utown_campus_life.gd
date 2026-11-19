@@ -652,6 +652,11 @@ func _nearest_pedestrian() -> int:
     return best
 
 func talk_to_nearest() -> bool:
+    if interior_active:
+        var indoor_characters: UTownIndoorNPCs = get_parent().get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+        if indoor_characters != null:
+            return indoor_characters.talk_to_nearest()
+        return false
     var index: int = _nearest_pedestrian()
     if index < 0:
         message = "No campus character is close enough to talk."
@@ -819,8 +824,13 @@ func activity_progress_count() -> int:
 
 func status_text() -> String:
     var lines := PackedStringArray()
-    lines.append("CAMPUS LIFE  |  %d pedestrians  |  [Q] talk" % pedestrians.size())
+    lines.append("INDOOR LIFE  |  3 characters  |  [Q] talk" if interior_active else "CAMPUS LIFE  |  %d pedestrians  |  [Q] talk" % pedestrians.size())
     if interior_active:
+        var indoor_characters: UTownIndoorNPCs = get_parent().get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+        if indoor_characters != null:
+            var nearby_name: String = indoor_characters.nearby_name()
+            if not nearby_name.is_empty():
+                lines.append("Nearby indoor character: %s  |  [Q] talk" % nearby_name)
         lines.append("INDOORS: %s / %s  |  [L] lift  [I] exit" % [active_interior, "MEZZANINE" if interior_floor == 1 else "GROUND"])
         var nearby_activity: Dictionary = nearest_activity()
         var available: String = str(nearby_activity["name"]) if not nearby_activity.is_empty() else "explore cafe / lounge / gallery"
