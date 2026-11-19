@@ -53,6 +53,11 @@ func _run() -> void:
     shell._enter_game()
     var coursework: UTownCourseworkUI = shell.game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if coursework != null and coursework.modal_visible:
+        # First-time faculty selection is mandatory; hide_modal() alone refuses it.
+        var faculty: UTownCoursework = shell.game.get_node("Coursework") as UTownCoursework
+        if not faculty.select_faculty(str(faculty.faculty_options[0]["id"])):
+            _fail("First faculty selection failed")
+            return
         coursework.hide_modal()
 
     shell._open_campus_hub()
