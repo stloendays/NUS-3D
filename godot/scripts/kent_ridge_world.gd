@@ -204,6 +204,8 @@ func _build_districts() -> void:
 
 func _build_stations() -> void:
     for stop in stops:
+        if bool(stop.get("walk_only", false)):
+            continue
         var stand: Node3D = Node3D.new()
         stand.name = "BusStop_" + str(stop["id"])
         stand.position = stop["position"]
