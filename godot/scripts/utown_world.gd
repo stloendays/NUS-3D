@@ -19,6 +19,7 @@ var generated_building_count: int = 0
 var generated_tree_count: int = 0
 var generated_tree_positions: Array[Vector3] = []
 var generated_path_count: int = 0
+var weather_reactive_materials: Array[StandardMaterial3D] = []
 var m2_profiles: Dictionary = {}
 var m2_detail_nodes: Array[Node3D] = []
 var generated_facade_count: int = 0
@@ -156,7 +157,9 @@ func _build_plaza() -> void:
     root.position = at
     root.rotation.y = deg_to_rad(float(plaza.get("rotation_deg", 0.0)))
     add_child(root)
-    _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), _mat("#b9bcb5"))
+    var plaza_surface: StandardMaterial3D = _mat("#b9bcb5")
+    weather_reactive_materials.append(plaza_surface)
+    _add_box(root, Vector3(0.0, 0.05, 0.0), Vector3(float(plaza.get("width_m", 44)), 0.09, float(plaza.get("depth_m", 30))), plaza_surface)
     for i in range(4):
         _add_box(root, Vector3(-16.0 + float(i) * 10.0, 2.4, -12.0), Vector3(0.8, 4.8, 0.8), _mat("#e8e8e3"))
     _add_box(root, Vector3(-1.0, 4.9, -12.0), Vector3(44.0, 0.45, 7.0), _mat("#b9c6cb"))
@@ -165,7 +168,8 @@ func _build_walkways() -> void:
     var root: Node3D = Node3D.new()
     root.name = "ConceptualFootpaths_NotSurveyed"
     add_child(root)
-    var path_material: Material = _mat("#c8c7bd")
+    var path_material: StandardMaterial3D = _mat("#c8c7bd")
+    weather_reactive_materials.append(path_material)
     for way in layout.get("walkways", []):
         var points: Array = way.get("lonlat", [])
         var width_m: float = float(way.get("width_m", 3.5))
