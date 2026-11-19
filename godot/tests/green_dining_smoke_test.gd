@@ -39,14 +39,15 @@ func _test() -> void:
     if multimesh.instance_count != environment.generated_tuft_count:
         _fail("turf instance accounting does not match MultiMesh")
         return
-    for i in range(multimesh.instance_count):
-        if not environment.is_clear_lawn_point(Vector2(
-            multimesh.get_instance_transform(i).origin.x,
-            multimesh.get_instance_transform(i).origin.z
-        )):
-            var actual_point := Vector2(multimesh.get_instance_transform(i).origin.x, multimesh.get_instance_transform(i).origin.z)
-            print("TURF_DEBUG index=", i, " position=", actual_point, " lawn_bounds=", environment._lawn_bounds(), " green_root=", environment.global_position, " polygon_vertices=", environment.lawn_polygon.size(), " path_count=", environment.path_corridors.size())
-            _fail("grass tuft %d was placed outside lawn or on an existing walkway" % i)
+    # Validate the actual CPU source positions. MultiMesh get_instance_transform()
+    # can yield identity in headless CI even after set_instance_transform(), so
+    # do not use renderer readback as a substitute for construction geometry.
+    if environment.tuft_positions.size() != multimesh.instance_count:
+        _fail("turf CPU position ledger did not match the GPU instance count")
+        return
+    for i in range(environment.tuft_positions.size()):
+        if not environment.is_clear_lawn_point(environment.tuft_positions[i]):
+            _fail("grass tuft %d was selected outside lawn or on a walkway" % i)
             return
     if environment.picnic_count < 2 or environment.picnic_count > environment.PICNIC_LIMIT:
         _fail("lawn picnic details missing or unbounded")
