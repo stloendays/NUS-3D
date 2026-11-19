@@ -1,0 +1,41 @@
+name: M15 Midnight Deadline opt-in horror QA
+
+on:
+  push:
+    branches:
+      - feature/m15-midnight-horror-mainline-20261119
+  pull_request:
+    paths:
+      - godot/scripts/utown_horror_mode.gd
+      - godot/scripts/utown_arcade.gd
+      - godot/scripts/game_shell.gd
+      - godot/scripts/account_store.gd
+      - godot/scripts/hud.gd
+      - godot/scenes/main.tscn
+      - godot/tests/midnight_horror_smoke_test.gd
+      - docs/M15_MIDNIGHT_DEADLINE.md
+      - .github/workflows/m15_midnight_horror.yml
+
+permissions:
+  contents: read
+
+jobs:
+  midnight-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+      - name: Import game and check GDScript
+        run: godot --headless --path godot --import --quit
+      - name: Horror mode state machine and chase
+        run: timeout 95s godot --headless --path godot --script res://tests/midnight_horror_smoke_test.gd
+      - name: Preserve existing arcade and account isolation
+        run: |
+          timeout 95s godot --headless --path godot --script res://tests/arcade_smoke_test.gd
+          timeout 95s godot --headless --path godot --script res://tests/account_smoke_test.gd
+          timeout 95s godot --headless --path godot --script res://tests/integration_smoke_test.gd
