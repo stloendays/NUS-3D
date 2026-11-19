@@ -328,6 +328,9 @@ func talk_to_professor() -> bool:
     return true
 
 func _can_fire() -> bool:
+    var horror: UTownHorrorMode = get_node_or_null("../MidnightHorror") as UTownHorrorMode
+    if horror != null and horror.active and not horror.armed:
+        return false  # A real round requires finding the fictional Pulse Blaster.
     return hud.visible and not campus_life.interior_active and not campus_life.on_shuttle and not player.bicycle_mode and not player.movement_locked
 
 func try_fire() -> bool:
@@ -349,6 +352,11 @@ func _resolve_shot() -> void:
     var chosen: Dictionary = WEAPONS[weapon_index]
     var origin: Vector3 = player.camera.global_position
     var forward: Vector3 = -player.camera.global_transform.basis.z.normalized()
+    var horror: UTownHorrorMode = get_node_or_null("../MidnightHorror") as UTownHorrorMode
+    if horror != null and horror.active:
+        var impact: Vector3 = horror.receive_arcade_shot(origin, forward, 25.0)
+        _show_pooled_projectile(origin + forward * 0.55, impact, "#83f8ec")
+        return
     var reach: float = float(chosen["range"]) + minf(6.0, float(level - 1) * 0.8)
     var best_index: int = -1
     var best_kind: int = 0
@@ -455,7 +463,8 @@ func _process(delta: float) -> void:
     if photo_visible != hud.visible:
         photo_visible = hud.visible
         status_layer.visible = photo_visible
-        held_toy.visible = photo_visible
+        var horror: UTownHorrorMode = get_node_or_null("../MidnightHorror") as UTownHorrorMode
+        held_toy.visible = photo_visible and (horror == null or not horror.active)
         for student in students:
             var student_label: Label3D = student["label"]
             student_label.visible = photo_visible
@@ -469,6 +478,9 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
+        var horror: UTownHorrorMode = get_node_or_null("../MidnightHorror") as UTownHorrorMode
+        if horror != null and horror.active and event.keycode in [KEY_1, KEY_2, KEY_3, KEY_U]:
+            return
         match event.keycode:
             KEY_1:
                 choose_weapon(0)
