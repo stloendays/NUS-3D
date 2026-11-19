@@ -132,9 +132,17 @@ func _run() -> void:
         _fail("Finishing guide must return to paused login")
         return
     shell._open_tutorial()
+    var exit_key: InputEventKey = InputEventKey.new()
+    exit_key.keycode = KEY_ESCAPE
+    exit_key.pressed = true
+    tutorial._input(exit_key)
+    if tutorial.visible or not paused or shell_accounts.is_logged_in():
+        _fail("Esc must close guide without altering login/game state")
+        return
+    shell._open_tutorial()
     tutorial.close_guide()
     if tutorial.visible or not paused or shell_accounts.is_logged_in():
-        _fail("Closing guide must not change login/game state")
+        _fail("Close button action must return to login safely")
         return
     if shell_accounts.register("shell_tester", "game-test-123") != "":
         _fail("UI scene local account could not register")
