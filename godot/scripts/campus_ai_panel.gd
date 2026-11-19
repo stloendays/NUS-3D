@@ -1,6 +1,6 @@
 extends CanvasLayer
 class_name NUS3DCampusAI
-## Optional online campus toolkit. All actions require a player click or F8.
+## Optional online campus toolkit. All actions require a player click or F11.
 ## Never receives local usernames, passwords, XP, coursework saves or mailbox data.
 
 const LINK_FILE: String = "res://data/campus_links.json"
@@ -117,7 +117,7 @@ func _build_ui() -> void:
     panel_title = _label("CAMPUS AI  /  ONLINE TOOLS", 25)
     panel_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     head.add_child(panel_title)
-    close_button = _button("Close [F8]", _request_close)
+    close_button = _button("Close [F11]", _request_close)
     head.add_child(close_button)
     privacy_note = _label("", 12)
     vertical.add_child(privacy_note)
@@ -412,7 +412,7 @@ func _on_language_changed(_locale: String) -> void:
     if panel_title == null:
         return
     panel_title.text = _t("CAMPUS AI  /  校园联网工具", "CAMPUS AI  /  ONLINE TOOLS")
-    close_button.text = _t("关闭 [F8]", "Close [F8]")
+    close_button.text = _t("关闭 [F11]", "Close [F11]")
     privacy_note.text = _t("需手动发起：不上传游戏账户、邮件、成绩或存档。AI 答复可能出错。", "Manual opt-in only. No game accounts, mail, grades or saves are uploaded. AI can be wrong.")
     section_links.text = _t("外部网站与校园信息", "Websites & campus links")
     section_weather.text = _t("新加坡实时天气（Open-Meteo）", "Singapore weather (Open-Meteo)")
