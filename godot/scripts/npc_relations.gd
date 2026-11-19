@@ -23,6 +23,10 @@ var affinity: Dictionary = {}
 var last_tag: Dictionary = {}
 var cooldown: Dictionary = {}
 var notice: Label
+var grudges: Dictionary = {}
+var call_for_help: Dictionary = {}
+var previous_indoor: bool = false
+var notice_timer: float = 0.0
 
 
 func _ready() -> void:
@@ -44,12 +48,14 @@ func _load() -> void:
         return
     for name in PERSONALITIES.keys():
         affinity[name] = clampi(int(file.get_value("affinity", name, 0)), MIN_AFFINITY, MAX_AFFINITY)
+        grudges[name] = maxi(0, int(file.get_value("grudge", name, 0)))
 
 
 func _save() -> void:
     var file := ConfigFile.new()
     for name in PERSONALITIES.keys():
         file.set_value("affinity", name, int(affinity.get(name, 0)))
+        file.set_value("grudge", name, int(grudges.get(name, 0)))
     if file.save(SAVE_PATH) != OK:
         push_warning("NPC relations could not be saved.")
 
@@ -62,6 +68,10 @@ func change_affinity(character_name: String, amount: int) -> void:
     if not PERSONALITIES.has(character_name):
         return
     affinity[character_name] = clampi(get_affinity(character_name) + amount, MIN_AFFINITY, MAX_AFFINITY)
+    if amount < 0:
+        grudges[character_name] = mini(int(grudges.get(character_name, 0)) + 1, 20)
+    elif amount > 0 and int(grudges.get(character_name, 0)) > 0:
+        grudges[character_name] = maxi(0, int(grudges[character_name]) - 1)
     _save()
     affinity_changed.emit(character_name, get_affinity(character_name))
 
@@ -107,8 +117,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-    if player == null or campus == null or campus.interior_active:
+    if player == null or campus == null:
         return
+    if campus.interior_active:
+        if not previous_indoor:
+            for state in campus.pedestrians:
+                state["hostile"] = false
+            notice.text = "Safe zone: campus interiors. Rivalry paused."
+        previous_indoor = true
+        return
+    previous_indoor = false
     var now: float = Time.get_ticks_msec() / 1000.0
     var chasing: int = 0
     for state in campus.pedestrians:
@@ -125,10 +143,30 @@ func _process(delta: float) -> void:
         if not hostile:
             continue
         chasing += 1
+        # Competitive/proud NPCs run faster; patient NPCs are slower.
+        var temperament: String = str(PERSONALITIES.get(name, ""))
+        var speed: float = CHASE_SPEED
+        if temperament == "competitive":
+            speed *= 1.25
+        elif temperament == "patient" or temperament == "friendly":
+            speed *= 0.72
+        elif temperament == "proud":
+            speed *= 1.12
+        # Grudges keep a rivalry memorable without altering the hostility thresholds.
+        speed *= 1.0 + minf(float(grudges.get(name, 0)) * 0.015, 0.20)
+        if (temperament == "outgoing" or temperament == "competitive") and get_affinity(name) <= -65 and not call_for_help.has(name):
+            call_for_help[name] = true
+            for ally_state in campus.pedestrians:
+                if str(ally_state["name"]) != name and (ally_state["node"] as Node3D).global_position.distance_to(npc.global_position) < 9.0:
+                    var ally_name: String = str(ally_state["name"])
+                    if get_affinity(ally_name) < 0:
+                        change_affinity(ally_name, -8)
+                        notice.text = "%s called %s for backup!" % [name, ally_name]
+                        break
         var toward: Vector3 = player.global_position - npc.global_position
         toward.y = 0.0
         if toward.length() > TAG_DISTANCE:
-            var step: float = minf(CHASE_SPEED * delta, toward.length() - TAG_DISTANCE)
+            var step: float = minf(speed * delta, toward.length() - TAG_DISTANCE)
             npc.global_position += toward.normalized() * step
             npc.look_at(npc.global_position + toward, Vector3.UP)
             var gait: float = sin(now * 12.0)
