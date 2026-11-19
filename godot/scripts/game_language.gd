@@ -10,6 +10,7 @@ const LOCALE_SAVE: String = "user://nus3d_locale.cfg"
 const SUPPORTED: PackedStringArray = PackedStringArray(["en", "zh"])
 
 var locale: String = "en"
+var save_path: String = LOCALE_SAVE
 var catalog: Dictionary = {}
 var fragments: Array = []
 var stop_zh: Dictionary = {}
@@ -18,7 +19,7 @@ var stop_zh: Dictionary = {}
 func _ready() -> void:
     _load_catalog()
     var saved: ConfigFile = ConfigFile.new()
-    if saved.load(LOCALE_SAVE) == OK:
+    if saved.load(save_path) == OK:
         var candidate: String = str(saved.get_value("settings", "locale", "en"))
         locale = candidate if SUPPORTED.has(candidate) else "en"
     else:
@@ -56,7 +57,7 @@ func set_locale(language_code: String) -> bool:
     var settings: ConfigFile = ConfigFile.new()
     settings.set_value("settings", "schema_version", 1)
     settings.set_value("settings", "locale", locale)
-    if settings.save(LOCALE_SAVE) != OK:
+    if settings.save(save_path) != OK:
         push_warning("Language preference could not be saved")
     language_changed.emit(locale)
     return true
