@@ -42,12 +42,11 @@ func _smoke() -> void:
         _fail("HUD clearance card references missing")
         return
     var starting_weather_minimum: Vector2 = weather_card.custom_minimum_size
-    var starting_weather_visible: bool = weather_card.visible
+    var starting_help_state: bool = hud.show_full_help
+    hud.show_full_help = true
     weather_card.custom_minimum_size = Vector2(starting_weather_minimum.x, 125.0)
-    weather_card.visible = true
     await process_frame
     arcade._refresh_status()
-    print("ARCADE_LAYOUT_DEBUG weather_rect=", weather_card.get_global_rect(), " weather_text=", weather_card.get_node("Message").text, " arcade_rect=", arcade_card.get_global_rect(), " arcade_visible=", arcade_card.visible)
     if arcade_card.visible and arcade_card.get_global_rect().intersects(weather_card.get_global_rect()):
         _fail("Arcade status overlaps expanded indoor/weather panel")
         return
@@ -58,7 +57,7 @@ func _smoke() -> void:
         _fail("Arcade summary was not compacted to one readable line")
         return
     weather_card.custom_minimum_size = starting_weather_minimum
-    weather_card.visible = starting_weather_visible
+    hud.show_full_help = starting_help_state
     await process_frame
     arcade._refresh_status()
     if not arcade_card.visible:
