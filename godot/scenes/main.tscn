@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -34,6 +34,7 @@
 
 [ext_resource type="Script" path="res://scripts/character_wardrobe.gd" id="32"]
 [ext_resource type="Script" path="res://scripts/utown_horror_mode.gd" id="33"]
+[ext_resource type="Script" path="res://scripts/utown_leisure_audio.gd" id="34"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -257,6 +258,9 @@ script = ExtResource("23")
 
 [node name="LeisureUI" type="CanvasLayer" parent="."]
 script = ExtResource("24")
+
+[node name="Sound" type="Node" parent="LeisureUI"]
+script = ExtResource("34")
 
 [node name="KentRidgeExpansion" type="Node3D" parent="."]
 script = ExtResource("25")
