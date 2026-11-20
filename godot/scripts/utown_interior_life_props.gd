@@ -184,24 +184,24 @@ static func decorate_recreation(room: Node3D) -> void:
             Vector3(0.28, 0.4, 0.28), red)
 
     # A compact social table occupies the side bay; it does not touch the main court.
-    _box(root, "ClubGameTable", Vector3(8.0, 0.82, 2.0), Vector3(1.8, 0.14, 1.25), bright)
+    _box(root, "ClubGameTable", Vector3(-8.0, 0.82, 2.0), Vector3(1.8, 0.14, 1.25), bright)
     for x_offset in [-0.72, 0.72]:
         for z_offset in [-0.42, 0.42]:
-            _box(root, "ClubTableLeg", Vector3(8.0 + x_offset, 0.4, 2.0 + z_offset),
+            _box(root, "ClubTableLeg", Vector3(-8.0 + x_offset, 0.4, 2.0 + z_offset),
                 Vector3(0.08, 0.8, 0.08), metal)
     # Small checker pattern and pieces make the board readable at player scale.
     for x in range(4):
         for z in range(4):
             _box(root, "ChessTile_%d_%d" % [x, z],
-                Vector3(7.52 + float(x) * 0.24, 0.902, 1.76 + float(z) * 0.24),
+                Vector3(-8.48 + float(x) * 0.24, 0.902, 1.76 + float(z) * 0.24),
                 Vector3(0.24, 0.018, 0.24), paper if (x + z) % 2 == 0 else dark)
     for i in range(8):
         _ball(root, "ChessPiece_%02d" % i,
-            Vector3(7.65 + float(i % 4) * 0.24, 0.99, 1.87 + float(i / 4) * 0.24),
+            Vector3(-8.35 + float(i % 4) * 0.24, 0.97, 1.87 + float(i / 4) * 0.24),
             0.055, metal if i < 4 else red)
-    _box(root, "CardDeckBox", Vector3(8.65, 0.94, 2.18), Vector3(0.24, 0.07, 0.32), red)
+    _box(root, "CardDeckBox", Vector3(-7.35, 0.94, 2.18), Vector3(0.24, 0.07, 0.32), red)
     for i in range(3):
-        var card := _box(root, "LooseCard_%d" % i, Vector3(8.45 + float(i) * 0.08, 0.93 + float(i) * 0.014, 1.72),
+        var card := _box(root, "LooseCard_%d" % i, Vector3(-7.55 + float(i) * 0.08, 0.91 + float(i) * 0.014, 1.72),
             Vector3(0.18, 0.012, 0.26), paper)
         card.rotation.y = float(i) * 0.14
 
