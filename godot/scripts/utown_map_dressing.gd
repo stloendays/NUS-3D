@@ -265,31 +265,39 @@ func _build_utown_trash_bins() -> void:
     for index in range(bench_anchors.size()):
         if trash_bin_count >= MAX_TRASH_BINS:
             break
-        if index % 2 != 0:
-            continue
         var anchor: Dictionary = bench_anchors[index]
         var direction: Vector2 = anchor.get("direction", Vector2.RIGHT)
-        var side: float = -1.0 if index % 4 == 0 else 1.0
-        var at: Vector2 = anchor.get("position", Vector2.ZERO) + direction * side * 2.15
-        if not _outside_walkways_and_buildings(at, 3.0):
-            continue
-        var conflict: bool = false
-        for previous in locations:
-            if previous.distance_to(at) < 9.0:
-                conflict = true
+        var anchor_position: Vector2 = anchor.get("position", Vector2.ZERO)
+        # Try either end of the bench before skipping it; the adjacent tree/building
+        # layout differs along each walkway segment.
+        var offsets: Array[Vector2] = [
+            direction * 1.9, -direction * 1.9,
+            direction * 2.35, -direction * 2.35
+        ]
+        for offset in offsets:
+            if trash_bin_count >= MAX_TRASH_BINS:
                 break
-        if conflict:
-            continue
+            var at: Vector2 = anchor_position + offset
+            if not _outside_walkways_and_buildings(at, 3.0):
+                continue
+            var conflict: bool = false
+            for previous in locations:
+                if previous.distance_to(at) < 8.0:
+                    conflict = true
+                    break
+            if conflict:
+                continue
 
-        var scale: float = rng.randf_range(0.92, 1.08)
-        var yaw: float = rng.randf_range(0.0, TAU)
-        var basis: Basis = Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale)
-        body_transforms.append(Transform3D(basis, Vector3(at.x, 0.39 * scale, at.y)))
-        lid_transforms.append(Transform3D(basis, Vector3(at.x, 0.80 * scale, at.y)))
-        body_colors.append(Color.html(body_palette[trash_bin_count % body_palette.size()]))
-        lid_colors.append(Color.html(lid_palette[trash_bin_count % lid_palette.size()]))
-        locations.append(at)
-        trash_bin_count += 1
+            var scale: float = rng.randf_range(0.92, 1.08)
+            var yaw: float = rng.randf_range(0.0, TAU)
+            var basis: Basis = Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale)
+            body_transforms.append(Transform3D(basis, Vector3(at.x, 0.39 * scale, at.y)))
+            lid_transforms.append(Transform3D(basis, Vector3(at.x, 0.80 * scale, at.y)))
+            body_colors.append(Color.html(body_palette[trash_bin_count % body_palette.size()]))
+            lid_colors.append(Color.html(lid_palette[trash_bin_count % lid_palette.size()]))
+            locations.append(at)
+            trash_bin_count += 1
+            break
 
     if not body_transforms.is_empty():
         _batch("UTownTrashBins_Body_OneBatch", body, _material("#FFFFFF", true), body_transforms, body_colors)
