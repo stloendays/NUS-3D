@@ -527,8 +527,8 @@ func _refresh_display() -> void:
             "Explore, discover and collect for more coins."))
         wallet_label.text = "\n".join(lines)
     if shop_status != null:
-        shop_status.text = _t("余额：%d 金币 | 幸运拾取 %d | 加时券 %d | 小费券 %d",
-            "Wallet: %d C | Lucky %d pickups | Lunch %d | Tips %d") % [
+        shop_status.text = _t("余额：%d 金币\n持有：幸运拾取 %d · 送餐加时券 %d · 双倍小费券 %d",
+            "BALANCE %d C\nOWNED: Lucky %d · Lunch %d · Double tips %d") % [
             balance, lucky_pickups, lunch_passes, double_tip_passes]
 
 func save_progress() -> void:
