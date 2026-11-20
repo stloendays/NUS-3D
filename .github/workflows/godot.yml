@@ -75,6 +75,8 @@ jobs:
       - name: Validate English exam catalog
         run: python tools/validate_english_exams.py
 
+      - name: Validate gameplay modal locking, per-account economy and transient-state isolation
+        run: godot --headless --path godot --script res://tests/gameplay_integrity_smoke_test.gd
       - name: Validate integrated campaign, accounts and controls
         run: |
           set -eo pipefail
