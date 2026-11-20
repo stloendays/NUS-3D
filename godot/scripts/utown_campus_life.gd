@@ -127,7 +127,8 @@ func npc_ground_position(current: Vector3, desired: Vector3, delta: float) -> Ve
     if hit.is_empty():
         return Vector3(desired.x, current.y, desired.z)
     var normal: Vector3 = hit.get("normal", Vector3.UP)
-    var surface_y: float = float((hit["position"] as Vector3).y)
+    var hit_position: Vector3 = hit["position"]
+    var surface_y: float = hit_position.y
     if normal.dot(Vector3.UP) < 0.72 or absf(surface_y - current.y) > NPC_STEP_HEIGHT:
         return Vector3(desired.x, current.y, desired.z)
     var blend: float = clampf(delta * NPC_GROUND_SNAP_SPEED, 0.0, 1.0)
