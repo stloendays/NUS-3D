@@ -128,6 +128,10 @@ func _run() -> void:
     if lounge_caption == null or lounge_caption.get_theme_color("font_color") != NUS3DUISkin.ink_for(Color("#b3cbd0")):
         _fail("Leisure caption still uses low-contrast legacy pastel ink")
         return
+    var age_check: CheckBox = leisure_ui.get("adult_confirm") as CheckBox
+    if age_check == null or age_check.get_theme_color("font_color") != NUS3DUISkin.TEXT or age_check.get_theme_color("font_disabled_color") != NUS3DUISkin.DIM:
+        _fail("Leisure age-gate checkbox does not use accessible shared text states")
+        return
     # The former arcade and area cards were stacked on the same pixels; a
     # translucent surface cannot make overlapping lines readable.
     var arcade_card: PanelContainer = arcade.status_layer.get_node_or_null("ArcadeCard") as PanelContainer if arcade != null and arcade.status_layer != null else null
