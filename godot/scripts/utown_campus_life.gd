@@ -2,6 +2,8 @@ extends Node
 class_name UTownCampusLife
 signal talked_to(character_name: String)
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
+const EXTRA_INTERIOR_KIT = preload("res://scripts/utown_extra_interiors.gd")
+const EXTRA_INTERIOR_IDS = ["CREATE_TOWER", "UTR_N", "UTR_S", "TEMBUSU", "CAPT"]
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -37,7 +39,7 @@ var entry_positions: Dictionary = {}
 var interiors: Dictionary = {}
 var activity_spots: Dictionary = {}
 var visited_activities: Dictionary = {}
-var interior_anchors: Dictionary = {"ERC": Vector3(900.0, 0.0, 0.0), "SRC": Vector3(940.0, 0.0, 0.0)}
+var interior_anchors: Dictionary = {"ERC": Vector3(900.0, 0.0, 0.0), "SRC": Vector3(940.0, 0.0, 0.0), "CREATE_TOWER": Vector3(980.0, 0.0, 0.0), "UTR_N": Vector3(1020.0, 0.0, 0.0), "UTR_S": Vector3(1060.0, 0.0, 0.0), "TEMBUSU": Vector3(1100.0, 0.0, 0.0), "CAPT": Vector3(1140.0, 0.0, 0.0)}
 var interior_active: bool = false
 var interior_floor: int = 0
 var active_interior: String = ""
@@ -60,6 +62,7 @@ var message_time: float = 0.0
 func _ready() -> void:
     _load_waypoints()
     _build_pedestrians()
+    _register_extra_entries()
     _build_interiors()
     _build_bicycle()
     _build_shuttle()
@@ -73,6 +76,13 @@ func _load_waypoints() -> void:
         entry_positions[id] = point
         if id in ["GREEN", "ERC", "SRC", "PLAZA"]:
             shuttle_route.append(point)
+
+func _register_extra_entries() -> void:
+    for raw in world.layout.get("buildings", []):
+        var building: Dictionary = raw
+        var id: String = str(building.get("id", ""))
+        if id in EXTRA_INTERIOR_IDS:
+            entry_positions[id] = world.lonlat_to_world(float(building.get("lon", world.origin_lon)), float(building.get("lat", world.origin_lat)))
 
 func _route_length(route: Array[Vector3]) -> float:
     var total: float = 0.0
@@ -204,18 +214,21 @@ func _box(parent: Node3D, name: String, at: Vector3, size: Vector3, material: Ma
     return mesh
 
 func _build_interiors() -> void:
-    for id in ["ERC", "SRC"]:
+    for id in interior_anchors.keys():
         var room := Node3D.new()
         room.name = id + "_IllustrativeInterior"
         room.position = interior_anchors[id]
         add_child(room)
         _build_room_shell(room, id)
-        _build_mezzanine(room, id)
+        if id in ["ERC", "SRC"]:
+            _build_mezzanine(room, id)
         if id == "ERC":
             _build_study_room(room)
-        else:
+        elif id == "SRC":
             _build_recreation_room(room)
-        activity_spots[id] = INTERIOR_KIT.decorate(room, id)
+        else:
+            EXTRA_INTERIOR_KIT.decorate(room, id)
+        activity_spots[id] = INTERIOR_KIT.decorate(room, id) if id in ["ERC", "SRC"] else []
         interiors[id] = room
 
 func _build_room_shell(room: Node3D, id: String) -> void:
@@ -703,6 +716,10 @@ func enter_interior(id: String) -> bool:
 func toggle_interior_floor() -> bool:
     if not interior_active:
         return false
+    if active_interior in EXTRA_INTERIOR_IDS:
+        message = "This room is ground-floor only."
+        message_time = 2.5
+        return false
     interior_floor = 1 - interior_floor
     var floor_position: Vector3 = Vector3(0.0, 0.18, 6.0) if interior_floor == 0 else Vector3(0.0, 3.58, -6.5)
     player.global_position = interior_anchors[active_interior] + floor_position
@@ -733,7 +750,7 @@ func enter_nearest_interior() -> bool:
         return true
     var best_id: String = ""
     var best_distance: float = ENTRY_RADIUS
-    for id in ["ERC", "SRC"]:
+    for id in interior_anchors.keys():
         if not entry_positions.has(id):
             continue
         var point: Vector3 = entry_positions[id]
@@ -742,7 +759,7 @@ func enter_nearest_interior() -> bool:
             best_id = id
             best_distance = d
     if best_id.is_empty():
-        message = "Approach the ERC or SRC study entrance, then press I."
+        message = "Approach an ERC, SRC, CREATE, residence or college entrance; press I."
         message_time = 3.0
         return false
     return enter_interior(best_id)
