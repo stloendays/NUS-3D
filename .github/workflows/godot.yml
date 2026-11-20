@@ -70,6 +70,8 @@ jobs:
         run: godot --headless --path godot --import --quit
       - name: Validate scene and geometry
         run: godot --headless --path godot --script res://tests/smoke_test.gd
+      - name: Validate NPC A-star obstacle navigation and graded terrain following
+        run: godot --headless --path godot --script res://tests/npc_navigation_smoke_test.gd
       - name: Check official stable-release updater version, URL and SHA-256 rules
         run: godot --headless --path godot --script res://tests/auto_update_smoke_test.gd
       - name: Validate English exam catalog
@@ -98,6 +100,9 @@ jobs:
             wardrobe_smoke_test.gd \
             boot_loading_smoke_test.gd \
             campus_ai_smoke_test.gd \
+            npc_relationship_smoke_test.gd \
+            campus_furniture_smoke_test.gd \
+            interior_life_props_smoke_test.gd \
             multiplayer_performance_smoke_test.gd \
             story_smoke_test.gd \
             leisure_smoke_test.gd \
