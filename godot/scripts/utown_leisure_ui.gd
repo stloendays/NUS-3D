@@ -112,8 +112,7 @@ func _label(content: String, size: int = 16, color_hex: String = "#e9ede7") -> L
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.add_theme_font_size_override("font_size", size)
     var original: Color = _palette(color_hex)
-    label.add_theme_color_override("font_color",
-        NUS3DUISkin.TEXT if original.get_luminance() > 0.58 else original)
+    label.add_theme_color_override("font_color", NUS3DUISkin.ink_for(original))
     return label
 
 func _button(title: String, width: float = 150.0) -> Button:
