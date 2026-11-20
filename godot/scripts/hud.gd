@@ -34,6 +34,9 @@ var help_backdrop: PanelContainer
 var toast_card: PanelContainer
 var toast_label: Label
 var toast_remaining: float = 0.0
+# Queue simultaneous rewards so later achievements do not overwrite the first toast.
+const MAX_PENDING_TOASTS: int = 12
+var _pending_toasts: Array[Dictionary] = []
 var _toast_tween: Tween
 var _seen_tour_stops: int = 0
 var _seen_notes: int = 0
@@ -98,6 +101,9 @@ func sync_feedback_state() -> void:
     _seen_activities = campus_life.visited_activities.size()
     _seen_sprint_time = challenge.sprint_last_time
     toast_remaining = 0.0
+    _pending_toasts.clear()
+    if _toast_tween != null and _toast_tween.is_running():
+        _toast_tween.kill()
     if toast_card != null:
         toast_card.hide()
 
@@ -174,6 +180,10 @@ func _play_ui_sound(effect: String) -> void:
 
 
 func _show_toast(message: String, effect: String = "confirm") -> void:
+    if toast_remaining > 0.0 and toast_card.visible:
+        if _pending_toasts.size() < MAX_PENDING_TOASTS:
+            _pending_toasts.append({"message": message, "effect": effect})
+        return
     toast_label.text = message
     toast_remaining = 2.7
     if _toast_tween != null and _toast_tween.is_running():
@@ -194,20 +204,30 @@ func _update_notices(delta: float) -> void:
         toast_remaining -= delta
         if toast_remaining <= 0.0:
             toast_card.hide()
+            if not _pending_toasts.is_empty():
+                var next_toast: Dictionary = _pending_toasts.pop_front()
+                _show_toast(str(next_toast["message"]), str(next_toast["effect"]))
     var stops: int = tour.discovered_ids.size()
     if stops > _seen_tour_stops:
-        _show_toast("Waypoint discovered  |  %d / %d" % [stops, tour.stops.size()])
+        _show_toast(language_service.choose(
+            "探索打卡  |  %d / %d" % [stops, tour.stops.size()],
+            "Waypoint discovered  |  %d / %d" % [stops, tour.stops.size()]))
     _seen_tour_stops = stops
     var notes: int = challenge.collected_ids.size()
     if notes > _seen_notes:
-        _show_toast("Field note collected  |  %d / %d" % [notes, challenge.items.size()], "reward")
+        _show_toast(language_service.choose(
+            "校园笔记已收集  |  %d / %d" % [notes, challenge.items.size()],
+            "Field note collected  |  %d / %d" % [notes, challenge.items.size()]), "reward")
     _seen_notes = notes
     var activities: int = campus_life.visited_activities.size()
     if activities > _seen_activities:
-        _show_toast("Campus activity completed", "confirm")
+        _show_toast(language_service.choose("校园活动已完成", "Campus activity completed"), "confirm")
     _seen_activities = activities
     if challenge.sprint_last_time >= 0.0 and challenge.sprint_last_time != _seen_sprint_time:
-        _show_toast("Campus Sprint finished  |  " + challenge.sprint_medal, "reward")
+        var medal_zh: String = str({"GOLD": "金牌", "SILVER": "银牌",
+            "BRONZE": "铜牌", "FINISH": "完赛"}.get(challenge.sprint_medal, "完赛"))
+        _show_toast(language_service.choose("校园竞速完成  |  " + medal_zh,
+            "Campus Sprint finished  |  " + challenge.sprint_medal), "reward")
     _seen_sprint_time = challenge.sprint_last_time
 
 
