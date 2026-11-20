@@ -47,6 +47,12 @@ func _run() -> void:
     # Avoid writing any real player coin/profile/mission save during testing.
     coins.save_path = "user://nus3d-coins-smoke-%d.cfg" % Time.get_ticks_usec()
     coins.load_progress()
+    var plaza: Node3D = world.get_node("TownPlaza_approximate") as Node3D
+    player.global_position = plaza.global_position + Vector3(0.0, 0.18, 0.0)
+    coins.toggle_shop()
+    if not coins.shop_open:
+        _fail("Town Plaza shop did not open in test play mode")
+        return
     if coins.balance != 0 or coins.claimed_rewards.size() != 0:
         _fail("new independent wallet should start empty")
         return
@@ -59,6 +65,7 @@ func _run() -> void:
     if coins.balance != 65 or coins.lucky_pickups != 5 or coins.purchase("lucky"):
         _fail("Lucky Badge price, buff or stacking restriction is incorrect")
         return
+    player.global_position = plaza.global_position + Vector3(0.0, 0.18, 0.0)
     if not coins.purchase("lunch") or coins.lunch_passes != 1 or coins.balance != 37:
         _fail("lunch pass purchase failed")
         return
@@ -138,6 +145,7 @@ func _run() -> void:
     if coins.delivery_interact() or coins.delivery_count != 1:
         _fail("delivery completion was repeatable during cooldown")
         return
+    player.global_position = plaza.global_position + Vector3(0.0, 0.18, 0.0)
     if not coins.purchase("tip"):
         _fail("Golden Tip purchase failed")
         return
