@@ -89,7 +89,7 @@ func _run() -> void:
     if normalized_panel.corner_radius_top_left != NUS3DUISkin.PANEL_RADIUS_MIN:
         _fail("Shared glass surfaces do not enforce the common corner radius")
         return
-    if NUS3DUISkin.ink_for(Color("#AEC0C5")) != NUS3DUISkin.DIM:
+    if NUS3DUISkin.ink_for(Color("#7D9298")) != NUS3DUISkin.DIM:
         _fail("Legacy pale secondary text is not mapped to readable secondary ink")
         return
     if NUS3DUISkin.ink_for(Color("#E8EEE8")) != NUS3DUISkin.TEXT:
@@ -119,10 +119,10 @@ func _run() -> void:
         return
     var guide_prompt_detail: Label = guide.get("prompt_detail") as Label
     var lounge_caption: Label = leisure_ui.get("caption_label") as Label
-    if guide_prompt_detail == null or guide_prompt_detail.get_theme_color("font_color") != NUS3DUISkin.DIM:
+    if guide_prompt_detail == null or guide_prompt_detail.get_theme_color("font_color") != NUS3DUISkin.ink_for(Color("#abcbd1")):
         _fail("Interaction hint still uses low-contrast legacy pastel ink")
         return
-    if lounge_caption == null or lounge_caption.get_theme_color("font_color") != NUS3DUISkin.DIM:
+    if lounge_caption == null or lounge_caption.get_theme_color("font_color") != NUS3DUISkin.ink_for(Color("#b3cbd0")):
         _fail("Leisure caption still uses low-contrast legacy pastel ink")
         return
     # The former arcade and area cards were stacked on the same pixels; a
