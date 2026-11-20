@@ -58,10 +58,13 @@ var adult_button: Button
 var tab_chess: Button
 var tab_cards: Button
 var tab_social: Button
+var lounge_panel: PanelContainer
 
 func _ready() -> void:
     layer = 18
     _build()
+    get_viewport().size_changed.connect(_update_lounge_layout)
+    _update_lounge_layout()
     if language != null:
         language.language_changed.connect(_on_language_changed)
         _on_language_changed(language.locale)
@@ -127,6 +130,15 @@ func _style_panel(panel: PanelContainer, _legacy_color: String) -> void:
     panel.add_theme_stylebox_override("panel",
         NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
 
+func _update_lounge_layout() -> void:
+    if lounge_panel == null:
+        return
+    var size: Vector2 = get_viewport().get_visible_rect().size
+    lounge_panel.custom_minimum_size = Vector2(
+        minf(728.0, maxf(300.0, size.x - 28.0)),
+        minf(620.0, maxf(280.0, size.y - 28.0)))
+
+
 func _build() -> void:
     status_chip = _label("", 15, "#ffd591")
     status_chip.name = "PostCourseShortcut"
@@ -156,17 +168,17 @@ func _build() -> void:
     center.mouse_filter = Control.MOUSE_FILTER_IGNORE
     backdrop.add_child(center)
 
-    var panel := PanelContainer.new()
-    panel.name = "PostCourseClubPanel"
-    panel.custom_minimum_size = Vector2(728, 620)
-    panel.mouse_filter = Control.MOUSE_FILTER_STOP
-    _style_panel(panel, "#183039")
-    center.add_child(panel)
+    lounge_panel = PanelContainer.new()
+    lounge_panel.name = "PostCourseClubPanel"
+    lounge_panel.custom_minimum_size = Vector2(728, 620)
+    lounge_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+    _style_panel(lounge_panel, "#183039")
+    center.add_child(lounge_panel)
 
     var column := VBoxContainer.new()
     column.name = "LeisureContent"
     column.add_theme_constant_override("separation", 9)
-    panel.add_child(column)
+    lounge_panel.add_child(column)
     var heading := HBoxContainer.new()
     column.add_child(heading)
     header_label = _label("POST-COURSE CLUB", 20, "#26343B")
