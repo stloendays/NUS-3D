@@ -66,6 +66,8 @@ func _ready() -> void:
     challenge_message.add_theme_font_size_override("font_size", 14)
     campus_message.add_theme_font_size_override("font_size", 12)
     _make_help_overlay()
+    get_viewport().size_changed.connect(_update_compact_layout)
+    _update_compact_layout()
     hint_label.visible = false
     perf_label.visible = false
     _make_key_rail()
@@ -74,6 +76,27 @@ func _ready() -> void:
     sync_feedback_state()
     language_service.language_changed.connect(_apply_language)
     _apply_language(language_service.locale)
+
+
+func _update_compact_layout() -> void:
+    # Keep F1 help legible on laptop-sized windows without adding a HUD mode.
+    var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+    var compact: bool = viewport_size.x < 1100.0 or viewport_size.y < 720.0
+    var horizontal_margin: float = 0.06 if compact else 0.16
+    if help_backdrop != null:
+        help_backdrop.anchor_left = horizontal_margin
+        help_backdrop.anchor_right = 1.0 - horizontal_margin
+        help_backdrop.offset_top = -275.0 if compact else -257.0
+        help_backdrop.offset_bottom = -48.0 if compact else -64.0
+    help_label.anchor_left = horizontal_margin + 0.02
+    help_label.anchor_right = 0.98 - horizontal_margin
+    help_label.offset_top = -265.0 if compact else -245.0
+    help_label.offset_bottom = -58.0 if compact else -76.0
+    help_label.add_theme_font_size_override("font_size", 13 if compact else 15)
+    if toast_card != null:
+        var half_width: float = minf(265.0, viewport_size.x * 0.40)
+        toast_card.offset_left = -half_width
+        toast_card.offset_right = half_width
 
 
 func _help_text() -> String:
@@ -165,6 +188,7 @@ func _make_toast() -> void:
     toast_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     toast_card.add_child(toast_label)
     toast_card.hide()
+    _update_compact_layout()
 
 
 func _play_ui_sound(effect: String) -> void:
@@ -287,7 +311,7 @@ func _process(delta: float) -> void:
     if show_full_help or (campus_life.message_time > 0.0 and not campus_life.message.is_empty()):
         var life_info: String = language_service.game_text(campus_life.status_text()) if localized else campus_life.status_text()
         campus_message.text += "\n" + life_info
-    campus_card.visible = true
+    campus_card.visible = show_full_help or (campus_life.message_time > 0.0 and not campus_life.message.is_empty())
     _update_notices(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
