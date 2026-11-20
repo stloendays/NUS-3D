@@ -27,9 +27,21 @@ func _ready() -> void:
         language.language_changed.connect(_apply_ui_locale)
     _load_outfit()
     _make_interface()
+    get_viewport().size_changed.connect(_update_wardrobe_layout)
+    _update_wardrobe_layout()
     _build_preview()
     _refresh()
     panel.visible = false
+
+
+func _update_wardrobe_layout() -> void:
+    if panel == null:
+        return
+    var size: Vector2 = get_viewport().get_visible_rect().size
+    panel.offset_left = -minf(330.0, (size.x - 24.0) * 0.5)
+    panel.offset_right = minf(330.0, (size.x - 24.0) * 0.5)
+    panel.offset_top = -minf(265.0, (size.y - 24.0) * 0.5)
+    panel.offset_bottom = minf(265.0, (size.y - 24.0) * 0.5)
 
 
 func _make_interface() -> void:
