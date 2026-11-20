@@ -7,6 +7,9 @@ const CLEARANCE: float = 1.4
 const REPATH_SECONDS: float = 0.85
 const ARRIVAL: float = 1.6
 const MAX_GRID_CELLS: int = 40000
+const STUCK_TIMEOUT: float = 1.25
+const STUCK_MOVEMENT: float = 0.12
+const MAX_STUCK_REPATHS: int = 3
 
 @onready var campus: UTownCampusLife = $"../CampusLife"
 @onready var world: UTownWorld = $"../World"
@@ -17,6 +20,9 @@ var paths: Dictionary = {}
 var last_goal: Dictionary = {}
 var repath_at: Dictionary = {}
 var repath_count: int = 0
+var last_position: Dictionary = {}
+var stuck_since: Dictionary = {}
+var stuck_repaths: Dictionary = {}
 
 
 func _ready() -> void:
@@ -111,10 +117,47 @@ func next_target(name: String, from: Vector3, goal: Vector3, now: float) -> Vect
     return from
 
 
+func report_movement(name: String, before: Vector3, after: Vector3, now: float) -> void:
+    # A collision-stalled NPC gets a fresh path from its actual position.
+    # Rate limiting avoids expensive A* queries every physics frame.
+    var horizontal_move: float = Vector2(before.x, before.z).distance_to(Vector2(after.x, after.z))
+    if horizontal_move > STUCK_MOVEMENT:
+        stuck_since.erase(name)
+        stuck_repaths.erase(name)
+        return
+    if not stuck_since.has(name):
+        stuck_since[name] = now
+        return
+    if now - float(stuck_since[name]) < STUCK_TIMEOUT:
+        return
+    stuck_since[name] = now
+    repath_at[name] = 0.0
+    stuck_repaths[name] = mini(int(stuck_repaths.get(name, 0)) + 1, MAX_STUCK_REPATHS)
+
+
+func separation_offset(name: String, position: Vector3, neighbours: Array, radius: float = 1.35) -> Vector3:
+    # Lightweight local steering; does not alter persistent NPC positions.
+    var result := Vector3.ZERO
+    for neighbour in neighbours:
+        if str(neighbour.get("name", "")) == name:
+            continue
+        var other: Node3D = neighbour.get("node") as Node3D
+        if other == null:
+            continue
+        var away: Vector3 = position - other.global_position
+        away.y = 0.0
+        var distance: float = away.length()
+        if distance > 0.01 and distance < radius:
+            result += away.normalized() * (1.0 - distance / radius)
+    return result.limit_length(1.0)
+
+
 func clear_path(name: String) -> void:
     paths.erase(name)
     last_goal.erase(name)
     repath_at.erase(name)
+    stuck_since.erase(name)
+    stuck_repaths.erase(name)
 
 
 func move_safe(current: Vector3, desired: Vector3, delta: float) -> Vector3:
