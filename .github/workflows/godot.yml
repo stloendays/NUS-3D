@@ -94,6 +94,12 @@ jobs:
             experience_guide_smoke_test.gd \
             building_accuracy_smoke_test.gd \
             kent_ridge_expansion_smoke_test.gd \
+            campus_elevation_smoke_test.gd \
+            graded_routes_smoke_test.gd \
+            graded_walkability_smoke_test.gd \
+            continuous_terrain_smoke_test.gd \
+            unified_height_sampler_smoke_test.gd \
+            terrain_following_paths_smoke_test.gd \
             ambient_ecology_smoke_test.gd \
             english_exams_smoke_test.gd \
             voice_presentation_smoke_test.gd \
