@@ -18,7 +18,7 @@ func _bright_panel(panel: PanelContainer, name_value: String) -> bool:
     if skin.bg_color.get_luminance() < 0.70 or skin.bg_color.a < 0.76:
         _fail(name_value + " reverted to an overly dark or unreadable panel")
         return false
-    if skin.corner_radius_top_left < 17 or not skin.anti_aliasing:
+    if skin.corner_radius_top_left < 18 or not skin.anti_aliasing:
         _fail(name_value + " lost rounded antialiased edges")
         return false
     if skin.shadow_size < 4 or skin.shadow_size > 18 or skin.shadow_color.a > 0.25:
@@ -76,6 +76,34 @@ func _run() -> void:
         return
     if NUS3DUISkin.TEXT.get_luminance() > 0.30:
         _fail("Text ink is too pale for the bright cards")
+        return
+    var normalized_panel: StyleBoxFlat = NUS3DUISkin.glass(NUS3DUISkin.ACCENT, 14, 12, true)
+    if normalized_panel.corner_radius_top_left != NUS3DUISkin.PANEL_RADIUS_MIN:
+        _fail("Shared glass surfaces do not enforce the common corner radius")
+        return
+    if NUS3DUISkin.ink_for(Color("#AEC0C5")) != NUS3DUISkin.DIM:
+        _fail("Legacy pale secondary text is not mapped to readable secondary ink")
+        return
+    if NUS3DUISkin.ink_for(Color("#E8EEE8")) != NUS3DUISkin.TEXT:
+        _fail("Legacy pale heading text is not mapped to primary ink")
+        return
+    if not _bright_panel(shell.profile_card, "ProfileStatus"):
+        return
+    var wardrobe: CanvasLayer = shell.game.get_node_or_null("Wardrobe") as CanvasLayer
+    var wardrobe_panel: PanelContainer = wardrobe.get("panel") as PanelContainer if wardrobe != null else null
+    if not _bright_panel(wardrobe_panel, "WardrobePanel"):
+        return
+    var leisure_ui: UTownLeisureUI = shell.game.get_node_or_null("LeisureUI") as UTownLeisureUI
+    var lounge_panel: PanelContainer = leisure_ui.get("lounge_panel") as PanelContainer if leisure_ui != null else null
+    if not _bright_panel(lounge_panel, "PostCourseClubPanel"):
+        return
+    var guide_prompt_detail: Label = guide.get("prompt_detail") as Label
+    var lounge_caption: Label = leisure_ui.get("caption_label") as Label
+    if guide_prompt_detail == null or guide_prompt_detail.get_theme_color("font_color") != NUS3DUISkin.DIM:
+        _fail("Interaction hint still uses low-contrast legacy pastel ink")
+        return
+    if lounge_caption == null or lounge_caption.get_theme_color("font_color") != NUS3DUISkin.DIM:
+        _fail("Leisure caption still uses low-contrast legacy pastel ink")
         return
     # The former arcade and area cards were stacked on the same pixels; a
     # translucent surface cannot make overlapping lines readable.
