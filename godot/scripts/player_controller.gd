@@ -42,6 +42,10 @@ func _process(delta: float) -> void:
     camera.fov = lerpf(camera.fov, camera_target_fov, blend)
 
 func _unhandled_input(event: InputEvent) -> void:
+    # A modal can lock movement and release the pointer. Clicking an in-game
+    # button must never recapture the pointer or reset the avatar underneath it.
+    if movement_locked:
+        return
     if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
         rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
         head.rotation.x = clampf(head.rotation.x - event.relative.y * MOUSE_SENSITIVITY, -1.48, 1.48)
