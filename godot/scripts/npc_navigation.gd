@@ -209,8 +209,9 @@ func move_safe(current: Vector3, desired: Vector3, delta: float) -> Vector3:
     displacement.y = 0.0
     if displacement.length_squared() < 0.000001:
         return current
-    var shape := SphereShape3D.new()
+    var shape := CapsuleShape3D.new()
     shape.radius = NAV_SWEEP_RADIUS
+    shape.height = NAV_SWEEP_HEIGHT
     var query := PhysicsShapeQueryParameters3D.new()
     query.shape = shape
     query.transform = Transform3D(Basis.IDENTITY, current + Vector3.UP * NAV_BODY_HEIGHT)
