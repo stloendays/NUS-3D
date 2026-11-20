@@ -187,23 +187,20 @@ func _smoke() -> void:
         push_error("invalid lighting preset was accepted")
         quit(1)
         return
-    if world.navigation_labels.size() < 10 or world.route_marker_root == null:
-        push_error("Missing navigational world labels for clean photo mode")
+    # Navigation labels and world-space route spheres were deliberately removed.
+    # The F7 compatibility API must not resurrect these obsolete visual markers.
+    if world.route_marker_root == null or not world.navigation_labels.is_empty():
+        push_error("Clean world navigation should have a marker root but no floating labels")
         quit(1)
         return
     world.set_navigation_markers_visible(false)
-    for label in world.navigation_labels:
-        if label.visible:
-            push_error("F7 clean photo mode did not hide world labels")
-            quit(1)
-            return
     if world.route_marker_root.visible:
-        push_error("F7 clean photo mode did not hide route spheres")
+        push_error("F7 clean photo mode exposed route markers")
         quit(1)
         return
     world.set_navigation_markers_visible(true)
-    if not world.route_marker_root.visible:
-        push_error("F7 photo mode did not restore navigation markers")
+    if world.route_marker_root.visible:
+        push_error("F7 compatibility API resurrected removed route markers")
         quit(1)
         return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
