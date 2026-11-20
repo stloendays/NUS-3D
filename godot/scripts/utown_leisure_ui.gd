@@ -16,7 +16,7 @@ class_name UTownLeisureUI
 # Literal UI sources only. Player-authored content is never translated.
 const STATIC_LANGUAGE: Dictionary = {
     "POST-COURSE CLUB  /  下课后才是真正的游戏": ["课后社团", "POST-COURSE CLUB"],
-    "×  关闭 [P]": ["关闭 [Tab]", "Close [Tab]"],
+    "×  关闭 [Esc]": ["关闭 [Esc]", "Close [Esc]"],
     "完成任意学院全部 3 章 Coursework 后永久开放。": ["完成任意学院三个任务后永久解锁。", "Permanently unlocked after three quests in any faculty."],
     "五子棋  GOMOKU": ["五子棋", "Gomoku"],
     "打牌  CARDS": ["纸牌对战", "Cards"],
