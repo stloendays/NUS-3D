@@ -2,6 +2,11 @@ extends Node3D
 class_name UTownAmbientEcology
 ## Decorative wildlife only; no navigation, collision, quests or controls.
 const TICK: float = 0.12
+const MAX_BIRDS: int = 14
+const MAX_BUTTERFLIES: int = 18
+const MAX_CATS: int = 3
+const MAX_CHICKENS: int = 9
+const MAX_LEAVES: int = 64
 @export_range(0, 2, 1) var detail_level: int = 1
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
@@ -38,7 +43,7 @@ func budgets() -> Dictionary:
     if detail_level == 0:
         return {"birds": 5, "butterflies": 6, "cats": 1, "leaves": 20, "chickens": 3}
     if detail_level == 2:
-        return {"birds": 14, "butterflies": 18, "cats": 3, "leaves": 64, "chickens": 9}
+        return {"birds": MAX_BIRDS, "butterflies": MAX_BUTTERFLIES, "cats": MAX_CATS, "leaves": MAX_LEAVES, "chickens": MAX_CHICKENS}
     return {"birds": 10, "butterflies": 12, "cats": 2, "leaves": 40, "chickens": 6}
 
 func _ready() -> void:
