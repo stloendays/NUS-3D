@@ -44,7 +44,8 @@ func _test() -> void:
             multimesh.get_instance_transform(i).origin.x,
             multimesh.get_instance_transform(i).origin.z
         )):
-            _fail("grass tuft %d was placed outside lawn or on an existing walkway" % i)
+            var origin: Vector3 = multimesh.get_instance_transform(i).origin
+            _fail("grass tuft %d invalid: world_xz=(%.5f, %.5f), turf_instances=%d, lawn_vertices=%d, turf_node_position=%s" % [i, origin.x, origin.z, multimesh.instance_count, environment.lawn_polygon.size(), str(environment.tuft_batch.global_position)])
             return
     if environment.picnic_count < 2 or environment.picnic_count > environment.PICNIC_LIMIT:
         _fail("lawn picnic details missing or unbounded")
