@@ -4,52 +4,52 @@ class_name NUS3DUISkin
 ## Apple UI assets. StyleBoxFlat only; no backbuffer blur or shader passes.
 ## Readable dark type, translucent white surfaces, restrained blue/teal accents.
 
-const TEXT: Color = Color("#233746")
-const DIM: Color = Color("#627785")
-const ACCENT: Color = Color("#268CA9")
-const TEAL: Color = Color("#248A80")
-const WARM: Color = Color("#D59650")
-const SURFACE: Color = Color(0.974, 0.991, 1.0, 0.93)
-const SURFACE_SOLID: Color = Color("#F7FAFC")
-const SURFACE_MUTED: Color = Color("#EAF1F5")
+const TEXT: Color = Color("#26343B")
+const DIM: Color = Color("#64727A")
+const ACCENT: Color = Color("#397E91")
+const TEAL: Color = Color("#397E91")
+const WARM: Color = Color("#BA9160")
+const SURFACE: Color = Color(0.98, 0.985, 0.984, 0.94)
+const SURFACE_SOLID: Color = Color("#FAFBFA")
+const SURFACE_MUTED: Color = Color("#F0F3F2")
 const HAIRLINE: Color = Color(0.61, 0.74, 0.78, 0.52)
 const BACKDROP: Color = Color(0.70, 0.79, 0.84, 0.48)
 
 static func panel(background: Color, accent: Color = ACCENT, radius: int = 20, margin: int = 14) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
     style.bg_color = background
-    style.border_color = Color(accent.lightened(0.61), 0.68)
+    style.border_color = Color("#D7DFDF")
     style.set_border_width_all(1)
-    style.border_width_top = 2
+    style.border_width_top = 1
     style.set_corner_radius_all(radius)
     style.content_margin_left = margin
     style.content_margin_right = margin
     style.content_margin_top = margin
     style.content_margin_bottom = margin
-    style.shadow_color = Color(0.11, 0.22, 0.29, 0.15)
-    style.shadow_size = 11
-    style.shadow_offset = Vector2(0, 4)
+    style.shadow_color = Color(0.10, 0.16, 0.18, 0.09)
+    style.shadow_size = 5
+    style.shadow_offset = Vector2(0, 2)
     style.anti_aliasing = true
     return style
 
 static func glass(accent: Color = ACCENT, radius: int = 23, margin: int = 17,
         dense: bool = false) -> StyleBoxFlat:
     # Slightly more opaque than real iOS glass, for contrast over moving 3D.
-    return panel(Color(0.97, 0.987, 1.0, 0.96 if dense else 0.88),
+    return panel(Color(0.985, 0.99, 0.987, 0.96 if dense else 0.92),
         accent, radius, margin)
 
 static func keycap(pressed: bool = false, highlighted: bool = false) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
-    style.bg_color = (Color("#CFE9F2") if pressed else
-        Color("#F9FCFF") if highlighted else Color("#E8F3F7"))
-    style.border_color = (Color("#75C1D2") if pressed else
-        Color("#DAEEF2") if highlighted else Color("#C8DEE5"))
+    style.bg_color = (Color("#DCE9E9") if pressed else
+        Color("#FFFFFF") if highlighted else Color("#F1F5F4"))
+    style.border_color = (Color("#98B8BB") if pressed else
+        Color("#DAE5E4") if highlighted else Color("#D8E2E1"))
     style.set_border_width_all(1)
-    style.border_width_top = 2 if not pressed else 1
-    style.border_width_bottom = 3 if not pressed else 1
+    style.border_width_top = 1
+    style.border_width_bottom = 1
     style.set_corner_radius_all(12)
     style.shadow_color = Color(0.14, 0.32, 0.42, 0.15)
-    style.shadow_size = 3 if pressed else 6
+    style.shadow_size = 1 if pressed else 3
     style.shadow_offset = Vector2(0, 1 if pressed else 4)
     style.content_margin_left = 7
     style.content_margin_right = 7

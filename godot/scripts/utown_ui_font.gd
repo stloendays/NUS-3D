@@ -8,9 +8,11 @@ static func make_font() -> SystemFont:
     var font := SystemFont.new()
     font.font_names = PackedStringArray([
         "Noto Sans CJK SC",
+        "Noto Sans",
+        "PingFang SC",
+        "Microsoft YaHei UI",
         "Microsoft YaHei",
         "Microsoft JhengHei",
-        "PingFang SC",
         "WenQuanYi Micro Hei",
         "Arial"
     ])
