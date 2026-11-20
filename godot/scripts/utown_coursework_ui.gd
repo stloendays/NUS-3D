@@ -83,7 +83,7 @@ func _refresh_dual_nodes(node: Node) -> void:
 
 func _style_panel(panel: PanelContainer, _legacy_background: Color) -> void:
     panel.add_theme_stylebox_override("panel",
-        NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
+        NUS3DUISkin.glass(Color("#E8EEEC"), 18, 14, true))
 
 func _label(text_value: String, font_size: int, color: Color) -> Label:
     var label := Label.new()
