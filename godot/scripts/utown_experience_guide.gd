@@ -140,8 +140,7 @@ func _label(text_value: String, size_value: int, color: Color) -> Label:
     label.text = text_value
     label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     label.add_theme_font_size_override("font_size", size_value)
-    label.add_theme_color_override("font_color",
-        NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color)
+    label.add_theme_color_override("font_color", NUS3DUISkin.ink_for(color))
     label.clip_text = true
     return label
 
@@ -156,7 +155,7 @@ func _make_action_card() -> void:
     var cap: PanelContainer = PanelContainer.new()
     cap.custom_minimum_size = Vector2(54, 39)
     cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    cap.add_theme_stylebox_override("panel", _panel_style(Color("#315966"), Color("#a1f0dd"), 8, 5))
+    cap.add_theme_stylebox_override("panel", NUS3DUISkin.keycap())
     horizontal.add_child(cap)
     prompt_key = _label("E", 19, Color("#f6fffe"))
     prompt_key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
