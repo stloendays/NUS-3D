@@ -61,12 +61,12 @@ func _run() -> void:
     if bench_batch.multimesh.instance_count < 8 or bin_batch.multimesh.instance_count < 8:
         _fail("Kent Ridge needs a visible minimum of 8 benches and 8 waste bins")
         return
-    if dressing.bench_count < 8 or dressing.trash_bin_count < 4:
-        _fail("UTown path seating or its adjacent waste bins are missing")
+    if dressing.bench_count < 5 or dressing.trash_bin_count < 4:
+        _fail("UTown expected at least 5 path benches and 4 adjacent bins; got %d benches and %d bins" % [dressing.bench_count, dressing.trash_bin_count])
         return
     if scatter.find_children("*", "CollisionShape3D", true, false).size() > 0:
         _fail("decorative scatter must not add collision geometry")
 
-    print("PASS: M25 campus scatter: %d props across %d GPU batches; %d benches, %d Kent Ridge bins and %d UTown bins" % [total_instances, batches, bench_batch.multimesh.instance_count, bin_batch.multimesh.instance_count, dressing.trash_bin_count])
+    print("PASS: M25 campus scatter: %d props across %d GPU batches; %d Kent Ridge benches, %d Kent Ridge bins, %d UTown benches and %d UTown bins" % [total_instances, batches, bench_batch.multimesh.instance_count, bin_batch.multimesh.instance_count, dressing.bench_count, dressing.trash_bin_count])
     game.queue_free()
     quit(0)

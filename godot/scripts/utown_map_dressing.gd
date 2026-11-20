@@ -37,7 +37,7 @@ func _ready() -> void:
     _build_plaza_planters()
     _build_district_groves()
     var scatter_stats: Dictionary = CAMPUS_SCATTERED_PROPS.decorate(self, expansion, grove_positions)
-    print("NUS3D_M25_SCATTER: %d clusters, %d props, %d batches, %d Kent Ridge benches, %d Kent Ridge bins, %d UTown bins" % [scatter_stats.get("cluster_count", 0), scatter_stats.get("item_count", 0), scatter_stats.get("batch_count", 0), scatter_stats.get("bench_count", 0), scatter_stats.get("trash_bin_count", 0), trash_bin_count])
+    print("NUS3D_M25_SCATTER: %d clusters, %d props, %d batches, %d Kent Ridge benches, %d Kent Ridge bins, %d UTown benches, %d UTown bins" % [scatter_stats.get("cluster_count", 0), scatter_stats.get("item_count", 0), scatter_stats.get("batch_count", 0), scatter_stats.get("bench_count", 0), scatter_stats.get("trash_bin_count", 0), bench_count, trash_bin_count])
 
 func _material(tint: String, use_vertex_colors: bool = false) -> StandardMaterial3D:
     var key: String = tint + (":vertex" if use_vertex_colors else ":flat")
