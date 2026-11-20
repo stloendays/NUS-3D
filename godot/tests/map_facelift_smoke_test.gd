@@ -23,6 +23,20 @@ func _run() -> void:
     if world == null or styling == null or ridge == null:
         _fail("Map components not attached")
         return
+    var map: Control = game.get_node_or_null("HUD/Minimap") as Control
+    var language_service: NUS3DGameLanguage = root.get_node_or_null("GameLanguage") as NUS3DGameLanguage
+    if map == null or language_service == null or (map.get("map_font") as Font) == null:
+        _fail("Minimap requires the installed CJK UI font and language service")
+        return
+    var previous_locale: String = language_service.locale
+    language_service.locale = "zh"
+    var chinese_map_label: String = str(map.call("_map_text", "地图", "GAME MAP"))
+    language_service.locale = "en"
+    var english_map_label: String = str(map.call("_map_text", "地图", "GAME MAP"))
+    language_service.locale = previous_locale
+    if chinese_map_label != "地图" or english_map_label != "GAME MAP":
+        _fail("Minimap labels do not follow the selected login language")
+        return
     if styling.path_edge_count != world.generated_path_count:
         _fail("Path edging failed to mirror original 11 walkway segments")
         return
@@ -41,6 +55,26 @@ func _run() -> void:
     if styling.grove_positions.size() != styling.district_tree_count:
         _fail("District foliage CPU positions inconsistent")
         return
+    # Kent Ridge JSON landmark offsets are east/north; the Godot world uses
+    # east/-north. Check ACTUAL built landmarks, not just the vegetation budget.
+    for tree_position in styling.grove_positions:
+        var tree_xz: Vector2 = Vector2(tree_position.x, tree_position.z)
+        for district in ridge.districts:
+            var center: Vector3 = district["position"]
+            var local: Vector2 = tree_xz - Vector2(center.x, center.z)
+            for landmark in district.get("landmarks", []):
+                var offset: Array = landmark.get("offset", [0, 0])
+                var size_m: Array = landmark.get("size", [30, 25, 14])
+                var footprint_z: float = -float(offset[1])
+                if absf(local.x - float(offset[0])) < float(size_m[0]) * 0.5 + 6.0 \
+                        and absf(local.y - footprint_z) < float(size_m[1]) * 0.5 + 6.0:
+                    _fail("District tree overlaps 6m building clearance at " + str(landmark.get("name", "")))
+                    return
+        for stop in ridge.stops:
+            var at: Vector3 = stop["position"]
+            if tree_xz.distance_to(Vector2(at.x, at.z)) < 15.0:
+                _fail("District tree overlaps a campus bus stop")
+                return
     for point in styling.bush_positions:
         if not world.is_tree_position_clear(Vector2(point.x, point.z), 4.5):
             _fail("Decorative shrub was planted on a building or walkway")

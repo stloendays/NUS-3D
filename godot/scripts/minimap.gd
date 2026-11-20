@@ -10,6 +10,8 @@ extends Control
 @onready var coursework: UTownCoursework = get_parent().get_parent().get_node("Coursework")
 @onready var ddl_story: UTownDDLStory = get_parent().get_parent().get_node_or_null("DDLStory") as UTownDDLStory
 @onready var campus_expansion: NUSKentRidgeWorld = get_parent().get_parent().get_node_or_null("KentRidgeExpansion") as NUSKentRidgeWorld
+@onready var language_service: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+@onready var map_font: Font = UTownUIFont.make_font()
 
 const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
@@ -40,6 +42,9 @@ func _ready() -> void:
     _map_outline.shadow_size = 0
     clip_contents = true
     mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+func _map_text(chinese: String, english: String) -> String:
+    return language_service.choose(chinese, english) if language_service != null else english
 
 func _process(delta: float) -> void:
     # Smooth follow only outside UTown; avoids the jarring old 180m camera jump.
@@ -80,26 +85,26 @@ func _draw() -> void:
     # Top/bottom editorial strips act as occlusion masks for crowded map detail.
     draw_rect(Rect2(3, 3, MAP_SIZE - 6, 26), Color("#E4F0F5", 0.95), true)
     draw_line(Vector2(5, 29), Vector2(MAP_SIZE - 5, 29), Color("#B4D0D5"), 1.0)
-    var zone: String = "UTOWN"
+    var zone: String = _map_text("大学城", "UTOWN")
     if campus_life.interior_active:
         zone = str(campus_life.active_interior).to_upper()
     elif Vector2(player.global_position.x, player.global_position.z).length() >= FOLLOW_START_METRES:
-        zone = "KENT RIDGE"
-    draw_string(ThemeDB.fallback_font, Vector2(12, 20), "NUS-3D  /  " + zone,
+        zone = _map_text("肯特岗", "KENT RIDGE")
+    draw_string(map_font, Vector2(12, 20), "NUS-3D  /  " + zone,
         HORIZONTAL_ALIGNMENT_LEFT, -1.0, 12, C_TEXT)
     draw_circle(Vector2(201, 14), 9.0, Color("#DAEAE9"), true)
-    draw_string(ThemeDB.fallback_font, Vector2(197, 19), "N",
+    draw_string(map_font, Vector2(197, 19), "N",
         HORIZONTAL_ALIGNMENT_LEFT, -1, 11, C_GOLD)
     draw_rect(Rect2(3, MAP_SIZE - 26, MAP_SIZE - 6, 23), Color("#E4F0F5", 0.95), true)
     draw_line(Vector2(5, MAP_SIZE - 26), Vector2(MAP_SIZE - 5, MAP_SIZE - 26), Color("#B4D0D5"), 1.0)
     draw_circle(Vector2(13, MAP_SIZE - 13), 3.3, C_PLAYER)
-    draw_string(ThemeDB.fallback_font, Vector2(23, MAP_SIZE - 9),
-        "YOU", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_TEXT)
+    draw_string(map_font, Vector2(23, MAP_SIZE - 9),
+        _map_text("玩家", "YOU"), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_TEXT)
     draw_circle(Vector2(77, MAP_SIZE - 13), 3.3, C_GOLD)
-    draw_string(ThemeDB.fallback_font, Vector2(87, MAP_SIZE - 9),
-        "GOAL", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_TEXT)
-    draw_string(ThemeDB.fallback_font, Vector2(148, MAP_SIZE - 9),
-        "GAME MAP", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_MUTED)
+    draw_string(map_font, Vector2(87, MAP_SIZE - 9),
+        _map_text("目标", "GOAL"), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_TEXT)
+    draw_string(map_font, Vector2(148, MAP_SIZE - 9),
+        _map_text("地图", "GAME MAP"), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 9, C_MUTED)
     # Thin rounded frame without an expensive backbuffer blur pass.
     draw_style_box(_map_outline, Rect2(Vector2.ZERO, Vector2.ONE * MAP_SIZE))
 
@@ -179,7 +184,7 @@ func _draw_building_footprints() -> void:
         if main:
             var label_at: Vector2 = _to_map(origin)
             if _visible(label_at, 18.0):
-                draw_string(ThemeDB.fallback_font, label_at + Vector2(8, -6),
+                draw_string(map_font, label_at + Vector2(8, -6),
                     str(record.get("id", "")).substr(0, 10), HORIZONTAL_ALIGNMENT_LEFT,
                     68.0, 10, C_TEXT)
 
@@ -217,7 +222,7 @@ func _draw_quiet_markers() -> void:
                 nearest_pos = p
                 nearest_name = str(stop["id"]).replace("_", " ")
         if not nearest_name.is_empty() and _visible(nearest_pos + Vector2(15, 0)):
-            draw_string(ThemeDB.fallback_font, nearest_pos + Vector2(8, -6),
+            draw_string(map_font, nearest_pos + Vector2(8, -6),
                 nearest_name, HORIZONTAL_ALIGNMENT_LEFT, 62, 10, C_TEXT)
     # Quiet collectibles, restrained world pins, obvious task priority.
     for i in range(tour.stops.size()):
@@ -319,6 +324,6 @@ func _draw_interior_plan() -> void:
                 _target_pin(_interior_map(room.to_local(actor_node.global_position)), C_GOLD, 8.0)
                 break
     _draw_player(_interior_map(room.to_local(player.global_position)))
-    draw_string(ThemeDB.fallback_font, Vector2(12, 190),
-        "MEZZANINE" if level == 1 else "GROUND FLOOR",
+    draw_string(map_font, Vector2(12, 190),
+        _map_text("夹层", "MEZZANINE") if level == 1 else _map_text("底层", "GROUND FLOOR"),
         HORIZONTAL_ALIGNMENT_LEFT, -1, 9, C_MUTED)
