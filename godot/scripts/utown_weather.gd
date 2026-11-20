@@ -4,10 +4,10 @@ class_name UTownWeather
 
 const MODE_COUNT: int = 5
 var names: PackedStringArray = PackedStringArray(["Clear", "Cloudy", "Overcast", "Rain", "Thunderstorm"])
-var sky_colors: Array[Color] = [Color("#AFCBD4"), Color("#d8c1a5"), Color("#607e9c"), Color("#243951")]
-var ambient_colors: Array[Color] = [Color("#e8edf0"), Color("#ffddb3"), Color("#a3b9d0"), Color("#96afce")]
-var sun_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.80, 0.65, 0.32, 0.14])
-var ambient_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.61, 0.61, 0.50, 0.41])
+var sky_colors: Array[Color] = [Color("#C7E2E8"), Color("#F1D5BE"), Color("#9DB7C8"), Color("#45617B")]
+var ambient_colors: Array[Color] = [Color("#ECF2F0"), Color("#FFE5CC"), Color("#C2D2DF"), Color("#A6BDD4")]
+var sun_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.86, 0.72, 0.34, 0.15])
+var ambient_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.69, 0.65, 0.54, 0.44])
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: CharacterBody3D = $"../Player"
@@ -360,7 +360,13 @@ func _apply() -> void:
     target_ambient = ambient
     target_sun = sun_energy
     target_ambient_energy = ambient_energy
-    target_fog = 0.0015 if mode == 2 else 0.0025 if mode >= 3 else 0.0
+    # Very light distance haze unifies large schematic grounds with the
+    # skyline; overcast/rain are still more atmospheric than clear daylight.
+    # This is distance fog, not a costly extra postprocess blur pass.
+    var haze_for_weather: PackedFloat32Array = PackedFloat32Array([
+        0.00030, 0.00052, 0.00086, 0.00125, 0.00165
+    ])
+    target_fog = float(haze_for_weather[mode])
     if not atmosphere_ready:
         world.sky_environment.background_color = target_sky
         world.sky_environment.ambient_light_color = target_ambient
