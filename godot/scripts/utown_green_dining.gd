@@ -182,6 +182,8 @@ func _build_lawn_tufts() -> void:
             Vector3(positions[i].x, 0.033, positions[i].y)
         )
         blades.set_instance_transform(i, transform)
+        if i == 0:
+            print("M3.8 turf diagnostic: point=", positions[i], " assigned=", transform.origin, " readback=", blades.get_instance_transform(i).origin, " count=", blades.instance_count)
         var tint: float = rng.randf_range(0.85, 1.12)
         blades.set_instance_color(i, Color(tint, tint, tint, 1.0))
     # Attach only after every transform/color has been written. Some render backends
