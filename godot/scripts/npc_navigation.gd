@@ -2,15 +2,16 @@ extends Node
 class_name NUS3DNPCNavigation
 ## Small, cached A* grid for outdoor NPCs. Uses the same estimated building
 ## massing as UTownWorld; final motion still checks physical collisions.
-const CELL: float = 4.0
+const CELL: float = 3.0
 const CLEARANCE: float = 1.4
 const REPATH_SECONDS: float = 0.85
 const ARRIVAL: float = 1.6
-const MAX_GRID_CELLS: int = 40000
+const MAX_GRID_CELLS: int = 60000
 const STUCK_TIMEOUT: float = 1.25
 const STUCK_MOVEMENT: float = 0.12
 const MAX_STUCK_REPATHS: int = 3
-const NAV_SWEEP_RADIUS: float = 0.42
+const NAV_SWEEP_RADIUS: float = 0.35
+const NAV_SWEEP_HEIGHT: float = 1.8
 const NAV_BODY_HEIGHT: float = 0.95
 
 @onready var campus: UTownCampusLife = $"../CampusLife"
@@ -133,8 +134,9 @@ func _has_clearance(from: Vector3, to: Vector3) -> bool:
     displacement.y = 0.0
     if displacement.length_squared() < 0.0001:
         return true
-    var shape := SphereShape3D.new()
+    var shape := CapsuleShape3D.new()
     shape.radius = NAV_SWEEP_RADIUS
+    shape.height = NAV_SWEEP_HEIGHT
     var query := PhysicsShapeQueryParameters3D.new()
     query.shape = shape
     query.transform = Transform3D(Basis.IDENTITY, from + Vector3.UP * NAV_BODY_HEIGHT)
