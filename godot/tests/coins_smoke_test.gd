@@ -99,7 +99,7 @@ func _run() -> void:
     var mission_before: int = coins.balance
     coins._poll_mission_rewards()
     if coins.balance != mission_before + 12:
-        _fail("existing Explorer checkpoint did not award its 12 coins")
+        _fail("existing Explorer checkpoint reward mismatch; before=%d after=%d delta=%d tour=%s claimed=%s notes=%s activities=%s professors=%s" % [mission_before, coins.balance, coins.balance - mission_before, str(tour.discovered_ids), str(coins.claimed_rewards.keys()), str(challenge.collected_ids), str(campus.visited_activities.keys()), str(arcade.met_professors)])
         return
     coins._poll_mission_rewards()
     if coins.balance != mission_before + 12:
