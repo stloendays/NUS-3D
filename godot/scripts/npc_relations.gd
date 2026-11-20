@@ -177,7 +177,10 @@ func _process(delta: float) -> void:
             var steering: Vector3 = (direction.normalized() + avoidance * 0.65).normalized() if direction.length() > 0.001 else Vector3.ZERO
             var desired: Vector3 = npc.global_position + steering * minf(step, direction.length())
             var previous: Vector3 = npc.global_position
-            npc.global_position = navigation.move_safe(previous, desired, delta)
+            var safe_position: Vector3 = navigation.move_safe(previous, desired, delta)
+            if safe_position.distance_squared_to(previous) < 0.0000005 and avoidance.length_squared() > 0.0001:
+                safe_position = navigation.move_safe(previous, previous + direction.normalized() * step, delta)
+            npc.global_position = safe_position
             navigation.report_movement("chase:" + name, previous, npc.global_position, now)
             var actual_direction: Vector3 = npc.global_position - previous
             actual_direction.y = 0.0
