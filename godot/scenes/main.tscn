@@ -35,6 +35,8 @@
 [ext_resource type="Script" path="res://scripts/character_wardrobe.gd" id="32"]
 [ext_resource type="Script" path="res://scripts/utown_horror_mode.gd" id="33"]
 
+[ext_resource type="Script" path="res://scripts/npc_relations.gd" id="29"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
 height = 1.84

@@ -571,6 +571,8 @@ func _process(delta: float) -> void:
     message_time = maxf(0.0, message_time - delta)
     var now: float = float(Time.get_ticks_msec()) / 1000.0
     for state in pedestrians:
+        if bool(state.get("hostile", false)):
+            continue
         var route: Array[Vector3] = state["route"]
         var total: float = _route_length(route)
         var talk_remaining: float = maxf(0.0, float(state["talk_remaining"]) - delta)
