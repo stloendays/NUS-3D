@@ -13,6 +13,7 @@ This pass tightens the shared NUS-3D light-campus visual system without changing
 - Coursework, leisure, experience-guide and wardrobe labels use the same ink mapping.
 - Wardrobe no longer creates an obsolete panel StyleBox and immediately overwrites it; duplicate label color overrides were removed.
 - Leisure shortcut chip uses the shared muted-teal accent.
+- The contextual weather/life card is clipped to three lines with ellipsis, preventing long campus messages from expanding over other HUD elements.
 - Arcade status placement now measures the weather panel’s rendered viewport-space bottom edge, so expanded weather content cannot overlap the arcade summary.
 - Profile toolbar height/width are clamped to the viewport instead of overflowing narrow windows.
 
