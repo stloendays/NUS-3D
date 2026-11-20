@@ -299,6 +299,9 @@ func _on_age_confirm(enabled: bool) -> void:
 func open_lounge() -> bool:
     if is_open:
         return true
+    var coins: Node = get_parent().get_node_or_null("Coins")
+    if coins != null and bool(coins.get("shop_open")):
+        return false
     if not leisure.unlocked():
         life.message = _t("完成任意学院三个课程任务，即可解锁棋牌和聚会。",
             "Complete three quests in any faculty to unlock the club.")
