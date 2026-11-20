@@ -19,6 +19,7 @@ const PERSONALITIES := {"Maya": "outgoing", "Ethan": "proud", "Aisha": "patient"
 
 @onready var campus: UTownCampusLife = $"../CampusLife"
 @onready var player: UTownPlayer = $"../Player"
+@onready var navigation: NUS3DNPCNavigation = $"../NPCNavigation"
 var affinity: Dictionary = {}
 var last_tag: Dictionary = {}
 var cooldown: Dictionary = {}
@@ -123,6 +124,7 @@ func _process(delta: float) -> void:
         if not previous_indoor:
             for state in campus.pedestrians:
                 state["hostile"] = false
+                navigation.clear_path("chase:" + str(state["name"]))
             notice.text = "Safe zone: campus interiors. Rivalry paused."
         previous_indoor = true
         return
@@ -136,6 +138,7 @@ func _process(delta: float) -> void:
         var hostile: bool = bool(state.get("hostile", false))
         if hostile and (get_affinity(name) >= STOP_THRESHOLD or distance > LEASH_RADIUS):
             state["hostile"] = false
+            navigation.clear_path("chase:" + name)
             hostile = false
         elif not hostile and get_affinity(name) <= CHASE_THRESHOLD and distance < CHASE_RADIUS:
             state["hostile"] = true
@@ -167,9 +170,22 @@ func _process(delta: float) -> void:
         toward.y = 0.0
         if toward.length() > TAG_DISTANCE:
             var step: float = minf(speed * delta, toward.length() - TAG_DISTANCE)
-            var desired: Vector3 = npc.global_position + toward.normalized() * step
-            npc.global_position = campus.npc_ground_position(npc.global_position, desired, delta)
-            npc.look_at(npc.global_position + toward, Vector3.UP)
+            var waypoint: Vector3 = navigation.next_target("chase:" + name, npc.global_position, player.global_position, now)
+            var direction: Vector3 = waypoint - npc.global_position
+            direction.y = 0.0
+            var avoidance: Vector3 = navigation.separation_offset(name, npc.global_position, campus.pedestrians, direction)
+            var steering: Vector3 = (direction.normalized() + avoidance * 0.65).normalized() if direction.length() > 0.001 else Vector3.ZERO
+            var desired: Vector3 = npc.global_position + steering * minf(step, direction.length())
+            var previous: Vector3 = npc.global_position
+            var safe_position: Vector3 = navigation.move_safe(previous, desired, delta)
+            if safe_position.distance_squared_to(previous) < 0.0000005 and avoidance.length_squared() > 0.0001:
+                safe_position = navigation.move_safe(previous, previous + direction.normalized() * step, delta)
+            npc.global_position = safe_position
+            navigation.report_movement("chase:" + name, previous, npc.global_position, now)
+            var actual_direction: Vector3 = npc.global_position - previous
+            actual_direction.y = 0.0
+            if actual_direction.length_squared() > 0.0001:
+                npc.look_at(npc.global_position + actual_direction, Vector3.UP)
             var gait: float = sin(now * 12.0)
             (state["left_leg"] as Node3D).rotation.x = gait * 0.8
             (state["right_leg"] as Node3D).rotation.x = -gait * 0.8

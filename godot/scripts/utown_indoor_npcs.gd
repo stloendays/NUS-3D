@@ -21,11 +21,13 @@ func _specifications() -> Array[Dictionary]:
             "line":"Coffee and a study break? The cafe is a fictional campus-life feature."},
         {"room":"ERC", "name":"Ethan", "role":"Quiet reader", "routine":"read", "position":Vector3(7.3, 0.0, 5.55), "heading":PI,
             "line":"I am revising for tomorrow. The mezzanine is quieter upstairs."},
-        {"room":"ERC", "name":"Mei", "role":"Study wanderer", "routine":"walk", "position":Vector3(-2.2, 3.5, -6.2), "heading":PI * 0.5,
+        {"room":"ERC", "name":"Mei", "role":"Study wanderer", "routine":"stairs", "position":Vector3(-2.2, 3.5, -6.2), "heading":PI * 0.5,
+            "stair_path":[Vector3(-2.2, 3.5, -6.2), Vector3(6.4, 3.5, -6.2), Vector3(9.25, 3.35, -3.8), Vector3(9.25, 1.75, -0.2), Vector3(9.25, 0.18, 3.5), Vector3(7.5, 0.18, 6.2)],
             "line":"I found a free desk above the lounge. You can use L to visit the upper level."},
         {"room":"SRC", "name":"Lucas", "role":"Warm-up", "routine":"exercise", "position":Vector3(1.2, 0.0, -2.2), "heading":-PI * 0.25,
             "line":"Doing some stretches before a game. This is a conceptual sports hall."},
-        {"room":"SRC", "name":"Aisha", "role":"Spectator", "routine":"read", "position":Vector3(7.3, 0.0, 5.25), "heading":PI,
+        {"room":"SRC", "name":"Aisha", "role":"Spectator", "routine":"stairs", "position":Vector3(7.3, 0.0, 5.25), "heading":PI,
+            "stair_path":[Vector3(7.3, 0.0, 5.25), Vector3(9.25, 0.18, 3.5), Vector3(9.25, 1.75, -0.2), Vector3(9.25, 3.35, -3.8), Vector3(6.8, 3.5, -6.2)],
             "line":"You can watch the hall from the upstairs viewing gallery."},
         {"room":"SRC", "name":"Daniel", "role":"Refill volunteer", "routine":"walk", "position":Vector3(-8.2, 0.0, 5.85), "heading":PI * 0.5,
             "line":"The refill station is a fictional prop. Press F near it to record a visit."}
@@ -128,6 +130,9 @@ func _spawn_occupants() -> void:
             "heading": float(spec["heading"]),
             "phase": offset,
             "talk_left": 0.0,
+            "stair_path": spec.get("stair_path", []),
+            "stair_index": 1,
+            "stair_direction": 1,
             "left_arm": actor.get_node("LeftArmPivot"),
             "right_arm": actor.get_node("RightArmPivot"),
             "left_leg": actor.get_node("LeftLegPivot"),
@@ -153,7 +158,8 @@ func _process(delta: float) -> void:
         var right_leg: Node3D = actor["right_leg"]
         var origin: Vector3 = actor["origin"]
         if float(actor["talk_left"]) > 0.0:
-            node.position = node.position.lerp(origin, clampf(delta * 3.0, 0.0, 1.0))
+            if routine != "stairs":
+                node.position = node.position.lerp(origin, clampf(delta * 3.0, 0.0, 1.0))
             var direction: Vector3 = player.global_position - node.global_position
             direction.y = 0.0
             if direction.length_squared() > 0.02:
@@ -176,6 +182,8 @@ func _process(delta: float) -> void:
             right_arm.rotation.x = -0.6
             left_leg.rotation.x = 0.0
             right_leg.rotation.x = 0.0
+        elif routine == "stairs":
+            _advance_stair(actor, delta, phase)
         elif routine == "exercise":
             node.position = origin + Vector3(0.0, absf(sin(phase * 2.1)) * 0.05, 0.0)
             node.rotation.y = float(actor["heading"])
@@ -193,6 +201,41 @@ func _process(delta: float) -> void:
             right_arm.rotation.x = -stride
             left_leg.rotation.x = -stride
             right_leg.rotation.x = stride
+
+
+func _advance_stair(actor: Dictionary, delta: float, phase: float) -> void:
+    var path: Array = actor.get("stair_path", [])
+    if path.size() < 2:
+        return
+    var node: Node3D = actor["node"]
+    var index: int = clampi(int(actor.get("stair_index", 1)), 0, path.size() - 1)
+    var target: Vector3 = path[index]
+    var offset: Vector3 = target - node.position
+    if offset.length() < 0.16:
+        var direction: int = int(actor.get("stair_direction", 1))
+        var next_index: int = index + direction
+        if next_index >= path.size():
+            direction = -1
+            next_index = path.size() - 2
+        elif next_index < 0:
+            direction = 1
+            next_index = 1
+        actor["stair_direction"] = direction
+        actor["stair_index"] = next_index
+        target = path[next_index]
+        offset = target - node.position
+    if offset.length_squared() > 0.0001:
+        var movement: Vector3 = offset.normalized() * minf(1.2 * delta, offset.length())
+        node.position += movement
+        var horizontal: Vector3 = Vector3(movement.x, 0.0, movement.z)
+        if horizontal.length_squared() > 0.0001:
+            node.look_at(node.global_position + horizontal, Vector3.UP)
+    var stride: float = sin(phase * 7.0) * 0.42
+    (actor["left_arm"] as Node3D).rotation.x = stride * 0.75
+    (actor["right_arm"] as Node3D).rotation.x = -stride * 0.75
+    (actor["left_leg"] as Node3D).rotation.x = -stride
+    (actor["right_leg"] as Node3D).rotation.x = stride
+
 
 func nearby_name() -> String:
     var found: Dictionary = _nearest_active()
