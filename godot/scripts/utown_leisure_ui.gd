@@ -11,6 +11,7 @@ class_name UTownLeisureUI
 @onready var intro: UTownIntro = $"../Intro"
 @onready var hud: CanvasLayer = $"../HUD"
 @onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+@onready var sound: UTownLeisureAudio = $Sound
 
 # Literal UI sources only. Player-authored content is never translated.
 const STATIC_LANGUAGE: Dictionary = {
@@ -59,10 +60,18 @@ var tab_chess: Button
 var tab_cards: Button
 var tab_social: Button
 var lounge_panel: PanelContainer
+var active_station: String = ""
+var fx_seconds: float = 0.0
+var fx_label: Label
+var fx_sparkles: Array[ColorRect] = []
+var sound_button: Button
+var secret_button: Button
+var secret_text: Label
 
 func _ready() -> void:
     layer = 18
     _build()
+    leisure.club_event.connect(_on_club_event)
     get_viewport().size_changed.connect(_update_lounge_layout)
     _update_lounge_layout()
     if language != null:
@@ -167,6 +176,30 @@ func _build() -> void:
     center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     center.mouse_filter = Control.MOUSE_FILTER_IGNORE
     backdrop.add_child(center)
+    var effect := Control.new()
+    effect.name = "MatchCelebrationEffect"
+    effect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    effect.visible = false
+    backdrop.add_child(effect)
+    fx_label = _label("", 30, "#f2c47e")
+    fx_label.name = "VictoryBanner"
+    fx_label.anchor_left = 0.25
+    fx_label.anchor_right = 0.75
+    fx_label.anchor_top = 0.46
+    fx_label.offset_bottom = 58.0
+    fx_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    fx_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    effect.add_child(fx_label)
+    var sparkle_palette: Array[String] = ["#ffd77c", "#dbeadf", "#a8ccd4", "#f4a09c"]
+    for i in range(19):
+        var sparkle := ColorRect.new()
+        sparkle.name = "VictoryConfetti_%d" % i
+        sparkle.color = _palette(sparkle_palette[i % sparkle_palette.size()])
+        sparkle.size = Vector2(7.0, 12.0) if i % 2 == 0 else Vector2(11.0, 6.0)
+        sparkle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        effect.add_child(sparkle)
+        fx_sparkles.append(sparkle)
 
     lounge_panel = PanelContainer.new()
     lounge_panel.name = "PostCourseClubPanel"
@@ -184,7 +217,10 @@ func _build() -> void:
     header_label = _label("POST-COURSE CLUB", 20, "#26343B")
     header_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     heading.add_child(header_label)
-    var close_btn := _button("×  关闭 [P]", 128.0)
+    sound_button = _button("SFX: ON", 104.0)
+    sound_button.pressed.connect(_toggle_sound)
+    heading.add_child(sound_button)
+    var close_btn := _button("×  关闭 [Esc]", 128.0)
     close_btn.pressed.connect(close_lounge)
     heading.add_child(close_btn)
 
@@ -290,6 +326,14 @@ func _build() -> void:
     social_message = _label("", 18, "#f6d7a4")
     social_message.custom_minimum_size.y = 124
     social_panel.add_child(social_message)
+    secret_button = _button("查看隐藏收官剧情 / SECRET ENDING", 340.0)
+    secret_button.name = "SecretEndingAccess"
+    secret_button.pressed.connect(_on_secret)
+    social_panel.add_child(secret_button)
+    secret_text = _label("", 15, "#9a754b")
+    secret_text.name = "SecretEndingDialogue"
+    secret_text.custom_minimum_size.y = 75.0
+    social_panel.add_child(secret_text)
     social_panel.add_child(_label("喝酒不是任务条件。不提供饮酒奖励或现实行为建议；小酌情节后需等待才能骑车或乘车。", 14, "#a9c1c4"))
     _refresh()
 
@@ -317,19 +361,30 @@ func open_lounge() -> bool:
             "Park your bicycle or leave the shuttle before joining the club.")
         life.message_time = 3.5
         return false
+    var station: String = leisure.nearest_station()
+    if station.is_empty():
+        life.message = _t("进入 SRC 一楼，走到棋桌、牌桌或社交柜台旁，再按 P。",
+            "Enter the SRC ground floor and stand beside a table before pressing P.")
+        life.message_time = 4.0
+        return false
+    active_station = station
     is_open = true
     backdrop.visible = true
     coursework.modal_open = true
     player.movement_locked = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     adult_confirm.button_pressed = false
-    switch_tab("chess")
+    switch_tab(active_station)
     return true
 
 func close_lounge() -> void:
     if not is_open:
         return
     is_open = false
+    active_station = ""
+    fx_seconds = 0.0
+    if fx_label != null:
+        fx_label.get_parent().visible = false
     backdrop.visible = false
     # Do not change first-run modal lock or shuttle state.
     coursework.modal_open = course_ui.modal_visible or intro.playing
@@ -339,10 +394,15 @@ func close_lounge() -> void:
 func switch_tab(key: String) -> void:
     if key not in ["chess", "cards", "social"]:
         return
+    if is_open and key != active_station:
+        return
     active_tab = key
     chess_panel.visible = key == "chess"
     card_panel.visible = key == "cards"
     social_panel.visible = key == "social"
+    tab_chess.disabled = is_open and active_station != "chess"
+    tab_cards.disabled = is_open and active_station != "cards"
+    tab_social.disabled = is_open and active_station != "social"
     _refresh()
 
 func _on_chess_cell(x: int, y: int) -> void:
@@ -365,10 +425,60 @@ func _on_drink(kind: String) -> void:
     leisure.celebrate(kind, adult_confirm.button_pressed)
     _refresh()
 
+func _toggle_sound() -> void:
+    sound.set_enabled(not sound.enabled)
+    sound_button.text = _t("音效：开", "SFX: ON") if sound.enabled else _t("音效：关", "SFX: OFF")
+
+func _on_secret() -> void:
+    secret_text.text = leisure.reveal_secret()
+    _refresh()
+
+func _on_club_event(kind: String) -> void:
+    if not is_open:
+        return
+    sound.play_cue(kind)
+    if kind in ["win", "ending"]:
+        sound.play_cue("cheer")
+    if kind in ["win", "ending"]:
+        fx_seconds = 2.4
+        fx_label.text = "VICTORY / 你赢了！" if kind == "win" else "SECRET ENDING / 彩蛋解锁"
+        fx_label.get_parent().visible = true
+    elif kind == "lose":
+        fx_seconds = 1.1
+        fx_label.text = "REMATCH? / 再来一局"
+        fx_label.get_parent().visible = true
+
+func _animate_victory(delta: float) -> void:
+    if fx_seconds <= 0.0 or not is_open:
+        return
+    fx_seconds = maxf(0.0, fx_seconds - delta)
+    var effect: Control = fx_label.get_parent()
+    effect.visible = fx_seconds > 0.0
+    if not effect.visible:
+        return
+    var elapsed: float = 2.4 - fx_seconds
+    fx_label.modulate.a = minf(1.0, fx_seconds * 2.2)
+    fx_label.scale = Vector2.ONE * (1.0 + 0.13 * exp(-elapsed * 2.4) * absf(sin(elapsed * 12.0)))
+    var center := get_viewport().get_visible_rect().size * 0.5
+    for i in range(fx_sparkles.size()):
+        var sparkle: ColorRect = fx_sparkles[i]
+        var angle: float = float(i) * TAU / float(fx_sparkles.size())
+        var radius: float = 30.0 + elapsed * (135.0 + float(i % 5) * 18.0)
+        sparkle.position = center + Vector2(cos(angle) * radius, sin(angle) * radius + elapsed * elapsed * 34.0)
+        sparkle.rotation = elapsed * (1.4 if i % 2 == 0 else -2.1)
+        sparkle.modulate.a = clampf(fx_seconds, 0.0, 1.0)
+
 func _refresh() -> void:
     if chess_score == null:
         return
     header_label.text = _static_text("POST-COURSE CLUB  /  下课后才是真正的游戏")
+    secret_button.visible = leisure.secret_unlocked()
+    if leisure.grand_master_unlocked():
+        secret_button.text = _t("39/39 真结局 / 毕业终章", "39/39 TRUE ENDING / GRADUATION")
+    else:
+        secret_button.text = _t("查看隐藏收官剧情", "SECRET ENDING")
+    if leisure.ending_seen and secret_text.text.is_empty():
+        secret_text.text = _t("隐藏剧情已触发，继续点击可以查看下一幕。", "Secret story unlocked. Click again for the next scene.")
     var count: int = coursework.total_completed()
     caption_label.text = _t("本机课程进度 %d/39 | 棋胜 %d/%d | 牌胜 %d/%d | 聚会 %d 次",
         "Coursework %d/39 | Gomoku wins %d/%d | Card wins %d/%d | Social visits %d") % [
@@ -408,14 +518,15 @@ func _refresh() -> void:
     adult_button.disabled = not adult_confirm.button_pressed
     social_message.text = leisure.social_message
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
     if status_chip == null:
         return
-    status_chip.visible = leisure.unlocked() and not is_open and hud.visible and not course_ui.modal_visible and not intro.playing
+    _animate_victory(delta)
+    var station: String = leisure.nearest_station()
+    status_chip.visible = not station.is_empty() and not is_open and hud.visible and not course_ui.modal_visible and not intro.playing
     if status_chip.visible:
-        status_chip.text = _t("课后社团 [Tab] | 五子棋 · 纸牌 · 聚会",
-            "POST-COURSE CLUB [Tab] | Gomoku · Cards · Social") + (
-            _t(" | 全院系通关", " | ALL FACULTIES COMPLETE") if leisure.grand_master_unlocked() else "")
+        var station_name: String = "五子棋" if station == "chess" else "牌桌" if station == "cards" else "社团聚会"
+        status_chip.text = "%s [P] 坐下开始  |  %s" % [station_name, "39/39 MASTER" if leisure.grand_master_unlocked() else "POST-COURSE CLUB"]
 
 func _input(event: InputEvent) -> void:
     var voice: Node = get_parent().get_node_or_null("VoicePresentation")
@@ -429,7 +540,7 @@ func _input(event: InputEvent) -> void:
     var key: InputEventKey = event as InputEventKey
     if not key.pressed or key.echo:
         return
-    if key.keycode == KEY_TAB:
+    if key.keycode == KEY_P:
         if is_open:
             close_lounge()
         else:
