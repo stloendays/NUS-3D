@@ -61,7 +61,7 @@ func _test() -> void:
         _fail("navigation path not released")
         return
     var blocked_goal: Vector3 = Vector3(0, 0, 0)
-    if nav._has_clearance(Vector3(-40, 0, 0), Vector3(40, 0, 0)):
+    if nav._has_clearance(Vector3(-80, 0, -100), Vector3(25, 0, -100)):
         _fail("known long segment unexpectedly passed through world geometry")
         return
     var before: int = campus.pedestrians.size()
