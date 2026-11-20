@@ -79,6 +79,12 @@ func _test() -> void:
     if passing.x <= 0.01:
         _fail("head-on NPCs did not receive deterministic right-hand passing bias")
         return
+    var yielding: Vector3 = nav.separation_offset("passing_b", passing_b.global_position,
+        [{"name":"passing_a", "node":passing_a}, {"name":"passing_b", "node":passing_b}],
+        Vector3(0, 0, -1), 1.6)
+    if yielding.z <= 0.01:
+        _fail("lower-priority oncoming NPC did not yield in the narrow passage")
+        return
 
     # Mei's ERC route must traverse the actual ground-to-mezzanine height span.
     var indoor: UTownIndoorNPCs = game.get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
