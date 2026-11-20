@@ -9,7 +9,7 @@ const WALKWAY_CLEARANCE_M: float = 7.0
 const BUS_STOP_CLEARANCE_M: float = 13.0
 const TREE_CLEARANCE_M: float = 6.0
 const PLANTER_CLEARANCE_M: float = 6.0
-const PROP_KINDS = ["paper", "notebook", "coffee", "bottle", "food", "bag", "ball", "shuttlecock"]
+const PROP_KINDS = ["paper", "notebook", "coffee", "bottle", "food", "bag", "ball", "shuttlecock", "bench", "trash_bin"]
 
 static func decorate(parent: Node3D, expansion: NUSKentRidgeWorld,
         tree_positions: Array[Vector3]) -> Dictionary:
@@ -66,6 +66,8 @@ static func decorate(parent: Node3D, expansion: NUSKentRidgeWorld,
                 item_count += 1
             cluster_count += 1
 
+        item_count += _append_furniture(district, expansion, tree_positions, sites, transforms_by_kind, colors_by_kind, rng)
+
     var shared_material: StandardMaterial3D = StandardMaterial3D.new()
     shared_material.albedo_color = Color.WHITE
     shared_material.vertex_color_use_as_albedo = true
@@ -78,7 +80,9 @@ static func decorate(parent: Node3D, expansion: NUSKentRidgeWorld,
     return {
         "cluster_count": cluster_count,
         "item_count": item_count,
-        "batch_count": root.get_child_count()
+        "batch_count": root.get_child_count(),
+        "bench_count": transforms_by_kind["bench"].size(),
+        "trash_bin_count": transforms_by_kind["trash_bin"].size()
     }
 
 
@@ -108,7 +112,7 @@ static func _sites_for_district(district: Dictionary, expansion: NUSKentRidgeWor
     ]
     for quadrant in quadrants:
         var accepted: int = 0
-        for attempt in range(96):
+        for attempt in range(128):
             var candidate: Vector2 = Vector2(
                 quadrant.x * width_m * rng.randf_range(0.18, 0.44),
                 quadrant.y * depth_m * rng.randf_range(0.18, 0.44)
@@ -124,13 +128,15 @@ static func _sites_for_district(district: Dictionary, expansion: NUSKentRidgeWor
                 continue
             sites.append(candidate)
             accepted += 1
-            if accepted >= 2:
+            if accepted >= 3:
                 break
     return sites
 
 
 static func _is_clear(local: Vector2, district: Dictionary, expansion: NUSKentRidgeWorld,
-        tree_positions: Array[Vector3]) -> bool:
+        tree_positions: Array[Vector3], walkway_clearance: float = WALKWAY_CLEARANCE_M,
+        bus_stop_clearance: float = BUS_STOP_CLEARANCE_M,
+        tree_clearance: float = TREE_CLEARANCE_M) -> bool:
     # Preserve both crossing promenade corridors in each schematic district.
     if absf(local.x) < 8.5 or absf(local.y) < 8.5:
         return false
@@ -161,13 +167,13 @@ static func _is_clear(local: Vector2, district: Dictionary, expansion: NUSKentRi
     var center: Vector3 = district.get("position", Vector3.ZERO)
     var world_xz: Vector2 = Vector2(center.x + local.x, center.z + local.y)
     for tree in tree_positions:
-        if Vector2(tree.x, tree.z).distance_to(world_xz) < TREE_CLEARANCE_M:
+        if Vector2(tree.x, tree.z).distance_to(world_xz) < tree_clearance:
             return false
 
     for stop_value in expansion.stops:
         var stop: Dictionary = stop_value
         var stop_at: Vector3 = stop.get("position", Vector3.ZERO)
-        if Vector2(stop_at.x, stop_at.z).distance_to(world_xz) < BUS_STOP_CLEARANCE_M:
+        if Vector2(stop_at.x, stop_at.z).distance_to(world_xz) < bus_stop_clearance:
             return false
 
     # Keep the schematic pedestrian/cycle links unobstructed as well.
@@ -181,9 +187,85 @@ static func _is_clear(local: Vector2, district: Dictionary, expansion: NUSKentRi
             continue
         var distance_to_link: float = _distance_to_segment(
             world_xz, Vector2(start.x, start.z), Vector2(finish.x, finish.z))
-        if distance_to_link < WALKWAY_CLEARANCE_M:
+        if distance_to_link < walkway_clearance:
             return false
     return true
+
+
+static func _append_furniture(district: Dictionary, expansion: NUSKentRidgeWorld,
+        tree_positions: Array[Vector3], sites: Array[Vector2],
+        transforms_by_kind: Dictionary, colors_by_kind: Dictionary,
+        rng: RandomNumberGenerator) -> int:
+    var candidates: Array[Vector2] = []
+    var kinds: Array[String] = []
+    var district_id: String = str(district.get("id", ""))
+
+    if district_id == "SPORTS":
+        # Keep benches and bins outside the central playing surface and track.
+        var sports_candidates: Array[Vector2] = [
+            Vector2(-82, -29), Vector2(82, -29),
+            Vector2(-82, 29), Vector2(82, 29)
+        ]
+        var sports_kinds: Array[String] = ["bench", "trash_bin", "bench", "trash_bin"]
+        for index in range(sports_candidates.size()):
+            var local: Vector2 = sports_candidates[index]
+            if not _is_clear(local, district, expansion, tree_positions, 4.0, 10.0, 4.5):
+                continue
+            if _is_near_any(local, sites, 8.0) or _is_near_any(local, candidates, 12.0):
+                continue
+            candidates.append(local)
+            kinds.append(sports_kinds[index])
+    else:
+        var size_values: Array = district.get("size", [150, 140])
+        var width_m: float = float(size_values[0])
+        var depth_m: float = float(size_values[1])
+        var quadrants: Array[Vector2] = [
+            Vector2(-1, -1), Vector2(1, -1),
+            Vector2(-1, 1), Vector2(1, 1)
+        ]
+        for quadrant_index in range(quadrants.size()):
+            var kind: String = "bench" if quadrant_index % 2 == 0 else "trash_bin"
+            var accepted: bool = false
+            for attempt in range(128):
+                var quadrant: Vector2 = quadrants[quadrant_index]
+                var local: Vector2 = Vector2(
+                    quadrant.x * width_m * rng.randf_range(0.35, 0.44),
+                    quadrant.y * depth_m * rng.randf_range(0.35, 0.44)
+                )
+                if not _is_clear(local, district, expansion, tree_positions, 4.0, 10.0, 4.5):
+                    continue
+                if _is_near_any(local, sites, 8.0) or _is_near_any(local, candidates, 12.0):
+                    continue
+                candidates.append(local)
+                kinds.append(kind)
+                accepted = true
+                break
+            if not accepted:
+                continue
+
+    for index in range(candidates.size()):
+        var kind: String = kinds[index]
+        var local: Vector2 = candidates[index]
+        var center: Vector3 = district.get("position", Vector3.ZERO)
+        var scale: float = rng.randf_range(0.94, 1.06)
+        var world_position: Vector3 = Vector3(
+            center.x + local.x,
+            GROUND_TOP_Y + _half_height(kind) * scale,
+            center.z + local.y
+        )
+        var basis: Basis = Basis(Vector3.UP, rng.randf_range(0.0, TAU)).scaled(Vector3.ONE * scale)
+        var transforms: Array = transforms_by_kind[kind]
+        transforms.append(Transform3D(basis, world_position))
+        var tints: Array = colors_by_kind[kind]
+        tints.append(_random_tint(kind, rng))
+    return candidates.size()
+
+
+static func _is_near_any(candidate: Vector2, others: Array[Vector2], minimum_distance: float) -> bool:
+    for other in others:
+        if candidate.distance_to(other) < minimum_distance:
+            return true
+    return false
 
 
 static func _distance_to_segment(point: Vector2, start: Vector2, finish: Vector2) -> float:
@@ -268,6 +350,14 @@ static func _make_meshes() -> Dictionary:
     shuttlecock.height = 0.22
     shuttlecock.radial_segments = 8
 
+    var bench: ArrayMesh = _make_bench_mesh()
+
+    var trash_bin: CylinderMesh = CylinderMesh.new()
+    trash_bin.top_radius = 0.32
+    trash_bin.bottom_radius = 0.38
+    trash_bin.height = 0.82
+    trash_bin.radial_segments = 8
+
     return {
         "paper": paper,
         "notebook": notebook,
@@ -276,8 +366,27 @@ static func _make_meshes() -> Dictionary:
         "food": food,
         "bag": bag,
         "ball": ball,
-        "shuttlecock": shuttlecock
+        "shuttlecock": shuttlecock,
+        "bench": bench,
+        "trash_bin": trash_bin
     }
+
+
+static func _make_bench_mesh() -> ArrayMesh:
+    # One combined low-poly mesh keeps each repeated bench to a single draw batch.
+    var tool: SurfaceTool = SurfaceTool.new()
+    tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+    var seat: BoxMesh = BoxMesh.new()
+    seat.size = Vector3(2.2, 0.16, 0.62)
+    tool.append_from(seat, 0, Transform3D(Basis.IDENTITY, Vector3(0.0, -0.02, 0.0)))
+    var back: BoxMesh = BoxMesh.new()
+    back.size = Vector3(2.2, 0.56, 0.14)
+    tool.append_from(back, 0, Transform3D(Basis.IDENTITY, Vector3(0.0, 0.30, -0.24)))
+    var support: BoxMesh = BoxMesh.new()
+    support.size = Vector3(0.14, 0.54, 0.56)
+    for x in [-0.92, 0.92]:
+        tool.append_from(support, 0, Transform3D(Basis.IDENTITY, Vector3(float(x), -0.32, 0.0)))
+    return tool.commit()
 
 
 static func _half_height(kind: String) -> float:
@@ -298,6 +407,10 @@ static func _half_height(kind: String) -> float:
             return 0.16
         "shuttlecock":
             return 0.11
+        "bench":
+            return 0.60
+        "trash_bin":
+            return 0.41
     return 0.05
 
 
@@ -318,6 +431,10 @@ static func _random_tint(kind: String, rng: RandomNumberGenerator) -> Color:
             palette = PackedStringArray(["#6e8990", "#c28d77", "#b7a77d", "#73866e"])
         "ball":
             palette = PackedStringArray(["#f1e8d6", "#e1a86d", "#7da8b5"])
+        "bench":
+            palette = PackedStringArray(["#ae8267", "#9b755e", "#c09a78"])
+        "trash_bin":
+            palette = PackedStringArray(["#71877f", "#788d91", "#879b82"])
         _:
             palette = PackedStringArray(["#f4efdf", "#d9e4d9", "#e6c18a"])
     return Color.html(palette[rng.randi_range(0, palette.size() - 1)])

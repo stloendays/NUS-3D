@@ -28,8 +28,8 @@ func _run() -> void:
         _fail("scatter root was not attached")
         return
     var batches: int = scatter.get_child_count()
-    if batches < 5 or batches > 8:
-        _fail("expected a bounded set of 1-8 object batches, got %d" % batches)
+    if batches < 10 or batches > 10:
+        _fail("expected 10 bounded object batches (8 small-prop types plus benches and bins), got %d" % batches)
         return
 
     var total_instances: int = 0
@@ -47,15 +47,26 @@ func _run() -> void:
             return
         total_instances += renderer.multimesh.instance_count
         seen_kinds[renderer.name] = true
-    if total_instances < 70 or total_instances > 240:
-        _fail("instance count outside the authored 70-240 budget: %d" % total_instances)
+    if total_instances < 240 or total_instances > 500:
+        _fail("instance count outside the authored 240-500 density budget: %d" % total_instances)
         return
     if not seen_kinds.has("Scattered_paper_MultiMesh") or not seen_kinds.has("Scattered_bottle_MultiMesh"):
         _fail("academic and everyday props were not both generated")
         return
-    if dressing.find_children("*", "CollisionShape3D", true, false).size() > 0:
+    if not seen_kinds.has("Scattered_bench_MultiMesh") or not seen_kinds.has("Scattered_trash_bin_MultiMesh"):
+        _fail("outdoor seating and waste bins were not generated")
+        return
+    var bench_batch: MultiMeshInstance3D = scatter.get_node("Scattered_bench_MultiMesh") as MultiMeshInstance3D
+    var bin_batch: MultiMeshInstance3D = scatter.get_node("Scattered_trash_bin_MultiMesh") as MultiMeshInstance3D
+    if bench_batch.multimesh.instance_count < 8 or bin_batch.multimesh.instance_count < 8:
+        _fail("Kent Ridge needs a visible minimum of 8 benches and 8 waste bins")
+        return
+    if dressing.bench_count < 8 or dressing.trash_bin_count < 4:
+        _fail("UTown path seating or its adjacent waste bins are missing")
+        return
+    if scatter.find_children("*", "CollisionShape3D", true, false).size() > 0:
         _fail("decorative scatter must not add collision geometry")
 
-    print("PASS: M25 campus scatter: %d props across %d GPU batches" % [total_instances, batches])
+    print("PASS: M25 campus scatter: %d props across %d GPU batches; %d benches, %d Kent Ridge bins and %d UTown bins" % [total_instances, batches, bench_batch.multimesh.instance_count, bin_batch.multimesh.instance_count, dressing.trash_bin_count])
     game.queue_free()
     quit(0)
