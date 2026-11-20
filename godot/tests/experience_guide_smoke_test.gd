@@ -107,8 +107,31 @@ func _run() -> void:
     if str(guide._nearest_offer().get("key", "")) != "I":
         _fail("Indoors without nearby activity should suggest returning outside")
         return
+    # Regression: an old SRC postcard must not remain visible after entering
+    # the already explored ERC room, even before the 220ms polling interval.
+    guide._active_zone = "SRC INTERIOR"
+    guide._visited_zones["ERC INTERIOR"] = true
+    guide.zone_heading.text = "NOW ENTERING: SRC INTERIOR"
+    guide._zone_remaining = 3.6
+    guide.zone_card.show()
+    guide._refresh_elapsed = 0.0
+    guide._process(0.016)
+    if guide._active_zone != "ERC INTERIOR" or guide.zone_card.visible or guide._zone_remaining > 0.0:
+        _fail("Returning to an explored interior preserved an incorrect postcard")
+        return
+    # A new room must trigger its own immediate discovery notice.
+    guide._visited_zones.erase("SRC INTERIOR")
+    life.active_interior = "SRC"
+    guide._process(0.016)
+    if guide._active_zone != "SRC INTERIOR" or not guide.zone_card.visible or not guide.zone_heading.text.contains("SRC"):
+        _fail("A new interior did not refresh its discovery postcard immediately")
+        return
     life.interior_active = false
     life.active_interior = ""
+    guide._process(0.016)
+    if guide._active_zone == "SRC INTERIOR":
+        _fail("Leaving an interior retained its prior location")
+        return
 
     # Photo mode / shop must suppress *all* guide cards, not just some.
     hud.visible = false
