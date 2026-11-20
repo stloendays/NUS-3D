@@ -283,7 +283,7 @@ func _build() -> void:
     adult_confirm.set_meta("i18n_source_key", "age_gate")
     adult_confirm.text = _t("我已达到所在地法定饮酒年龄（仅开启虚构小酌选项）",
         "I meet the legal drinking age where I live (optional fictional adult toast)")
-    adult_confirm.add_theme_font_size_override("font_size", 14)
+    NUS3DUISkin.checkbox(adult_confirm)
     adult_confirm.toggled.connect(_on_age_confirm)
     social_panel.add_child(adult_confirm)
     social_message = _label("", 18, "#f6d7a4")
