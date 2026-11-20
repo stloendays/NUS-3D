@@ -371,6 +371,14 @@ func _render() -> void:
         quit(1)
         return
     count += 1
+    player.global_position = erc_lounge.to_global(Vector3(0.0, 0.18, 7.0))
+    player.look_at(erc_lounge.to_global(Vector3(-3.5, 1.0, -2.2)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M24_ERC_STUDY_DESK_DETAILS.png"):
+        push_error("Cannot capture ERC desk accessories and study props")
+        quit(1)
+        return
+    count += 1
     var barista: Node3D = indoor_npcs.actors[0]["node"]
     player.global_position = barista.global_position + Vector3(1.2, 0.18, -3.4)
     player.look_at(barista.global_position + Vector3(0.0, 1.35, 0.0), Vector3.UP)
@@ -412,6 +420,14 @@ func _render() -> void:
         await process_frame
     if not await _capture_frame(output, "M3_5_SRC_ACTIVE_CHARACTERS.png"):
         push_error("Cannot capture active SRC indoor characters")
+        quit(1)
+        return
+    count += 1
+    player.global_position = src_hall.to_global(Vector3(0.0, 0.18, 7.2))
+    player.look_at(src_hall.to_global(Vector3(8.0, 0.95, 2.0)), Vector3.UP)
+    player.head.rotation = Vector3.ZERO
+    if not await _capture_frame(output, "M24_SRC_CLUB_GAME_CORNER.png"):
+        push_error("Cannot capture SRC board-game table and social props")
         quit(1)
         return
     count += 1
