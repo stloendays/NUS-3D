@@ -163,6 +163,7 @@ func _build_pedestrians() -> void:
             "left_arm": npc.get_node("LeftArmPivot"), "right_arm": npc.get_node("RightArmPivot"),
             "left_leg": npc.get_node("LeftLegPivot"), "right_leg": npc.get_node("RightLegPivot"),
             "name": AMBIENT_NAMES[i % AMBIENT_NAMES.size()] if ambient else npc_names[i],
+            "nav_key": npc.name,
             "line": AMBIENT_LINES[i % AMBIENT_LINES.size()] if ambient else npc_lines[i],
             "ambient": ambient,
             "personality_enabled": not ambient and ["Maya", "Ethan", "Mei"].has(npc_names[i] if not ambient else "")
@@ -665,19 +666,19 @@ func _process(delta: float) -> void:
         var bob: float = absf(sin(now * 6.2 + float(state["phase"]))) * 0.035 if walking else sin(now * 1.8 + float(state["phase"])) * 0.012
         var previous_position: Vector3 = npc.global_position
         if walking and npc_navigation != null:
-            var next_waypoint: Vector3 = npc_navigation.next_target(str(state["name"]), previous_position, sample["position"], now)
+            var next_waypoint: Vector3 = npc_navigation.next_target(str(state.get("nav_key", state["name"])), previous_position, sample["position"], now)
             var toward_waypoint: Vector3 = next_waypoint - previous_position
             toward_waypoint.y = 0.0
             var step_distance: float = minf(float(state["speed"]) * delta, toward_waypoint.length())
             var forward: Vector3 = toward_waypoint.normalized() if toward_waypoint.length_squared() > 0.0001 else Vector3.ZERO
-            var avoidance: Vector3 = npc_navigation.separation_offset(str(state["name"]), previous_position, pedestrians, forward, 1.6)
+            var avoidance: Vector3 = npc_navigation.separation_offset(str(state.get("nav_key", state["name"])), previous_position, pedestrians, forward, 1.6)
             var steering: Vector3 = (forward + avoidance * 0.55).normalized() if forward.length_squared() > 0.0001 else Vector3.ZERO
             var desired: Vector3 = previous_position + steering * step_distance
             var safe_position: Vector3 = npc_navigation.move_safe(previous_position, desired, delta)
             if safe_position.distance_squared_to(previous_position) < 0.0000005 and avoidance.length_squared() > 0.0001:
                 safe_position = npc_navigation.move_safe(previous_position, previous_position + forward * step_distance, delta)
             npc.global_position = safe_position
-            npc_navigation.report_movement(str(state["name"]), previous_position, npc.global_position, now)
+            npc_navigation.report_movement(str(state.get("nav_key", state["name"])), previous_position, npc.global_position, now)
             if npc.global_position.distance_squared_to(previous_position) < 0.0000005 and step_distance > 0.001:
                 state["distance"] = float(state["distance"]) - float(state["direction"]) * float(state["speed"]) * delta
         elif walking:
