@@ -95,6 +95,9 @@ func _run() -> void:
     if NUS3DUISkin.ink_for(Color("#E8EEE8")) != NUS3DUISkin.TEXT:
         _fail("Legacy pale heading text is not mapped to primary ink")
         return
+    if NUS3DUISkin.ink_for(NUS3DUISkin.DANGER) != NUS3DUISkin.DANGER or NUS3DUISkin.ink_for(NUS3DUISkin.SUCCESS) != NUS3DUISkin.SUCCESS:
+        _fail("Semantic error/success colors were flattened into neutral text")
+        return
     if not _bright_panel(shell.profile_card, "ProfileStatus"):
         return
     var wardrobe: CanvasLayer = shell.game.get_node_or_null("Wardrobe") as CanvasLayer
@@ -104,6 +107,15 @@ func _run() -> void:
     var leisure_ui: UTownLeisureUI = shell.game.get_node_or_null("LeisureUI") as UTownLeisureUI
     var lounge_panel: PanelContainer = leisure_ui.get("lounge_panel") as PanelContainer if leisure_ui != null else null
     if not _bright_panel(lounge_panel, "PostCourseClubPanel"):
+        return
+    if not _bright_panel(guide.prompt_card, "InteractionPrompt"):
+        return
+    if not _bright_panel(guide.objective_card, "ObjectiveCard"):
+        return
+    if not _bright_panel(guide.zone_card, "DistrictPostcard"):
+        return
+    var coins: UTownCoins = shell.game.get_node_or_null("Coins") as UTownCoins
+    if coins == null or not _bright_panel(coins.wallet_card, "CoinWallet") or not _bright_panel(coins.shop_panel, "CoinShop"):
         return
     var guide_prompt_detail: Label = guide.get("prompt_detail") as Label
     var lounge_caption: Label = leisure_ui.get("caption_label") as Label
