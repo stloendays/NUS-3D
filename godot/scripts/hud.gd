@@ -68,6 +68,10 @@ func _ready() -> void:
         label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     challenge_message.add_theme_font_size_override("font_size", 14)
     campus_message.add_theme_font_size_override("font_size", 12)
+    campus_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    campus_message.max_lines_visible = 3
+    campus_message.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+    campus_card.clip_contents = true
     _make_help_overlay()
     get_viewport().size_changed.connect(_update_compact_layout)
     _update_compact_layout()
