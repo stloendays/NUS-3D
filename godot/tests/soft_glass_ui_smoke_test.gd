@@ -79,6 +79,12 @@ func _run() -> void:
         return
     var arcade: UTownArcade = shell.game.get_node_or_null("Arcade") as UTownArcade
     var guide: UTownExperienceGuide = shell.game.get_node_or_null("ExperienceGuide") as UTownExperienceGuide
+    if arcade == null or guide == null:
+        _fail("Gameplay guidance or arcade status overlay is absent")
+        return
+    var session_panel: PanelContainer = shell.session_overlay.get("panel") as PanelContainer if shell.session_overlay != null else null
+    if not _bright_panel(session_panel, "SessionPanel"):
+        return
     var normalized_panel: StyleBoxFlat = NUS3DUISkin.glass(NUS3DUISkin.ACCENT, 14, 12, true)
     if normalized_panel.corner_radius_top_left != NUS3DUISkin.PANEL_RADIUS_MIN:
         _fail("Shared glass surfaces do not enforce the common corner radius")
@@ -110,7 +116,7 @@ func _run() -> void:
     # The former arcade and area cards were stacked on the same pixels; a
     # translucent surface cannot make overlapping lines readable.
     var arcade_card: PanelContainer = arcade.status_layer.get_node_or_null("ArcadeCard") as PanelContainer if arcade != null and arcade.status_layer != null else null
-    if arcade_card == null or guide == null or guide.zone_card == null:
+    if arcade_card == null or guide.zone_card == null:
         _fail("Area or arcade card vanished")
         return
     var combat_rect: Rect2 = Rect2(arcade_card.offset_left, arcade_card.offset_top,
