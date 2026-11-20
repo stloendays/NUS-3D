@@ -53,6 +53,7 @@ var delivery_destination: Vector3 = Vector3.ZERO
 
 var interface: CanvasLayer
 var wallet_label: Label
+var wallet_card: PanelContainer
 var shop_panel: PanelContainer
 var shop_status: Label
 var shop_heading: Label
@@ -67,6 +68,8 @@ func _ready() -> void:
     _build_pickup_pool()
     _build_interface()
     _build_shop()
+    get_viewport().size_changed.connect(_update_coin_ui_layout)
+    _update_coin_ui_layout()
     _load_delivery_anchors()
     load_progress()
     source_student_wins = arcade.student_wins
@@ -172,27 +175,44 @@ func _coin_icon_draw(control: Control) -> void:
     control.draw_string(ThemeDB.fallback_font, Vector2(15, 25), "C",
         HORIZONTAL_ALIGNMENT_LEFT, -1.0, 20, Color.html("#785017"))
 
+func _update_coin_ui_layout() -> void:
+    var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+    if wallet_card != null:
+        var wallet_width: float = minf(417.0, maxf(280.0, viewport_size.x * 0.36))
+        wallet_card.offset_left = -wallet_width - 18.0
+        wallet_card.offset_right = -18.0
+        wallet_card.offset_top = 238.0 if viewport_size.y < 700.0 else 259.0
+        wallet_card.offset_bottom = wallet_card.offset_top + 82.0
+    if shop_panel != null:
+        var shop_width: float = minf(436.0, maxf(280.0, viewport_size.x - 28.0))
+        var shop_height: float = minf(412.0, maxf(280.0, viewport_size.y - 28.0))
+        shop_panel.offset_left = -shop_width * 0.5
+        shop_panel.offset_right = shop_width * 0.5
+        shop_panel.offset_top = -shop_height * 0.5
+        shop_panel.offset_bottom = shop_height * 0.5
+
+
 func _build_interface() -> void:
     interface = CanvasLayer.new()
     interface.name = "CoinsOverlay"
     interface.layer = 4
     add_child(interface)
-    var card := PanelContainer.new()
-    card.name = "WalletPanel"
+    wallet_card = PanelContainer.new()
+    wallet_card.name = "WalletPanel"
     # Wallet occupies the right-hand gap under the map, and yields to F6 GIS.
-    card.anchor_left = 1.0
-    card.anchor_right = 1.0
-    card.offset_left = -435.0
-    card.offset_right = -18.0
-    card.offset_top = 259.0
-    card.offset_bottom = 344.0
-    card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var card_style: StyleBoxFlat = NUS3DUISkin.glass(Color("#D7AE74"), 21, 10)
-    card.add_theme_stylebox_override("panel", card_style)
-    interface.add_child(card)
+    wallet_card.anchor_left = 1.0
+    wallet_card.anchor_right = 1.0
+    wallet_card.offset_left = -435.0
+    wallet_card.offset_right = -18.0
+    wallet_card.offset_top = 259.0
+    wallet_card.offset_bottom = 344.0
+    wallet_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    var card_style: StyleBoxFlat = NUS3DUISkin.glass(Color("#E8EEEC"), 14, 10)
+    wallet_card.add_theme_stylebox_override("panel", card_style)
+    interface.add_child(wallet_card)
     var row := HBoxContainer.new()
     row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    card.add_child(row)
+    wallet_card.add_child(row)
     var icon_control := Control.new()
     icon_control.name = "GoldenCoinIcon"
     icon_control.custom_minimum_size = Vector2(44.0, 44.0)
@@ -203,7 +223,7 @@ func _build_interface() -> void:
     wallet_label.name = "WalletStatus"
     wallet_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     wallet_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    wallet_label.add_theme_font_size_override("font_size", 13)
+    wallet_label.add_theme_font_size_override("font_size", 12)
     wallet_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     wallet_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     row.add_child(wallet_label)
@@ -213,7 +233,7 @@ func _shop_button(parent_node: Node, title: String, callback: Callable) -> Butto
     button.text = _shop_text(title)
     button.set_meta("shop_original", title)
     shop_buttons.append(button)
-    button.custom_minimum_size.y = 40.0
+    button.custom_minimum_size.y = 38.0
     NUS3DUISkin.button(button)
     button.pressed.connect(callback)
     parent_node.add_child(button)
@@ -232,7 +252,7 @@ func _build_shop() -> void:
     shop_panel.offset_bottom = 206.0
     shop_panel.visible = false
     shop_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#D8B67F"), 25, 18, true)
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true)
     shop_panel.add_theme_stylebox_override("panel", style)
     interface.add_child(shop_panel)
     var contents := VBoxContainer.new()
@@ -240,12 +260,13 @@ func _build_shop() -> void:
     shop_panel.add_child(contents)
     shop_heading = Label.new()
     shop_heading.text = _t("校园金币商店 | 全天营业", "CAMPUS COIN SHOP | OPEN 24/7")
-    shop_heading.add_theme_font_size_override("font_size", 20)
-    shop_heading.add_theme_color_override("font_color", Color("#866020"))
+    shop_heading.add_theme_font_size_override("font_size", 18)
+    shop_heading.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     contents.add_child(shop_heading)
     shop_status = Label.new()
     shop_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    shop_status.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
+    shop_status.add_theme_color_override("font_color", NUS3DUISkin.DIM)
+    shop_status.add_theme_font_size_override("font_size", 12)
     contents.add_child(shop_status)
     _shop_button(contents, "Lucky Badge - 35 C  |  Double next 5 coin pickups", _purchase_lucky)
     _shop_button(contents, "Lunch Time Pass - 28 C  |  +35 seconds on next delivery", _purchase_lunch)
@@ -506,8 +527,8 @@ func _refresh_display() -> void:
             "Explore, discover and collect for more coins."))
         wallet_label.text = "\n".join(lines)
     if shop_status != null:
-        shop_status.text = _t("余额：%d 金币 | 幸运拾取 %d | 加时券 %d | 小费券 %d",
-            "Wallet: %d C | Lucky %d pickups | Lunch %d | Tips %d") % [
+        shop_status.text = _t("余额：%d 金币\n持有：幸运拾取 %d · 送餐加时券 %d · 双倍小费券 %d",
+            "BALANCE %d C\nOWNED: Lucky %d · Lunch %d · Double tips %d") % [
             balance, lucky_pickups, lunch_passes, double_tip_passes]
 
 func save_progress() -> void:
@@ -559,9 +580,8 @@ func load_progress() -> void:
 func _process(delta: float) -> void:
     # F6 map validation has its own panel in the same region.
     if interface != null:
-        var wallet: PanelContainer = interface.get_node_or_null("WalletPanel") as PanelContainer
-        if wallet != null:
-            wallet.visible = not world.osm_reference_visible
+        if wallet_card != null:
+            wallet_card.visible = not world.osm_reference_visible
     notice_time = maxf(0.0, notice_time - delta)
     delivery_cooldown = maxf(0.0, delivery_cooldown - delta)
     if delivery_active:
