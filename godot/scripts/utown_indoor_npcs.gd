@@ -26,7 +26,7 @@ func _specifications() -> Array[Dictionary]:
             "line":"I found a free desk above the lounge. You can use L to visit the upper level."},
         {"room":"SRC", "name":"Lucas", "role":"Warm-up", "routine":"exercise", "position":Vector3(1.2, 0.0, -2.2), "heading":-PI * 0.25,
             "line":"Doing some stretches before a game. This is a conceptual sports hall."},
-        {"room":"SRC", "name":"Aisha", "role":"Spectator", "routine":"read", "position":Vector3(7.3, 0.0, 5.25), "heading":PI,
+        {"room":"SRC", "name":"Aisha", "role":"Spectator", "routine":"stairs", "position":Vector3(7.3, 0.0, 5.25), "heading":PI,\n            "stair_path":[Vector3(7.3, 0.0, 5.25), Vector3(9.25, 0.18, 3.5), Vector3(9.25, 1.75, -0.2), Vector3(9.25, 3.35, -3.8), Vector3(6.8, 3.5, -6.2)],
             "line":"You can watch the hall from the upstairs viewing gallery."},
         {"room":"SRC", "name":"Daniel", "role":"Refill volunteer", "routine":"walk", "position":Vector3(-8.2, 0.0, 5.85), "heading":PI * 0.5,
             "line":"The refill station is a fictional prop. Press F near it to record a visit."}
