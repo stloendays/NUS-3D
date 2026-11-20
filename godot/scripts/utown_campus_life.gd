@@ -625,7 +625,12 @@ func _process(delta: float) -> void:
             var avoidance: Vector3 = npc_navigation.separation_offset(str(state["name"]), previous_position, pedestrians, forward, 1.6)
             var steering: Vector3 = (forward + avoidance * 0.55).normalized() if forward.length_squared() > 0.0001 else Vector3.ZERO
             var desired: Vector3 = previous_position + steering * step_distance
-            npc.global_position = npc_navigation.move_safe(previous_position, desired, delta)
+            var safe_position: Vector3 = npc_navigation.move_safe(previous_position, desired, delta)
+            if safe_position.distance_squared_to(previous_position) < 0.0000005 and avoidance.length_squared() > 0.0001:
+                # If the passing offset points into a wall, retry the cached
+                # path direction rather than leaving the pedestrian wedged.
+                safe_position = npc_navigation.move_safe(previous_position, previous_position + forward * step_distance, delta)
+            npc.global_position = safe_position
             npc_navigation.report_movement(str(state["name"]), previous_position, npc.global_position, now)
             if npc.global_position.distance_squared_to(previous_position) < 0.0000005 and step_distance > 0.001:
                 state["distance"] = float(state["distance"]) - float(state["direction"]) * float(state["speed"]) * delta
