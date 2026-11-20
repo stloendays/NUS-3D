@@ -173,7 +173,7 @@ func _process(delta: float) -> void:
             var waypoint: Vector3 = navigation.next_target("chase:" + name, npc.global_position, player.global_position, now)
             var direction: Vector3 = waypoint - npc.global_position
             direction.y = 0.0
-            var avoidance: Vector3 = navigation.separation_offset(name, npc.global_position, campus.pedestrians)
+            var avoidance: Vector3 = navigation.separation_offset(name, npc.global_position, campus.pedestrians, direction)
             var steering: Vector3 = (direction.normalized() + avoidance * 0.65).normalized() if direction.length() > 0.001 else Vector3.ZERO
             var desired: Vector3 = npc.global_position + steering * minf(step, direction.length())
             var previous: Vector3 = npc.global_position
