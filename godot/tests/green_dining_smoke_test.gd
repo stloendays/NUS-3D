@@ -80,8 +80,18 @@ func _test() -> void:
     if environment.get_node_or_null("ERCLearningCafe_IllustrativeSignage") != null:
         _fail("ERC cafe signage must be attached to the existing ERC, not this unrelated root")
         return
-    if world.generated_path_count < 8 or campus.pedestrians.size() != 6 or arcade.professors.size() != 2:
-        _fail("a prior route or NPC system regressed")
+    if world.generated_path_count < 8 or campus.pedestrians.size() != 24 or arcade.professors.size() != 2:
+        _fail("a prior route or expanded 24-character campus NPC system regressed")
+        return
+    var ambient_count: int = 0
+    var personality_count: int = 0
+    for pedestrian in campus.pedestrians:
+        if bool(pedestrian.get("ambient", false)):
+            ambient_count += 1
+        if bool(pedestrian.get("personality_enabled", false)):
+            personality_count += 1
+    if ambient_count != 18 or personality_count != 3:
+        _fail("ambient passerby budget or selective NPC personality assignment is incorrect")
         return
     var stack: Array[Node] = [environment]
     while not stack.is_empty():
