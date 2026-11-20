@@ -33,6 +33,30 @@ func _smoke() -> void:
     if arcade.projectiles.size() != arcade.PROJECTILE_CAPACITY:
         _fail("bounded projectile pool missing")
         return
+    # The weather/campus card can grow with indoor status. Arcade HUD must
+    # never cover it or the zone postcard (starts at y=354).
+    var arcade_card: PanelContainer = arcade.status_card
+    var weather_card: PanelContainer = hud.get_node("CampusCard") as PanelContainer
+    if arcade_card == null or weather_card == null:
+        _fail("compact arcade or campus status card missing")
+        return
+    weather_card.visible = true
+    weather_card.custom_minimum_size = Vector2(0, 140)
+    arcade.call("_layout_status_card")
+    var weather_bottom: float = weather_card.position.y + maxf(
+        weather_card.size.y, weather_card.get_combined_minimum_size().y)
+    if arcade_card.visible and (arcade_card.offset_top < weather_bottom + 9.0
+            or arcade_card.offset_bottom > 344.0):
+        _fail("Arcade summary overlaps expanded indoor/weather status or zone postcard")
+        return
+    weather_card.custom_minimum_size = Vector2.ZERO
+    arcade.call("_layout_status_card")
+    if not arcade_card.visible or arcade_card.offset_bottom > 344.0:
+        _fail("Compact arcade summary did not restore after weather card collapsed")
+        return
+    if arcade.status_label.text.contains("\n"):
+        _fail("Arcade summary reverted to a four-line permanent overlay")
+        return
     # At 720p the indoor/weather panel can expand; Arcade must not cover
     # either it or the area-discovery postcard.
     var weather_card: PanelContainer = hud.get_node_or_null("CampusCard") as PanelContainer
