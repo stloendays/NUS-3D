@@ -364,7 +364,7 @@ func open_lounge() -> bool:
     var station: String = leisure.nearest_station()
     if station.is_empty():
         life.message = _t("进入 SRC 一楼，走到棋桌、牌桌或社交柜台旁，再按 P。",
-            "Enter the SRC ground floor and stand beside a table before pressing P.")
+            "Enter the SRC ground floor and stand beside a table before pressing Tab.")
         life.message_time = 4.0
         return false
     active_station = station
@@ -526,7 +526,7 @@ func _process(delta: float) -> void:
     status_chip.visible = not station.is_empty() and not is_open and hud.visible and not course_ui.modal_visible and not intro.playing
     if status_chip.visible:
         var station_name: String = "五子棋" if station == "chess" else "牌桌" if station == "cards" else "社团聚会"
-        status_chip.text = "%s [P] 坐下开始  |  %s" % [station_name, "39/39 MASTER" if leisure.grand_master_unlocked() else "POST-COURSE CLUB"]
+        status_chip.text = "%s [Tab] 坐下开始  |  %s" % [station_name, "39/39 MASTER" if leisure.grand_master_unlocked() else "POST-COURSE CLUB"]
 
 func _input(event: InputEvent) -> void:
     var voice: Node = get_parent().get_node_or_null("VoicePresentation")
@@ -540,7 +540,7 @@ func _input(event: InputEvent) -> void:
     var key: InputEventKey = event as InputEventKey
     if not key.pressed or key.echo:
         return
-    if key.keycode == KEY_P:
+    if key.keycode == KEY_TAB:
         if is_open:
             close_lounge()
         else:
