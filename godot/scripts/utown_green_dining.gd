@@ -174,7 +174,6 @@ func _build_lawn_tufts() -> void:
     tuft_batch.multimesh = blades
     tuft_batch.material_override = mat
     tuft_batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-    add_child(tuft_batch)
     for i in range(generated_tuft_count):
         var amount: float = rng.randf_range(0.65, 1.45)
         var yaw: float = rng.randf_range(0.0, TAU)
@@ -185,6 +184,13 @@ func _build_lawn_tufts() -> void:
         blades.set_instance_transform(i, transform)
         var tint: float = rng.randf_range(0.85, 1.12)
         blades.set_instance_color(i, Color(tint, tint, tint, 1.0))
+    # Attach only after every transform/color has been written. Some render backends
+    # initialize newly attached MultiMeshInstance3D buffers on tree entry.
+    add_child(tuft_batch)
+    var first_transform: Transform3D = blades.get_instance_transform(0)
+    var last_transform: Transform3D = blades.get_instance_transform(generated_tuft_count - 1)
+    if first_transform.origin.length_squared() < 0.0001 or last_transform.origin.length_squared() < 0.0001:
+        push_error("M3.8 turf MultiMesh contains an unwritten identity transform")
 
 func _build_picnic_spots() -> void:
     if lawn_polygon.size() < 3:
