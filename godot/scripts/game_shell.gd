@@ -245,7 +245,7 @@ func _build_login() -> void:
     box.add_child(_button("How to play", _open_tutorial))
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
     box.add_child(login_sound_button)
-    login_message = _label("", 13, Color("#A6534C"))
+    login_message = _label("", 13, NUS3DUISkin.DANGER)
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
     var foot: Label = _label(
