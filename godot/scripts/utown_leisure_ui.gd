@@ -125,7 +125,7 @@ func _button(title: String, width: float = 150.0) -> Button:
 
 func _style_panel(panel: PanelContainer, _legacy_color: String) -> void:
     panel.add_theme_stylebox_override("panel",
-        NUS3DUISkin.glass(Color("#8EAEC4"), 25, 18, true))
+        NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
 
 func _build() -> void:
     status_chip = _label("", 15, "#ffd591")
@@ -169,7 +169,7 @@ func _build() -> void:
     panel.add_child(column)
     var heading := HBoxContainer.new()
     column.add_child(heading)
-    header_label = _label("POST-COURSE CLUB  /  下课后才是真正的游戏", 23, "#ffcf86")
+    header_label = _label("POST-COURSE CLUB", 20, "#26343B")
     header_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     heading.add_child(header_label)
     var close_btn := _button("×  关闭 [P]", 128.0)
@@ -183,13 +183,13 @@ func _build() -> void:
     tabs.alignment = BoxContainer.ALIGNMENT_CENTER
     tabs.add_theme_constant_override("separation", 12)
     column.add_child(tabs)
-    tab_chess = _button("五子棋  GOMOKU", 190)
+    tab_chess = _button("五子棋  GOMOKU", 170)
     tab_chess.pressed.connect(func() -> void: switch_tab("chess"))
     tabs.add_child(tab_chess)
-    tab_cards = _button("打牌  CARDS", 190)
+    tab_cards = _button("打牌  CARDS", 170)
     tab_cards.pressed.connect(func() -> void: switch_tab("cards"))
     tabs.add_child(tab_cards)
-    tab_social = _button("聚会  CHEERS", 190)
+    tab_social = _button("聚会  CHEERS", 170)
     tab_social.pressed.connect(func() -> void: switch_tab("social"))
     tabs.add_child(tab_social)
 
