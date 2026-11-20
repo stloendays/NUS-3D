@@ -621,7 +621,10 @@ func _process(delta: float) -> void:
             var toward_waypoint: Vector3 = next_waypoint - previous_position
             toward_waypoint.y = 0.0
             var step_distance: float = minf(float(state["speed"]) * delta, toward_waypoint.length())
-            var desired: Vector3 = previous_position + toward_waypoint.normalized() * step_distance if step_distance > 0.0001 else previous_position
+            var forward: Vector3 = toward_waypoint.normalized() if toward_waypoint.length_squared() > 0.0001 else Vector3.ZERO
+            var avoidance: Vector3 = npc_navigation.separation_offset(str(state["name"]), previous_position, pedestrians, forward, 1.6)
+            var steering: Vector3 = (forward + avoidance * 0.55).normalized() if forward.length_squared() > 0.0001 else Vector3.ZERO
+            var desired: Vector3 = previous_position + steering * step_distance
             npc.global_position = npc_navigation.move_safe(previous_position, desired, delta)
             npc_navigation.report_movement(str(state["name"]), previous_position, npc.global_position, now)
             if npc.global_position.distance_squared_to(previous_position) < 0.0000005 and step_distance > 0.001:
