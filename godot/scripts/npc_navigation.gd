@@ -175,7 +175,7 @@ func separation_offset(name: String, position: Vector3, neighbours: Array, forwa
         heading = heading.normalized()
     var right: Vector3 = Vector3(heading.z, 0.0, -heading.x)
     for neighbour in neighbours:
-        if str(neighbour.get("name", "")) == name:
+        if str(neighbour.get("nav_key", neighbour.get("name", ""))) == name:
             continue
         var other: Node3D = neighbour.get("node") as Node3D
         if other == null:
