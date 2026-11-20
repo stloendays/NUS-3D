@@ -42,7 +42,7 @@ func _smoke() -> void:
         _fail("HUD clearance card references missing")
         return
     var starting_weather_minimum: Vector2 = weather_card.custom_minimum_size
-    weather_card.custom_minimum_size.y = 125.0
+    weather_card.custom_minimum_size = Vector2(starting_weather_minimum.x, 125.0)
     await process_frame
     arcade._refresh_status()
     if arcade_card.visible and arcade_card.get_global_rect().intersects(weather_card.get_global_rect()):
