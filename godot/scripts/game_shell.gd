@@ -162,7 +162,9 @@ func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> L
     var label: Label = Label.new()
     label.text = value
     label.add_theme_font_size_override("font_size", font_size)
-    label.add_theme_color_override("font_color", NUS3DUISkin.ink_for(color))
+    # Legacy dark shell authored labels in white; maintain contrast on glass.
+    var legible: Color = NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color
+    label.add_theme_color_override("font_color", legible)
     return label
 
 
@@ -245,7 +247,7 @@ func _build_login() -> void:
     box.add_child(_button("How to play", _open_tutorial))
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
     box.add_child(login_sound_button)
-    login_message = _label("", 13, NUS3DUISkin.DANGER)
+    login_message = _label("", 13, Color("#A6534C"))
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
     var foot: Label = _label(
@@ -377,16 +379,6 @@ func _open_horror_mode() -> void:
     horror_mode.request_mode_menu()
 
 
-func _update_profile_layout() -> void:
-    if profile_card == null:
-        return
-    var viewport_size: Vector2 = get_viewport().get_visible_rect().size
-    var width_value: float = minf(1020.0, maxf(320.0, viewport_size.x - 24.0))
-    profile_card.offset_left = -width_value * 0.5
-    profile_card.offset_right = width_value * 0.5
-    profile_card.offset_bottom = 70.0
-
-
 func _build_profile_card() -> void:
     profile_card = PanelContainer.new()
     profile_card.name = "ProfileStatus"
@@ -395,13 +387,11 @@ func _build_profile_card() -> void:
     profile_card.offset_left = -510
     profile_card.offset_right = 510
     profile_card.offset_top = 10
-    profile_card.offset_bottom = 70
+    profile_card.offset_bottom = 61
     profile_card.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 14, 10, true))
     ui.add_child(profile_card)
-    get_viewport().size_changed.connect(_update_profile_layout)
-    _update_profile_layout()
     var row: HBoxContainer = HBoxContainer.new()
-    row.add_theme_constant_override("separation", 5)
+    row.add_theme_constant_override("separation", 7)
     profile_card.add_child(row)
     profile_label = _label("LV 1", 13, Color.html("#e4f5f6"))
     profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
