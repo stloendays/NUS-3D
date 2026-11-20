@@ -4,10 +4,10 @@ class_name UTownWeather
 
 const MODE_COUNT: int = 5
 var names: PackedStringArray = PackedStringArray(["Clear", "Cloudy", "Overcast", "Rain", "Thunderstorm"])
-var sky_colors: Array[Color] = [Color("#C7E2E8"), Color("#F1D5BE"), Color("#9DB7C8"), Color("#45617B")]
-var ambient_colors: Array[Color] = [Color("#ECF2F0"), Color("#FFE5CC"), Color("#C2D2DF"), Color("#A6BDD4")]
-var sun_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.86, 0.72, 0.34, 0.15])
-var ambient_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.69, 0.65, 0.54, 0.44])
+var sky_colors: Array[Color] = [Color("#BDD7DE"), Color("#EDD1B9"), Color("#9DB7C8"), Color("#45617B")]
+var ambient_colors: Array[Color] = [Color("#E9EFEF"), Color("#FFE2C5"), Color("#BED0DD"), Color("#A3B8D0")]
+var sun_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.80, 0.67, 0.33, 0.15])
+var ambient_energy_by_time: PackedFloat32Array = PackedFloat32Array([0.62, 0.63, 0.52, 0.42])
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: CharacterBody3D = $"../Player"
@@ -364,7 +364,7 @@ func _apply() -> void:
     # skyline; overcast/rain are still more atmospheric than clear daylight.
     # This is distance fog, not a costly extra postprocess blur pass.
     var haze_for_weather: PackedFloat32Array = PackedFloat32Array([
-        0.00030, 0.00052, 0.00086, 0.00125, 0.00165
+        0.00020, 0.00037, 0.00072, 0.00115, 0.00150
     ])
     target_fog = float(haze_for_weather[mode])
     if not atmosphere_ready:

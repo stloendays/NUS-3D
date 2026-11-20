@@ -59,6 +59,11 @@ func _run() -> void:
     if weather.target_fog <= 0.0 or weather.target_fog > 0.002:
         _fail("daylight haze is missing or too heavy")
         return
+    # Software-rendered screenshots detected clipped mint grass after a
+    # broad +15% ambient increase. Keep daytime reflectance in a usable range.
+    if weather.ambient_energy_by_time[0] > 0.64 or weather.sun_energy_by_time[0] > 0.83:
+        _fail("daylight exposure exceeds pastel-map readability budget")
+        return
     var base: Node3D = world.get_node("BuildingMassing_Estimated") as Node3D
     var source_count: int = 0
     var collision_count: int = 0
