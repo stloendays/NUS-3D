@@ -17,6 +17,7 @@ const PATH_CLEARANCE: float = 1.2
 var lawn_polygon: PackedVector2Array = PackedVector2Array()
 var path_corridors: Array[Dictionary] = []
 var generated_tuft_count: int = 0
+var generated_tuft_positions: PackedVector2Array = PackedVector2Array()
 var picnic_count: int = 0
 var dining_table_count: int = 0
 var food_stall_count: int = 0
@@ -148,6 +149,9 @@ func _build_lawn_tufts() -> void:
         if is_clear_lawn_point(candidate, 0.6):
             positions.append(candidate)
     generated_tuft_count = positions.size()
+    generated_tuft_positions = PackedVector2Array()
+    for point in positions:
+        generated_tuft_positions.append(point)
     if generated_tuft_count == 0:
         return
     var blades := MultiMesh.new()
@@ -182,17 +186,12 @@ func _build_lawn_tufts() -> void:
             Vector3(positions[i].x, 0.033, positions[i].y)
         )
         blades.set_instance_transform(i, transform)
-        if i == 0:
-            print("M3.8 turf diagnostic: point=", positions[i], " assigned=", transform.origin, " readback=", blades.get_instance_transform(i).origin, " count=", blades.instance_count)
         var tint: float = rng.randf_range(0.85, 1.12)
         blades.set_instance_color(i, Color(tint, tint, tint, 1.0))
     # Attach only after every transform/color has been written. Some render backends
     # initialize newly attached MultiMeshInstance3D buffers on tree entry.
     add_child(tuft_batch)
-    var first_transform: Transform3D = blades.get_instance_transform(0)
-    var last_transform: Transform3D = blades.get_instance_transform(generated_tuft_count - 1)
-    if first_transform.origin.length_squared() < 0.0001 or last_transform.origin.length_squared() < 0.0001:
-        push_error("M3.8 turf MultiMesh contains an unwritten identity transform")
+
 
 func _build_picnic_spots() -> void:
     if lawn_polygon.size() < 3:
