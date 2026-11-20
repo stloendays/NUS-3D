@@ -15,6 +15,7 @@ func _run() -> void:
     var game := packed.instantiate()
     root.add_child(game)
     await process_frame
+    NUS3DServices.enter_test_playmode(game)
     var coins := game.get_node("Coins") as UTownCoins
     var clock := game.get_node("CampusClock") as UTownCampusClock
     var player := game.get_node("Player") as UTownPlayer
