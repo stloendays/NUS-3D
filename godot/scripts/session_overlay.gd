@@ -31,6 +31,8 @@ func setup(owner_shell: Variant, game: Node3D) -> void:
     network.changed.connect(_refresh)
     network.notice.connect(_notice)
     _build()
+    get_viewport().size_changed.connect(_update_panel_layout)
+    _update_panel_layout()
     if language != null:
         language.language_changed.connect(_on_language_changed)
     _on_language_changed(language.locale if language != null else "en")
@@ -77,6 +79,18 @@ func _on_language_changed(_code: String) -> void:
     _refresh()
 
 
+func _update_panel_layout() -> void:
+    if panel == null:
+        return
+    var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+    var panel_width: float = minf(510.0, maxf(280.0, viewport_size.x - 32.0))
+    var panel_height: float = minf(470.0, maxf(280.0, viewport_size.y - 32.0))
+    panel.offset_left = -panel_width * 0.5
+    panel.offset_right = panel_width * 0.5
+    panel.offset_top = -panel_height * 0.5
+    panel.offset_bottom = panel_height * 0.5
+
+
 func _build() -> void:
     layer = 35
     process_mode = Node.PROCESS_MODE_ALWAYS
@@ -90,15 +104,15 @@ func _build() -> void:
     panel.offset_right = 255
     panel.offset_top = -235
     panel.offset_bottom = 235
-    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#86B4C5"), 25, 19, true)
+    var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true)
     panel.add_theme_stylebox_override("panel", style)
     add_child(panel)
     var layout: VBoxContainer = VBoxContainer.new()
-    layout.add_theme_constant_override("separation", 9)
+    layout.add_theme_constant_override("separation", 8)
     panel.add_child(layout)
     session_title = Label.new()
     session_title.text = _t("校园联机与性能 [F11]", "CAMPUS LOBBY & PERFORMANCE [F11]")
-    session_title.add_theme_font_size_override("font_size", 19)
+    session_title.add_theme_font_size_override("font_size", 18)
     layout.add_child(session_title)
     session_title.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     status = Label.new()
