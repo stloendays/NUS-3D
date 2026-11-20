@@ -42,6 +42,8 @@ func _smoke() -> void:
         _fail("HUD clearance card references missing")
         return
     var starting_weather_minimum: Vector2 = weather_card.custom_minimum_size
+    var starting_help_state: bool = hud.show_full_help
+    hud.show_full_help = true
     weather_card.custom_minimum_size = Vector2(starting_weather_minimum.x, 125.0)
     await process_frame
     arcade._refresh_status()
@@ -55,6 +57,7 @@ func _smoke() -> void:
         _fail("Arcade summary was not compacted to one readable line")
         return
     weather_card.custom_minimum_size = starting_weather_minimum
+    hud.show_full_help = starting_help_state
     await process_frame
     arcade._refresh_status()
     if not arcade_card.visible:

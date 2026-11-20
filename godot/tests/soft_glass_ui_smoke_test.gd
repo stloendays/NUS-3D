@@ -18,7 +18,7 @@ func _bright_panel(panel: PanelContainer, name_value: String) -> bool:
     if skin.bg_color.get_luminance() < 0.70 or skin.bg_color.a < 0.76:
         _fail(name_value + " reverted to an overly dark or unreadable panel")
         return false
-    if skin.corner_radius_top_left < 17 or not skin.anti_aliasing:
+    if skin.corner_radius_top_left < 18 or not skin.anti_aliasing:
         _fail(name_value + " lost rounded antialiased edges")
         return false
     if skin.shadow_size < 4 or skin.shadow_size > 18 or skin.shadow_color.a > 0.25:
@@ -45,6 +45,9 @@ func _run() -> void:
     if not _bright_panel(hud.get_node("Info") as PanelContainer, "Info"):
         return
     if not _bright_panel(hud.get_node("CampusCard") as PanelContainer, "CampusCard"):
+        return
+    if hud.campus_message.max_lines_visible != 3 or not hud.campus_card.clip_contents:
+        _fail("Contextual weather card is not bounded to a compact readable height")
         return
     if not _bright_panel(hud.get_node("HelpBackdrop") as PanelContainer, "HelpBackdrop"):
         return
@@ -77,12 +80,62 @@ func _run() -> void:
     if NUS3DUISkin.TEXT.get_luminance() > 0.30:
         _fail("Text ink is too pale for the bright cards")
         return
-    # The former arcade and area cards were stacked on the same pixels; a
-    # translucent surface cannot make overlapping lines readable.
     var arcade: UTownArcade = shell.game.get_node_or_null("Arcade") as UTownArcade
     var guide: UTownExperienceGuide = shell.game.get_node_or_null("ExperienceGuide") as UTownExperienceGuide
+    if arcade == null or guide == null:
+        _fail("Gameplay guidance or arcade status overlay is absent")
+        return
+    var session_panel: PanelContainer = shell.session_overlay.get("panel") as PanelContainer if shell.session_overlay != null else null
+    if not _bright_panel(session_panel, "SessionPanel"):
+        return
+    var normalized_panel: StyleBoxFlat = NUS3DUISkin.glass(NUS3DUISkin.ACCENT, 14, 12, true)
+    if normalized_panel.corner_radius_top_left != NUS3DUISkin.PANEL_RADIUS_MIN:
+        _fail("Shared glass surfaces do not enforce the common corner radius")
+        return
+    if NUS3DUISkin.ink_for(Color("#7D9298")) != NUS3DUISkin.DIM:
+        _fail("Legacy pale secondary text is not mapped to readable secondary ink")
+        return
+    if NUS3DUISkin.ink_for(Color("#E8EEE8")) != NUS3DUISkin.TEXT:
+        _fail("Legacy pale heading text is not mapped to primary ink")
+        return
+    if NUS3DUISkin.ink_for(NUS3DUISkin.DANGER) != NUS3DUISkin.DANGER or NUS3DUISkin.ink_for(NUS3DUISkin.SUCCESS) != NUS3DUISkin.SUCCESS:
+        _fail("Semantic error/success colors were flattened into neutral text")
+        return
+    if not _bright_panel(shell.profile_card, "ProfileStatus"):
+        return
+    var wardrobe: CanvasLayer = shell.game.get_node_or_null("Wardrobe") as CanvasLayer
+    var wardrobe_panel: PanelContainer = wardrobe.get("panel") as PanelContainer if wardrobe != null else null
+    if not _bright_panel(wardrobe_panel, "WardrobePanel"):
+        return
+    var leisure_ui: UTownLeisureUI = shell.game.get_node_or_null("LeisureUI") as UTownLeisureUI
+    var lounge_panel: PanelContainer = leisure_ui.get("lounge_panel") as PanelContainer if leisure_ui != null else null
+    if not _bright_panel(lounge_panel, "PostCourseClubPanel"):
+        return
+    if not _bright_panel(guide.prompt_card, "InteractionPrompt"):
+        return
+    if not _bright_panel(guide.objective_card, "ObjectiveCard"):
+        return
+    if not _bright_panel(guide.zone_card, "DistrictPostcard"):
+        return
+    var coins: UTownCoins = shell.game.get_node_or_null("Coins") as UTownCoins
+    if coins == null or not _bright_panel(coins.wallet_card, "CoinWallet") or not _bright_panel(coins.shop_panel, "CoinShop"):
+        return
+    var guide_prompt_detail: Label = guide.get("prompt_detail") as Label
+    var lounge_caption: Label = leisure_ui.get("caption_label") as Label
+    if guide_prompt_detail == null or guide_prompt_detail.get_theme_color("font_color") != NUS3DUISkin.ink_for(Color("#abcbd1")):
+        _fail("Interaction hint still uses low-contrast legacy pastel ink")
+        return
+    if lounge_caption == null or lounge_caption.get_theme_color("font_color") != NUS3DUISkin.ink_for(Color("#b3cbd0")):
+        _fail("Leisure caption still uses low-contrast legacy pastel ink")
+        return
+    var age_check: CheckBox = leisure_ui.get("adult_confirm") as CheckBox
+    if age_check == null or age_check.get_theme_color("font_color") != NUS3DUISkin.TEXT or age_check.get_theme_color("font_disabled_color") != NUS3DUISkin.DIM:
+        _fail("Leisure age-gate checkbox does not use accessible shared text states")
+        return
+    # The former arcade and area cards were stacked on the same pixels; a
+    # translucent surface cannot make overlapping lines readable.
     var arcade_card: PanelContainer = arcade.status_layer.get_node_or_null("ArcadeCard") as PanelContainer if arcade != null and arcade.status_layer != null else null
-    if arcade_card == null or guide == null or guide.zone_card == null:
+    if arcade_card == null or guide.zone_card == null:
         _fail("Area or arcade card vanished")
         return
     var combat_rect: Rect2 = Rect2(arcade_card.offset_left, arcade_card.offset_top,

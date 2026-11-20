@@ -112,8 +112,7 @@ func _label(content: String, size: int = 16, color_hex: String = "#e9ede7") -> L
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.add_theme_font_size_override("font_size", size)
     var original: Color = _palette(color_hex)
-    label.add_theme_color_override("font_color",
-        NUS3DUISkin.TEXT if original.get_luminance() > 0.58 else original)
+    label.add_theme_color_override("font_color", NUS3DUISkin.ink_for(original))
     return label
 
 func _button(title: String, width: float = 150.0) -> Button:
@@ -140,7 +139,7 @@ func _update_lounge_layout() -> void:
 
 
 func _build() -> void:
-    status_chip = _label("", 15, "#ffd591")
+    status_chip = _label("", 13, "#397E91")
     status_chip.name = "PostCourseShortcut"
     status_chip.anchor_left = 0.0
     status_chip.anchor_right = 0.0
@@ -284,7 +283,7 @@ func _build() -> void:
     adult_confirm.set_meta("i18n_source_key", "age_gate")
     adult_confirm.text = _t("我已达到所在地法定饮酒年龄（仅开启虚构小酌选项）",
         "I meet the legal drinking age where I live (optional fictional adult toast)")
-    adult_confirm.add_theme_font_size_override("font_size", 14)
+    NUS3DUISkin.checkbox(adult_confirm)
     adult_confirm.toggled.connect(_on_age_confirm)
     social_panel.add_child(adult_confirm)
     social_message = _label("", 18, "#f6d7a4")

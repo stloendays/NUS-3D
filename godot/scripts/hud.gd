@@ -68,6 +68,10 @@ func _ready() -> void:
         label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     challenge_message.add_theme_font_size_override("font_size", 14)
     campus_message.add_theme_font_size_override("font_size", 12)
+    campus_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    campus_message.max_lines_visible = 3
+    campus_message.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+    campus_card.clip_contents = true
     _make_help_overlay()
     get_viewport().size_changed.connect(_update_compact_layout)
     _update_compact_layout()
@@ -327,9 +331,15 @@ func _process(delta: float) -> void:
     else:
         challenge_message.text = challenge.feedback_message
     var weather_info: String = language_service.weather_card(weather) if localized else weather.status_text()
-    campus_message.text = weather_info.get_slice("\n", 0)
+    var weather_line: String = weather_info.get_slice("\n", 0)
+    if weather_line.length() > 48:
+        weather_line = weather_line.substr(0, 45) + "…"
+    campus_message.text = weather_line
     if show_full_help or (campus_life.message_time > 0.0 and not campus_life.message.is_empty()):
         var life_info: String = language_service.game_text(campus_life.status_text()) if localized else campus_life.status_text()
+        life_info = life_info.get_slice("\n", 0)
+        if life_info.length() > 48:
+            life_info = life_info.substr(0, 45) + "…"
         campus_message.text += "\n" + life_info
     campus_card.visible = show_full_help or (campus_life.message_time > 0.0 and not campus_life.message.is_empty())
     _update_notices(delta)

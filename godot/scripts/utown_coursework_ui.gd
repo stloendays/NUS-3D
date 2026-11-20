@@ -90,8 +90,7 @@ func _label(text_value: String, font_size: int, color: Color) -> Label:
     label.text = text_value
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.add_theme_font_size_override("font_size", font_size)
-    label.add_theme_color_override("font_color",
-        NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color)
+    label.add_theme_color_override("font_color", NUS3DUISkin.ink_for(color))
     return label
 
 func _build_status() -> void:
@@ -114,7 +113,7 @@ func _build_status() -> void:
     status_body = _dual_label("选择学院 [Shift+P] · 手册 [P]",
         "Choose faculty [Shift+P] · Journal [P]", 12, Color.html("#edf2ed"))
     column.add_child(status_body)
-    status_feedback = _label("", 12, Color.html("#a9e4b7"))
+    status_feedback = _label("", 12, NUS3DUISkin.SUCCESS)
     column.add_child(status_feedback)
 
 func _update_modal_layout() -> void:

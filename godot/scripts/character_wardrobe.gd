@@ -53,16 +53,9 @@ func _make_interface() -> void:
     panel.offset_top = -265
     panel.offset_bottom = 265
     add_child(panel)
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color.html("#f4f1e9")
-    style.border_color = Color.html("#30343b")
-    style.set_border_width_all(3)
-    style.set_corner_radius_all(16)
-    panel.add_theme_stylebox_override("panel", style)
-
     var outer := VBoxContainer.new()
     outer.add_theme_constant_override("separation", 12)
-    panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
+    panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 18, 14, true))
     panel.add_child(outer)
     var title := Label.new()
     title.name = "WardrobeTitle"
@@ -100,9 +93,8 @@ func _make_interface() -> void:
         var label := Label.new()
         label.name = key + "Label"
         label.custom_minimum_size.x = 170
-        label.add_theme_color_override("font_color", Color.html("#252b33"))
         label.add_theme_font_size_override("font_size", 13)
-        label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
+        label.add_theme_color_override("font_color", NUS3DUISkin.ink_for(Color.html("#252b33"), 13))
         row.add_child(label)
         var previous := Button.new()
         previous.text = "<"
@@ -115,7 +107,6 @@ func _make_interface() -> void:
         row.add_child(following)
         following.pressed.connect(_cycle.bind(key, 1, int(item[2])))
     summary = Label.new()
-    summary.add_theme_color_override("font_color", Color.html("#46505a"))
     summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     summary.add_theme_color_override("font_color", NUS3DUISkin.DIM)
     choices.add_child(summary)

@@ -9,11 +9,15 @@ const DIM: Color = Color("#64727A")
 const ACCENT: Color = Color("#397E91")
 const TEAL: Color = Color("#397E91")
 const WARM: Color = Color("#BA9160")
+const SUCCESS: Color = Color("#397E68")
+const WARNING: Color = Color("#9A6B2E")
+const DANGER: Color = Color("#A6534C")
 const SURFACE: Color = Color(0.98, 0.985, 0.984, 0.94)
 const SURFACE_SOLID: Color = Color("#FAFBFA")
 const SURFACE_MUTED: Color = Color("#F0F3F2")
 const HAIRLINE: Color = Color(0.61, 0.74, 0.78, 0.52)
 const BACKDROP: Color = Color(0.70, 0.79, 0.84, 0.48)
+const PANEL_RADIUS_MIN: int = 18
 
 static func panel(background: Color, accent: Color = ACCENT, radius: int = 20, margin: int = 14) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
@@ -34,9 +38,26 @@ static func panel(background: Color, accent: Color = ACCENT, radius: int = 20, m
 
 static func glass(accent: Color = ACCENT, radius: int = 23, margin: int = 17,
         dense: bool = false) -> StyleBoxFlat:
+    # Every major panel shares the same minimum corner radius and material.
     # Slightly more opaque than real iOS glass, for contrast over moving 3D.
     return panel(Color(0.985, 0.99, 0.987, 0.96 if dense else 0.92),
-        accent, radius, margin)
+        accent, maxi(radius, PANEL_RADIUS_MIN), margin)
+
+
+static func ink_for(source: Color, _font_size: int = 14) -> Color:
+    # Convert legacy pastel-on-dark text colors into accessible ink for light
+    # panels. Keep genuinely dark semantic colors (error/warning/success) intact.
+    var luminance: float = source.get_luminance()
+    if luminance >= 0.58:
+        return TEXT
+    var brightest: float = maxf(source.r, maxf(source.g, source.b))
+    var darkest: float = minf(source.r, minf(source.g, source.b))
+    var saturation: float = (brightest - darkest) / maxf(brightest, 0.001)
+    if saturation >= 0.38:
+        return source
+    if luminance >= 0.30:
+        return DIM
+    return source
 
 static func keycap(pressed: bool = false, highlighted: bool = false) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
@@ -85,6 +106,15 @@ static func button(control: Button) -> void:
     control.add_theme_color_override("font_pressed_color", Color("#145B70"))
     control.add_theme_color_override("font_disabled_color", Color("#8F9FA8"))
     control.add_theme_font_size_override("font_size", 14)
+
+static func checkbox(control: CheckBox) -> void:
+    control.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+    control.add_theme_color_override("font_color", TEXT)
+    control.add_theme_color_override("font_hover_color", ACCENT)
+    control.add_theme_color_override("font_pressed_color", TEXT)
+    control.add_theme_color_override("font_disabled_color", DIM)
+    control.add_theme_font_size_override("font_size", 13)
+
 
 static func field(control: Control) -> void:
     var base: StyleBoxFlat = panel(Color("#F2F8FA"), Color("#B4CCD4"), 13, 11)

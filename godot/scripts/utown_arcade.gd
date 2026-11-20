@@ -426,8 +426,10 @@ func _layout_status_card() -> void:
     var top: float = STATUS_CARD_MIN_TOP
     var campus_card: Control = hud.get_node_or_null("CampusCard") as Control
     if campus_card != null and campus_card.visible:
-        var weather_height: float = maxf(campus_card.size.y, campus_card.get_combined_minimum_size().y)
-        top = maxf(top, campus_card.position.y + weather_height + 10.0)
+        # Use the rendered viewport-space bottom edge. position.y is only the
+        # local offset and can under-report the panel after its minimum height grows.
+        var weather_bottom: float = campus_card.get_global_rect().end.y
+        top = maxf(top, weather_bottom + 10.0)
     # The district postcard starts at y=354 and the key rail is bottom-fixed.
     # Hide this optional summary when either takes priority on a small window.
     var limit: float = minf(STATUS_CARD_MAX_BOTTOM,
