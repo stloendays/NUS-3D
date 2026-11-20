@@ -41,7 +41,7 @@ static func glass(accent: Color = ACCENT, radius: int = 23, margin: int = 17,
         accent, maxi(radius, PANEL_RADIUS_MIN), margin)
 
 
-static func ink_for(source: Color, font_size: int = 14) -> Color:
+static func ink_for(source: Color, _font_size: int = 14) -> Color:
     # Convert legacy pastel-on-dark text colors into accessible ink for light
     # panels. Keep genuinely dark semantic colors (error/warning/success) intact.
     var luminance: float = source.get_luminance()
