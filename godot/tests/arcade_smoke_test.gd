@@ -47,6 +47,7 @@ func _smoke() -> void:
     weather_card.visible = true
     await process_frame
     arcade._refresh_status()
+    print("ARCADE_LAYOUT_DEBUG weather_rect=", weather_card.get_global_rect(), " weather_text=", weather_card.get_child(0).get_child(0).text, " arcade_rect=", arcade_card.get_global_rect(), " arcade_visible=", arcade_card.visible)
     if arcade_card.visible and arcade_card.get_global_rect().intersects(weather_card.get_global_rect()):
         _fail("Arcade status overlaps expanded indoor/weather panel")
         return
