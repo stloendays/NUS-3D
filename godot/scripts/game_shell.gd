@@ -155,7 +155,7 @@ func _refresh_sound_buttons() -> void:
 
 func _panel_style(_legacy_background: Color) -> StyleBoxFlat:
     # All entry, profile and mail panels use one accessible light-glass material.
-    return NUS3DUISkin.glass(Color("#87B9C5"), 25, 22, true)
+    return NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true)
 
 
 func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> Label:
@@ -199,8 +199,16 @@ func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
     cover.add_child(center)
     var panel: PanelContainer = PanelContainer.new()
     panel.custom_minimum_size = size
-    panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#85B4C5"), 26, 23, true))
+    panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
     center.add_child(panel)
+    if size.x > 0.0:
+        var responsive := func() -> void:
+            var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+            panel.custom_minimum_size.x = minf(size.x, maxf(280.0, viewport_size.x - 32.0))
+            if size.y > 0.0:
+                panel.custom_minimum_size.y = minf(size.y, maxf(240.0, viewport_size.y - 32.0))
+        get_viewport().size_changed.connect(responsive)
+        responsive.call()
     var content: VBoxContainer = VBoxContainer.new()
     content.add_theme_constant_override("separation", 13)
     panel.add_child(content)
@@ -209,16 +217,16 @@ func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
 
 func _build_login() -> void:
     login_cover = _cover("Login")
-    var box: VBoxContainer = _center_panel(login_cover, Vector2(480, 0))
-    box.add_child(_label("NUS-3D", 42, Color.html("#e8f9ff")))
-    box.add_child(_label("UTOWN EXPLORER  /  OFFLINE ALPHA", 14, Color.html("#75c8d6")))
+    var box: VBoxContainer = _center_panel(login_cover, Vector2(440, 0))
+    box.add_child(_label("NUS-3D", 34, Color.html("#e8f9ff")))
+    box.add_child(_label("UTOWN EXPLORER", 14, Color.html("#75c8d6")))
     box.add_child(_label("Explore an original, unofficial campus world.", 15, Color.html("#cbdde0")))
     language_login_button = _button("Language: English", _toggle_language)
     box.add_child(language_login_button)
     var spacer: Control = Control.new()
-    spacer.custom_minimum_size.y = 20
+    spacer.custom_minimum_size.y = 10
     box.add_child(spacer)
-    login_title = _label("SIGN IN", 24)
+    login_title = _label("SIGN IN", 21)
     box.add_child(login_title)
     login_name = LineEdit.new()
     login_name.placeholder_text = "Local username (3-20 characters)"
@@ -239,12 +247,12 @@ func _build_login() -> void:
     box.add_child(_button("How to play", _open_tutorial))
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
     box.add_child(login_sound_button)
-    login_message = _label("", 13, Color.html("#efb8ad"))
+    login_message = _label("", 13, Color("#A6534C"))
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
     var foot: Label = _label(
         "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.",
-        12, Color.html("#a4c0c6"))
+        12, NUS3DUISkin.DIM)
     foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(foot)
 
@@ -380,10 +388,10 @@ func _build_profile_card() -> void:
     profile_card.offset_right = 510
     profile_card.offset_top = 10
     profile_card.offset_bottom = 61
-    profile_card.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#7EB6BE"), 23, 12, true))
+    profile_card.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 14, 10, true))
     ui.add_child(profile_card)
     var row: HBoxContainer = HBoxContainer.new()
-    row.add_theme_constant_override("separation", 10)
+    row.add_theme_constant_override("separation", 7)
     profile_card.add_child(row)
     profile_label = _label("LV 1", 13, Color.html("#e4f5f6"))
     profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -403,14 +411,14 @@ func _build_mail() -> void:
     var layout: VBoxContainer = _center_panel(mail_cover, Vector2(960, 530))
     var header: HBoxContainer = HBoxContainer.new()
     layout.add_child(header)
-    var title: Label = _label("CAMPUS POST  /  LOCAL MAILBOX", 23, Color.html("#cff5f2"))
+    var title: Label = _label("CAMPUS POST", 21, NUS3DUISkin.TEXT)
     title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     header.add_child(title)
     mail_sound_button = _button("Sound ON", _toggle_ui_sound)
     header.add_child(mail_sound_button)
     header.add_child(_button("Close [J]", _close_mail))
     layout.add_child(_label("Only accounts registered on this installation can exchange messages.",
-        12, Color.html("#b0c8cc")))
+        12, NUS3DUISkin.DIM))
 
     var options: HBoxContainer = HBoxContainer.new()
     layout.add_child(options)
@@ -464,7 +472,7 @@ func _build_mail() -> void:
     mail_compose_panel.add_child(compose_body)
     NUS3DUISkin.field(compose_body)
     mail_compose_panel.add_child(_button("Send local message", _send_mail))
-    mail_status = _label("", 13, Color.html("#b8dbdf"))
+    mail_status = _label("", 13, NUS3DUISkin.DIM)
     layout.add_child(mail_status)
     # User mail, dynamic notices and usernames are never passed through the static translator.
     for dynamic_control in [login_message, login_title, login_submit, login_toggle, profile_label, mail_heading, mail_body, mail_status]:
