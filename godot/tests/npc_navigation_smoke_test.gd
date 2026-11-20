@@ -72,6 +72,7 @@ func _test() -> void:
     game.add_child(passing_b)
     passing_a.position = Vector3(0, 0, 0)
     passing_b.position = Vector3(0, 0, 0.8)
+    passing_a.look_at(Vector3(0, 0, 1), Vector3.UP)
     passing_b.look_at(Vector3(0, 0, -1), Vector3.UP)
     var passing: Vector3 = nav.separation_offset("passing_a", passing_a.global_position,
         [{"name":"passing_a", "node":passing_a}, {"name":"passing_b", "node":passing_b}],
