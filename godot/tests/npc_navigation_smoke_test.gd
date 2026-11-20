@@ -22,7 +22,7 @@ func _test() -> void:
     if nav == null or campus == null or nav.grid == null:
         _fail("navigation service failed to initialize")
         return
-    if campus.pedestrians.size() != 6:
+    if campus.pedestrians.size() != 24:
         _fail("outdoor NPC roster changed")
         return
     var obstacles: int = 0
