@@ -4,7 +4,7 @@
 
 ## Unlock and progression
 
-Finish all three Coursework chapters in any single selected faculty to permanently unlock the Post-Course Club. Press Tab while on foot to open it. The unlock remains after switching faculties, derived from existing per-faculty saved coursework progress; no separate paid entitlement or account exists.
+Finish all three Coursework chapters in any single selected faculty to permanently unlock the Post-Course Club. Press P while on foot to open it. The unlock remains after switching faculties, derived from existing per-faculty saved coursework progress; no separate paid entitlement or account exists.
 
 Finish all 39 chapters across thirteen academic roleplay options for the additional cosmetic "校园休闲大师 / All Faculty Master" label. This is not required to access the club.
 
@@ -28,7 +28,7 @@ The conceptual SRC lounge gets a procedural Gomoku table, card table, drinks cou
 
 ## Controls
 
-- Tab opens or closes the unlocked club while the player is on foot.
+- After unlocking, enter the illustrated SRC ground floor, approach the **specific** chess/card/social station and press P. P does not open the club outdoors or from distant buildings.
 - Esc closes the club and restores mouse-look.
 - Use mouse clicks for chess moves, card selection, drink options and rematches.
 - O/J retain their original faculty selector and coursework journal behavior but do not open through this modal.
@@ -47,3 +47,8 @@ The conceptual SRC lounge gets a procedural Gomoku table, card table, drinks cou
 Only an anonymous game statistics file at user://nus3d_leisure.cfg is written: games, wins and social visits. No ages, emails, payment information, drinks history or accounts are recorded.
 
 Manual Windows GUI QA is still required for glyph coverage, cursor focus, layout on smaller windows, skill balance, 3D prop placement and controller behavior.
+
+
+## M3.9 interaction refinement
+
+M3.9 changes the earlier global P shortcut: the player must actually walk up to one of the three SRC tables before opening that activity. Other tabs are disabled until the player walks to those tables. Three seated low-poly NPCs react to chess/card outcomes; the physical Gomoku board now mirrors the game state. The UI adds win/lose reactions, procedural music-free cheering/chime cues and an SFX toggle. Two chess wins, one card win and one social visit reveal an original three-part hidden story; 39/39 Coursework completion adds a true-ending line. See M3_9_3D_CLUB_INTERACTIONS.md. Existing M3.8 local stats/grades remain compatible.
