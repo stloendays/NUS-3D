@@ -257,6 +257,34 @@ func _save_progress() -> void:
     if error != OK:
         push_warning("Campus Arcade could not save its independent progression file: " + str(error))
 
+## Reset only non-persistent actor reactions when a different local player
+## signs in. Levels, wins, XP and professor interactions load from that user's save.
+func reset_runtime_session() -> void:
+    pending_shot = false
+    shot_cooldown = 0.0
+    message = ""
+    message_time = 0.0
+    hud_update_elapsed = 0.0
+    weapon_index = 0
+    next_projectile = 0
+    for i in range(students.size()):
+        var state: Dictionary = students[i]
+        state["focus"] = STUDENT_FOCUS
+        state["break_seconds"] = 0.0
+        var actor: Node3D = state["node"]
+        actor.scale = Vector3.ONE
+        if i < campus_life.pedestrians.size():
+            campus_life.pedestrians[i]["talk_remaining"] = 0.0
+        _refresh_student_label(i)
+    for projectile in projectiles:
+        projectile["active"] = false
+        projectile["time"] = 0.0
+        var visual: MeshInstance3D = projectile["node"]
+        visual.visible = false
+    if held_toy_body != null:
+        held_toy_body.material_override = _shared_material(str(WEAPONS[0]["color"]))
+    _refresh_status()
+
 func choose_weapon(index: int) -> bool:
     if index < 0 or index >= WEAPONS.size():
         return false

@@ -77,7 +77,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 14
     },
     {
       "id": "ENGINEERING",
@@ -145,7 +146,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 28
     },
     {
       "id": "YIH",
@@ -196,7 +198,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 21
     },
     {
       "id": "CLB",
@@ -264,7 +267,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 12
     },
     {
       "id": "COM3",
@@ -315,7 +319,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 12
     },
     {
       "id": "BIZ2",
@@ -366,7 +371,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 12
     },
     {
       "id": "UHC",
@@ -417,7 +423,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 12
     },
     {
       "id": "SCIENCE",
@@ -449,7 +456,7 @@
           "canopy": true
         },
         {
-          "name": "Frontier Canteen / Science Food Court",
+          "name": "Frontier Food Court",
           "offset": [
             43,
             28
@@ -504,7 +511,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 18
     },
     {
       "id": "KR_MRT",
@@ -572,7 +580,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 12
     },
     {
       "id": "PGP",
@@ -640,21 +649,8 @@
       ],
       "architecture_reference": "NUS 2025 campus map + official NUS 360-degree virtual tour. Stylized reconstruction; NOT Google imagery or surveyed facade.",
       "facade_style": "tropical-modern campus architecture",
-      "planting": "shaded palms, rain trees, covered paths"
-    },
-    {
-      "id": "SPORTS",
-      "name": "Campus Sports Fields (schematic)",
-      "lon": 103.77895,
-      "lat": 1.2982,
-      "size": [
-        190,
-        170
-      ],
-      "accent": "#88bfa0",
-      "joke": "The sprint assignment has no extension.",
-      "architecture_reference": "Sports zone is a stylized gameplay placement, not a verified NUS field footprint.",
-      "landmarks": []
+      "planting": "shaded palms, rain trees, covered paths",
+      "elevation_m": 12
     }
   ],
   "stops": [
@@ -745,15 +741,6 @@
       "lon": 103.78118,
       "lat": 1.29078,
       "tagline": "Dormitory side-quests never end."
-    },
-    {
-      "id": "SPORTS",
-      "district": "SPORTS",
-      "name": "Sports Field / Walk Access",
-      "lon": 103.77895,
-      "lat": 1.2982,
-      "tagline": "Jogging is cheaper than therapy.",
-      "walk_only": true
     }
   ],
   "routes": {
@@ -820,32 +807,13 @@
     [
       "PGP",
       "BIZ2"
-    ],
-    [
-      "SCIENCE",
-      "SPORTS"
-    ],
-    [
-      "UHC",
-      "SPORTS"
     ]
   ],
-  "sports_ground": {
-    "district": "SPORTS",
-    "field_size_m": [
-      104,
-      64
-    ],
-    "running_track": true,
-    "football_goals": true,
-    "bleachers": true,
-    "night_lights": true
-  },
-  "edge_design": {
-    "type": "wooded-ridge",
-    "inner_margin_m": 22,
-    "segments_per_side": 18,
-    "buffer_m": 110,
-    "warning": "Schematic game boundary, not a geographic NUS property line"
+  "elevation_model": {
+    "type": "stylized_district_terraces_v1",
+    "datum": "UTown game level = 0",
+    "units": "game metres",
+    "accuracy": "illustrative only; not surveyed NUS elevation",
+    "notes": "District pads and connected pedestrian routes use the same elevation datum; local UTown terrain remains at zero in this phase."
   }
 }

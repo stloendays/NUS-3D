@@ -21,6 +21,7 @@ var mail_cover: Control
 var profile_card: PanelContainer
 var profile_label: Label
 var login_title: Label
+var login_art: NUS3DCampusLoginArt
 var login_name: LineEdit
 var login_password: LineEdit
 var login_message: Label
@@ -217,42 +218,55 @@ func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
 
 func _build_login() -> void:
     login_cover = _cover("Login")
+    login_art = NUS3DCampusLoginArt.new()
+    login_art.name = "CampusCartoonBackdrop"
+    login_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    login_cover.add_child(login_art)
     var box: VBoxContainer = _center_panel(login_cover, Vector2(440, 0))
-    box.add_child(_label("NUS-3D", 34, Color.html("#e8f9ff")))
-    box.add_child(_label("UTOWN EXPLORER", 14, Color.html("#75c8d6")))
-    box.add_child(_label("Explore an original, unofficial campus world.", 15, Color.html("#cbdde0")))
+    var login_panel: PanelContainer = box.get_parent() as PanelContainer
+    if login_panel != null:
+        login_panel.add_theme_stylebox_override("panel", NUS3DCartoonSkin.panel())
+    box.add_child(_label("NUS-3D", 34, NUS3DCartoonSkin.INK))
+    box.add_child(_label("CAMPUS CHAOS  /  校园解压日常", 14, NUS3DCartoonSkin.MUTED))
+    box.add_child(_label("Explore, survive coursework, and laugh at the deadline.", 14, NUS3DCartoonSkin.MUTED))
     language_login_button = _button("Language: English", _toggle_language)
+    NUS3DCartoonSkin.button(language_login_button)
     box.add_child(language_login_button)
     var spacer: Control = Control.new()
     spacer.custom_minimum_size.y = 10
     box.add_child(spacer)
-    login_title = _label("SIGN IN", 21)
+    login_title = _label("SIGN IN", 21, NUS3DCartoonSkin.INK)
     box.add_child(login_title)
     login_name = LineEdit.new()
     login_name.placeholder_text = "Local username (3-20 characters)"
     login_name.max_length = 20
     box.add_child(login_name)
-    NUS3DUISkin.field(login_name)
+    NUS3DCartoonSkin.field(login_name)
     login_password = LineEdit.new()
     login_password.placeholder_text = "Password (at least 8 characters)"
     login_password.secret = true
     login_password.max_length = 128
     login_password.text_submitted.connect(func(_value: String) -> void: _submit_login())
     box.add_child(login_password)
-    NUS3DUISkin.field(login_password)
+    NUS3DCartoonSkin.field(login_password)
     login_submit = _button("Sign in and explore", _submit_login)
+    NUS3DCartoonSkin.button(login_submit, true)
     box.add_child(login_submit)
     login_toggle = _button("Create a new local account", _toggle_register)
+    NUS3DCartoonSkin.button(login_toggle)
     box.add_child(login_toggle)
-    box.add_child(_button("How to play", _open_tutorial))
+    var tutorial_button: Button = _button("How to play", _open_tutorial)
+    NUS3DCartoonSkin.button(tutorial_button)
+    box.add_child(tutorial_button)
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
+    NUS3DCartoonSkin.button(login_sound_button)
     box.add_child(login_sound_button)
-    login_message = _label("", 13, Color("#A6534C"))
+    login_message = _label("", 13, NUS3DCartoonSkin.ERROR)
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
     var foot: Label = _label(
         "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.",
-        12, NUS3DUISkin.DIM)
+        12, NUS3DCartoonSkin.MUTED)
     foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(foot)
 
@@ -584,6 +598,9 @@ func _enter_game() -> void:
     _restore_game_features()
     if horror_mode != null:
         horror_mode.attach_profile(accounts)
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.load_account(accounts.feature_save_path("relationships"))
     observed_tour_ids.clear()
     observed_note_ids.clear()
     observed_sprint_time = -1
@@ -594,7 +611,20 @@ func _enter_game() -> void:
     login_cover.hide()
     mail_cover.hide()
     profile_card.show()
-    game.get_node("Player").call("reset_player")
+    # Respawning clears the controller's movement lock. Restore the lock for
+    # first-time faculty selection or the intro *after* the player reset.
+    var player_actor: UTownPlayer = game.get_node_or_null("Player") as UTownPlayer
+    if player_actor != null:
+        player_actor.reset_player()
+        var intro_state: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
+        var faculty_state: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
+        player_actor.movement_locked = (
+            (intro_state != null and intro_state.playing)
+            or (faculty_state != null and (faculty_state.modal_visible or faculty_state.intro_blocked))
+        )
+    var coin_session: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
+    if coin_session != null:
+        coin_session.seed_session_drops()
     _play_ui_sound("confirm")
     get_tree().paused = false
     var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
@@ -615,6 +645,9 @@ func _logout() -> void:
     if admin_console != null:
         admin_console.close_console()
     challenge.sprint_active = false
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.clear_account()
     if story_director != null:
         story_director.on_logout()
     if session_overlay != null:
@@ -632,6 +665,10 @@ func _logout() -> void:
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
         coins.save_progress()
+        coins.reset_runtime_session()
+    var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
+    if arcade != null:
+        arcade.reset_runtime_session()
     var leisure: UTownLeisure = game.get_node_or_null("Leisure") as UTownLeisure
     if leisure != null:
         leisure._save_stats()
@@ -784,6 +821,7 @@ func _restore_game_features() -> void:
         exams._restore_missing_awards()
     var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
     if arcade != null:
+        arcade.reset_runtime_session()
         arcade.save_path = accounts.feature_save_path("arcade")
         arcade.load_progress()
         arcade._refresh_status()
@@ -801,6 +839,9 @@ func _restore_game_features() -> void:
         leisure._load_stats()
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
+        # Restore wallet and one-time rewards for the new account while leaving
+        # only transient pickups/delivery behind; account data is not reset.
+        coins.reset_runtime_session()
         coins.save_path = accounts.feature_save_path("coins")
         coins.load_progress()
         coins.source_student_wins = arcade.student_wins if arcade != null else 0

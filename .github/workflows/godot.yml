@@ -70,17 +70,22 @@ jobs:
         run: godot --headless --path godot --import --quit
       - name: Validate scene and geometry
         run: godot --headless --path godot --script res://tests/smoke_test.gd
+      - name: Validate NPC A-star obstacle navigation and graded terrain following
+        run: godot --headless --path godot --script res://tests/npc_navigation_smoke_test.gd
       - name: Check official stable-release updater version, URL and SHA-256 rules
         run: godot --headless --path godot --script res://tests/auto_update_smoke_test.gd
       - name: Validate English exam catalog
         run: python tools/validate_english_exams.py
 
+      - name: Validate gameplay modal locking, per-account economy and transient-state isolation
+        run: godot --headless --path godot --script res://tests/gameplay_integrity_smoke_test.gd
       - name: Validate integrated campaign, accounts and controls
         run: |
           set -eo pipefail
           for test in \
             account_smoke_test.gd \
             language_smoke_test.gd \
+            cartoon_shell_smoke_test.gd \
             ui_feedback_smoke_test.gd \
             soft_glass_ui_smoke_test.gd \
             arcade_smoke_test.gd \
@@ -90,12 +95,21 @@ jobs:
             experience_guide_smoke_test.gd \
             building_accuracy_smoke_test.gd \
             kent_ridge_expansion_smoke_test.gd \
+            campus_elevation_smoke_test.gd \
+            graded_routes_smoke_test.gd \
+            graded_walkability_smoke_test.gd \
+            continuous_terrain_smoke_test.gd \
+            unified_height_sampler_smoke_test.gd \
+            terrain_following_paths_smoke_test.gd \
             ambient_ecology_smoke_test.gd \
             english_exams_smoke_test.gd \
             voice_presentation_smoke_test.gd \
             wardrobe_smoke_test.gd \
             boot_loading_smoke_test.gd \
             campus_ai_smoke_test.gd \
+            npc_relationship_smoke_test.gd \
+            campus_furniture_smoke_test.gd \
+            interior_life_props_smoke_test.gd \
             multiplayer_performance_smoke_test.gd \
             story_smoke_test.gd \
             leisure_smoke_test.gd \

@@ -37,6 +37,7 @@ func collect_issues() -> Array[String]:
     var intro: UTownIntro = get_parent().get_node_or_null("Intro") as UTownIntro
     var leisure: UTownLeisure = get_parent().get_node_or_null("Leisure") as UTownLeisure
     var leisure_ui: UTownLeisureUI = get_parent().get_node_or_null("LeisureUI") as UTownLeisureUI
+    var audio: UTownLeisureAudio = get_parent().get_node_or_null("LeisureUI/Sound") as UTownLeisureAudio
     var hud: CanvasLayer = get_parent().get_node_or_null("HUD") as CanvasLayer
 
     for source_file in REQUIRED_SOURCE_FILES:
@@ -104,6 +105,16 @@ func collect_issues() -> Array[String]:
         issues.append("M3.8 post-course chess/cards/social controller or room props missing")
     if leisure_ui == null or leisure_ui.cells.size() != 81 or leisure_ui.card_hand_row == null or leisure_ui.adult_confirm == null:
         issues.append("M3.8 gameplay UI and adult choice disclosure not initialized")
+    if leisure != null and (leisure.seat_actors.size() != 3 or leisure.station_targets.size() != 3 or leisure.station_highlights.size() != 3 or leisure.stone_models == null):
+        issues.append("M3.9 must have three tabletop NPCs, proximity anchors and real board stones")
+    if leisure_ui != null and (leisure_ui.fx_sparkles.size() != 19 or leisure_ui.secret_button == null):
+        issues.append("M3.9 victory animation or hidden epilogue control is missing")
+    if audio == null or audio.players.size() != 7:
+        issues.append("M3.9 seven original generated tones/cheering sounds were not initialized")
+    if audio != null and audio.players.size() == 7:
+        var cue: AudioStreamWAV = audio.players["win"].stream
+        if cue == null or cue.data.size() < 1000:
+            issues.append("M3.9 original PCM victory sound has no generated samples")
     if polish == null or polish.facade_groups.size() != 2 or polish.facade_panes < 40:
         issues.append("Material-study facade layers missing")
     if polish != null and (polish.indoor_finish_groups.size() != 2 or polish.indoor_lamps.size() != 2 or polish.facade_lamps.size() != 2 or polish.material_panel_count < 100):
@@ -139,6 +150,7 @@ func _run_export_test() -> void:
     var intro: UTownIntro = get_parent().get_node_or_null("Intro") as UTownIntro
     var leisure: UTownLeisure = get_parent().get_node_or_null("Leisure") as UTownLeisure
     var leisure_ui: UTownLeisureUI = get_parent().get_node_or_null("LeisureUI") as UTownLeisureUI
+    var audio: UTownLeisureAudio = get_parent().get_node_or_null("LeisureUI/Sound") as UTownLeisureAudio
     var quests_total: int = 0
     if coursework != null:
         for faculty in coursework.faculty_options:
@@ -182,6 +194,13 @@ func _run_export_test() -> void:
         "leisure_room_loaded": leisure.lounge_root != null if leisure != null else false,
         "leisure_ui_cells": leisure_ui.cells.size() if leisure_ui != null else 0,
         "leisure_age_gate": leisure_ui.adult_confirm != null if leisure_ui != null else false,
+        "leisure_walkup_stations": leisure.station_targets.size() if leisure != null else 0,
+        "leisure_seated_npcs": leisure.seat_actors.size() if leisure != null else 0,
+        "leisure_proximity_halos": leisure.station_highlights.size() if leisure != null else 0,
+        "leisure_live_board": leisure.stone_models != null if leisure != null else false,
+        "leisure_sfx_count": audio.players.size() if audio != null else 0,
+        "leisure_win_confetti": leisure_ui.fx_sparkles.size() if leisure_ui != null else 0,
+        "leisure_secret_button": leisure_ui.secret_button != null if leisure_ui != null else false,
         "shuttle_wheels": campus_life.shuttle_wheels.size() if campus_life != null else 0,
         "osm_features": world.osm_reference_layer.feature_count if world != null and world.osm_reference_layer != null else 0,
         "issues": issues,

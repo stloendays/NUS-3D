@@ -56,3 +56,8 @@ At each application launch, the offline Godot engine plays an approximately 12-s
 ## M3.8 post-course games
 
 Finishing a three-chapter faculty Coursework route unlocks the permanent P-key post-course clubhouse. This includes interactive 9x9 Gomoku versus a simple NPC, a five-round card comparison minigame with no money stakes, and an optional all-ages social lounge with nonalcoholic beverages. An adult-only fictional toast has no extra rewards and temporarily blocks travel controls; no age or drink history is persisted. The Windows exported-runtime self-test asserts 81 chess board cells, 5 card rounds, 81 UI buttons, social-age acknowledgement and decorative SRC club props. Headless checks are not substitutes for Windows keyboard and viewport QA.
+
+
+## M3.9 walk-up SRC game scene and sound
+
+The player must now enter the illustrative SRC ground floor and approach the chess, card or social station before P opens that minigame. A seamless in-scene table-specific menu replaces remote activation. Exported-runtime checks require three seated NPC companions, three proximity stations, a live 3D board, 19 UI victory effects, the optional epilogue button and seven original in-memory synthesized SFX including a short cheer. All M3.8 saves remain backwards-compatible; no new assets, imported audio or online API is needed.

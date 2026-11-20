@@ -7,6 +7,13 @@
   ],
   "ui": {
     "NUS-3D": "NUS-3D",
+    "CAMPUS CHAOS  /  DDL EDITION": "校园大混乱 / DDL 特别版",
+    "Survive deadlines. Explore campus. Repeat.": "赶 DDL，逛校园，再来一次。",
+    "Username (3-20 characters)": "用户名（3–20 位英数字符）",
+    "Password (8+ characters)": "密码（至少 8 位）",
+    "How to play": "新手教程",
+    "Offline accounts and local mail only. Not an NUS login.": "本机账号与游戏邮箱，非 NUS 官方登录。",
+    "CAMPUS POST": "校园邮局",
     "UTOWN EXPLORER  /  OFFLINE ALPHA": "UTOWN 探索者 / 离线测试版",
     "Explore an original, unofficial campus world.": "走进脑洞大开的非官方校园，DDL 正在追你。",
     "SIGN IN": "登录",
@@ -62,8 +69,7 @@
     "WEATHER  CLEAR  |  [Y] change\nCAMPUS LIFE": "天气 晴天 [Y] 切换\n校园生活",
     "Level up!": "升级啦！",
     "Welcome to NUS-3D!": "欢迎来到 NUS-3D！",
-    "Campus Office": "校园事务处（虚构）",
-    "How to play": "新手教程"
+    "Campus Office": "校园事务处（虚构）"
   },
   "fragments": [
     {

@@ -194,8 +194,8 @@ func _smoke() -> void:
         push_error("invalid lighting preset was accepted")
         quit(1)
         return
-    if world.route_marker_root == null:
-        push_error("Missing route marker visibility controller for clean photo mode")
+    if world.navigation_labels.size() < 10 or world.route_marker_root == null:
+        push_error("Missing navigational world labels for clean photo mode")
         quit(1)
         return
     world.set_navigation_markers_visible(false)
@@ -209,8 +209,8 @@ func _smoke() -> void:
         quit(1)
         return
     world.set_navigation_markers_visible(true)
-    if world.route_marker_root.visible:
-        push_error("Removed sky-high route labels reappeared after F7 photo mode")
+    if not world.route_marker_root.visible:
+        push_error("F7 photo mode did not restore navigation markers")
         quit(1)
         return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
@@ -671,6 +671,202 @@ func _smoke() -> void:
         quit(1)
         return
     player.call("reset_player")
+    # M3.8 checks run with isolated leisure and Coursework saves, never the user's progress.
+    var leisure: UTownLeisure = instance.get_node_or_null("Leisure") as UTownLeisure
+    var leisure_ui: UTownLeisureUI = instance.get_node_or_null("LeisureUI") as UTownLeisureUI
+    if leisure == null or leisure_ui == null or leisure.chess_board.size() != 81 or leisure_ui.cells.size() != 81:
+        push_error("Post-course games or the 9x9 chess board could not initialize")
+        quit(1)
+        return
+    leisure.save_path = "user://nus3d_leisure_smoke_temp.cfg"
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
+    leisure.chess_wins = 0
+    leisure.chess_games = 0
+    leisure.card_wins = 0
+    leisure.card_games = 0
+    leisure.social_visits = 0
+    if leisure.unlocked() or leisure_ui.open_lounge():
+        push_error("Leisure must remain locked until 3 faculty coursework chapters complete")
+        quit(1)
+        return
+    coursework.active_quest_index = 3
+    coursework._store_active_state()
+    if not leisure.unlocked() or leisure.grand_master_unlocked():
+        push_error("Passing one faculty did not unlock leisure, or awarded 39-chapter bonus too soon")
+        quit(1)
+        return
+    if leisure.lounge_root == null or leisure.lounge_root.name != "PostCourseClub_Illustrative":
+        push_error("The SRC post-course club was not built")
+        quit(1)
+        return
+    if leisure.seat_actors.size() != 3 or leisure.station_highlights.size() != 3 or leisure.stone_models == null:
+        push_error("Three seated opponents, walk-up interaction halos or live chess scene are missing")
+        quit(1)
+        return
+    if leisure_ui.sound == null or leisure_ui.sound.players.size() != 7 or leisure_ui.fx_sparkles.size() != 19:
+        push_error("Six original procedural sounds and local win celebration UI must load")
+        quit(1)
+        return
+    var cheer_stream: AudioStreamWAV = leisure_ui.sound.players["cheer"].stream
+    if cheer_stream == null or cheer_stream.data.size() < 1000:
+        push_error("Original game-win sound has no generated PCM data")
+        quit(1)
+        return
+    leisure_ui._toggle_sound()
+    if leisure_ui.sound.enabled:
+        push_error("Accessibility toggle did not mute post-course SFX")
+        quit(1)
+        return
+    leisure_ui._toggle_sound()
+    if not leisure_ui.sound.enabled:
+        push_error("Post-course SFX could not be re-enabled")
+        quit(1)
+        return
+    if leisure_ui.open_lounge():
+        push_error("Unlocked club should require physically walking into SRC")
+        quit(1)
+        return
+    if campus_life.interior_active:
+        campus_life.exit_interior()
+    if not campus_life.enter_interior("SRC"):
+        push_error("Could not enter SRC to approach physical club stations")
+        quit(1)
+        return
+    player.global_position = leisure.station_global_position("chess")
+    campus_life.interior_floor = 1
+    if not leisure.nearest_station().is_empty():
+        push_error("Leisure interaction should be unavailable on the mezzanine")
+        quit(1)
+        return
+    campus_life.interior_floor = 0
+    var press_p := InputEventKey.new()
+    press_p.keycode = KEY_P
+    press_p.pressed = true
+    leisure_ui._input(press_p)
+    if leisure.nearest_station() != "chess" or not leisure_ui.is_open or leisure_ui.active_tab != "chess":
+        push_error("P-key near the Gomoku table did not open the matching game")
+        quit(1)
+        return
+    if not coursework.modal_open or not player.movement_locked:
+        push_error("Opening the club did not pause first-person movement")
+        quit(1)
+        return
+    leisure_ui.switch_tab("cards")
+    if leisure_ui.active_tab != "chess" or not leisure_ui.tab_cards.disabled:
+        push_error("A player can change to a distant table without walking over")
+        quit(1)
+        return
+    leisure_ui.close_lounge()
+    if leisure_ui.is_open or coursework.modal_open or player.movement_locked:
+        push_error("Closing the club did not restore first-person controls")
+        quit(1)
+        return
+    player.global_position = leisure.station_global_position("cards")
+    if leisure.nearest_station() != "cards" or not leisure_ui.open_lounge() or leisure_ui.active_tab != "cards":
+        push_error("Approaching the card table did not select card gameplay")
+        quit(1)
+        return
+    leisure_ui.close_lounge()
+    player.global_position = leisure.station_global_position("social")
+    if leisure.nearest_station() != "social" or not leisure_ui.open_lounge() or leisure_ui.active_tab != "social":
+        push_error("Approaching the social counter did not select the party scene")
+        quit(1)
+        return
+    leisure_ui.close_lounge()
+    leisure.reset_chess()
+    for col in range(4):
+        leisure.chess_board[col] = 1
+        leisure.chess_moves += 1
+    if not leisure.play_chess(4, 0) or not leisure.chess_over or leisure.chess_winner != 1 or leisure.chess_wins != 1:
+        push_error("Human five-in-a-row victory did not score correctly")
+        quit(1)
+        return
+    if leisure.stone_models.get_child_count() != 5 or leisure.reaction_left <= 0.0:
+        push_error("Completed board was not represented by five live 3D stones or a seated-NPC reaction")
+        quit(1)
+        return
+    leisure.reset_chess()
+    for col in range(4):
+        leisure.chess_board[2 * 9 + col] = 2
+    if leisure._ai_move() != Vector2i(4, 2):
+        push_error("Gomoku NPC does not recognize an immediate winning move")
+        quit(1)
+        return
+    leisure.start_cards()
+    for card_round in range(5):
+        if not leisure.play_card(0):
+            push_error("Valid card selection did not complete a round")
+            quit(1)
+            return
+    if not leisure.card_over or leisure.card_games != 1 or leisure.card_round != 5 or leisure.play_card(0):
+        push_error("Five-round card game end state is incorrect")
+        quit(1)
+        return
+    if leisure.celebrate("adult") or not leisure.celebrate("mocktail") or not leisure.safe_to_ride():
+        push_error("Optional adult toast not gated, or alcohol-free drink restricted travel")
+        quit(1)
+        return
+    if not leisure.celebrate("adult", true) or leisure.safe_to_ride():
+        push_error("Adult social option did not begin temporary no-travel cooldown")
+        quit(1)
+        return
+    # Leaving the interior is necessary to reach the vehicle-specific guard:
+    # the ordinary campus code rejects vehicle controls indoors first.
+    campus_life.exit_interior()
+    if campus_life.set_bicycle(true) or campus_life.board_or_alight():
+        push_error("Post-toast bike/bus safety rule was bypassed")
+        quit(1)
+        return
+    if not campus_life.message.contains("cooldown"):
+        push_error("Alcohol-choice travel guard did not explain its decision")
+        quit(1)
+        return
+    leisure._process(leisure.SOCIAL_COOLDOWN + 0.1)
+    if not leisure.safe_to_ride() or not campus_life.set_bicycle(true):
+        push_error("Post-toast temporary travel restriction failed to clear")
+        quit(1)
+        return
+    campus_life.set_bicycle(false)
+    # An original, replayable hidden story appears after repeat game victories.
+    if leisure.secret_unlocked():
+        push_error("A hidden ending was unlocked without sufficient wins")
+        quit(1)
+        return
+    leisure.chess_wins = 2
+    leisure.card_wins = 1
+    if not leisure.secret_unlocked() or not leisure.reveal_secret().contains("SRC"):
+        push_error("The cross-minigame epilogue did not unlock at 2 chess/1 card win and a visit")
+        quit(1)
+        return
+    if not leisure.ending_seen or leisure.ending_line_index != 1:
+        push_error("The first secret story scene did not persist its chapter")
+        quit(1)
+        return
+    leisure.ending_seen = false
+    leisure.ending_line_index = 0
+    leisure._load_stats()
+    if not leisure.ending_seen or leisure.ending_line_index != 1:
+        push_error("Secret ending progress was not restored from a local save")
+        quit(1)
+        return
+    if not coursework.select_faculty("computing") or not leisure.unlocked():
+        push_error("Earned leisure access was lost after switching faculty")
+        quit(1)
+        return
+    if leisure.social_visits != 2 or leisure.chess_games != 1 or leisure.card_games != 1:
+        push_error("Leisure replay and visit stats are incorrect")
+        quit(1)
+        return
+    leisure.chess_wins = 0
+    leisure.chess_games = 0
+    leisure.card_games = 0
+    leisure.social_visits = 0
+    leisure._load_stats()
+    if leisure.chess_wins != 2 or leisure.chess_games != 1 or leisure.card_wins != 1 or leisure.card_games != 1 or leisure.social_visits != 2:
+        push_error("Leisure and hidden story progress did not persist in the isolated save")
+        quit(1)
+        return
+    DirAccess.remove_absolute(ProjectSettings.globalize_path(leisure.save_path))
     DirAccess.remove_absolute(ProjectSettings.globalize_path(coursework.save_path))
     var trunks: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeTrunks_MultiMesh") as MultiMeshInstance3D
     var canopies: MultiMeshInstance3D = world.get_node_or_null("Vegetation_Procedural/TreeCanopies_MultiMesh") as MultiMeshInstance3D

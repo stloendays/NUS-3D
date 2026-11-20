@@ -2,6 +2,11 @@ extends Node
 class_name UTownCampusLife
 signal talked_to(character_name: String)
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
+const EXTRA_INTERIOR_KIT = preload("res://scripts/utown_extra_interiors.gd")
+const EXTRA_INTERIOR_IDS = ["CREATE_TOWER", "UTR_N", "UTR_S", "TEMBUSU", "CAPT"]
+const CLASSROOM_PROPS = preload("res://scripts/utown_classroom_props.gd")
+const CAMPUS_PROPS = preload("res://scripts/utown_campus_props.gd")
+const INTERIOR_LIFE_PROPS = preload("res://scripts/utown_interior_life_props.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -17,14 +22,22 @@ var npc_lines: PackedStringArray = PackedStringArray([
     "The weather presets are artistic effects, not a live Singapore forecast."
 ])
 var npc_colors: PackedStringArray = PackedStringArray(["#d77f69", "#6d93bf", "#9b83bd", "#6eaa91", "#d4a65f", "#8a9da7"])
+const SKIN_TONES = ["#f3cba8", "#8c553e", "#c98d62", "#e0ac82", "#633d30", "#ae7153"]
+const HAIR_TONES = ["#292c30", "#382923", "#4d342a", "#1f252c", "#624737", "#353136"]
+const AMBIENT_COUNT: int = 18
+const AMBIENT_NAMES = ["Student", "Researcher", "Visitor", "Runner", "Exchange student", "Teaching assistant"]
+const AMBIENT_LINES = ["Heading to class!", "Is the shuttle coming?", "I need coffee.", "Which way is the canteen?", "My presentation starts soon!", "Nice weather for a campus walk."]
 const TALK_RADIUS: float = 5.5
 const ENTRY_RADIUS: float = 18.0
 const BOARD_RADIUS: float = 7.0
 const SHUTTLE_SPEED: float = 5.2
+const NPC_STEP_HEIGHT: float = 0.6
+const NPC_GROUND_SNAP_SPEED: float = 7.0
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
 @onready var weather: UTownWeather = $"../Weather"
+@onready var npc_navigation: NUS3DNPCNavigation = $"../NPCNavigation"
 
 var pedestrians: Array[Dictionary] = []
 var bicycle_wheels: Array[MeshInstance3D] = []
@@ -37,7 +50,7 @@ var entry_positions: Dictionary = {}
 var interiors: Dictionary = {}
 var activity_spots: Dictionary = {}
 var visited_activities: Dictionary = {}
-var interior_anchors: Dictionary = {"ERC": Vector3(900.0, 0.0, 0.0), "SRC": Vector3(940.0, 0.0, 0.0)}
+var interior_anchors: Dictionary = {"ERC": Vector3(900.0, 0.0, 0.0), "SRC": Vector3(940.0, 0.0, 0.0), "CREATE_TOWER": Vector3(980.0, 0.0, 0.0), "UTR_N": Vector3(1020.0, 0.0, 0.0), "UTR_S": Vector3(1060.0, 0.0, 0.0), "TEMBUSU": Vector3(1100.0, 0.0, 0.0), "CAPT": Vector3(1140.0, 0.0, 0.0)}
 var interior_active: bool = false
 var interior_floor: int = 0
 var active_interior: String = ""
@@ -59,6 +72,8 @@ var message_time: float = 0.0
 
 func _ready() -> void:
     _load_waypoints()
+    _register_extra_entries()
+    CAMPUS_PROPS.decorate(world, entry_positions)
     _build_pedestrians()
     _build_interiors()
     _build_bicycle()
@@ -73,6 +88,13 @@ func _load_waypoints() -> void:
         entry_positions[id] = point
         if id in ["GREEN", "ERC", "SRC", "PLAZA"]:
             shuttle_route.append(point)
+
+func _register_extra_entries() -> void:
+    for raw in world.layout.get("buildings", []):
+        var building: Dictionary = raw
+        var id: String = str(building.get("id", ""))
+        if id in EXTRA_INTERIOR_IDS:
+            entry_positions[id] = world.lonlat_to_world(float(building.get("lon", world.origin_lon)), float(building.get("lat", world.origin_lat)))
 
 func _route_length(route: Array[Vector3]) -> float:
     var total: float = 0.0
@@ -93,9 +115,32 @@ func _sample_route(route: Array[Vector3], distance: float) -> Dictionary:
             remaining -= length
     return {"position": route[route.size() - 1], "direction": (route[-1] - route[-2]).normalized()}
 
+func npc_ground_position(current: Vector3, desired: Vector3, delta: float) -> Vector3:
+    # Probe from near the NPC feet to avoid snapping onto overhead roofs.
+    # Only gently follow walkable surfaces; reject steep slopes and large jumps.
+    var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
+    var from: Vector3 = desired + Vector3.UP * (NPC_STEP_HEIGHT + 0.15)
+    var to: Vector3 = desired + Vector3.DOWN * 1.6
+    var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
+    query.collide_with_areas = false
+    var hit: Dictionary = space.intersect_ray(query)
+    if hit.is_empty():
+        return Vector3(desired.x, current.y, desired.z)
+    var normal: Vector3 = hit.get("normal", Vector3.UP)
+    var hit_position: Vector3 = hit["position"]
+    var surface_y: float = hit_position.y
+    if normal.dot(Vector3.UP) < 0.72 or absf(surface_y - current.y) > NPC_STEP_HEIGHT:
+        return Vector3(desired.x, current.y, desired.z)
+    var blend: float = clampf(delta * NPC_GROUND_SNAP_SPEED, 0.0, 1.0)
+    return Vector3(desired.x, lerpf(current.y, surface_y, blend), desired.z)
+
+
 func _build_pedestrians() -> void:
     var walkways: Array = world.layout.get("walkways", [])
-    for i in range(npc_names.size()):
+    if walkways.is_empty():
+        return
+    for i in range(npc_names.size() + AMBIENT_COUNT):
+        var ambient: bool = i >= npc_names.size()
         var path: Dictionary = walkways[i % walkways.size()]
         var route: Array[Vector3] = []
         for coords in path.get("lonlat", []):
@@ -103,9 +148,13 @@ func _build_pedestrians() -> void:
         if route.size() < 2:
             continue
         var total: float = _route_length(route)
-        var distance: float = total * float((i % 3) + 1) / 4.0
+        if total <= 0.001:
+            continue
+        var distance: float = total * float((i % 7) + 1) / 8.0
         var npc: Node3D = _make_person(i)
         npc.position = _sample_route(route, distance)["position"]
+        var height_scale: float = 0.87 + float((i * 7 + 3) % 13) * 0.023
+        npc.scale = Vector3(height_scale * (0.96 + float(i % 4) * 0.025), height_scale, height_scale * (0.96 + float(i % 4) * 0.025))
         add_child(npc)
         pedestrians.append({
             "node": npc, "route": route, "distance": distance,
@@ -114,16 +163,20 @@ func _build_pedestrians() -> void:
             "idle_remaining": 0.0, "talk_remaining": 0.0,
             "left_arm": npc.get_node("LeftArmPivot"), "right_arm": npc.get_node("RightArmPivot"),
             "left_leg": npc.get_node("LeftLegPivot"), "right_leg": npc.get_node("RightLegPivot"),
-            "name": npc_names[i], "line": npc_lines[i]
+            "name": AMBIENT_NAMES[i % AMBIENT_NAMES.size()] if ambient else npc_names[i],
+            "nav_key": npc.name,
+            "line": AMBIENT_LINES[i % AMBIENT_LINES.size()] if ambient else npc_lines[i],
+            "ambient": ambient,
+            "personality_enabled": not ambient and ["Maya", "Ethan", "Mei"].has(npc_names[i] if not ambient else "")
         })
 
 func _make_person(index: int) -> Node3D:
     var root := Node3D.new()
     root.name = "StudentNPC_%02d" % index
     var shirt := StandardMaterial3D.new()
-    shirt.albedo_color = Color.html(str(npc_colors[index]))
+    shirt.albedo_color = Color.html(str(npc_colors[index % npc_colors.size()]))
     var skin := StandardMaterial3D.new()
-    skin.albedo_color = Color.html("#d9ad8d")
+    skin.albedo_color = Color.html(SKIN_TONES[index % SKIN_TONES.size()])
     var trousers := StandardMaterial3D.new()
     trousers.albedo_color = Color.html("#354353")
 
@@ -143,6 +196,18 @@ func _make_person(index: int) -> Node3D:
     head_mesh.position.y = 1.72
     head_mesh.material_override = skin
     root.add_child(head_mesh)
+
+    var hair := MeshInstance3D.new()
+    hair.name = "Hair"
+    var hair_mesh := SphereMesh.new()
+    hair_mesh.radius = 0.232
+    hair.mesh = hair_mesh
+    hair.position = Vector3(0.0, 1.81, 0.015)
+    hair.scale = Vector3(1.02, 0.43 + float(index % 3) * 0.12, 1.03)
+    var hair_material := StandardMaterial3D.new()
+    hair_material.albedo_color = Color.html(HAIR_TONES[index % HAIR_TONES.size()])
+    hair.material_override = hair_material
+    root.add_child(hair)
 
     for side in [-1.0, 1.0]:
         var suffix: String = "Left" if side < 0.0 else "Right"
@@ -204,18 +269,23 @@ func _box(parent: Node3D, name: String, at: Vector3, size: Vector3, material: Ma
     return mesh
 
 func _build_interiors() -> void:
-    for id in ["ERC", "SRC"]:
+    for id in interior_anchors.keys():
         var room := Node3D.new()
         room.name = id + "_IllustrativeInterior"
         room.position = interior_anchors[id]
         add_child(room)
         _build_room_shell(room, id)
-        _build_mezzanine(room, id)
+        if id in ["ERC", "SRC"]:
+            _build_mezzanine(room, id)
         if id == "ERC":
             _build_study_room(room)
-        else:
+            INTERIOR_LIFE_PROPS.decorate_study(room)
+        elif id == "SRC":
             _build_recreation_room(room)
-        activity_spots[id] = INTERIOR_KIT.decorate(room, id)
+            INTERIOR_LIFE_PROPS.decorate_recreation(room)
+        else:
+            EXTRA_INTERIOR_KIT.decorate(room, id)
+        activity_spots[id] = INTERIOR_KIT.decorate(room, id) if id in ["ERC", "SRC"] else []
         interiors[id] = room
 
 func _build_room_shell(room: Node3D, id: String) -> void:
@@ -320,6 +390,7 @@ func _build_study_room(room: Node3D) -> void:
         _box(room, "UpperStudyDesk", Vector3(x, 3.95, -6.5), Vector3(2.7, 0.14, 1.0), table)
         _box(room, "UpperStudySeat", Vector3(x, 3.68, -5.7), Vector3(0.7, 0.12, 0.65), seat)
     _box(room, "UpperQuietBooth", Vector3(9.5, 4.0, -6.5), Vector3(1.4, 0.9, 2.6), dark)
+    CLASSROOM_PROPS.decorate(room)
 
 func _build_recreation_room(room: Node3D) -> void:
     var dark := _mat("#4e6269")
@@ -571,6 +642,8 @@ func _process(delta: float) -> void:
     message_time = maxf(0.0, message_time - delta)
     var now: float = float(Time.get_ticks_msec()) / 1000.0
     for state in pedestrians:
+        if bool(state.get("hostile", false)):
+            continue
         var route: Array[Vector3] = state["route"]
         var total: float = _route_length(route)
         var talk_remaining: float = maxf(0.0, float(state["talk_remaining"]) - delta)
@@ -592,14 +665,34 @@ func _process(delta: float) -> void:
         var walking: bool = talk_remaining <= 0.0 and idle_remaining <= 0.0
         var gait: float = sin(now * 6.2 + float(state["phase"])) if walking else sin(now * 1.8 + float(state["phase"])) * 0.08
         var bob: float = absf(sin(now * 6.2 + float(state["phase"]))) * 0.035 if walking else sin(now * 1.8 + float(state["phase"])) * 0.012
-        npc.position = sample["position"] + Vector3(0.0, bob, 0.0)
+        var previous_position: Vector3 = npc.global_position
+        if walking and npc_navigation != null:
+            var next_waypoint: Vector3 = npc_navigation.next_target(str(state.get("nav_key", state["name"])), previous_position, sample["position"], now)
+            var toward_waypoint: Vector3 = next_waypoint - previous_position
+            toward_waypoint.y = 0.0
+            var step_distance: float = minf(float(state["speed"]) * delta, toward_waypoint.length())
+            var forward: Vector3 = toward_waypoint.normalized() if toward_waypoint.length_squared() > 0.0001 else Vector3.ZERO
+            var avoidance: Vector3 = npc_navigation.separation_offset(str(state.get("nav_key", state["name"])), previous_position, pedestrians, forward, 1.6)
+            var steering: Vector3 = (forward + avoidance * 0.55).normalized() if forward.length_squared() > 0.0001 else Vector3.ZERO
+            var desired: Vector3 = previous_position + steering * step_distance
+            var safe_position: Vector3 = npc_navigation.move_safe(previous_position, desired, delta)
+            if safe_position.distance_squared_to(previous_position) < 0.0000005 and avoidance.length_squared() > 0.0001:
+                safe_position = npc_navigation.move_safe(previous_position, previous_position + forward * step_distance, delta)
+            npc.global_position = safe_position
+            npc_navigation.report_movement(str(state.get("nav_key", state["name"])), previous_position, npc.global_position, now)
+            if npc.global_position.distance_squared_to(previous_position) < 0.0000005 and step_distance > 0.001:
+                state["distance"] = float(state["distance"]) - float(state["direction"]) * float(state["speed"]) * delta
+        elif walking:
+            npc.global_position = npc_ground_position(previous_position, sample["position"], delta)
+        npc.position.y += bob
         if talk_remaining > 0.0:
             var to_player: Vector3 = player.global_position - npc.global_position
             to_player.y = 0.0
             if to_player.length() > 0.05:
                 npc.look_at(npc.global_position + to_player, Vector3.UP)
         else:
-            var facing: Vector3 = sample["direction"] * float(state["direction"])
+            var facing: Vector3 = npc.global_position - previous_position if walking else sample["direction"] * float(state["direction"])
+            facing.y = 0.0
             if facing.length() > 0.01:
                 npc.look_at(npc.global_position + facing, Vector3.UP)
         var left_arm: Node3D = state["left_arm"]
@@ -673,10 +766,26 @@ func talk_to_nearest() -> bool:
     pedestrians[index]["talk_remaining"] = 6.0
     var speaker: String = str(pedestrians[index]["name"])
     var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
-    var role: String = bank.role_for("outdoor", speaker) if bank != null else "Student"
-    var line: String = bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"])
+    var ambient: bool = bool(pedestrians[index].get("ambient", false))
+    var role: String = "Passerby" if ambient else (bank.role_for("outdoor", speaker) if bank != null else "Student")
+    var line: String = str(pedestrians[index]["line"]) if ambient else (bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"]))
+    var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
+    var affinity_line: String = ""
+    var affinity_status: String = ""
+    if relationships != null and relationships.is_story_character(speaker):
+        var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+        var chinese: bool = language != null and language.is_chinese()
+        affinity_status = relationships.conversation(speaker, chinese)
+        affinity_line = relationships.contextual_line(speaker, chinese)
+        var invitation: String = relationships.invitation(speaker, chinese)
+        if not invitation.is_empty():
+            affinity_line += "\n" + invitation
     message = "%s · %s\n%s" % [speaker, role, line]
-    message_time = 6.0
+    if not affinity_line.is_empty():
+        message += "\n" + affinity_line
+    if not affinity_status.is_empty():
+        message += "\n♥ " + affinity_status
+    message_time = 7.0
     talked_to.emit(speaker)
     return true
 
@@ -702,6 +811,10 @@ func enter_interior(id: String) -> bool:
 
 func toggle_interior_floor() -> bool:
     if not interior_active:
+        return false
+    if active_interior in EXTRA_INTERIOR_IDS:
+        message = "This room is ground-floor only."
+        message_time = 2.5
         return false
     interior_floor = 1 - interior_floor
     var floor_position: Vector3 = Vector3(0.0, 0.18, 6.0) if interior_floor == 0 else Vector3(0.0, 3.58, -6.5)
@@ -733,7 +846,7 @@ func enter_nearest_interior() -> bool:
         return true
     var best_id: String = ""
     var best_distance: float = ENTRY_RADIUS
-    for id in ["ERC", "SRC"]:
+    for id in interior_anchors.keys():
         if not entry_positions.has(id):
             continue
         var point: Vector3 = entry_positions[id]
@@ -742,7 +855,7 @@ func enter_nearest_interior() -> bool:
             best_id = id
             best_distance = d
     if best_id.is_empty():
-        message = "Approach the ERC or SRC study entrance, then press I."
+        message = "Approach an ERC, SRC, CREATE, residence or college entrance; press I."
         message_time = 3.0
         return false
     return enter_interior(best_id)
