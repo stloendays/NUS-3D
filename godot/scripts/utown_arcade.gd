@@ -415,7 +415,7 @@ func _announce(value: String, duration: float) -> void:
     message_time = duration
     # Reuse the bounded HUD toast queue for full event text, instead of a
     # permanent four-line overlay that obscures indoor weather information.
-    if hud != null and hud.visible and hud.has_method("_show_toast"):
+    if hud != null and hud.visible and not get_tree().paused and hud.has_method("_show_toast"):
         hud.call("_show_toast", value)
     _refresh_status()
 
