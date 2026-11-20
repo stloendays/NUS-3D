@@ -15,7 +15,7 @@ const LEASH_RADIUS := 38.0
 const CHASE_SPEED := 4.4
 const TAG_DISTANCE := 1.6
 const TAG_COOLDOWN := 6.0
-const PERSONALITIES := {"Maya": "outgoing", "Ethan": "proud", "Aisha": "patient", "Lucas": "competitive", "Mei": "friendly", "Daniel": "reserved"}
+const PERSONALITIES := {"Maya": "outgoing", "Ethan": "proud", "Mei": "curious"}
 
 @onready var campus: UTownCampusLife = $"../CampusLife"
 @onready var player: UTownPlayer = $"../Player"
@@ -92,11 +92,14 @@ func _closest_name() -> String:
     var closest: float = 6.0
     var result: String = ""
     for state in campus.pedestrians:
+        var candidate: String = str(state["name"])
+        if not PERSONALITIES.has(candidate) or not bool(state.get("personality_enabled", false)):
+            continue
         var npc: Node3D = state["node"]
         var distance: float = npc.global_position.distance_to(player.global_position)
         if distance < closest:
             closest = distance
-            result = str(state["name"])
+            result = candidate
     return result
 
 
