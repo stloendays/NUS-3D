@@ -50,6 +50,11 @@ static func ink_for(source: Color, _font_size: int = 14) -> Color:
     var luminance: float = source.get_luminance()
     if luminance >= 0.58:
         return TEXT
+    var brightest: float = maxf(source.r, maxf(source.g, source.b))
+    var darkest: float = minf(source.r, minf(source.g, source.b))
+    var saturation: float = (brightest - darkest) / maxf(brightest, 0.001)
+    if saturation >= 0.38:
+        return source
     if luminance >= 0.30:
         return DIM
     return source
