@@ -341,6 +341,9 @@ func _process(_delta: float) -> void:
         _refresh_journal()
 
 func _input(event: InputEvent) -> void:
+    var coins: Node = get_parent().get_node_or_null("Coins")
+    if coins != null and bool(coins.get("shop_open")):
+        return
     var voice: Node = get_parent().get_node_or_null("VoicePresentation")
     if voice != null and voice.get("is_open") == true:
         return
