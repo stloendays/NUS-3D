@@ -69,6 +69,10 @@ func _run() -> void:
     if not coins.purchase("lunch") or coins.lunch_passes != 1 or coins.balance != 37:
         _fail("lunch pass purchase failed")
         return
+    coins.toggle_shop()
+    if coins.shop_open:
+        _fail("shop should close before outdoor coin pickup and delivery")
+        return
     if not coins.reward_once("test:only-once", 12, "demo mission"):
         _fail("unique quest reward was not paid")
         return
@@ -146,8 +150,13 @@ func _run() -> void:
         _fail("delivery completion was repeatable during cooldown")
         return
     player.global_position = plaza.global_position + Vector3(0.0, 0.18, 0.0)
-    if not coins.purchase("tip"):
-        _fail("Golden Tip purchase failed")
+    coins.toggle_shop()
+    if not coins.shop_open or not coins.purchase("tip"):
+        _fail("Golden Tip purchase failed at the Town Plaza counter")
+        return
+    coins.toggle_shop()
+    if coins.shop_open:
+        _fail("shop should close after Golden Tip purchase")
         return
     coins.delivery_cooldown = 0.0
     player.global_position = coins.delivery_origin + Vector3(0.0, 0.18, 0.0)
