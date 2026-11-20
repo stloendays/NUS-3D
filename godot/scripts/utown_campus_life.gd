@@ -73,7 +73,7 @@ var message_time: float = 0.0
 func _ready() -> void:
     _load_waypoints()
     _register_extra_entries()
-    CAMPUS_PROPS.decorate(self, entry_positions)
+    CAMPUS_PROPS.decorate(world, entry_positions)
     _build_pedestrians()
     _build_interiors()
     _build_bicycle()
