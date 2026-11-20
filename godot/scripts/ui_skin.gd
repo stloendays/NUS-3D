@@ -14,6 +14,7 @@ const SURFACE_SOLID: Color = Color("#FAFBFA")
 const SURFACE_MUTED: Color = Color("#F0F3F2")
 const HAIRLINE: Color = Color(0.61, 0.74, 0.78, 0.52)
 const BACKDROP: Color = Color(0.70, 0.79, 0.84, 0.48)
+const PANEL_RADIUS_MIN: int = 18
 
 static func panel(background: Color, accent: Color = ACCENT, radius: int = 20, margin: int = 14) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
@@ -34,9 +35,21 @@ static func panel(background: Color, accent: Color = ACCENT, radius: int = 20, m
 
 static func glass(accent: Color = ACCENT, radius: int = 23, margin: int = 17,
         dense: bool = false) -> StyleBoxFlat:
+    # Every major panel shares the same minimum corner radius and material.
     # Slightly more opaque than real iOS glass, for contrast over moving 3D.
     return panel(Color(0.985, 0.99, 0.987, 0.96 if dense else 0.92),
-        accent, radius, margin)
+        accent, maxi(radius, PANEL_RADIUS_MIN), margin)
+
+
+static func ink_for(source: Color, font_size: int = 14) -> Color:
+    # Convert legacy pastel-on-dark text colors into accessible ink for light
+    # panels. Keep genuinely dark semantic colors (error/warning/success) intact.
+    var luminance: float = source.get_luminance()
+    if luminance >= 0.58:
+        return TEXT
+    if luminance >= 0.30:
+        return DIM
+    return source
 
 static func keycap(pressed: bool = false, highlighted: bool = false) -> StyleBoxFlat:
     var style: StyleBoxFlat = StyleBoxFlat.new()
