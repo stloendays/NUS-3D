@@ -68,18 +68,7 @@ func _spawn_occupants() -> void:
 
         # Distinguishable head silhouettes, small faces and shoes keep the
         # fictional indoor cast readable from the new third-person screenshots.
-        var hair_cap := MeshInstance3D.new()
-        hair_cap.name = "HairCap"
-        var hair_mesh := SphereMesh.new()
-        hair_mesh.radius = 0.227
-        hair_mesh.height = 0.454
-        hair_cap.mesh = hair_mesh
-        hair_cap.position = Vector3(0.0, 1.84, 0.0)
-        hair_cap.scale = Vector3(1.03, 0.48, 1.03)
-        var hair_palette: PackedStringArray = PackedStringArray([
-            "#323b40", "#584534", "#292f36", "#4e3931", "#39434e", "#53463f"])
-        hair_cap.material_override = _mat(hair_palette[i], 0.92)
-        actor.add_child(hair_cap)
+        # Hair and skin variants come from the shared campus character builder.
         var features := _mat("#2d3439")
         for eye_side in [-1.0, 1.0]:
             _prop(actor, "Eye", Vector3(eye_side * 0.076, 1.72, -0.207),
@@ -228,8 +217,23 @@ func talk_to_nearest() -> bool:
     var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
     var role: String = bank.role_for("indoor", speaker) if bank != null else str(actor["role"])
     var line: String = bank.next_line("indoor", speaker, 0) if bank != null else str(actor["dialogue"])
+    var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
+    var affinity_line: String = ""
+    var affinity_status: String = ""
+    if relationships != null and relationships.is_story_character(speaker):
+        var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+        var chinese: bool = language != null and language.is_chinese()
+        affinity_status = relationships.conversation(speaker, chinese)
+        affinity_line = relationships.contextual_line(speaker, chinese)
+        var invitation: String = relationships.invitation(speaker, chinese)
+        if not invitation.is_empty():
+            affinity_line += "\n" + invitation
     life.message = "%s / %s\n%s" % [speaker, role, line]
-    life.message_time = 5.0
+    if not affinity_line.is_empty():
+        life.message += "\n" + affinity_line
+    if not affinity_status.is_empty():
+        life.message += "\n♥ " + affinity_status
+    life.message_time = 7.0
     return true
 
 func active_count() -> int:
