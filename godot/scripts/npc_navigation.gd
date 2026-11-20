@@ -97,10 +97,18 @@ func next_target(name: String, from: Vector3, goal: Vector3, now: float) -> Vect
         repath_at[name] = now + REPATH_SECONDS
         repath_count += 1
     var path: Array = paths.get(name, [])
-    while not path.is_empty() and from.distance_squared_to(path[0]) < ARRIVAL * ARRIVAL:
+    # Waypoints are stored on the XZ plane; terrain elevation must not
+    # prevent them from being consumed.
+    while not path.is_empty() and Vector2(from.x, from.z).distance_squared_to(Vector2(path[0].x, path[0].z)) < ARRIVAL * ARRIVAL:
         path.pop_front()
     paths[name] = path
-    return goal if path.is_empty() else path[0]
+    if not path.is_empty():
+        return path[0]
+    # Never fall back to a straight line through a building when A* failed.
+    var destination: Vector2i = _cell(goal)
+    if grid.is_in_boundsv(destination) and not grid.is_point_solid(destination):
+        return goal
+    return from
 
 
 func clear_path(name: String) -> void:
@@ -127,6 +135,8 @@ func move_safe(current: Vector3, desired: Vector3, delta: float) -> Vector3:
     var travel: PackedFloat32Array = space.cast_motion(query)
     var fraction: float = clampf(float(travel[0]) if travel.size() > 0 else 0.0, 0.0, 1.0)
     var limited: Vector3 = current + displacement * maxf(0.0, fraction - 0.04)
+    if fraction <= 0.05:
+        return current
     var grounded: Vector3 = campus.npc_ground_position(current, limited, delta)
     # Never cross a cliff or staircase too tall for this lightweight walker.
     if absf(grounded.y - current.y) > campus.NPC_STEP_HEIGHT:
