@@ -113,7 +113,7 @@ func _build_status() -> void:
     status_body = _dual_label("选择学院 [Shift+P] · 手册 [P]",
         "Choose faculty [Shift+P] · Journal [P]", 12, Color.html("#edf2ed"))
     column.add_child(status_body)
-    status_feedback = _label("", 12, Color.html("#a9e4b7"))
+    status_feedback = _label("", 12, NUS3DUISkin.SUCCESS)
     column.add_child(status_feedback)
 
 func _update_modal_layout() -> void:
