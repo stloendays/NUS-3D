@@ -20,6 +20,7 @@ const DELIVERY_COOLDOWN_SECONDS: float = 32.0
 @onready var challenge: UTownChallenge = $"../Challenge"
 @onready var campus_life: UTownCampusLife = $"../CampusLife"
 @onready var arcade: UTownArcade = $"../Arcade"
+@onready var coursework: UTownCoursework = $"../Coursework"
 @onready var green_dining: UTownGreenDining = $"../GreenDining"
 @onready var hud: CanvasLayer = $"../HUD"
 @onready var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
@@ -60,6 +61,9 @@ var shop_heading: Label
 var shop_buttons: Array[Button] = []
 var shop_open: bool = false
 var capture_mouse_before_shop: bool = false
+var previous_shop_mouse_mode: int = Input.MOUSE_MODE_CAPTURED
+var previous_shop_player_lock: bool = false
+var previous_shop_coursework_modal: bool = false
 var known_hud_visibility: bool = true
 
 func _ready() -> void:
@@ -305,6 +309,10 @@ func purchase(item_id: String) -> bool:
     if balance < price:
         _notify(_t("需要 %d 金币。先探索或送餐！", "Need %d coins. Explore or deliver lunch first!") % price, 3.0)
         return false
+    var previous_balance: int = balance
+    var previous_lucky: int = lucky_pickups
+    var previous_lunch: int = lunch_passes
+    var previous_tips: int = double_tip_passes
     balance -= price
     match item_id:
         "lucky":
@@ -313,7 +321,13 @@ func purchase(item_id: String) -> bool:
             lunch_passes += 1
         "tip":
             double_tip_passes += 1
-    _save_progress()
+    if not _save_progress():
+        balance = previous_balance
+        lucky_pickups = previous_lucky
+        lunch_passes = previous_lunch
+        double_tip_passes = previous_tips
+        _notify("Purchase was not saved. No coins were spent.", 3.0)
+        return false
     _notify(_t("购买成功：%s，花费 %d 金币。", "Bought %s for %d C") % [
         _t("幸运徽章", "Lucky Badge") if item_id == "lucky" else
         _t("送餐加时券", "Lunch Time Pass") if item_id == "lunch" else _t("双倍小费券", "Golden Tip Pass"), price
@@ -333,7 +347,9 @@ func _horizontal_distance(a: Vector3, b: Vector3) -> float:
     return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
 
 func _can_interact() -> bool:
-    return hud.visible and not shop_open and not campus_life.interior_active and not campus_life.on_shuttle and not player.movement_locked
+    return (hud.visible and not shop_open and not campus_life.interior_active
+        and not campus_life.on_shuttle and not player.movement_locked
+        and not coursework.modal_open)
 
 func _drop_at(position: Vector3, amount: int) -> bool:
     if amount <= 0 or amount > 50:
@@ -393,11 +409,12 @@ func pickup_nearby() -> bool:
     var doubled: bool = lucky_pickups > 0
     if doubled:
         amount *= 2
-    if not credit(amount, "Found a dropped coin"):
-        return false
-    if doubled:
         lucky_pickups -= 1
-        _save_progress()
+    # One write commits both the coin amount and consumed Lucky Badge charge.
+    if not credit(amount, "Found a dropped coin"):
+        if doubled:
+            lucky_pickups += 1
+        return false
     state["active"] = false
     var root: Node3D = state["node"]
     root.visible = false
@@ -407,9 +424,14 @@ func credit(amount: int, reason: String) -> bool:
     var gain: int = mini(maxi(amount, 0), MAX_BALANCE - balance)
     if gain <= 0:
         return false
+    var previous_balance: int = balance
+    var previous_lifetime: int = lifetime_earned
     balance += gain
     lifetime_earned = mini(MAX_BALANCE * 100, lifetime_earned + gain)
-    _save_progress()
+    if not _save_progress():
+        balance = previous_balance
+        lifetime_earned = previous_lifetime
+        return false
     _notify(_t("+%d 金币 | %s", "+%d C | %s") % [gain, _reason(reason)], 3.0)
     return true
 
@@ -457,6 +479,9 @@ func delivery_interact() -> bool:
             _notify(_t("饭快凉了！赶到中央草坪按 N。", "Lunch is getting cold! Reach Town Green and press N."), 3.0)
             return false
         var base_reward: int = 38 + (15 if delivery_time >= 50.0 else 0)
+        var previously_tipped: int = double_tip_passes
+        var previous_time: float = delivery_time
+        var previous_count: int = delivery_count
         if double_tip_passes > 0:
             double_tip_passes -= 1
             base_reward *= 2
@@ -464,8 +489,15 @@ func delivery_interact() -> bool:
         delivery_time = 0.0
         delivery_cooldown = DELIVERY_COOLDOWN_SECONDS
         delivery_count += 1
-        credit(base_reward, "Lunch Express delivered")
-        _save_progress()
+        # Reward, delivery count and consumed tip pass share one save.
+        if not credit(base_reward, "Lunch Express delivered"):
+            delivery_active = true
+            delivery_time = previous_time
+            delivery_cooldown = 0.0
+            delivery_count = previous_count
+            double_tip_passes = previously_tipped
+            _notify("Delivery could not be saved. Please try again.", 3.0)
+            return false
         return true
     if delivery_cooldown > 0.0:
         _notify(_t("食堂备餐中（剩余 %d 秒）。", "Food court is preparing the next order (%ds).") % ceili(delivery_cooldown), 2.3)
@@ -481,7 +513,12 @@ func delivery_interact() -> bool:
     if lunch_passes > 0:
         lunch_passes -= 1
         delivery_time += 35.0
-        _save_progress()
+        if not _save_progress():
+            lunch_passes += 1
+            delivery_active = false
+            delivery_time = 0.0
+            _notify("Order could not be saved. Please try again.", 3.0)
+            return false
     _notify(_t("送餐挑战开始！赶往中央草坪，抵达后按 N。", "LUNCH EXPRESS! Deliver to Town Green. Press N at destination."), 4.2)
     return true
 
@@ -490,20 +527,64 @@ func _close_shop() -> void:
         return
     shop_open = false
     shop_panel.visible = false
-    if capture_mouse_before_shop:
-        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+    # Restore the exact state that existed before the shop acquired the modal.
+    # Do not clear a lock introduced by a different overlay while this was open.
+    var course_ui: Node = get_parent().get_node_or_null("CourseworkUI")
+    var exams: Node = get_parent().get_node_or_null("EnglishExams")
+    var leisure: Node = get_parent().get_node_or_null("LeisureUI")
+    var another_modal: bool = (
+        (course_ui != null and bool(course_ui.get("modal_visible")))
+        or (exams != null and bool(exams.get("is_open")))
+        or (leisure != null and bool(leisure.get("is_open")))
+    )
+    coursework.modal_open = previous_shop_coursework_modal or another_modal
+    player.movement_locked = previous_shop_player_lock or coursework.modal_open or campus_life.on_shuttle
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if another_modal else previous_shop_mouse_mode
 
 func toggle_shop() -> void:
     if shop_open:
         _close_shop()
         return
-    if not hud.visible or campus_life.on_shuttle or campus_life.interior_active:
+    if (not hud.visible or campus_life.on_shuttle or campus_life.interior_active
+        or player.bicycle_mode or player.movement_locked or coursework.modal_open):
         return
+    previous_shop_mouse_mode = Input.mouse_mode
+    previous_shop_player_lock = player.movement_locked
+    previous_shop_coursework_modal = coursework.modal_open
+    capture_mouse_before_shop = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
     shop_open = true
     shop_panel.visible = true
-    capture_mouse_before_shop = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+    coursework.modal_open = true
+    player.movement_locked = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     _refresh_display()
+
+## Session-only state may never follow a different local account. Keep wallet,
+## purchased buffs and claimed rewards in the account-specific ConfigFile.
+func reset_runtime_session() -> void:
+    _close_shop()
+    delivery_active = false
+    delivery_time = 0.0
+    delivery_cooldown = 0.0
+    source_student_wins = 0
+    reward_poll_timer = 0.0
+    drop_timer = 0.0
+    refresh_timer = 0.0
+    notice = ""
+    notice_time = 0.0
+    pickup_cursor = 0
+    for pickup in pickups:
+        pickup["active"] = false
+        pickup["life"] = 0.0
+        pickup["value"] = 0
+        var node: Node3D = pickup["node"]
+        node.visible = false
+    _refresh_display()
+
+func seed_session_drops() -> void:
+    # New accounts do not inherit the previous avatar's world pickups.
+    for i in range(5):
+        _spawn_random_coin(true)
 
 func _notify(value: String, seconds: float) -> void:
     notice = value
@@ -534,7 +615,7 @@ func _refresh_display() -> void:
 func save_progress() -> void:
     _save_progress()
 
-func _save_progress() -> void:
+func _save_progress() -> bool:
     var data := ConfigFile.new()
     data.set_value("coins", "schema_version", 1)
     data.set_value("coins", "balance", balance)
@@ -548,8 +629,11 @@ func _save_progress() -> void:
         ids.append(str(claimed))
     ids.sort()
     data.set_value("coins", "claimed_rewards", ids)
-    if data.save(save_path) != OK:
-        push_warning("Could not save independent campus coins file")
+    var status: Error = data.save(save_path)
+    if status != OK:
+        push_warning("Could not save independent campus coins file (error %d)" % status)
+        return false
+    return true
 
 func load_progress() -> void:
     balance = 0
@@ -623,7 +707,19 @@ func _process(delta: float) -> void:
         refresh_timer = 0.0
         _refresh_display()
 
+func _input(event: InputEvent) -> void:
+    if not shop_open:
+        return
+    if event is InputEventKey:
+        var key: InputEventKey = event as InputEventKey
+        if key.pressed and not key.echo and key.keycode in [KEY_ESCAPE, KEY_O]:
+            _close_shop()
+        # While the modal is open no gameplay keys should reach other systems.
+        get_viewport().set_input_as_handled()
+
 func _unhandled_input(event: InputEvent) -> void:
+    if shop_open or player.movement_locked:
+        return
     if event is InputEventKey and event.pressed and not event.echo:
         match event.keycode:
             KEY_Z:
