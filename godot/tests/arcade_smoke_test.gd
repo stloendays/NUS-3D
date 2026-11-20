@@ -45,6 +45,7 @@ func _smoke() -> void:
     weather_card.custom_minimum_size = Vector2(starting_weather_minimum.x, 125.0)
     await process_frame
     arcade._refresh_status()
+    print("ARCADE_LAYOUT_DEBUG weather_rect=", weather_card.get_global_rect(), " weather_size=", weather_card.size, " weather_min=", weather_card.get_combined_minimum_size(), " weather_position=", weather_card.position, " arcade_rect=", arcade_card.get_global_rect(), " arcade_offsets=", arcade_card.offset_top, "/", arcade_card.offset_bottom)
     if arcade_card.visible and arcade_card.get_global_rect().intersects(weather_card.get_global_rect()):
         _fail("Arcade status overlaps expanded indoor/weather panel")
         return
