@@ -113,8 +113,6 @@ func _spawn_occupants() -> void:
             _prop(actor, "CoffeeCup", Vector3(0.33, 0.95, -0.32), Vector3(0.15, 0.18, 0.15), ceramic)
         elif routine == "walk":
             _prop(actor, "CarrySatchel", Vector3(0.26, 0.83, 0.16), Vector3(0.44, 0.56, 0.23), glass)
-        elif routine == "stairs":
-            _advance_stair(actor, delta, phase)
         elif routine == "exercise":
             _prop(actor, "Wristband", Vector3(0.43, 0.84, 0.0), Vector3(0.20, 0.12, 0.20), ceramic)
 
@@ -183,6 +181,8 @@ func _process(delta: float) -> void:
             right_arm.rotation.x = -0.6
             left_leg.rotation.x = 0.0
             right_leg.rotation.x = 0.0
+        elif routine == "stairs":
+            _advance_stair(actor, delta, phase)
         elif routine == "exercise":
             node.position = origin + Vector3(0.0, absf(sin(phase * 2.1)) * 0.05, 0.0)
             node.rotation.y = float(actor["heading"])
