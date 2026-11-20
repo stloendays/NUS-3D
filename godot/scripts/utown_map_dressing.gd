@@ -7,6 +7,7 @@ const MAX_BUSHES: int = 128
 const MAX_BENCHES: int = 13
 const MAX_DISTRICT_TREES: int = 84
 const MAX_PLAZA_PLANTERS: int = 4
+const CAMPUS_SCATTERED_PROPS = preload("res://scripts/campus_scattered_props.gd")
 
 @onready var world: UTownWorld = $"../World"
 @onready var expansion: NUSKentRidgeWorld = $"../KentRidgeExpansion"
@@ -31,6 +32,8 @@ func _ready() -> void:
     _build_path_benches()
     _build_plaza_planters()
     _build_district_groves()
+    var scatter_stats: Dictionary = CAMPUS_SCATTERED_PROPS.decorate(self, expansion, grove_positions)
+    print("NUS3D_M25_SCATTER: %d clusters, %d props, %d batches" % [scatter_stats.get("cluster_count", 0), scatter_stats.get("item_count", 0), scatter_stats.get("batch_count", 0)])
 
 func _material(tint: String, use_vertex_colors: bool = false) -> StandardMaterial3D:
     var key: String = tint + (":vertex" if use_vertex_colors else ":flat")
