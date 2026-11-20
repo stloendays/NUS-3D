@@ -29,6 +29,8 @@ var intro_blocked: bool = false
 func _ready() -> void:
     _build_status()
     _build_modal()
+    get_viewport().size_changed.connect(_update_modal_layout)
+    _update_modal_layout()
     var font_theme: Theme = UI_FONT_KIT.make_theme()
     status_card.theme = font_theme
     shade.theme = font_theme
@@ -81,7 +83,7 @@ func _refresh_dual_nodes(node: Node) -> void:
 
 func _style_panel(panel: PanelContainer, _legacy_background: Color) -> void:
     panel.add_theme_stylebox_override("panel",
-        NUS3DUISkin.glass(Color("#8AAFB9"), 22, 15, true))
+        NUS3DUISkin.glass(Color("#E8EEEC"), 18, 14, true))
 
 func _label(text_value: String, font_size: int, color: Color) -> Label:
     var label := Label.new()
@@ -114,6 +116,15 @@ func _build_status() -> void:
     column.add_child(status_body)
     status_feedback = _label("", 12, Color.html("#a9e4b7"))
     column.add_child(status_feedback)
+
+func _update_modal_layout() -> void:
+    if modal_panel == null:
+        return
+    var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+    modal_panel.custom_minimum_size = Vector2(
+        minf(570.0, maxf(280.0, viewport_size.x - 32.0)),
+        minf(350.0, maxf(240.0, viewport_size.y - 32.0)))
+
 
 func _build_modal() -> void:
     shade = ColorRect.new()
