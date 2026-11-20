@@ -33,6 +33,10 @@ func _run() -> void:
     if graphics.profile_msaa("high") != Viewport.MSAA_4X or graphics.profile_msaa("ultra") != Viewport.MSAA_4X:
         _fail("high/ultra quality anti-aliasing missing")
         return
+    # GraphicsSettings is a Node constructed outside the SceneTree. Unlike a
+    # RefCounted resource it must be explicitly freed before the process exits;
+    # otherwise its GDScript stays referenced and Godot reports leaked objects.
+    graphics.free()
 
     NUS3DServices.ensure_scene_services(self)
     var packed: PackedScene = load("res://scenes/main.tscn") as PackedScene
