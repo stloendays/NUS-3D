@@ -2,6 +2,7 @@ extends Node
 class_name UTownCampusLife
 signal talked_to(character_name: String)
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
+const INTERIOR_LIFE_PROPS = preload("res://scripts/utown_interior_life_props.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -216,6 +217,10 @@ func _build_interiors() -> void:
         else:
             _build_recreation_room(room)
         activity_spots[id] = INTERIOR_KIT.decorate(room, id)
+        if id == "ERC":
+            INTERIOR_LIFE_PROPS.decorate_study(room)
+        else:
+            INTERIOR_LIFE_PROPS.decorate_recreation(room)
         interiors[id] = room
 
 func _build_room_shell(room: Node3D, id: String) -> void:
