@@ -163,9 +163,15 @@ func report_movement(name: String, before: Vector3, after: Vector3, now: float) 
     stuck_repaths[name] = mini(int(stuck_repaths.get(name, 0)) + 1, MAX_STUCK_REPATHS)
 
 
-func separation_offset(name: String, position: Vector3, neighbours: Array, radius: float = 1.35) -> Vector3:
-    # Lightweight local steering; does not alter persistent NPC positions.
+func separation_offset(name: String, position: Vector3, neighbours: Array, forward: Vector3 = Vector3.ZERO, radius: float = 1.35) -> Vector3:
+    # Soft local avoidance for narrow paths. Head-on walkers use right-hand
+    # passing; same-direction walkers simply maintain personal space.
     var result := Vector3.ZERO
+    var heading: Vector3 = forward
+    heading.y = 0.0
+    if heading.length_squared() > 0.0001:
+        heading = heading.normalized()
+    var right: Vector3 = Vector3(heading.z, 0.0, -heading.x)
     for neighbour in neighbours:
         if str(neighbour.get("name", "")) == name:
             continue
@@ -175,8 +181,15 @@ func separation_offset(name: String, position: Vector3, neighbours: Array, radiu
         var away: Vector3 = position - other.global_position
         away.y = 0.0
         var distance: float = away.length()
-        if distance > 0.01 and distance < radius:
-            result += away.normalized() * (1.0 - distance / radius)
+        if distance <= 0.01 or distance >= radius:
+            continue
+        var weight: float = 1.0 - distance / radius
+        result += away.normalized() * weight
+        if heading.length_squared() > 0.0001:
+            var other_forward: Vector3 = -other.global_transform.basis.z
+            other_forward.y = 0.0
+            if other_forward.length_squared() > 0.0001 and heading.dot(other_forward.normalized()) < -0.35:
+                result += right * weight * 0.55
     return result.limit_length(1.0)
 
 
