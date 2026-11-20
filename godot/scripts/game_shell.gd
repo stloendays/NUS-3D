@@ -9,12 +9,6 @@ var language_service: NUS3DGameLanguage
 var game: Node3D
 var tour: UTownTour
 var challenge: UTownChallenge
-var story_director: NUS3DStoryDirector
-var session_overlay: NUS3DSessionOverlay
-var horror_mode: UTownHorrorMode
-var admin_authority: NUS3DAdminAuthority
-var admin_console: NUS3DAdminConsole
-var campus_hub: NUS3DCampusHub
 var ui: CanvasLayer
 var login_cover: Control
 var mail_cover: Control
@@ -80,43 +74,11 @@ func _ready() -> void:
     _build_profile_card()
     _build_mail()
     _build_tutorial()
-    story_director = NUS3DStoryDirector.new()
-    story_director.name = "StoryCampaign"
-    story_director.configure(accounts, game)
-    add_child(story_director)
-    session_overlay = NUS3DSessionOverlay.new()
-    session_overlay.name = "MultiplayerAndGraphics"
-    add_child(session_overlay)
-    session_overlay.setup(self, game)
-    _build_admin_console()
-    _build_campus_hub()
-    horror_mode = game.get_node_or_null("MidnightHorror") as UTownHorrorMode
     accounts.profile_changed.connect(_refresh_profile)
     accounts.mailbox_changed.connect(_on_mailbox_changed)
     language_service.language_changed.connect(_on_language_changed)
     _on_language_changed(language_service.locale)
     _show_login()
-    var release_updater := NUS3DAutoUpdater.new()
-    release_updater.name = "StableReleaseUpdater"
-    add_child(release_updater)
-
-
-## An update restart must flush the same account-specific ledgers as a normal
-## exit. Do not log the player out or replace the GameShell/active scene.
-func save_for_version_update() -> void:
-    if not accounts.is_logged_in():
-        return
-    _scan_rewards()
-    challenge._save_progress()
-    var names: Array[String] = ["Coursework", "EnglishExams", "VoicePresentation", "Arcade", "Coins", "Leisure", "CampusLife", "DDLStory"]
-    var methods: Array[String] = ["_save_progress", "_save_progress", "_save_progress", "_save_progress", "save_progress", "_save_stats", "_save_activities", "_save_progress"]
-    for i in range(names.size()):
-        var system: Node = game.get_node_or_null(names[i])
-        if system != null and system.has_method(methods[i]):
-            system.call(methods[i])
-    if story_director != null:
-        story_director._persist()
-    accounts._save_profile()
 
 
 func _ui_sound_service() -> NUS3DUISound:
@@ -140,31 +102,34 @@ func _refresh_sound_buttons() -> void:
     var sound: NUS3DUISound = _ui_sound_service()
     var active: bool = sound != null and sound.enabled
     if login_sound_button != null:
-        login_sound_button.text = language_service.choose(
-            "界面音效：开 [F9]" if active else "界面音效：关 [F9]",
-            "UI sound: ON [F9]" if active else "UI sound: OFF [F9]")
+        login_sound_button.text = "UI sound: ON  [F9]" if active else "UI sound: OFF  [F9]"
     if profile_sound_button != null:
-        profile_sound_button.text = language_service.choose(
-            "音效：开" if active else "音效：关",
-            "Sound ON" if active else "Sound OFF")
+        profile_sound_button.text = "Sound ON" if active else "Sound OFF"
     if mail_sound_button != null:
-        mail_sound_button.text = language_service.choose(
-            "音效：开" if active else "音效：关",
-            "Sound ON" if active else "Sound OFF")
+        mail_sound_button.text = "Sound ON" if active else "Sound OFF"
 
 
-func _panel_style(_legacy_background: Color) -> StyleBoxFlat:
-    # All entry, profile and mail panels use one accessible light-glass material.
-    return NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true)
+func _panel_style(background: Color) -> StyleBoxFlat:
+    var style: StyleBoxFlat = StyleBoxFlat.new()
+    style.bg_color = background
+    style.border_color = Color.html("#446878")
+    style.set_border_width_all(1)
+    style.set_corner_radius_all(15)
+    style.content_margin_left = 23.0
+    style.content_margin_right = 23.0
+    style.content_margin_top = 22.0
+    style.content_margin_bottom = 22.0
+    style.shadow_color = Color(0.01, 0.035, 0.055, 0.72)
+    style.shadow_size = 9
+    style.shadow_offset = Vector2(0, 5)
+    return style
 
 
 func _label(value: String, font_size: int = 16, color: Color = Color.WHITE) -> Label:
     var label: Label = Label.new()
     label.text = value
     label.add_theme_font_size_override("font_size", font_size)
-    # Legacy dark shell authored labels in white; maintain contrast on glass.
-    var legible: Color = NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color
-    label.add_theme_color_override("font_color", legible)
+    label.add_theme_color_override("font_color", color)
     return label
 
 
@@ -186,7 +151,7 @@ func _cover(name: String) -> Control:
     ui.add_child(cover)
 
     var backdrop: ColorRect = ColorRect.new()
-    backdrop.color = NUS3DUISkin.BACKDROP
+    backdrop.color = Color(0.025, 0.067, 0.091, 0.91)
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
     cover.add_child(backdrop)
@@ -199,16 +164,8 @@ func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
     cover.add_child(center)
     var panel: PanelContainer = PanelContainer.new()
     panel.custom_minimum_size = size
-    panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
+    panel.add_theme_stylebox_override("panel", _panel_style(Color.html("#10212c")))
     center.add_child(panel)
-    if size.x > 0.0:
-        var responsive := func() -> void:
-            var viewport_size: Vector2 = get_viewport().get_visible_rect().size
-            panel.custom_minimum_size.x = minf(size.x, maxf(280.0, viewport_size.x - 32.0))
-            if size.y > 0.0:
-                panel.custom_minimum_size.y = minf(size.y, maxf(240.0, viewport_size.y - 32.0))
-        get_viewport().size_changed.connect(responsive)
-        responsive.call()
     var content: VBoxContainer = VBoxContainer.new()
     content.add_theme_constant_override("separation", 13)
     panel.add_child(content)
@@ -217,16 +174,16 @@ func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
 
 func _build_login() -> void:
     login_cover = _cover("Login")
-    var box: VBoxContainer = _center_panel(login_cover, Vector2(440, 0))
-    box.add_child(_label("NUS-3D", 34, Color.html("#e8f9ff")))
-    box.add_child(_label("UTOWN EXPLORER", 14, Color.html("#75c8d6")))
+    var box: VBoxContainer = _center_panel(login_cover, Vector2(480, 0))
+    box.add_child(_label("NUS-3D", 42, Color.html("#e8f9ff")))
+    box.add_child(_label("UTOWN EXPLORER  /  OFFLINE ALPHA", 14, Color.html("#75c8d6")))
     box.add_child(_label("Explore an original, unofficial campus world.", 15, Color.html("#cbdde0")))
-    language_login_button = _button("Language: English", _toggle_language)
+    language_login_button = _button("中文 / English", _toggle_language)
     box.add_child(language_login_button)
     var spacer: Control = Control.new()
-    spacer.custom_minimum_size.y = 10
+    spacer.custom_minimum_size.y = 20
     box.add_child(spacer)
-    login_title = _label("SIGN IN", 21)
+    login_title = _label("SIGN IN", 24)
     box.add_child(login_title)
     login_name = LineEdit.new()
     login_name.placeholder_text = "Local username (3-20 characters)"
@@ -244,15 +201,15 @@ func _build_login() -> void:
     box.add_child(login_submit)
     login_toggle = _button("Create a new local account", _toggle_register)
     box.add_child(login_toggle)
-    box.add_child(_button("How to play", _open_tutorial))
+    box.add_child(_button("新手教程  /  HOW TO PLAY", _open_tutorial))
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
     box.add_child(login_sound_button)
-    login_message = _label("", 13, Color("#A6534C"))
+    login_message = _label("", 13, Color.html("#efb8ad"))
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
     var foot: Label = _label(
         "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.",
-        12, NUS3DUISkin.DIM)
+        12, Color.html("#a4c0c6"))
     foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(foot)
 
@@ -269,139 +226,28 @@ func _open_tutorial() -> void:
         tutorial.open_guide()
 
 
-func _build_admin_console() -> void:
-    admin_authority = NUS3DAdminAuthority.new()
-    admin_authority.name = "AdminAuthority"
-    admin_authority.accounts = accounts
-    admin_authority.game = game
-    add_child(admin_authority)
-    admin_console = NUS3DAdminConsole.new()
-    admin_console.name = "AdminConsole"
-    ui.add_child(admin_console)
-    admin_console.setup(admin_authority)
-    admin_console.close_requested.connect(_close_admin_console)
-
-
-func _open_admin_console() -> void:
-    if admin_console == null or not accounts.is_logged_in() or (horror_mode != null and horror_mode.active):
-        return
-    if login_cover.visible or mail_cover.visible or get_tree().paused:
-        return
-    var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
-    var coursework_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
-    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
-    var leisure_ui: UTownLeisureUI = game.get_node_or_null("LeisureUI") as UTownLeisureUI
-    if (intro != null and intro.playing) or (coursework_ui != null and coursework_ui.modal_visible):
-        return
-    if (exams != null and exams.is_open) or (leisure_ui != null and leisure_ui.is_open):
-        return
-    if story_director != null and story_director.cover != null and story_director.cover.visible:
-        return
-    if session_overlay != null and (session_overlay.is_open or session_overlay.network.state != NUS3DNetworkSession.State.OFFLINE):
-        return
-    get_tree().paused = true
-    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-    profile_card.hide()
-    admin_console.open_console()
-
-
-func _close_admin_console() -> void:
-    if admin_console == null:
-        return
-    admin_console.close_console()
-    if accounts.is_logged_in() and not login_cover.visible and not mail_cover.visible:
-        profile_card.show()
-        get_tree().paused = false
-        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-
-
-func _build_campus_hub() -> void:
-    # Optional F11 toolkit. No account data or save state is passed to AI.
-    campus_hub = NUS3DCampusHub.new()
-    campus_hub.name = "CampusAIHub"
-    ui.add_child(campus_hub)
-    campus_hub.close_requested.connect(_close_campus_hub)
-
-
-func _open_campus_hub() -> void:
-    if campus_hub == null or not accounts.is_logged_in() or login_cover.visible or mail_cover.visible or (horror_mode != null and horror_mode.active):
-        return
-    if get_tree().paused or (admin_console != null and admin_console.visible):
-        return
-    var course_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
-    var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
-    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
-    var leisure: UTownLeisureUI = game.get_node_or_null("LeisureUI") as UTownLeisureUI
-    var voice: Node = game.get_node_or_null("VoicePresentation")
-    var wardrobe: Node = game.get_node_or_null("Wardrobe")
-    if (course_ui != null and (course_ui.modal_visible or course_ui.intro_blocked)) or (intro != null and intro.playing):
-        return
-    if (exams != null and exams.is_open) or (leisure != null and leisure.is_open):
-        return
-    if (voice != null and voice.get("is_open") == true) or (wardrobe != null and wardrobe.get("is_open") == true):
-        return
-    if story_director != null and story_director.cover != null and story_director.cover.visible:
-        return
-    if session_overlay != null and session_overlay.is_open:
-        return
-    get_tree().paused = true
-    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-    profile_card.hide()
-    campus_hub.open_hub()
-
-
-func _close_campus_hub() -> void:
-    if campus_hub == null:
-        return
-    campus_hub.close_hub()
-    if accounts.is_logged_in() and not login_cover.visible and not mail_cover.visible:
-        profile_card.show()
-        get_tree().paused = false
-        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-
-
-func _open_horror_mode() -> void:
-    if horror_mode == null or not accounts.is_logged_in():
-        return
-    if login_cover.visible or mail_cover.visible or admin_console.visible or campus_hub.visible:
-        return
-    if session_overlay != null and session_overlay.is_open:
-        return
-    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
-    var course_ui: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
-    var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
-    if (exams != null and exams.is_open) or (course_ui != null and course_ui.modal_visible):
-        return
-    if intro != null and intro.playing:
-        return
-    if story_director != null and story_director.cover != null and story_director.cover.visible:
-        return
-    horror_mode.request_mode_menu()
-
-
 func _build_profile_card() -> void:
     profile_card = PanelContainer.new()
     profile_card.name = "ProfileStatus"
     profile_card.anchor_left = 0.5
     profile_card.anchor_right = 0.5
-    profile_card.offset_left = -510
-    profile_card.offset_right = 510
+    profile_card.offset_left = -410
+    profile_card.offset_right = 410
     profile_card.offset_top = 10
     profile_card.offset_bottom = 61
-    profile_card.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 14, 10, true))
+    profile_card.add_theme_stylebox_override("panel", _panel_style(Color(0.03, 0.14, 0.20, 0.88)))
     ui.add_child(profile_card)
     var row: HBoxContainer = HBoxContainer.new()
-    row.add_theme_constant_override("separation", 7)
+    row.add_theme_constant_override("separation", 10)
     profile_card.add_child(row)
     profile_label = _label("LV 1", 13, Color.html("#e4f5f6"))
     profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     row.add_child(profile_label)
+    language_game_button = _button("中文 / English", _toggle_language)
+    row.add_child(language_game_button)
     profile_sound_button = _button("Sound ON", _toggle_ui_sound)
     row.add_child(profile_sound_button)
     row.add_child(_button("Mail [J]", _open_mail))
-    row.add_child(_button("Campus AI [F11]", _open_campus_hub))
-    row.add_child(_button("Admin [F12]", _open_admin_console))
-    row.add_child(_button("午夜追逐" if language_service.is_chinese() else "Night Shift", _open_horror_mode))
     row.add_child(_button("Log out", _logout))
     profile_card.hide()
 
@@ -411,14 +257,14 @@ func _build_mail() -> void:
     var layout: VBoxContainer = _center_panel(mail_cover, Vector2(960, 530))
     var header: HBoxContainer = HBoxContainer.new()
     layout.add_child(header)
-    var title: Label = _label("CAMPUS POST", 21, NUS3DUISkin.TEXT)
+    var title: Label = _label("CAMPUS POST  /  LOCAL MAILBOX", 23, Color.html("#cff5f2"))
     title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     header.add_child(title)
     mail_sound_button = _button("Sound ON", _toggle_ui_sound)
     header.add_child(mail_sound_button)
     header.add_child(_button("Close [J]", _close_mail))
     layout.add_child(_label("Only accounts registered on this installation can exchange messages.",
-        12, NUS3DUISkin.DIM))
+        12, Color.html("#b0c8cc")))
 
     var options: HBoxContainer = HBoxContainer.new()
     layout.add_child(options)
@@ -472,7 +318,7 @@ func _build_mail() -> void:
     mail_compose_panel.add_child(compose_body)
     NUS3DUISkin.field(compose_body)
     mail_compose_panel.add_child(_button("Send local message", _send_mail))
-    mail_status = _label("", 13, NUS3DUISkin.DIM)
+    mail_status = _label("", 13, Color.html("#b8dbdf"))
     layout.add_child(mail_status)
     # User mail, dynamic notices and usernames are never passed through the static translator.
     for dynamic_control in [login_message, login_title, login_submit, login_toggle, profile_label, mail_heading, mail_body, mail_status]:
@@ -481,9 +327,6 @@ func _build_mail() -> void:
 
 
 func _toggle_language() -> void:
-    if accounts.is_logged_in() or language_service.session_locked:
-        return
-    # Language is selected on the login screen, never swapped mid-game.
     language_service.set_locale("en" if language_service.is_chinese() else "zh")
 
 
@@ -493,7 +336,9 @@ func _on_language_changed(_language: String) -> void:
     language_service.apply_static_ui(profile_card)
     language_service.refresh_world_labels(game.get_node("World") as UTownWorld)
     _refresh_auth_text()
-    language_login_button.text = language_service.choose("语言：中文（点击切换）", "Language: English (click to change)")
+    var button_text: String = "English / 中文" if language_service.is_chinese() else "中文 / English"
+    language_login_button.text = button_text
+    language_game_button.text = button_text
     login_message.text = language_service.ui_text(login_error_source)
     mail_status.text = language_service.ui_text(mail_status_source)
     _refresh_profile()
@@ -509,24 +354,10 @@ func _refresh_auth_text() -> void:
 
 
 func _show_login() -> void:
-    # Signing out always returns to the sign-in form; the previous session's
-    # register-mode flag must not carry over to a new login/language choice.
-    language_service.end_session()
-    registering = false
-    _refresh_auth_text()
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     login_cover.show()
     mail_cover.hide()
-    if admin_console != null:
-        admin_console.close_console()
-    if admin_authority != null:
-        admin_authority.lock()
-    if horror_mode != null:
-        horror_mode.detach_profile()
-    if campus_hub != null:
-        campus_hub.clear_session()
-        campus_hub.close_hub()
     profile_card.hide()
     _shown_level = 0
     _refresh_sound_buttons()
@@ -554,14 +385,10 @@ func _submit_login() -> void:
         login_error_source = error
         login_message.text = language_service.ui_text(error)
         return
-    accounts.set_ui_locale(language_service.locale)
     _enter_game()
 
 
 func _enter_game() -> void:
-    language_service.begin_session()
-    if admin_authority != null:
-        admin_authority.lock()
     challenge.sprint_active = false
     challenge.sprint_elapsed = 0
     challenge.sprint_last_time = -1
@@ -582,14 +409,13 @@ func _enter_game() -> void:
     # Feature rewards must read the newly restored tour and challenge, never the
     # previous user's objects during account switching.
     _restore_game_features()
-    if horror_mode != null:
-        horror_mode.attach_profile(accounts)
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.load_account(accounts.feature_save_path("relationships"))
     observed_tour_ids.clear()
     observed_note_ids.clear()
     observed_sprint_time = -1
     _scan_rewards() # Backfill already completed exploration and existing Field Notes.
-    if story_director != null:
-        story_director.load_account()
     _refresh_profile()
     login_cover.hide()
     mail_cover.hide()
@@ -618,30 +444,13 @@ func _enter_game() -> void:
 func _logout() -> void:
     if not accounts.is_logged_in():
         return
-    if horror_mode != null:
-        horror_mode.detach_profile()
-    if campus_hub != null:
-        campus_hub.clear_session()
-        campus_hub.close_hub()
-    if admin_authority != null:
-        admin_authority.lock()
-    if admin_console != null:
-        admin_console.close_console()
     challenge.sprint_active = false
-    if story_director != null:
-        story_director.on_logout()
-    if session_overlay != null:
-        if session_overlay.is_open:
-            session_overlay.toggle()
-        session_overlay.network.leave_room()
+    var relationships: NUS3DRelationships = game.get_node_or_null("Relationships") as NUS3DRelationships
+    if relationships != null:
+        relationships.clear_account()
     var coursework: UTownCoursework = game.get_node_or_null("Coursework") as UTownCoursework
     if coursework != null:
         coursework._save_progress()
-    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
-    if exams != null and exams.is_open:
-        exams.close_exam()
-    if exams != null:
-        exams._save_progress()
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coins != null:
         coins.save_progress()
@@ -682,7 +491,7 @@ func _on_mailbox_changed() -> void:
 
 
 func _open_mail() -> void:
-    if not accounts.is_logged_in() or (horror_mode != null and horror_mode.active) or (admin_console != null and admin_console.visible) or (campus_hub != null and campus_hub.visible):
+    if not accounts.is_logged_in():
         return
     get_tree().paused = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -786,19 +595,12 @@ func _restore_game_features() -> void:
     var intro: UTownIntro = game.get_node_or_null("Intro") as UTownIntro
     if ui_course != null:
         if intro != null and intro.playing:
-            if coursework != null and not coursework.current_faculty_id.is_empty():
-                ui_course.modal_visible = false
-                ui_course.selection_visible = false
+            # The cinematic owns the screen until it calls end_intro().
             ui_course.begin_intro()
         elif coursework != null and coursework.current_faculty_id.is_empty():
             ui_course.show_selector()
         elif ui_course.modal_visible:
             ui_course.hide_modal()
-    var exams: UTownEnglishExams = game.get_node_or_null("EnglishExams") as UTownEnglishExams
-    if exams != null:
-        exams.save_path = accounts.feature_save_path("english_exams")
-        exams.load_progress()
-        exams._restore_missing_awards()
     var arcade: UTownArcade = game.get_node_or_null("Arcade") as UTownArcade
     if arcade != null:
         arcade.reset_runtime_session()
@@ -838,8 +640,6 @@ func _scan_source_rewards() -> void:
     var coins: UTownCoins = game.get_node_or_null("Coins") as UTownCoins
     if coursework == null or coins == null:
         return
-    for exam_id in coursework.exam_reward_ids:
-        coins.reward_once(str(exam_id), 25, "Major exam pass")
     for faculty_id in coursework.faculty_progress.keys():
         if not coursework.faculty_by_id.has(faculty_id):
             continue
@@ -889,47 +689,14 @@ func _unhandled_input(event: InputEvent) -> void:
         _toggle_ui_sound()
         get_viewport().set_input_as_handled()
         return
-    # F10 is allowed only on the login screen. Gameplay language is fixed.
-    if key_event.keycode == KEY_F10 and not accounts.is_logged_in():
+    if key_event.keycode == KEY_F10:
         _toggle_language()
         get_viewport().set_input_as_handled()
         return
     if not accounts.is_logged_in():
         return
-    if key_event.keycode == KEY_F6 and key_event.ctrl_pressed and not key_event.alt_pressed:
-        _open_horror_mode()
-        get_viewport().set_input_as_handled()
-        return
-    if horror_mode != null and horror_mode.active:
-        return
-    if campus_hub != null and campus_hub.visible:
-        if key_event.keycode == KEY_F11 or key_event.keycode == KEY_ESCAPE:
-            _close_campus_hub()
-            get_viewport().set_input_as_handled()
-        return
-    if key_event.keycode == KEY_F12:
-        if admin_console != null and admin_console.visible:
-            _close_admin_console()
-        else:
-            _open_admin_console()
-        get_viewport().set_input_as_handled()
-        return
-    if admin_console != null and admin_console.visible:
-        return
-    if key_event.keycode == KEY_F11 and not mail_cover.visible:
-        _open_campus_hub()
-        get_viewport().set_input_as_handled()
-        return
     var coursework_modal: UTownCourseworkUI = game.get_node_or_null("CourseworkUI") as UTownCourseworkUI
     if coursework_modal != null and coursework_modal.modal_visible:
-        return
-    if story_director != null and story_director.cover != null and story_director.cover.visible:
-        return
-    if key_event.keycode == KEY_H and key_event.shift_pressed and not mail_cover.visible:
-        var player_actor: UTownPlayer = game.get_node("Player") as UTownPlayer
-        if player_actor != null and not player_actor.movement_locked:
-            story_director.open_journal()
-            get_viewport().set_input_as_handled()
         return
     if key_event.keycode == KEY_J:
         if mail_cover.visible:
