@@ -39,13 +39,16 @@ func _test() -> void:
     if multimesh.instance_count != environment.generated_tuft_count:
         _fail("turf instance accounting does not match MultiMesh")
         return
-    for i in range(multimesh.instance_count):
-        if not environment.is_clear_lawn_point(Vector2(
-            multimesh.get_instance_transform(i).origin.x,
-            multimesh.get_instance_transform(i).origin.z
-        )):
-            var origin: Vector3 = multimesh.get_instance_transform(i).origin
-            _fail("grass tuft %d invalid: world_xz=(%.5f, %.5f), turf_instances=%d, lawn_vertices=%d, turf_node_position=%s" % [i, origin.x, origin.z, multimesh.instance_count, environment.lawn_polygon.size(), str(environment.tuft_batch.global_position)])
+    if environment.generated_tuft_positions.size() != multimesh.instance_count:
+        _fail("source turf positions do not match the MultiMesh instance count")
+        return
+    # In headless CI, MultiMesh transform readback is delegated to the dummy
+    # RenderingServer and returns identity transforms. Validate the deterministic
+    # source coordinates that were used to populate the render buffer instead.
+    for i in range(environment.generated_tuft_positions.size()):
+        var point: Vector2 = environment.generated_tuft_positions[i]
+        if not environment.is_clear_lawn_point(point):
+            _fail("grass tuft %d invalid: source_xz=(%.5f, %.5f), turf_instances=%d, lawn_vertices=%d" % [i, point.x, point.y, multimesh.instance_count, environment.lawn_polygon.size()])
             return
     if environment.picnic_count < 2 or environment.picnic_count > environment.PICNIC_LIMIT:
         _fail("lawn picnic details missing or unbounded")
