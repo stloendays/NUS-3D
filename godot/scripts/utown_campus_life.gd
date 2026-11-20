@@ -623,6 +623,7 @@ func _process(delta: float) -> void:
             var step_distance: float = minf(float(state["speed"]) * delta, toward_waypoint.length())
             var desired: Vector3 = previous_position + toward_waypoint.normalized() * step_distance if step_distance > 0.0001 else previous_position
             npc.global_position = npc_navigation.move_safe(previous_position, desired, delta)
+            npc_navigation.report_movement(str(state["name"]), previous_position, npc.global_position, now)
             if npc.global_position.distance_squared_to(previous_position) < 0.0000005 and step_distance > 0.001:
                 state["distance"] = float(state["distance"]) - float(state["direction"]) * float(state["speed"]) * delta
         elif walking:
