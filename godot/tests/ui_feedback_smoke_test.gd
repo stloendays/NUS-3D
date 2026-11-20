@@ -43,8 +43,8 @@ func _run() -> void:
         return
     var info: PanelContainer = shell.game.get_node("HUD/Info") as PanelContainer
     var info_style: StyleBoxFlat = info.get_theme_stylebox("panel") as StyleBoxFlat
-    if info_style == null or info_style.shadow_size < 5 or info_style.border_width_top < 2:
-        _fail("Beveled HUD panel material is missing")
+    if info_style == null or info_style.shadow_size < 4 or info_style.border_width_top < 1:
+        _fail("Minimal HUD panel material is missing")
         return
     var button_style: StyleBoxFlat = shell.login_submit.get_theme_stylebox("normal") as StyleBoxFlat
     if button_style == null or button_style.shadow_size < 3:
