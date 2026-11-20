@@ -31,10 +31,13 @@ const TALK_RADIUS: float = 5.5
 const ENTRY_RADIUS: float = 18.0
 const BOARD_RADIUS: float = 7.0
 const SHUTTLE_SPEED: float = 5.2
+const NPC_STEP_HEIGHT: float = 0.6
+const NPC_GROUND_SNAP_SPEED: float = 7.0
 
 @onready var world: UTownWorld = $"../World"
 @onready var player: UTownPlayer = $"../Player"
 @onready var weather: UTownWeather = $"../Weather"
+@onready var npc_navigation: NUS3DNPCNavigation = $"../NPCNavigation"
 
 var pedestrians: Array[Dictionary] = []
 var bicycle_wheels: Array[MeshInstance3D] = []
@@ -111,6 +114,25 @@ func _sample_route(route: Array[Vector3], distance: float) -> Dictionary:
                 return {"position": route[i].lerp(route[i + 1], remaining / length), "direction": segment.normalized()}
             remaining -= length
     return {"position": route[route.size() - 1], "direction": (route[-1] - route[-2]).normalized()}
+
+func npc_ground_position(current: Vector3, desired: Vector3, delta: float) -> Vector3:
+    # Probe from near the NPC feet to avoid snapping onto overhead roofs.
+    # Only gently follow walkable surfaces; reject steep slopes and large jumps.
+    var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
+    var from: Vector3 = desired + Vector3.UP * (NPC_STEP_HEIGHT + 0.15)
+    var to: Vector3 = desired + Vector3.DOWN * 1.6
+    var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
+    query.collide_with_areas = false
+    var hit: Dictionary = space.intersect_ray(query)
+    if hit.is_empty():
+        return Vector3(desired.x, current.y, desired.z)
+    var normal: Vector3 = hit.get("normal", Vector3.UP)
+    var surface_y: float = float((hit["position"] as Vector3).y)
+    if normal.dot(Vector3.UP) < 0.72 or absf(surface_y - current.y) > NPC_STEP_HEIGHT:
+        return Vector3(desired.x, current.y, desired.z)
+    var blend: float = clampf(delta * NPC_GROUND_SNAP_SPEED, 0.0, 1.0)
+    return Vector3(desired.x, lerpf(current.y, surface_y, blend), desired.z)
+
 
 func _build_pedestrians() -> void:
     var walkways: Array = world.layout.get("walkways", [])
@@ -618,6 +640,8 @@ func _process(delta: float) -> void:
     message_time = maxf(0.0, message_time - delta)
     var now: float = float(Time.get_ticks_msec()) / 1000.0
     for state in pedestrians:
+        if bool(state.get("hostile", false)):
+            continue
         var route: Array[Vector3] = state["route"]
         var total: float = _route_length(route)
         var talk_remaining: float = maxf(0.0, float(state["talk_remaining"]) - delta)
@@ -639,14 +663,34 @@ func _process(delta: float) -> void:
         var walking: bool = talk_remaining <= 0.0 and idle_remaining <= 0.0
         var gait: float = sin(now * 6.2 + float(state["phase"])) if walking else sin(now * 1.8 + float(state["phase"])) * 0.08
         var bob: float = absf(sin(now * 6.2 + float(state["phase"]))) * 0.035 if walking else sin(now * 1.8 + float(state["phase"])) * 0.012
-        npc.position = sample["position"] + Vector3(0.0, bob, 0.0)
+        var previous_position: Vector3 = npc.global_position
+        if walking and npc_navigation != null:
+            var next_waypoint: Vector3 = npc_navigation.next_target(str(state["name"]), previous_position, sample["position"], now)
+            var toward_waypoint: Vector3 = next_waypoint - previous_position
+            toward_waypoint.y = 0.0
+            var step_distance: float = minf(float(state["speed"]) * delta, toward_waypoint.length())
+            var forward: Vector3 = toward_waypoint.normalized() if toward_waypoint.length_squared() > 0.0001 else Vector3.ZERO
+            var avoidance: Vector3 = npc_navigation.separation_offset(str(state["name"]), previous_position, pedestrians, forward, 1.6)
+            var steering: Vector3 = (forward + avoidance * 0.55).normalized() if forward.length_squared() > 0.0001 else Vector3.ZERO
+            var desired: Vector3 = previous_position + steering * step_distance
+            var safe_position: Vector3 = npc_navigation.move_safe(previous_position, desired, delta)
+            if safe_position.distance_squared_to(previous_position) < 0.0000005 and avoidance.length_squared() > 0.0001:
+                safe_position = npc_navigation.move_safe(previous_position, previous_position + forward * step_distance, delta)
+            npc.global_position = safe_position
+            npc_navigation.report_movement(str(state["name"]), previous_position, npc.global_position, now)
+            if npc.global_position.distance_squared_to(previous_position) < 0.0000005 and step_distance > 0.001:
+                state["distance"] = float(state["distance"]) - float(state["direction"]) * float(state["speed"]) * delta
+        elif walking:
+            npc.global_position = npc_ground_position(previous_position, sample["position"], delta)
+        npc.position.y += bob
         if talk_remaining > 0.0:
             var to_player: Vector3 = player.global_position - npc.global_position
             to_player.y = 0.0
             if to_player.length() > 0.05:
                 npc.look_at(npc.global_position + to_player, Vector3.UP)
         else:
-            var facing: Vector3 = sample["direction"] * float(state["direction"])
+            var facing: Vector3 = npc.global_position - previous_position if walking else sample["direction"] * float(state["direction"])
+            facing.y = 0.0
             if facing.length() > 0.01:
                 npc.look_at(npc.global_position + facing, Vector3.UP)
         var left_arm: Node3D = state["left_arm"]
