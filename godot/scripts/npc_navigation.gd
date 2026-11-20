@@ -191,7 +191,14 @@ func separation_offset(name: String, position: Vector3, neighbours: Array, forwa
             var other_forward: Vector3 = -other.global_transform.basis.z
             other_forward.y = 0.0
             if other_forward.length_squared() > 0.0001 and heading.dot(other_forward.normalized()) < -0.35:
-                result += right * weight * 0.55
+                var other_name: String = str(neighbour.get("name", ""))
+                if name < other_name:
+                    # Stable priority: one walker takes the right-hand pass.
+                    result += right * weight * 0.55
+                else:
+                    # The lower-priority walker yields briefly instead of
+                    # both trying to occupy the same narrow passing lane.
+                    result -= heading * weight * 0.55
     return result.limit_length(1.0)
 
 
