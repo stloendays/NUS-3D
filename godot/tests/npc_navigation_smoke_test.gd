@@ -64,6 +64,48 @@ func _test() -> void:
     if nav._has_clearance(Vector3(-80, 0, -100), Vector3(25, 0, -100)):
         _fail("known long segment unexpectedly passed through world geometry")
         return
+    # Two pedestrians approaching head-on should receive a stable
+    # right-hand passing bias instead of walking directly through each other.
+    var passing_a := Node3D.new()
+    var passing_b := Node3D.new()
+    game.add_child(passing_a)
+    game.add_child(passing_b)
+    passing_a.position = Vector3(0, 0, 0)
+    passing_b.position = Vector3(0, 0, 0.8)
+    passing_b.look_at(Vector3(0, 0, -1), Vector3.UP)
+    var passing: Vector3 = nav.separation_offset("passing_a", passing_a.global_position,
+        [{"name":"passing_a", "node":passing_a}, {"name":"passing_b", "node":passing_b}],
+        Vector3(0, 0, 1), 1.6)
+    if passing.x <= 0.01:
+        _fail("head-on NPCs did not receive deterministic right-hand passing bias")
+        return
+
+    # Mei's ERC route must traverse the actual ground-to-mezzanine height span.
+    var indoor: UTownIndoorNPCs = game.get_node_or_null("IndoorNPCs") as UTownIndoorNPCs
+    if indoor == null:
+        _fail("indoor NPC system missing")
+        return
+    var mei: Dictionary = {}
+    for actor in indoor.actors:
+        if str(actor.get("name", "")) == "Mei":
+            mei = actor
+            break
+    if mei.is_empty() or str(mei.get("routine", "")) != "stairs":
+        _fail("Mei stair traversal routine was not registered")
+        return
+    var stair_path: Array = mei.get("stair_path", [])
+    if stair_path.size() < 5 or float(stair_path[0].y - stair_path[4].y) < 3.0:
+        _fail("ERC stair path does not span the mezzanine height")
+        return
+    var mei_node: Node3D = mei["node"]
+    mei_node.position = stair_path[3]
+    mei["stair_index"] = 4
+    var stair_y_before: float = mei_node.position.y
+    indoor._advance_stair(mei, 0.4, 1.0)
+    if mei_node.position.y >= stair_y_before:
+        _fail("indoor NPC did not descend the ERC stair ramp continuously")
+        return
+
     var before: int = campus.pedestrians.size()
     var current: Vector3 = Vector3(0, 0, 0)
     var next: Vector3 = nav.move_safe(current, Vector3(0.1, 0, 0), 0.016)
