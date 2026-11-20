@@ -1,0 +1,23 @@
+name: M11 NPC personality and affinity
+on:
+  push:
+    branches: ["feature/m11-*"]
+  pull_request:
+
+jobs:
+  npc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fLsS --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+      - name: Import Godot resources
+        run: godot --headless --path godot --import --quit
+      - name: Test NPC personality and relationship progression
+        run: godot --headless --path godot --script res://tests/npc_relationship_smoke_test.gd
+      - name: Test integrated gameplay
+        run: godot --headless --path godot --script res://tests/integration_smoke_test.gd
