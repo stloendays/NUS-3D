@@ -46,6 +46,9 @@ func _run() -> void:
         return
     if not _bright_panel(hud.get_node("CampusCard") as PanelContainer, "CampusCard"):
         return
+    if hud.campus_message.max_lines_visible != 3 or not hud.campus_card.clip_contents:
+        _fail("Contextual weather card is not bounded to a compact readable height")
+        return
     if not _bright_panel(hud.get_node("HelpBackdrop") as PanelContainer, "HelpBackdrop"):
         return
     var map: Control = hud.get_node_or_null("Minimap") as Control
