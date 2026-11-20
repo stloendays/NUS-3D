@@ -39,6 +39,22 @@ static func _ball(parent: Node3D, name: String, at: Vector3, radius: float, mate
     return mesh
 
 
+static func _cylinder(parent: Node3D, name: String, at: Vector3, radius: float, height: float, material: Material) -> MeshInstance3D:
+    var mesh := MeshInstance3D.new()
+    mesh.name = name
+    var shape := CylinderMesh.new()
+    shape.top_radius = radius * 0.9
+    shape.bottom_radius = radius
+    shape.height = height
+    shape.radial_segments = 10
+    mesh.mesh = shape
+    mesh.position = at
+    mesh.material_override = material
+    mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+    parent.add_child(mesh)
+    return mesh
+
+
 static func _rod(parent: Node3D, name: String, a: Vector3, b: Vector3, radius: float, material: Material) -> MeshInstance3D:
     var direction: Vector3 = b - a
     var mesh := MeshInstance3D.new()
@@ -118,7 +134,7 @@ static func decorate_study(room: Node3D) -> void:
             _box(root, "PencilCase_%02d" % desk_index,
                 center + Vector3(0.70, 0.09, -0.34), Vector3(0.34, 0.12, 0.14), book_teal if desk_index % 2 == 0 else book_rust)
             if desk_index % 2 == 0:
-                _ball(root, "WaterCup_%02d" % desk_index, center + Vector3(-0.92, 0.14, 0.36), 0.10, ceramic)
+                _cylinder(root, "WaterCup_%02d" % desk_index, center + Vector3(-0.92, 0.13, 0.36), 0.08, 0.20, ceramic)
             desk_index += 1
 
     # Mezzanine study desks: loose revision stacks and a task lamp on each bay.
@@ -146,7 +162,11 @@ static func decorate_study(room: Node3D) -> void:
     _label(root, "QuietZoneLabel", "FOCUS AREA  /  KEEP IT DOWN", Vector3(7.1, 2.75, -8.42), "#e9e4d6")
     _box(root, "StudyWasteBin", Vector3(10.25, 0.38, 7.0), Vector3(0.48, 0.72, 0.48), book_teal)
     _box(root, "StudyBinRim", Vector3(10.25, 0.76, 7.0), Vector3(0.52, 0.07, 0.52), dark)
-    _ball(root, "StudyCornerPlant", Vector3(-10.35, 0.82, 7.1), 0.32, plant_green)
+    _cylinder(root, "StudyCornerPlantPot", Vector3(-10.35, 0.25, 7.1), 0.25, 0.5, book_rust)
+    for leaf in range(4):
+        _ball(root, "StudyCornerPlantLeaf_%d" % leaf,
+            Vector3(-10.35 + cos(float(leaf) * TAU / 4.0) * 0.16, 0.75 + float(leaf % 2) * 0.12, 7.1 + sin(float(leaf) * TAU / 4.0) * 0.16),
+            0.24, plant_green)
 
 
 static func decorate_recreation(room: Node3D) -> void:
@@ -207,9 +227,9 @@ static func decorate_recreation(room: Node3D) -> void:
 
     # Bottle and towel details on the existing spectator benches.
     for i in range(4):
-        _ball(root, "SpectatorBottle_%d" % i,
-            Vector3(6.9 + float(i % 2) * 1.15, 0.77, 4.0 + float(i / 2) * 0.42),
-            0.095, blue)
+        _cylinder(root, "SpectatorBottle_%d" % i,
+            Vector3(6.9 + float(i % 2) * 1.15, 0.81, 4.0 + float(i / 2) * 0.42),
+            0.075, 0.28, blue)
     _box(root, "FoldedSportsTowel", Vector3(-7.7, 0.72, 4.0), Vector3(0.62, 0.08, 0.34), paper)
     _box(root, "SRCClubPoster", Vector3(0.0, 2.65, -8.38), Vector3(3.0, 1.25, 0.05), blue)
     _label(root, "SRCClubPosterText", "CLUB NIGHT  /  PLAY FAIR", Vector3(0.0, 2.68, -8.33))
