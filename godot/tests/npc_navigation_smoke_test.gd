@@ -106,6 +106,27 @@ func _test() -> void:
         _fail("indoor NPC did not descend the ERC stair ramp continuously")
         return
 
+    var aisha: Dictionary = {}
+    for actor in indoor.actors:
+        if str(actor.get("name", "")) == "Aisha":
+            aisha = actor
+            break
+    if aisha.is_empty() or str(aisha.get("routine", "")) != "stairs":
+        _fail("SRC spectator stair routine was not registered")
+        return
+    var aisha_path: Array = aisha.get("stair_path", [])
+    if aisha_path.size() < 5 or float(aisha_path[4].y - aisha_path[0].y) < 3.0:
+        _fail("SRC stair path does not reach the upper viewing gallery")
+        return
+    var aisha_node: Node3D = aisha["node"]
+    aisha_node.position = aisha_path[1]
+    aisha["stair_index"] = 2
+    var aisha_y_before: float = aisha_node.position.y
+    indoor._advance_stair(aisha, 0.4, 2.0)
+    if aisha_node.position.y <= aisha_y_before:
+        _fail("SRC indoor NPC did not ascend the stair ramp continuously")
+        return
+
     var before: int = campus.pedestrians.size()
     var current: Vector3 = Vector3(0, 0, 0)
     var next: Vector3 = nav.move_safe(current, Vector3(0.1, 0, 0), 0.016)
