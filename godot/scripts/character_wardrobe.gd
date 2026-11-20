@@ -27,9 +27,21 @@ func _ready() -> void:
         language.language_changed.connect(_apply_ui_locale)
     _load_outfit()
     _make_interface()
+    get_viewport().size_changed.connect(_update_wardrobe_layout)
+    _update_wardrobe_layout()
     _build_preview()
     _refresh()
     panel.visible = false
+
+
+func _update_wardrobe_layout() -> void:
+    if panel == null:
+        return
+    var size: Vector2 = get_viewport().get_visible_rect().size
+    panel.offset_left = -minf(330.0, (size.x - 24.0) * 0.5)
+    panel.offset_right = minf(330.0, (size.x - 24.0) * 0.5)
+    panel.offset_top = -minf(265.0, (size.y - 24.0) * 0.5)
+    panel.offset_bottom = minf(265.0, (size.y - 24.0) * 0.5)
 
 
 func _make_interface() -> void:
@@ -50,12 +62,13 @@ func _make_interface() -> void:
 
     var outer := VBoxContainer.new()
     outer.add_theme_constant_override("separation", 12)
+    panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
     panel.add_child(outer)
     var title := Label.new()
     title.name = "WardrobeTitle"
     title.text = "CAMPUS WARDROBE   |   F5 to close"
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    title.add_theme_color_override("font_color", Color.html("#252b33"))
+    title.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
     title.add_theme_font_size_override("font_size", 22)
     outer.add_child(title)
     var columns := HBoxContainer.new()
@@ -88,34 +101,42 @@ func _make_interface() -> void:
         label.name = key + "Label"
         label.custom_minimum_size.x = 170
         label.add_theme_color_override("font_color", Color.html("#252b33"))
+        label.add_theme_font_size_override("font_size", 13)
+        label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
         row.add_child(label)
         var previous := Button.new()
         previous.text = "<"
+        NUS3DUISkin.button(previous)
         row.add_child(previous)
         previous.pressed.connect(_cycle.bind(key, -1, int(item[2])))
         var following := Button.new()
         following.text = ">"
+        NUS3DUISkin.button(following)
         row.add_child(following)
         following.pressed.connect(_cycle.bind(key, 1, int(item[2])))
     summary = Label.new()
     summary.add_theme_color_override("font_color", Color.html("#46505a"))
     summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    summary.add_theme_color_override("font_color", NUS3DUISkin.DIM)
     choices.add_child(summary)
     var close := Button.new()
     close.name = "WardrobeSave"
     close.text = "SAVE & RETURN"
     close.pressed.connect(_toggle)
+    NUS3DUISkin.button(close)
     outer.add_child(close)
     var rotate_row := HBoxContainer.new()
     outer.add_child(rotate_row)
     var turn_left := Button.new()
     turn_left.name = "WardrobeRotateLeft"
     turn_left.text = "ROTATE LEFT"
+    NUS3DUISkin.button(turn_left)
     rotate_row.add_child(turn_left)
     turn_left.pressed.connect(_rotate_preview.bind(-1.0))
     var turn_right := Button.new()
     turn_right.name = "WardrobeRotateRight"
     turn_right.text = "ROTATE RIGHT"
+    NUS3DUISkin.button(turn_right)
     rotate_row.add_child(turn_right)
     turn_right.pressed.connect(_rotate_preview.bind(1.0))
 

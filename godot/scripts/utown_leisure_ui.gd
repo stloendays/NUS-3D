@@ -58,10 +58,13 @@ var adult_button: Button
 var tab_chess: Button
 var tab_cards: Button
 var tab_social: Button
+var lounge_panel: PanelContainer
 
 func _ready() -> void:
     layer = 18
     _build()
+    get_viewport().size_changed.connect(_update_lounge_layout)
+    _update_lounge_layout()
     if language != null:
         language.language_changed.connect(_on_language_changed)
         _on_language_changed(language.locale)
@@ -125,7 +128,16 @@ func _button(title: String, width: float = 150.0) -> Button:
 
 func _style_panel(panel: PanelContainer, _legacy_color: String) -> void:
     panel.add_theme_stylebox_override("panel",
-        NUS3DUISkin.glass(Color("#8EAEC4"), 25, 18, true))
+        NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
+
+func _update_lounge_layout() -> void:
+    if lounge_panel == null:
+        return
+    var size: Vector2 = get_viewport().get_visible_rect().size
+    lounge_panel.custom_minimum_size = Vector2(
+        minf(728.0, maxf(300.0, size.x - 28.0)),
+        minf(620.0, maxf(280.0, size.y - 28.0)))
+
 
 func _build() -> void:
     status_chip = _label("", 15, "#ffd591")
@@ -156,20 +168,20 @@ func _build() -> void:
     center.mouse_filter = Control.MOUSE_FILTER_IGNORE
     backdrop.add_child(center)
 
-    var panel := PanelContainer.new()
-    panel.name = "PostCourseClubPanel"
-    panel.custom_minimum_size = Vector2(728, 620)
-    panel.mouse_filter = Control.MOUSE_FILTER_STOP
-    _style_panel(panel, "#183039")
-    center.add_child(panel)
+    lounge_panel = PanelContainer.new()
+    lounge_panel.name = "PostCourseClubPanel"
+    lounge_panel.custom_minimum_size = Vector2(728, 620)
+    lounge_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+    _style_panel(lounge_panel, "#183039")
+    center.add_child(lounge_panel)
 
     var column := VBoxContainer.new()
     column.name = "LeisureContent"
     column.add_theme_constant_override("separation", 9)
-    panel.add_child(column)
+    lounge_panel.add_child(column)
     var heading := HBoxContainer.new()
     column.add_child(heading)
-    header_label = _label("POST-COURSE CLUB  /  下课后才是真正的游戏", 23, "#ffcf86")
+    header_label = _label("POST-COURSE CLUB", 20, "#26343B")
     header_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     heading.add_child(header_label)
     var close_btn := _button("×  关闭 [P]", 128.0)
@@ -183,13 +195,13 @@ func _build() -> void:
     tabs.alignment = BoxContainer.ALIGNMENT_CENTER
     tabs.add_theme_constant_override("separation", 12)
     column.add_child(tabs)
-    tab_chess = _button("五子棋  GOMOKU", 190)
+    tab_chess = _button("五子棋  GOMOKU", 170)
     tab_chess.pressed.connect(func() -> void: switch_tab("chess"))
     tabs.add_child(tab_chess)
-    tab_cards = _button("打牌  CARDS", 190)
+    tab_cards = _button("打牌  CARDS", 170)
     tab_cards.pressed.connect(func() -> void: switch_tab("cards"))
     tabs.add_child(tab_cards)
-    tab_social = _button("聚会  CHEERS", 190)
+    tab_social = _button("聚会  CHEERS", 170)
     tab_social.pressed.connect(func() -> void: switch_tab("social"))
     tabs.add_child(tab_social)
 
