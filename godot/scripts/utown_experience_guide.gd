@@ -397,7 +397,7 @@ func _update_goal(goal: Dictionary) -> void:
         objective_detail.text = str(goal["detail"])
     objective_distance.text = "%d m" % roundi(distance_m)
     # Dark, semantic glyphs on the pearly compass surface: never pastel-on-white.
-    var indicator_color: Color = Color("#267F66") if arrived else Color("#B94C40") if urgent else Color("#98691F")
+    var indicator_color: Color = NUS3DUISkin.SUCCESS if arrived else NUS3DUISkin.DANGER if urgent else NUS3DUISkin.WARNING
     objective_arrow.add_theme_color_override("font_color", indicator_color)
     objective_distance.add_theme_color_override("font_color", indicator_color)
     if id_value != _active_goal or not objective_card.visible:
