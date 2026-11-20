@@ -4,6 +4,9 @@ signal talked_to(character_name: String)
 const INTERIOR_KIT = preload("res://scripts/utown_interior_details.gd")
 const EXTRA_INTERIOR_KIT = preload("res://scripts/utown_extra_interiors.gd")
 const EXTRA_INTERIOR_IDS = ["CREATE_TOWER", "UTR_N", "UTR_S", "TEMBUSU", "CAPT"]
+const CLASSROOM_PROPS = preload("res://scripts/utown_classroom_props.gd")
+const CAMPUS_PROPS = preload("res://scripts/utown_campus_props.gd")
+const INTERIOR_LIFE_PROPS = preload("res://scripts/utown_interior_life_props.gd")
 const ACTIVITY_SAVE_PATH: String = "user://nus3d_campus_activities.cfg"
 var activity_save_path: String = ACTIVITY_SAVE_PATH
 ## Offline campus-life prototype: fictional pedestrians, illustrative interiors,
@@ -19,6 +22,11 @@ var npc_lines: PackedStringArray = PackedStringArray([
     "The weather presets are artistic effects, not a live Singapore forecast."
 ])
 var npc_colors: PackedStringArray = PackedStringArray(["#d77f69", "#6d93bf", "#9b83bd", "#6eaa91", "#d4a65f", "#8a9da7"])
+const SKIN_TONES = ["#f3cba8", "#8c553e", "#c98d62", "#e0ac82", "#633d30", "#ae7153"]
+const HAIR_TONES = ["#292c30", "#382923", "#4d342a", "#1f252c", "#624737", "#353136"]
+const AMBIENT_COUNT: int = 18
+const AMBIENT_NAMES = ["Student", "Researcher", "Visitor", "Runner", "Exchange student", "Teaching assistant"]
+const AMBIENT_LINES = ["Heading to class!", "Is the shuttle coming?", "I need coffee.", "Which way is the canteen?", "My presentation starts soon!", "Nice weather for a campus walk."]
 const TALK_RADIUS: float = 5.5
 const ENTRY_RADIUS: float = 18.0
 const BOARD_RADIUS: float = 7.0
@@ -61,8 +69,9 @@ var message_time: float = 0.0
 
 func _ready() -> void:
     _load_waypoints()
-    _build_pedestrians()
     _register_extra_entries()
+    CAMPUS_PROPS.decorate(self, entry_positions)
+    _build_pedestrians()
     _build_interiors()
     _build_bicycle()
     _build_shuttle()
@@ -105,7 +114,10 @@ func _sample_route(route: Array[Vector3], distance: float) -> Dictionary:
 
 func _build_pedestrians() -> void:
     var walkways: Array = world.layout.get("walkways", [])
-    for i in range(npc_names.size()):
+    if walkways.is_empty():
+        return
+    for i in range(npc_names.size() + AMBIENT_COUNT):
+        var ambient: bool = i >= npc_names.size()
         var path: Dictionary = walkways[i % walkways.size()]
         var route: Array[Vector3] = []
         for coords in path.get("lonlat", []):
@@ -113,9 +125,13 @@ func _build_pedestrians() -> void:
         if route.size() < 2:
             continue
         var total: float = _route_length(route)
-        var distance: float = total * float((i % 3) + 1) / 4.0
+        if total <= 0.001:
+            continue
+        var distance: float = total * float((i % 7) + 1) / 8.0
         var npc: Node3D = _make_person(i)
         npc.position = _sample_route(route, distance)["position"]
+        var height_scale: float = 0.87 + float((i * 7 + 3) % 13) * 0.023
+        npc.scale = Vector3(height_scale * (0.96 + float(i % 4) * 0.025), height_scale, height_scale * (0.96 + float(i % 4) * 0.025))
         add_child(npc)
         pedestrians.append({
             "node": npc, "route": route, "distance": distance,
@@ -124,16 +140,19 @@ func _build_pedestrians() -> void:
             "idle_remaining": 0.0, "talk_remaining": 0.0,
             "left_arm": npc.get_node("LeftArmPivot"), "right_arm": npc.get_node("RightArmPivot"),
             "left_leg": npc.get_node("LeftLegPivot"), "right_leg": npc.get_node("RightLegPivot"),
-            "name": npc_names[i], "line": npc_lines[i]
+            "name": AMBIENT_NAMES[i % AMBIENT_NAMES.size()] if ambient else npc_names[i],
+            "line": AMBIENT_LINES[i % AMBIENT_LINES.size()] if ambient else npc_lines[i],
+            "ambient": ambient,
+            "personality_enabled": not ambient and ["Maya", "Ethan", "Mei"].has(npc_names[i] if not ambient else "")
         })
 
 func _make_person(index: int) -> Node3D:
     var root := Node3D.new()
     root.name = "StudentNPC_%02d" % index
     var shirt := StandardMaterial3D.new()
-    shirt.albedo_color = Color.html(str(npc_colors[index]))
+    shirt.albedo_color = Color.html(str(npc_colors[index % npc_colors.size()]))
     var skin := StandardMaterial3D.new()
-    skin.albedo_color = Color.html("#d9ad8d")
+    skin.albedo_color = Color.html(SKIN_TONES[index % SKIN_TONES.size()])
     var trousers := StandardMaterial3D.new()
     trousers.albedo_color = Color.html("#354353")
 
@@ -153,6 +172,18 @@ func _make_person(index: int) -> Node3D:
     head_mesh.position.y = 1.72
     head_mesh.material_override = skin
     root.add_child(head_mesh)
+
+    var hair := MeshInstance3D.new()
+    hair.name = "Hair"
+    var hair_mesh := SphereMesh.new()
+    hair_mesh.radius = 0.232
+    hair.mesh = hair_mesh
+    hair.position = Vector3(0.0, 1.81, 0.015)
+    hair.scale = Vector3(1.02, 0.43 + float(index % 3) * 0.12, 1.03)
+    var hair_material := StandardMaterial3D.new()
+    hair_material.albedo_color = Color.html(HAIR_TONES[index % HAIR_TONES.size()])
+    hair.material_override = hair_material
+    root.add_child(hair)
 
     for side in [-1.0, 1.0]:
         var suffix: String = "Left" if side < 0.0 else "Right"
@@ -224,8 +255,10 @@ func _build_interiors() -> void:
             _build_mezzanine(room, id)
         if id == "ERC":
             _build_study_room(room)
+            INTERIOR_LIFE_PROPS.decorate_study(room)
         elif id == "SRC":
             _build_recreation_room(room)
+            INTERIOR_LIFE_PROPS.decorate_recreation(room)
         else:
             EXTRA_INTERIOR_KIT.decorate(room, id)
         activity_spots[id] = INTERIOR_KIT.decorate(room, id) if id in ["ERC", "SRC"] else []
@@ -333,6 +366,7 @@ func _build_study_room(room: Node3D) -> void:
         _box(room, "UpperStudyDesk", Vector3(x, 3.95, -6.5), Vector3(2.7, 0.14, 1.0), table)
         _box(room, "UpperStudySeat", Vector3(x, 3.68, -5.7), Vector3(0.7, 0.12, 0.65), seat)
     _box(room, "UpperQuietBooth", Vector3(9.5, 4.0, -6.5), Vector3(1.4, 0.9, 2.6), dark)
+    CLASSROOM_PROPS.decorate(room)
 
 func _build_recreation_room(room: Node3D) -> void:
     var dark := _mat("#4e6269")
@@ -686,10 +720,26 @@ func talk_to_nearest() -> bool:
     pedestrians[index]["talk_remaining"] = 6.0
     var speaker: String = str(pedestrians[index]["name"])
     var bank: NUS3DDialogueBank = get_node_or_null("/root/DialogueBank") as NUS3DDialogueBank
-    var role: String = bank.role_for("outdoor", speaker) if bank != null else "Student"
-    var line: String = bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"])
+    var ambient: bool = bool(pedestrians[index].get("ambient", false))
+    var role: String = "Passerby" if ambient else (bank.role_for("outdoor", speaker) if bank != null else "Student")
+    var line: String = str(pedestrians[index]["line"]) if ambient else (bank.next_line("outdoor", speaker, weather.mode) if bank != null else str(pedestrians[index]["line"]))
+    var relationships: NUS3DRelationships = get_parent().get_node_or_null("Relationships") as NUS3DRelationships
+    var affinity_line: String = ""
+    var affinity_status: String = ""
+    if relationships != null and relationships.is_story_character(speaker):
+        var language: NUS3DGameLanguage = get_node_or_null("/root/GameLanguage") as NUS3DGameLanguage
+        var chinese: bool = language != null and language.is_chinese()
+        affinity_status = relationships.conversation(speaker, chinese)
+        affinity_line = relationships.contextual_line(speaker, chinese)
+        var invitation: String = relationships.invitation(speaker, chinese)
+        if not invitation.is_empty():
+            affinity_line += "\n" + invitation
     message = "%s · %s\n%s" % [speaker, role, line]
-    message_time = 6.0
+    if not affinity_line.is_empty():
+        message += "\n" + affinity_line
+    if not affinity_status.is_empty():
+        message += "\n♥ " + affinity_status
+    message_time = 7.0
     talked_to.emit(speaker)
     return true
 
