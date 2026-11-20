@@ -201,6 +201,14 @@ func _center_panel(cover: Control, size: Vector2) -> VBoxContainer:
     panel.custom_minimum_size = size
     panel.add_theme_stylebox_override("panel", NUS3DUISkin.glass(Color("#E8EEEC"), 16, 14, true))
     center.add_child(panel)
+    if size.x > 0.0:
+        var responsive := func() -> void:
+            var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+            panel.custom_minimum_size.x = minf(size.x, maxf(280.0, viewport_size.x - 32.0))
+            if size.y > 0.0:
+                panel.custom_minimum_size.y = minf(size.y, maxf(240.0, viewport_size.y - 32.0))
+        get_viewport().size_changed.connect(responsive)
+        responsive.call()
     var content: VBoxContainer = VBoxContainer.new()
     content.add_theme_constant_override("separation", 13)
     panel.add_child(content)
@@ -239,12 +247,12 @@ func _build_login() -> void:
     box.add_child(_button("How to play", _open_tutorial))
     login_sound_button = _button("UI sound: ON  [F9]", _toggle_ui_sound)
     box.add_child(login_sound_button)
-    login_message = _label("", 13, Color.html("#efb8ad"))
+    login_message = _label("", 13, Color("#A6534C"))
     login_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(login_message)
     var foot: Label = _label(
         "Local-only profiles. No internet login, NUS account or cross-device sync.\nYour progress and mail remain on this computer.",
-        12, Color.html("#a4c0c6"))
+        12, NUS3DUISkin.DIM)
     foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     box.add_child(foot)
 
@@ -403,14 +411,14 @@ func _build_mail() -> void:
     var layout: VBoxContainer = _center_panel(mail_cover, Vector2(960, 530))
     var header: HBoxContainer = HBoxContainer.new()
     layout.add_child(header)
-    var title: Label = _label("CAMPUS POST  /  LOCAL MAILBOX", 23, Color.html("#cff5f2"))
+    var title: Label = _label("CAMPUS POST", 21, NUS3DUISkin.TEXT)
     title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     header.add_child(title)
     mail_sound_button = _button("Sound ON", _toggle_ui_sound)
     header.add_child(mail_sound_button)
     header.add_child(_button("Close [J]", _close_mail))
     layout.add_child(_label("Only accounts registered on this installation can exchange messages.",
-        12, Color.html("#b0c8cc")))
+        12, NUS3DUISkin.DIM))
 
     var options: HBoxContainer = HBoxContainer.new()
     layout.add_child(options)
@@ -464,7 +472,7 @@ func _build_mail() -> void:
     mail_compose_panel.add_child(compose_body)
     NUS3DUISkin.field(compose_body)
     mail_compose_panel.add_child(_button("Send local message", _send_mail))
-    mail_status = _label("", 13, Color.html("#b8dbdf"))
+    mail_status = _label("", 13, NUS3DUISkin.DIM)
     layout.add_child(mail_status)
     # User mail, dynamic notices and usernames are never passed through the static translator.
     for dynamic_control in [login_message, login_title, login_submit, login_toggle, profile_label, mail_heading, mail_body, mail_status]:
