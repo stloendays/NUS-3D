@@ -77,6 +77,8 @@ func _run() -> void:
     if NUS3DUISkin.TEXT.get_luminance() > 0.30:
         _fail("Text ink is too pale for the bright cards")
         return
+    var arcade: UTownArcade = shell.game.get_node_or_null("Arcade") as UTownArcade
+    var guide: UTownExperienceGuide = shell.game.get_node_or_null("ExperienceGuide") as UTownExperienceGuide
     var normalized_panel: StyleBoxFlat = NUS3DUISkin.glass(NUS3DUISkin.ACCENT, 14, 12, true)
     if normalized_panel.corner_radius_top_left != NUS3DUISkin.PANEL_RADIUS_MIN:
         _fail("Shared glass surfaces do not enforce the common corner radius")
@@ -107,8 +109,6 @@ func _run() -> void:
         return
     # The former arcade and area cards were stacked on the same pixels; a
     # translucent surface cannot make overlapping lines readable.
-    var arcade: UTownArcade = shell.game.get_node_or_null("Arcade") as UTownArcade
-    var guide: UTownExperienceGuide = shell.game.get_node_or_null("ExperienceGuide") as UTownExperienceGuide
     var arcade_card: PanelContainer = arcade.status_layer.get_node_or_null("ArcadeCard") as PanelContainer if arcade != null and arcade.status_layer != null else null
     if arcade_card == null or guide == null or guide.zone_card == null:
         _fail("Area or arcade card vanished")
