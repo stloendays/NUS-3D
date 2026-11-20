@@ -43,6 +43,7 @@ func _run() -> void:
         return
     var info: PanelContainer = shell.game.get_node("HUD/Info") as PanelContainer
     var info_style: StyleBoxFlat = info.get_theme_stylebox("panel") as StyleBoxFlat
+    # Minimal glass panels intentionally use a thin 1 px top border and a soft 5 px shadow.
     if info_style == null or info_style.shadow_size < 4 or info_style.border_width_top < 1:
         _fail("Minimal HUD panel material is missing")
         return
