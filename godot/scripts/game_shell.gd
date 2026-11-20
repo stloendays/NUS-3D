@@ -225,7 +225,7 @@ func _build_login() -> void:
     var box: VBoxContainer = _center_panel(login_cover, Vector2(440, 0))
     var login_panel: PanelContainer = box.get_parent() as PanelContainer
     if login_panel != null:
-        login_panel.add_theme_stylebox_override("panel", NUS3DCartoonSkin.panel(NUS3DCartoonSkin.PAPER, 16, 18))
+        login_panel.add_theme_stylebox_override("panel", NUS3DCartoonSkin.panel())
     box.add_child(_label("NUS-3D", 34, NUS3DCartoonSkin.INK))
     box.add_child(_label("CAMPUS CHAOS  /  校园解压日常", 14, NUS3DCartoonSkin.MUTED))
     box.add_child(_label("Explore, survive coursework, and laugh at the deadline.", 14, NUS3DCartoonSkin.MUTED))
