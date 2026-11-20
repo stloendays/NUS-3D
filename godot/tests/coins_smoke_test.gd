@@ -47,6 +47,17 @@ func _run() -> void:
     # Avoid writing any real player coin/profile/mission save during testing.
     coins.save_path = "user://nus3d-coins-smoke-%d.cfg" % Time.get_ticks_usec()
     coins.load_progress()
+    # Other gameplay systems may have loaded a prior local profile. This smoke
+    # uses a clean in-memory mission baseline and never edits the player's saves.
+    tour.discovered_ids.clear()
+    challenge.collected_ids.clear()
+    challenge.sprint_active = false
+    challenge.sprint_last_time = -1.0
+    challenge.sprint_best_time = -1.0
+    campus.visited_activities.clear()
+    arcade.met_professors.clear()
+    arcade.student_wins = 0
+    coins.source_student_wins = 0
     var plaza: Node3D = world.get_node("TownPlaza_approximate") as Node3D
     player.global_position = plaza.global_position + Vector3(0.0, 0.18, 0.0)
     coins.toggle_shop()
