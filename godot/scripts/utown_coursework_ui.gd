@@ -90,8 +90,7 @@ func _label(text_value: String, font_size: int, color: Color) -> Label:
     label.text = text_value
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.add_theme_font_size_override("font_size", font_size)
-    label.add_theme_color_override("font_color",
-        NUS3DUISkin.TEXT if color.get_luminance() > 0.58 else color)
+    label.add_theme_color_override("font_color", NUS3DUISkin.ink_for(color))
     return label
 
 func _build_status() -> void:
