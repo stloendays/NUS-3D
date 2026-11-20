@@ -114,7 +114,7 @@ func _unhandled_input(event: InputEvent) -> void:
         change_affinity(name, -25 if personality == "proud" else -18)
         notice.text = "You teased %s. Affinity: %+d" % [name, get_affinity(name)]
         get_viewport().set_input_as_handled()
-    elif event.keycode == KEY_U:
+    elif event.keycode == KEY_U and event.shift_pressed:
         change_affinity(name, 12)
         notice.text = "%s accepted your apology. Affinity: %+d" % [name, get_affinity(name)]
         get_viewport().set_input_as_handled()
