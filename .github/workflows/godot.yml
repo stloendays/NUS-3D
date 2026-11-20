@@ -85,6 +85,7 @@ jobs:
           for test in \
             account_smoke_test.gd \
             language_smoke_test.gd \
+            cartoon_shell_smoke_test.gd \
             ui_feedback_smoke_test.gd \
             soft_glass_ui_smoke_test.gd \
             arcade_smoke_test.gd \
