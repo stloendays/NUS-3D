@@ -30,9 +30,16 @@ func _run() -> void:
     coins.shop_stock = {"coffee": 5, "snack": 8, "umbrella": 1}
     var plaza := world.get_node("TownPlaza_approximate") as Node3D
     player.global_position = plaza.global_position + Vector3(0, 0.2, 0)
+    var plaza_distance: float = player.global_position.distance_to(plaza.global_position)
+    var shop_near_before: bool = coins._near_shop()
+    var hud_visible_before: bool = coins.hud.visible
+    var interior_before: bool = coins.campus_life.interior_active
+    var shuttle_before: bool = coins.campus_life.on_shuttle
     coins.toggle_shop()
-    if not coins.shop_open or not coins.purchase("coffee"):
-        _fail("coffee purchase near Town Plaza should succeed")
+    var opened_shop: bool = coins.shop_open
+    var bought_coffee: bool = coins.purchase("coffee") if opened_shop else false
+    if not opened_shop or not bought_coffee:
+        _fail("coffee purchase near Town Plaza should succeed; open=%s bought=%s near=%s distance=%.3f hud=%s interior=%s shuttle=%s status=%s" % [str(opened_shop), str(bought_coffee), str(shop_near_before), plaza_distance, str(hud_visible_before), str(interior_before), str(shuttle_before), coins.notice])
         return
     if coins.balance != 188 or coins.coffee_count != 1:
         _fail("wallet debit or coffee inventory mismatch")
