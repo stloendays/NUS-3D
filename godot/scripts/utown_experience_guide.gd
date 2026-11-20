@@ -60,6 +60,8 @@ var zone_caption: Label
 
 var _refresh_elapsed: float = 0.0
 var _zone_remaining: float = 0.0
+# A room transition needs an immediate HUD refresh, not the 220ms polling delay.
+var _interior_context_key: String = ""
 var _active_zone: String = ""
 var _visited_zones: Dictionary = {}
 var _active_goal: String = ""
@@ -429,6 +431,9 @@ func _update_zone() -> void:
         return
     _active_zone = current_zone
     if current_zone.is_empty() or _visited_zones.has(current_zone):
+        # Never leave the old building postcard visible in a different room.
+        _zone_remaining = 0.0
+        zone_card.hide()
         return
     _visited_zones[current_zone] = true
     zone_heading.text = _t("进入区域：", "NOW ENTERING: ") + _place_name(current_zone)
@@ -450,6 +455,13 @@ func _refresh_feedback() -> void:
 
 
 func _process(delta: float) -> void:
+    # Interior entrances/exits are discrete transitions; refresh on the first
+    # simulation tick even when the normal guide polling window has not elapsed.
+    var next_interior: String = life.active_interior if life.interior_active else ""
+    if next_interior != _interior_context_key:
+        _interior_context_key = next_interior
+        _refresh_elapsed = 0.0
+        _refresh_feedback()
     _refresh_elapsed += delta
     if _zone_remaining > 0.0:
         _zone_remaining = maxf(0.0, _zone_remaining - delta)
