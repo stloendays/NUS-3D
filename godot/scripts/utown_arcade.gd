@@ -7,6 +7,10 @@ const SAVE_PATH: String = "user://nus3d_arcade_progress.cfg"
 const STUDENT_FOCUS: int = 3
 const BREAK_DURATION: float = 16.0
 const PROJECTILE_CAPACITY: int = 8
+# A single-line arcade summary fits between the weather card and area postcard.
+const STATUS_CARD_HEIGHT: float = 42.0
+const STATUS_CARD_MIN_TOP: float = 194.0
+const STATUS_CARD_MAX_BOTTOM: float = 344.0
 const WEAPONS = [
     {"name": "Paper Plane", "damage": 1, "range": 28.0, "cooldown": 0.33, "level": 1, "color": "#e7efff"},
     {"name": "Chalk Popper", "damage": 2, "range": 22.0, "cooldown": 0.62, "level": 2, "color": "#b5f2db"},
@@ -37,6 +41,7 @@ var next_projectile: int = 0
 var mesh_cache: Dictionary = {}
 var material_cache: Dictionary = {}
 var status_layer: CanvasLayer
+var status_card: PanelContainer
 var status_label: Label
 var held_toy: Node3D
 var held_toy_body: MeshInstance3D
@@ -159,20 +164,21 @@ func _build_status_panel() -> void:
     add_child(status_layer)
     var card := PanelContainer.new()
     card.name = "ArcadeCard"
-    # Keep combat stats in their own left rail slot. The previous 352–453px
-    # position exactly overlapped the zone-discovery postcard (354–430px).
+    # Compact one-line summary: never cover expanding indoor/weather information.
     card.anchor_left = 0.0
     card.anchor_right = 0.0
     card.offset_left = 18.0
     card.offset_right = 430.0
-    card.offset_top = 194.0
-    card.offset_bottom = 294.0
+    card.offset_top = STATUS_CARD_MIN_TOP
+    card.offset_bottom = STATUS_CARD_MIN_TOP + STATUS_CARD_HEIGHT
     card.mouse_filter = Control.MOUSE_FILTER_IGNORE
     var style: StyleBoxFlat = NUS3DUISkin.glass(Color("#9991B9"), 20, 12)
     card.add_theme_stylebox_override("panel", style)
     status_layer.add_child(card)
+    status_card = card
     status_label = Label.new()
-    status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    status_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+    status_label.clip_text = true
     status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     status_label.add_theme_font_size_override("font_size", 13)
     status_label.add_theme_color_override("font_color", NUS3DUISkin.TEXT)
@@ -407,22 +413,44 @@ func _show_pooled_projectile(start: Vector3, finish: Vector3, color: String) -> 
 func _announce(value: String, duration: float) -> void:
     message = value
     message_time = duration
+    # Reuse the bounded HUD toast queue for full event text, instead of a
+    # permanent four-line overlay that obscures indoor weather information.
+    if hud != null and hud.visible and not get_tree().paused and hud.has_method("_show_toast"):
+        hud.call("_show_toast", value)
     _refresh_status()
+
+
+func _layout_status_card() -> void:
+    if status_card == null:
+        return
+    var top: float = STATUS_CARD_MIN_TOP
+    var campus_card: Control = hud.get_node_or_null("CampusCard") as Control
+    if campus_card != null and campus_card.visible:
+        var weather_height: float = maxf(campus_card.size.y, campus_card.get_combined_minimum_size().y)
+        top = maxf(top, campus_card.position.y + weather_height + 10.0)
+    # The district postcard starts at y=354 and the key rail is bottom-fixed.
+    # Hide this optional summary when either takes priority on a small window.
+    var limit: float = minf(STATUS_CARD_MAX_BOTTOM,
+        float(get_viewport().get_visible_rect().size.y) - 66.0)
+    if top + STATUS_CARD_HEIGHT > limit:
+        status_card.hide()
+        return
+    status_card.offset_top = top
+    status_card.offset_bottom = top + STATUS_CARD_HEIGHT
+    status_card.show()
+
 
 func _refresh_status() -> void:
     if status_label == null:
         return
-    var chosen: Dictionary = WEAPONS[weapon_index]
-    var lines := PackedStringArray()
-    lines.append(_t("校园玩具场 | 等级 %d | 经验 %d/%d",
-        "CAMPUS ARCADE | LV %d | XP %d/%d") % [level, xp, xp_required()])
-    lines.append(_t("学生对战胜场：%d | %s", "Student wins: %d | %s") % [student_wins, _toy_name(weapon_index)])
-    lines.append(_t("[1/2/3] 选择玩具 [左键] 游玩 [U] 找老师",
-        "[1/2/3] toys [LMB] play [U] teacher"))
-    lines.append(message if message_time > 0.0 else _t(
-        "仅限卡通搞笑，角色不会受到真实伤害。",
-        "Pure cartoon: nobody gets hurt."))
-    status_label.text = "\n".join(lines)
+    var summary: String = _t(
+        "玩具 LV %d | 经验 %d/%d | 胜 %d | %s",
+        "ARCADE LV %d | XP %d/%d | W %d | %s") % [
+            level, xp, xp_required(), student_wins, _toy_name(weapon_index)
+        ]
+    if status_label.text != summary:
+        status_label.text = summary
+    _layout_status_card()
 
 func _process(delta: float) -> void:
     shot_cooldown = maxf(0.0, shot_cooldown - delta)

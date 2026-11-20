@@ -37,6 +37,18 @@ func _run() -> void:
     if chinese_map_label != "地图" or english_map_label != "GAME MAP":
         _fail("Minimap labels do not follow the selected login language")
         return
+    # This dense 222px schematic is redrawn at 20Hz, not each game frame.
+    # Camera, player position and simulation are NOT rate limited.
+    map.set("_redraw_elapsed", 0.0)
+    if bool(map.call("_redraw_due", 0.016)) or bool(map.call("_redraw_due", 0.016)):
+        _fail("Minimap redraws needlessly on every 60Hz frame")
+        return
+    if not bool(map.call("_redraw_due", 0.020)):
+        _fail("Minimap skipped a scheduled redraw after 52ms")
+        return
+    if bool(map.call("_redraw_due", 0.001)):
+        _fail("Minimap redraw clock did not reset after drawing")
+        return
     if styling.path_edge_count != world.generated_path_count:
         _fail("Path edging failed to mirror original 11 walkway segments")
         return

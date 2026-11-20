@@ -17,6 +17,8 @@ const MAP_SIZE: float = 222.0
 const SCALE: float = 0.54
 const FOLLOW_START_METRES: float = 180.0
 const MAX_NPC_DOTS: int = 14
+# 20 Hz is sufficient for the tiny sketch map; world physics/camera stay at full rate.
+const REDRAW_INTERVAL: float = 0.05
 const C_BACKGROUND: Color = Color("#F0F5F1")
 const C_PANEL: Color = Color("#EBF2F4")
 const C_GRID: Color = Color("#D7E3E2")
@@ -32,6 +34,7 @@ const C_GOLD: Color = Color("#C89137")
 const C_PLAYER: Color = Color("#218FA8")
 
 var map_focus: Vector3 = Vector3.ZERO
+var _redraw_elapsed: float = 0.0
 var _map_glass: StyleBoxFlat
 var _map_outline: StyleBoxFlat
 
@@ -46,6 +49,13 @@ func _ready() -> void:
 func _map_text(chinese: String, english: String) -> String:
     return language_service.choose(chinese, english) if language_service != null else english
 
+func _redraw_due(delta: float) -> bool:
+    _redraw_elapsed += maxf(delta, 0.0)
+    if _redraw_elapsed < REDRAW_INTERVAL:
+        return false
+    _redraw_elapsed = fmod(_redraw_elapsed, REDRAW_INTERVAL)
+    return true
+
 func _process(delta: float) -> void:
     # Smooth follow only outside UTown; avoids the jarring old 180m camera jump.
     # _to_map deliberately remains pure so game code/tests can set map_focus.
@@ -56,7 +66,8 @@ func _process(delta: float) -> void:
     map_focus = map_focus.lerp(target, clampf(delta * 7.0, 0.0, 1.0))
     if map_focus.distance_to(target) < 0.05:
         map_focus = target
-    queue_redraw()
+    if _redraw_due(delta):
+        queue_redraw()
 
 func _to_map(p: Vector3) -> Vector2:
     return Vector2(MAP_SIZE * 0.5 + (p.x - map_focus.x) * SCALE,
