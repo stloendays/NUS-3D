@@ -1,5 +1,6 @@
 extends Node3D
 class_name NUSKentRidgeWorld
+const SOFT_ARCHITECTURE = preload("res://scripts/utown_soft_architecture.gd")
 ## Campus-scale schematic expansion. Anchors are approximate WGS84 POIs,
 ## but buildings, walkways and vehicle paths are original fictional geometry.
 ## Does not mutate existing UTown layouts, physics, vehicles or missions.
@@ -184,8 +185,10 @@ func _build_districts() -> void:
             building.name = str(info["name"]).replace(" ", "_").replace("/", "_")
             building.position = Vector3(at.x, 0.0, at.z)
             root.add_child(building)
-            _box(building, "OriginalMass", Vector3(0.0, height_value * 0.5, 0.0), Vector3(width_value, height_value, depth_value), str(info.get("facade", district["accent"])), true)
-            _box(building, "Roof", Vector3(0.0, height_value + 0.22, 0.0), Vector3(width_value + 1.4, 0.45, depth_value + 1.4), "#d4dad6")
+            var main_mass: MeshInstance3D = _box(building, "OriginalMass", Vector3(0.0, height_value * 0.5, 0.0), Vector3(width_value, height_value, depth_value), str(info.get("facade", district["accent"])), true)
+            main_mass.mesh = SOFT_ARCHITECTURE.rounded_prism(Vector3(width_value, height_value, depth_value), minf(width_value, depth_value) * 0.032)
+            var roof_cap: MeshInstance3D = _box(building, "Roof", Vector3(0.0, height_value + 0.22, 0.0), Vector3(width_value + 1.4, 0.45, depth_value + 1.4), "#d4dad6")
+            roof_cap.mesh = SOFT_ARCHITECTURE.rounded_prism(Vector3(width_value + 1.4, 0.45, depth_value + 1.4), 0.95)
             _box(building, "Entrance", Vector3(0.0, 2.4, depth_value * 0.5 + 0.07), Vector3(minf(width_value * 0.42, 14.0), 4.6, 0.16), "#466678")
             for level in range(mini(int(height_value / 4.6), 6)):
                 _box(building, "Windows_%d" % level, Vector3(0.0, 3.9 + float(level) * 3.3, depth_value * 0.5 + 0.11), Vector3(width_value * 0.72, 1.2, 0.14), "#5b818b")
