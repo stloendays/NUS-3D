@@ -1,20 +1,21 @@
 extends Node
 class_name NUS3DGraphicsSettings
 ## Device-local graphics settings. No account/profile or multiplayer state is stored here.
-## Godot 4.4 GL Compatibility uses bilinear 3D scaling (not Forward+ FSR).
+## Godot 4.4 GL Compatibility uses bilinear 3D scaling and native 3D MSAA,
+## not Forward+ FSR/TAA. The lowest preset never pays for MSAA.
 signal preset_changed(preset: String)
 
 const SAVE_PATH: String = "user://nus3d_graphics.cfg"
 const ORDER = ["low", "balanced", "high", "ultra"]
 const PROFILES: Dictionary = {
     "low": {"fps": 30, "scale": 0.70, "minimum": 0.60, "far": 520.0,
-        "rain": 180, "streaks": 65, "shadows": false, "details": false},
+        "rain": 180, "streaks": 65, "shadows": false, "details": false, "msaa": 0},
     "balanced": {"fps": 60, "scale": 0.85, "minimum": 0.70, "far": 850.0,
-        "rain": 500, "streaks": 130, "shadows": true, "details": true},
+        "rain": 500, "streaks": 130, "shadows": true, "details": true, "msaa": 1},
     "high": {"fps": 60, "scale": 1.0, "minimum": 0.80, "far": 1100.0,
-        "rain": 1100, "streaks": 220, "shadows": true, "details": true},
+        "rain": 1100, "streaks": 220, "shadows": true, "details": true, "msaa": 2},
     "ultra": {"fps": 120, "scale": 1.0, "minimum": 0.85, "far": 1250.0,
-        "rain": 1100, "streaks": 220, "shadows": true, "details": true}
+        "rain": 1100, "streaks": 220, "shadows": true, "details": true, "msaa": 2}
 }
 
 var preset: String = "high"
@@ -80,6 +81,12 @@ func _save() -> void:
     config.save(SAVE_PATH)
 
 
+func profile_msaa(value: String) -> int:
+    if not PROFILES.has(value):
+        return Viewport.MSAA_DISABLED
+    return int(PROFILES[value]["msaa"])
+
+
 func _apply_display() -> void:
     # Never cap automated headless / fixed-FPS simulation.
     if DisplayServer.get_name() == "headless":
@@ -91,6 +98,9 @@ func _apply_display() -> void:
     if viewport != null:
         viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
         viewport.scaling_3d_scale = clampf(render_scale, 0.5, 1.0)
+        # Keep the Compatibility renderer and UI at native 2D resolution.
+        # MSAA 2x/4x softens distant building diagonals; low stays disabled.
+        viewport.msaa_3d = profile_msaa(preset)
 
 
 func apply_to_game(target: Node3D) -> void:

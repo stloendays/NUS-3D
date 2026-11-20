@@ -7,6 +7,7 @@ const DATA_PATH: String = "res://data/utown_core.json"
 const M2_DATA_PATH: String = "res://data/m2_profiles.json"
 const FACADE_KIT = preload("res://scripts/utown_facades.gd")
 const OSM_KIT = preload("res://scripts/osm_reference.gd")
+const SOFT_ARCHITECTURE = preload("res://scripts/utown_soft_architecture.gd")
 const COMIC_LAWN_PATH: String = "res://assets/materials/comic_lawn.svg"
 const COMIC_PAVERS_PATH: String = "res://assets/materials/comic_pavers.svg"
 const METRES_PER_DEG_LAT: float = 110574.0
@@ -114,6 +115,17 @@ func _add_box(parent: Node3D, at: Vector3, size_m: Vector3, material: Material, 
         body.add_child(shape)
     return part
 
+## Preserve every original BoxShape3D footprint while rounding visible facades.
+## This changes no quest, bus, collider or elevation data.
+func _add_soft_box(parent: Node3D, at: Vector3, size_m: Vector3,
+        material: Material, solid: bool = false, radius_m: float = 0.7) -> Node3D:
+    var part: Node3D = _add_box(parent, at, size_m, material, solid)
+    part.name = "SoftCampusVolume"
+    var visual: MeshInstance3D = part.get_child(0) as MeshInstance3D
+    visual.mesh = SOFT_ARCHITECTURE.rounded_prism(size_m, radius_m)
+    return part
+
+
 func _build_sky() -> void:
     var env: Environment = Environment.new()
     env.background_mode = Environment.BG_COLOR
@@ -129,6 +141,10 @@ func _build_sky() -> void:
     sun.rotation_degrees = Vector3(-54.0, -38.0, 0.0)
     sun.light_energy = 1.0
     sun.shadow_enabled = true
+    sun.shadow_blur = 1.25
+    sun.directional_shadow_max_distance = 180.0
+    sun.directional_shadow_fade_start = 0.63
+    sun.directional_shadow_blend_splits = true
     add_child(sun)
     sunlight = sun
 
@@ -243,8 +259,8 @@ func _build_buildings() -> void:
             var h: float = float(piece.get("h", 15.0))
             max_height = maxf(max_height, h)
             var z: float = -north
-            _add_box(group, Vector3(dx, h / 2.0, z), Vector3(w, h, d), wall, true)
-            _add_box(group, Vector3(dx, h + 0.24, z), Vector3(w + 0.65, 0.48, d + 0.65), roof)
+            _add_soft_box(group, Vector3(dx, h / 2.0, z), Vector3(w, h, d), wall, true, minf(w, d) * 0.032)
+            _add_soft_box(group, Vector3(dx, h + 0.24, z), Vector3(w + 0.65, 0.48, d + 0.65), roof, false, 0.85)
             var bands: int = 0 if priority != "P0" and record.has("confirmed_storeys") else mini(int(h / 3.6), 11)
             for floor_index in range(bands):
                 var yf: float = 2.4 + 3.5 * float(floor_index)
