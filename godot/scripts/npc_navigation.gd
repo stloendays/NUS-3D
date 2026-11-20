@@ -10,6 +10,8 @@ const MAX_GRID_CELLS: int = 40000
 const STUCK_TIMEOUT: float = 1.25
 const STUCK_MOVEMENT: float = 0.12
 const MAX_STUCK_REPATHS: int = 3
+const NAV_SWEEP_RADIUS: float = 0.42
+const NAV_BODY_HEIGHT: float = 0.95
 
 @onready var campus: UTownCampusLife = $"../CampusLife"
 @onready var world: UTownWorld = $"../World"
@@ -109,12 +111,38 @@ func next_target(name: String, from: Vector3, goal: Vector3, now: float) -> Vect
         path.pop_front()
     paths[name] = path
     if not path.is_empty():
+        # Skip intermediate cells when a swept line is clear. This reduces
+        # grid-corner jitter while retaining collision-safe turns.
+        var furthest_clear: int = -1
+        for i in range(path.size()):
+            if _has_clearance(from, path[i]):
+                furthest_clear = i
+            else:
+                break
+        if furthest_clear >= 0:
+            return path[furthest_clear]
         return path[0]
-    # Never fall back to a straight line through a building when A* failed.
-    var destination: Vector2i = _cell(goal)
-    if grid.is_in_boundsv(destination) and not grid.is_point_solid(destination):
+    # An empty A* result is not permission to walk straight through walls.
+    if _has_clearance(from, goal):
         return goal
     return from
+
+
+func _has_clearance(from: Vector3, to: Vector3) -> bool:
+    var displacement: Vector3 = to - from
+    displacement.y = 0.0
+    if displacement.length_squared() < 0.0001:
+        return true
+    var shape := SphereShape3D.new()
+    shape.radius = NAV_SWEEP_RADIUS
+    var query := PhysicsShapeQueryParameters3D.new()
+    query.shape = shape
+    query.transform = Transform3D(Basis.IDENTITY, from + Vector3.UP * NAV_BODY_HEIGHT)
+    query.motion = displacement
+    query.collision_mask = 1
+    query.collide_with_areas = false
+    var result: PackedFloat32Array = world.get_world_3d().direct_space_state.cast_motion(query)
+    return result.is_empty() or result[0] >= 0.995
 
 
 func report_movement(name: String, before: Vector3, after: Vector3, now: float) -> void:
@@ -167,10 +195,10 @@ func move_safe(current: Vector3, desired: Vector3, delta: float) -> Vector3:
     if displacement.length_squared() < 0.000001:
         return current
     var shape := SphereShape3D.new()
-    shape.radius = 0.48
+    shape.radius = NAV_SWEEP_RADIUS
     var query := PhysicsShapeQueryParameters3D.new()
     query.shape = shape
-    query.transform = Transform3D(Basis.IDENTITY, current + Vector3.UP * 0.95)
+    query.transform = Transform3D(Basis.IDENTITY, current + Vector3.UP * NAV_BODY_HEIGHT)
     query.motion = displacement
     query.collision_mask = 1
     query.collide_with_areas = false
