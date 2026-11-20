@@ -33,6 +33,33 @@ func _smoke() -> void:
     if arcade.projectiles.size() != arcade.PROJECTILE_CAPACITY:
         _fail("bounded projectile pool missing")
         return
+    # At 720p the indoor/weather panel can expand; Arcade must not cover
+    # either it or the area-discovery postcard.
+    var weather_card: PanelContainer = hud.get_node_or_null("CampusCard") as PanelContainer
+    var arcade_card: PanelContainer = arcade.status_card
+    var guide: UTownExperienceGuide = instance.get_node_or_null("ExperienceGuide") as UTownExperienceGuide
+    if weather_card == null or arcade_card == null or guide == null or guide.zone_card == null:
+        _fail("HUD clearance card references missing")
+        return
+    var starting_weather_minimum: Vector2 = weather_card.custom_minimum_size
+    weather_card.custom_minimum_size.y = 125.0
+    await process_frame
+    arcade._refresh_status()
+    if arcade_card.visible and arcade_card.get_global_rect().intersects(weather_card.get_global_rect()):
+        _fail("Arcade status overlaps expanded indoor/weather panel")
+        return
+    if arcade_card.visible and arcade_card.get_global_rect().intersects(guide.zone_card.get_global_rect()):
+        _fail("Arcade status overlaps the district postcard")
+        return
+    if arcade.status_label.text.contains("\\n") or arcade.status_label.text.length() < 20:
+        _fail("Arcade summary was not compacted to one readable line")
+        return
+    weather_card.custom_minimum_size = starting_weather_minimum
+    await process_frame
+    arcade._refresh_status()
+    if not arcade_card.visible:
+        _fail("Arcade summary did not return after weather panel contracted")
+        return
     arcade.save_path = "user://arcade-test-%d.cfg" % Time.get_ticks_usec()
     arcade.load_progress()
     if arcade.level != 1 or arcade.xp != 0 or arcade.choose_weapon(1):
