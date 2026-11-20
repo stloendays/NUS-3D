@@ -107,6 +107,15 @@ static func button(control: Button) -> void:
     control.add_theme_color_override("font_disabled_color", Color("#8F9FA8"))
     control.add_theme_font_size_override("font_size", 14)
 
+static func checkbox(control: CheckBox) -> void:
+    control.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+    control.add_theme_color_override("font_color", TEXT)
+    control.add_theme_color_override("font_hover_color", ACCENT)
+    control.add_theme_color_override("font_pressed_color", TEXT)
+    control.add_theme_color_override("font_disabled_color", DIM)
+    control.add_theme_font_size_override("font_size", 13)
+
+
 static func field(control: Control) -> void:
     var base: StyleBoxFlat = panel(Color("#F2F8FA"), Color("#B4CCD4"), 13, 11)
     base.shadow_size = 2
