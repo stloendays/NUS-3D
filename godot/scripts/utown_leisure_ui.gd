@@ -139,7 +139,7 @@ func _update_lounge_layout() -> void:
 
 
 func _build() -> void:
-    status_chip = _label("", 15, "#ffd591")
+    status_chip = _label("", 13, "#397E91")
     status_chip.name = "PostCourseShortcut"
     status_chip.anchor_left = 0.0
     status_chip.anchor_right = 0.0
