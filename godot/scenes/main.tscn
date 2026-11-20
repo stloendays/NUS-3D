@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -260,3 +260,9 @@ script = ExtResource("26")
 
 [node name="EnglishExams" type="CanvasLayer" parent="."]
 script = ExtResource("28")
+
+[node name="NPCNavigation" type="Node" parent="."]
+script = ExtResource("30")
+
+[node name="NPCRelations" type="Node" parent="."]
+script = ExtResource("29")
