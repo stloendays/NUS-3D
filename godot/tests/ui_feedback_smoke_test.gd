@@ -96,9 +96,20 @@ func _run() -> void:
     if not toast_card.visible or toast_label.text != "UI TEST":
         _fail("Milestone toast is not available")
         return
+    # Two rewards in one frame must be delivered sequentially, not overwritten.
+    hud.call("_show_toast", "SECOND UI TEST", "reward")
+    if toast_label.text != "UI TEST" or (hud.get("_pending_toasts") as Array).size() != 1:
+        _fail("Back-to-back milestone toasts must be queued")
+        return
+    hud.call("_update_notices", 3.0)
+    if toast_label.text != "SECOND UI TEST" or not toast_card.visible or not (hud.get("_pending_toasts") as Array).is_empty():
+        _fail("Queued milestone toast did not display after the first expired")
+        return
+    # Restoring an account must clear both the visible toast and queued rewards.
+    hud.call("_show_toast", "STALE ACCOUNT REWARD", "reward")
     hud.call("sync_feedback_state")
-    if toast_card.visible:
-        _fail("Restored account progress should not retain a toast")
+    if toast_card.visible or not (hud.get("_pending_toasts") as Array).is_empty():
+        _fail("Restored account progress should not retain queued toasts")
         return
 
     print("NUS3D_UI_STAGE_8_TOAST_OK")
