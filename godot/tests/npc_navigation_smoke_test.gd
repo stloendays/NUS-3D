@@ -47,6 +47,15 @@ func _test() -> void:
     if nav.repath_count != 2:
         _fail("navigation path did not refresh after cache timeout")
         return
+    nav.report_movement("test", start, start, 2.0)
+    nav.report_movement("test", start, start, 3.5)
+    if float(nav.repath_at.get("test", 1.0)) != 0.0:
+        _fail("stuck recovery did not request a new path")
+        return
+    var away: Vector3 = nav.separation_offset("test", start, [{"name": "test", "node": game.get_node("Player")}])
+    if away.length_squared() > 0.0001:
+        _fail("separation incorrectly includes the same NPC")
+        return
     nav.clear_path("test")
     if nav.paths.has("test"):
         _fail("navigation path not released")
