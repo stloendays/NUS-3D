@@ -253,21 +253,36 @@ func _build_path_refill_stations() -> void:
     for index in range(bench_anchors.size()):
         if refill_station_count >= 4:
             break
-        # Place refill points on the outer side of selected benches, away from the path.
-        if index % 3 != 1:
+        # Bench placement already validated the inner clearance. Place refill
+        # equipment farther out into the verge, and only reject nearby trees
+        # or another refill station so a valid bench does not lose its fixture.
+        if index % 2 == 0:
             continue
         var anchor: Dictionary = bench_anchors[index]
         var bench_position: Vector2 = anchor.get("position", Vector2.ZERO)
         var outward: Vector2 = anchor.get("outward", Vector2.RIGHT).normalized()
-        var candidate: Vector2 = bench_position + outward * 4.0
-        if not _outside_walkways_and_buildings(candidate, 2.6):
-            continue
-        var separated: bool = true
-        for previous in locations:
-            if previous.distance_to(candidate) < 18.0:
-                separated = false
-                break
-        if not separated:
+        var candidate: Vector2 = Vector2.ZERO
+        var candidate_found: bool = false
+        for offset_m in [2.8, 3.8, 4.8]:
+            var option: Vector2 = bench_position + outward * float(offset_m)
+            var tree_conflict: bool = false
+            for tree in world.generated_tree_positions:
+                if Vector2(tree.x, tree.z).distance_to(option) < 2.8:
+                    tree_conflict = true
+                    break
+            if tree_conflict:
+                continue
+            var separated: bool = true
+            for previous in locations:
+                if previous.distance_to(option) < 16.0:
+                    separated = false
+                    break
+            if not separated:
+                continue
+            candidate = option
+            candidate_found = true
+            break
+        if not candidate_found:
             continue
 
         var station: Node3D = Node3D.new()
@@ -284,6 +299,7 @@ func _build_path_refill_stations() -> void:
         _box(station, "DripTray", Vector3(0.0, 0.48, -0.49), Vector3(0.50, 0.07, 0.22), tray)
         locations.append(candidate)
         refill_station_count += 1
+    print("NUS3D_M26_REFILL: %d stations from %d benches" % [refill_station_count, bench_anchors.size()])
 
 
 func _build_plaza_planters() -> void:
