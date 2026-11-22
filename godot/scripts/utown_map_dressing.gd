@@ -5,8 +5,10 @@ class_name NUS3DMapDressing
 ## Static, seeded, low-poly, shared mesh/material, bounded instances.
 const MAX_BUSHES: int = 128
 const MAX_BENCHES: int = 13
+const MAX_TRASH_BINS: int = 8
 const MAX_DISTRICT_TREES: int = 84
 const MAX_PLAZA_PLANTERS: int = 4
+const CAMPUS_SCATTERED_PROPS = preload("res://scripts/campus_scattered_props.gd")
 
 @onready var world: UTownWorld = $"../World"
 @onready var expansion: NUSKentRidgeWorld = $"../KentRidgeExpansion"
@@ -15,6 +17,8 @@ var path_edge_count: int = 0
 var meadow_patch_count: int = 0
 var bush_count: int = 0
 var bench_count: int = 0
+var trash_bin_count: int = 0
+var bench_anchors: Array[Dictionary] = []
 var district_tree_count: int = 0
 var plaza_planter_count: int = 0
 var grove_positions: Array[Vector3] = []
@@ -29,8 +33,11 @@ func _ready() -> void:
     _build_meadow_islands()
     _build_verge_shrubs()
     _build_path_benches()
+    _build_utown_trash_bins()
     _build_plaza_planters()
     _build_district_groves()
+    var scatter_stats: Dictionary = CAMPUS_SCATTERED_PROPS.decorate(self, expansion, grove_positions)
+    print("NUS3D_M25_SCATTER: %d clusters, %d props, %d batches, %d Kent Ridge benches, %d Kent Ridge bins, %d UTown benches, %d UTown bins" % [scatter_stats.get("cluster_count", 0), scatter_stats.get("item_count", 0), scatter_stats.get("batch_count", 0), scatter_stats.get("bench_count", 0), scatter_stats.get("trash_bin_count", 0), bench_count, trash_bin_count])
 
 func _material(tint: String, use_vertex_colors: bool = false) -> StandardMaterial3D:
     var key: String = tint + (":vertex" if use_vertex_colors else ":flat")
@@ -218,6 +225,7 @@ func _build_path_benches() -> void:
             if conflict:
                 continue
             locations.append(at)
+            bench_anchors.append({"position": at, "direction": d.normalized()})
             var bench: Node3D = Node3D.new()
             bench.name = "CurvedStudyBench_%02d" % bench_count
             bench.position = Vector3(at.x, 0.0, at.y)
@@ -229,6 +237,72 @@ func _build_path_benches() -> void:
             for x in [-1.10, 1.10]:
                 _box(bench, "Frame", Vector3(x, 0.31, 0), Vector3(0.13, 0.62, 0.61), legs)
             bench_count += 1
+
+func _build_utown_trash_bins() -> void:
+    if bench_anchors.is_empty():
+        return
+    var body: CylinderMesh = CylinderMesh.new()
+    body.top_radius = 0.34
+    body.bottom_radius = 0.39
+    body.height = 0.78
+    body.radial_segments = 8
+    var lid: CylinderMesh = CylinderMesh.new()
+    lid.top_radius = 0.41
+    lid.bottom_radius = 0.41
+    lid.height = 0.07
+    lid.radial_segments = 8
+
+    var body_transforms: Array[Transform3D] = []
+    var lid_transforms: Array[Transform3D] = []
+    var body_colors: Array[Color] = []
+    var lid_colors: Array[Color] = []
+    var locations: Array[Vector2] = []
+    var body_palette: PackedStringArray = ["#71877F", "#788D91", "#879B82"]
+    var lid_palette: PackedStringArray = ["#D3B66F", "#6C9B86", "#779AA5"]
+    var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+    rng.seed = 2026112051
+
+    for index in range(bench_anchors.size()):
+        if trash_bin_count >= MAX_TRASH_BINS:
+            break
+        var anchor: Dictionary = bench_anchors[index]
+        var direction: Vector2 = anchor.get("direction", Vector2.RIGHT)
+        var anchor_position: Vector2 = anchor.get("position", Vector2.ZERO)
+        # Try either end of the bench before skipping it; the adjacent tree/building
+        # layout differs along each walkway segment.
+        var offsets: Array[Vector2] = [
+            direction * 1.9, -direction * 1.9,
+            direction * 2.35, -direction * 2.35
+        ]
+        for offset in offsets:
+            if trash_bin_count >= MAX_TRASH_BINS:
+                break
+            var at: Vector2 = anchor_position + offset
+            if not _outside_walkways_and_buildings(at, 3.0):
+                continue
+            var conflict: bool = false
+            for previous in locations:
+                if previous.distance_to(at) < 8.0:
+                    conflict = true
+                    break
+            if conflict:
+                continue
+
+            var scale: float = rng.randf_range(0.92, 1.08)
+            var yaw: float = rng.randf_range(0.0, TAU)
+            var basis: Basis = Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale)
+            body_transforms.append(Transform3D(basis, Vector3(at.x, 0.39 * scale, at.y)))
+            lid_transforms.append(Transform3D(basis, Vector3(at.x, 0.80 * scale, at.y)))
+            body_colors.append(Color.html(body_palette[trash_bin_count % body_palette.size()]))
+            lid_colors.append(Color.html(lid_palette[trash_bin_count % lid_palette.size()]))
+            locations.append(at)
+            trash_bin_count += 1
+            break
+
+    if not body_transforms.is_empty():
+        _batch("UTownTrashBins_Body_OneBatch", body, _material("#FFFFFF", true), body_transforms, body_colors)
+        _batch("UTownTrashBins_Lid_OneBatch", lid, _material("#FFFFFF", true), lid_transforms, lid_colors)
+
 
 func _build_plaza_planters() -> void:
     var plaza: Dictionary = world.layout.get("plaza", {})

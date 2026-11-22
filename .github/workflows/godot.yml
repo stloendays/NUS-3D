@@ -101,6 +101,7 @@ jobs:
             leisure_smoke_test.gd \
             integration_smoke_test.gd \
             map_facelift_smoke_test.gd \
+            campus_scattered_props_smoke_test.gd \
             soft_architecture_smoke_test.gd
           do
             echo "Testing $test"
