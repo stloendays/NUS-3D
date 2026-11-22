@@ -30,6 +30,11 @@ func _run() -> void:
     if activities.spots.size() < 14 or activities.picnic_groups.is_empty():
         _fail("bench, water, vending or picnic activity anchors are missing")
         return
+    var map_dressing: Node3D = game.get_node_or_null("MapDressing") as Node3D
+    var refill_root: Node3D = map_dressing.get_node_or_null("CampusRefillStations_NoCollision") as Node3D if map_dressing != null else null
+    if refill_root == null or refill_root.get_child_count() < 2 or activities._available_spots("drink").size() < 2:
+        _fail("actual outdoor refill stations or their NPC approach spots are missing")
+        return
     var green_dining: Node3D = game.get_node_or_null("GreenDining") as Node3D
     var picnic_root: Node3D = green_dining.get_node_or_null("TownGreenPicnicPatches_NoCollisions") as Node3D if green_dining != null else null
     if picnic_root == null or picnic_root.get_child_count() < 1:

@@ -64,18 +64,33 @@ func _build_facility_spots() -> void:
                 "position": anchor + Vector3(seat_x, 0.0, 5.0),
                 "facing": Vector3(0.0, 0.0, -1.0)
             })
-        _add_spot({
-            "id": "water_%s" % anchor_id,
-            "kind": "drink",
-            "position": anchor + Vector3(8.0, 0.0, 5.8),
-            "facing": Vector3(0.0, 0.0, 1.0)
-        })
         if anchor_id in ["SRC", "PLAZA"]:
             _add_spot({
                 "id": "vending_%s" % anchor_id,
                 "kind": "buy",
                 "position": anchor + Vector3(10.0, 0.0, 6.6),
                 "facing": Vector3(0.0, 0.0, 1.0)
+            })
+
+    # Discover the actual map-dressing refill stations; stand in front of each dispenser.
+    var map_dressing: Node3D = get_parent().get_node_or_null("MapDressing") as Node3D
+    var refill_root: Node3D = map_dressing.get_node_or_null("CampusRefillStations_NoCollision") as Node3D if map_dressing != null else null
+    if refill_root != null:
+        for station in refill_root.get_children():
+            if not station is Node3D:
+                continue
+            var station_node: Node3D = station as Node3D
+            var front: Vector3 = station_node.global_transform.basis * Vector3(0.0, 0.0, -1.0)
+            front.y = 0.0
+            if front.length_squared() < 0.0001:
+                continue
+            front = front.normalized()
+            var target: Vector3 = station_node.global_position + front * 1.55
+            _add_spot({
+                "id": "refill_%s" % station_node.name,
+                "kind": "drink",
+                "position": Vector3(target.x, 0.0, target.z),
+                "facing": -front
             })
 
     # Use the real generated Town Green picnic patches for paired conversations.
