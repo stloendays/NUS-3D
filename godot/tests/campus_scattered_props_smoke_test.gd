@@ -28,7 +28,7 @@ func _run() -> void:
         _fail("scatter root was not attached")
         return
     var batches: int = scatter.get_child_count()
-    if batches < 17 or batches > 22:
+    if batches < 17 or batches > 26:
         _fail("expected 17-22 bounded prop and amenity batches, got %d" % batches)
         return
 
@@ -56,11 +56,15 @@ func _run() -> void:
     var required_amenity_batches: Array[String] = [
         "Scattered_vending_machine_MultiMesh",
         "Scattered_vending_display_MultiMesh",
+        "Scattered_vending_products_MultiMesh",
+        "Scattered_vending_buttons_MultiMesh",
         "Scattered_picnic_table_MultiMesh",
         "Scattered_shade_umbrella_MultiMesh",
         "Scattered_umbrella_pole_MultiMesh",
         "Scattered_water_dispenser_MultiMesh",
-        "Scattered_water_tap_MultiMesh"
+        "Scattered_water_bottle_MultiMesh",
+        "Scattered_water_tap_MultiMesh",
+        "Scattered_water_tray_MultiMesh"
     ]
     for required_batch in required_amenity_batches:
         if not seen_kinds.has(required_batch):
@@ -72,8 +76,18 @@ func _run() -> void:
     var vending_batch: MultiMeshInstance3D = scatter.get_node("Scattered_vending_machine_MultiMesh") as MultiMeshInstance3D
     var picnic_batch: MultiMeshInstance3D = scatter.get_node("Scattered_picnic_table_MultiMesh") as MultiMeshInstance3D
     var water_batch: MultiMeshInstance3D = scatter.get_node("Scattered_water_dispenser_MultiMesh") as MultiMeshInstance3D
+    var vending_products: MultiMeshInstance3D = scatter.get_node("Scattered_vending_products_MultiMesh") as MultiMeshInstance3D
+    var vending_buttons: MultiMeshInstance3D = scatter.get_node("Scattered_vending_buttons_MultiMesh") as MultiMeshInstance3D
+    var water_bottles: MultiMeshInstance3D = scatter.get_node("Scattered_water_bottle_MultiMesh") as MultiMeshInstance3D
+    var water_trays: MultiMeshInstance3D = scatter.get_node("Scattered_water_tray_MultiMesh") as MultiMeshInstance3D
     if vending_batch.multimesh.instance_count < 4 or picnic_batch.multimesh.instance_count < 4 or water_batch.multimesh.instance_count < 2:
         _fail("vending, shaded picnic or water refill amenities are below their minimum counts")
+        return
+    if vending_products.multimesh.instance_count < 24 or vending_buttons.multimesh.instance_count < 12:
+        _fail("vending machine displays need visible products and selection buttons")
+        return
+    if water_bottles.multimesh.instance_count < 2 or water_trays.multimesh.instance_count < 2:
+        _fail("water refill stations need visible bottle and drip-tray details")
         return
     var bench_batch: MultiMeshInstance3D = scatter.get_node("Scattered_bench_MultiMesh") as MultiMeshInstance3D
     var bin_batch: MultiMeshInstance3D = scatter.get_node("Scattered_trash_bin_MultiMesh") as MultiMeshInstance3D

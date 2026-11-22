@@ -22,4 +22,4 @@ M25 extends the existing Kent Ridge map-dressing layer with small, low-poly obje
 
 The dedicated M25 workflow runs the scattered-props smoke test and the existing map-dressing regression. It also renders three genuine Godot viewport captures for the vending machine, shaded picnic table and water refill station.
 
-Latest successful smoke result: 372 instances across 22 MultiMesh batches, including 7 vending machines, 5 shaded picnic tables and 3 refill stations. These counts are test-scene results, not a claim of measured frame-rate improvement.
+Latest successful smoke result before the final model-detail pass: 372 instances across 22 MultiMesh batches, including 7 vending machines, 5 shaded picnic tables and 3 refill stations. The current CI rerun also checks product displays, water bottles, drip trays and building-adjacent amenity placement. These counts are test-scene results, not a claim of measured frame-rate improvement.
