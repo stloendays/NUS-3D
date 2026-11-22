@@ -9,7 +9,7 @@ const WALKWAY_CLEARANCE_M: float = 7.0
 const BUS_STOP_CLEARANCE_M: float = 13.0
 const TREE_CLEARANCE_M: float = 6.0
 const PLANTER_CLEARANCE_M: float = 6.0
-const PROP_KINDS = ["paper", "notebook", "coffee", "bottle", "food", "bag", "ball", "shuttlecock", "bench", "trash_bin"]
+const PROP_KINDS = ["paper", "notebook", "coffee", "bottle", "food", "bag", "ball", "shuttlecock", "bench", "trash_bin", "phone", "headphones", "folded_umbrella", "cardboard_box", "frisbee", "vending_machine", "vending_display", "picnic_table", "shade_umbrella", "umbrella_pole", "water_dispenser", "water_tap"]
 
 static func decorate(parent: Node3D, expansion: NUSKentRidgeWorld,
         tree_positions: Array[Vector3]) -> Dictionary:
@@ -66,7 +66,11 @@ static func decorate(parent: Node3D, expansion: NUSKentRidgeWorld,
                 item_count += 1
             cluster_count += 1
 
-        item_count += _append_furniture(district, expansion, tree_positions, sites, transforms_by_kind, colors_by_kind, rng)
+        var occupied_positions: Array[Vector2] = []
+        for site in sites:
+            occupied_positions.append(site)
+        item_count += _append_furniture(district, expansion, tree_positions, sites, transforms_by_kind, colors_by_kind, rng, occupied_positions)
+        item_count += _append_amenities(district, expansion, tree_positions, transforms_by_kind, colors_by_kind, rng, occupied_positions)
 
     var shared_material: StandardMaterial3D = StandardMaterial3D.new()
     shared_material.albedo_color = Color.WHITE
@@ -82,7 +86,10 @@ static func decorate(parent: Node3D, expansion: NUSKentRidgeWorld,
         "item_count": item_count,
         "batch_count": root.get_child_count(),
         "bench_count": transforms_by_kind["bench"].size(),
-        "trash_bin_count": transforms_by_kind["trash_bin"].size()
+        "trash_bin_count": transforms_by_kind["trash_bin"].size(),
+        "vending_machine_count": transforms_by_kind["vending_machine"].size(),
+        "picnic_table_count": transforms_by_kind["picnic_table"].size(),
+        "water_dispenser_count": transforms_by_kind["water_dispenser"].size()
     }
 
 
@@ -195,7 +202,7 @@ static func _is_clear(local: Vector2, district: Dictionary, expansion: NUSKentRi
 static func _append_furniture(district: Dictionary, expansion: NUSKentRidgeWorld,
         tree_positions: Array[Vector3], sites: Array[Vector2],
         transforms_by_kind: Dictionary, colors_by_kind: Dictionary,
-        rng: RandomNumberGenerator) -> int:
+        rng: RandomNumberGenerator, occupied_positions: Array[Vector2]) -> int:
     var candidates: Array[Vector2] = []
     var kinds: Array[String] = []
     var district_id: String = str(district.get("id", ""))
@@ -211,10 +218,11 @@ static func _append_furniture(district: Dictionary, expansion: NUSKentRidgeWorld
             var local: Vector2 = sports_candidates[index]
             if not _is_clear(local, district, expansion, tree_positions, 4.0, 10.0, 4.5):
                 continue
-            if _is_near_any(local, sites, 8.0) or _is_near_any(local, candidates, 12.0):
+            if _is_near_any(local, occupied_positions, 8.0) or _is_near_any(local, candidates, 12.0):
                 continue
             candidates.append(local)
             kinds.append(sports_kinds[index])
+            occupied_positions.append(local)
     else:
         var size_values: Array = district.get("size", [150, 140])
         var width_m: float = float(size_values[0])
@@ -234,10 +242,11 @@ static func _append_furniture(district: Dictionary, expansion: NUSKentRidgeWorld
                 )
                 if not _is_clear(local, district, expansion, tree_positions, 4.0, 10.0, 4.5):
                     continue
-                if _is_near_any(local, sites, 8.0) or _is_near_any(local, candidates, 12.0):
+                if _is_near_any(local, occupied_positions, 8.0) or _is_near_any(local, candidates, 12.0):
                     continue
                 candidates.append(local)
                 kinds.append(kind)
+                occupied_positions.append(local)
                 accepted = true
                 break
             if not accepted:
@@ -259,6 +268,131 @@ static func _append_furniture(district: Dictionary, expansion: NUSKentRidgeWorld
         var tints: Array = colors_by_kind[kind]
         tints.append(_random_tint(kind, rng))
     return candidates.size()
+
+
+static func _append_amenities(district: Dictionary, expansion: NUSKentRidgeWorld,
+        tree_positions: Array[Vector3], transforms_by_kind: Dictionary,
+        colors_by_kind: Dictionary, rng: RandomNumberGenerator,
+        occupied_positions: Array[Vector2]) -> int:
+    var district_id: String = str(district.get("id", ""))
+    var center: Vector3 = district.get("position", Vector3.ZERO)
+    var added: int = 0
+
+    # Vending machines belong near busy teaching, residential and transit areas.
+    var vending_districts: PackedStringArray = PackedStringArray([
+        "SCIENCE", "ENGINEERING", "COM3", "YIH", "PGP", "KR_MRT", "UHC"
+    ])
+    if district_id in vending_districts:
+        var vending_site: Dictionary = _find_amenity_site(
+            district, expansion, tree_positions, occupied_positions, rng, 4.0, 12.0)
+        if bool(vending_site.get("found", false)):
+            var local: Vector2 = vending_site["local"]
+            var yaw: float = rng.randf_range(0.0, TAU)
+            var basis: Basis = Basis(Vector3.UP, yaw)
+            var base_position: Vector3 = Vector3(
+                center.x + local.x, GROUND_TOP_Y + 1.025, center.z + local.y)
+            var machine_transform: Transform3D = Transform3D(basis, base_position)
+            _append_instance("vending_machine", base_position, basis,
+                _random_tint("vending_machine", rng), transforms_by_kind, colors_by_kind)
+            var display_position: Vector3 = machine_transform * Vector3(-0.08, 0.22, -0.38)
+            _append_instance("vending_display", display_position, basis,
+                Color.html("#8fbac0"), transforms_by_kind, colors_by_kind)
+            occupied_positions.append(local)
+            added += 2
+
+    # A few refill stations make the longer Science/Engineering walks feel plausible.
+    var water_districts: PackedStringArray = PackedStringArray(["SCIENCE", "ENGINEERING", "CLB"])
+    if district_id in water_districts:
+        var water_site: Dictionary = _find_amenity_site(
+            district, expansion, tree_positions, occupied_positions, rng, 4.5, 13.0)
+        if bool(water_site.get("found", false)):
+            var local: Vector2 = water_site["local"]
+            var yaw: float = rng.randf_range(0.0, TAU)
+            var basis: Basis = Basis(Vector3.UP, yaw)
+            var base_position: Vector3 = Vector3(
+                center.x + local.x, GROUND_TOP_Y + 0.75, center.z + local.y)
+            var dispenser_transform: Transform3D = Transform3D(basis, base_position)
+            _append_instance("water_dispenser", base_position, basis,
+                Color.html("#8caeae"), transforms_by_kind, colors_by_kind)
+            var tap_position: Vector3 = dispenser_transform * Vector3(0.0, 0.10, -0.37)
+            _append_instance("water_tap", tap_position, basis,
+                Color.html("#d7e8e4"), transforms_by_kind, colors_by_kind)
+            occupied_positions.append(local)
+            added += 2
+
+    # Small outdoor table clusters are concentrated in commons and library/civic districts.
+    var picnic_districts: PackedStringArray = PackedStringArray([
+        "YIH", "PGP", "BIZ2", "MUSEUM", "CLB"
+    ])
+    if district_id in picnic_districts:
+        var picnic_site: Dictionary = _find_amenity_site(
+            district, expansion, tree_positions, occupied_positions, rng, 5.0, 14.0)
+        if bool(picnic_site.get("found", false)):
+            var local: Vector2 = picnic_site["local"]
+            var yaw: float = rng.randf_range(0.0, TAU)
+            var basis: Basis = Basis(Vector3.UP, yaw)
+            var table_position: Vector3 = Vector3(
+                center.x + local.x, GROUND_TOP_Y + 0.54, center.z + local.y)
+            var table_transform: Transform3D = Transform3D(basis, table_position)
+            _append_instance("picnic_table", table_position, basis,
+                _random_tint("picnic_table", rng), transforms_by_kind, colors_by_kind)
+            var pole_position: Vector3 = table_transform * Vector3(1.38, 0.54, 0.0)
+            var canopy_position: Vector3 = table_transform * Vector3(1.38, 1.62, 0.0)
+            _append_instance("umbrella_pole", pole_position, basis,
+                Color.html("#6d7775"), transforms_by_kind, colors_by_kind)
+            _append_instance("shade_umbrella", canopy_position, basis,
+                _random_tint("shade_umbrella", rng), transforms_by_kind, colors_by_kind)
+            occupied_positions.append(local)
+            added += 3
+    return added
+
+
+static func _find_amenity_site(district: Dictionary, expansion: NUSKentRidgeWorld,
+        tree_positions: Array[Vector3], occupied_positions: Array[Vector2],
+        rng: RandomNumberGenerator, walkway_clearance: float,
+        minimum_separation: float) -> Dictionary:
+    var size_values: Array = district.get("size", [150, 140])
+    var width_m: float = float(size_values[0])
+    var depth_m: float = float(size_values[1])
+    var quadrants: Array[Vector2] = [
+        Vector2(-1, -1), Vector2(1, -1),
+        Vector2(-1, 1), Vector2(1, 1)
+    ]
+    for attempt in range(192):
+        var quadrant: Vector2 = quadrants[attempt % quadrants.size()]
+        var candidate: Vector2 = Vector2(
+            quadrant.x * width_m * rng.randf_range(0.24, 0.42),
+            quadrant.y * depth_m * rng.randf_range(0.24, 0.42)
+        )
+        if not _is_clear(candidate, district, expansion, tree_positions,
+                walkway_clearance, 10.0, 4.5):
+            continue
+        if not _outside_existing_amenity_zones(candidate, str(district.get("id", ""))):
+            continue
+        if _is_near_any(candidate, occupied_positions, minimum_separation):
+            continue
+        return {"found": true, "local": candidate}
+    return {"found": false, "local": Vector2.ZERO}
+
+
+static func _outside_existing_amenity_zones(local: Vector2, district_id: String) -> bool:
+    # Faculty amenities already occupy three 22 x 18 m pads centred at z = -26 m.
+    if district_id != "SCIENCE":
+        for zone_x in [-31.0, 0.0, 31.0]:
+            if absf(local.x - zone_x) < 16.0 and absf(local.y + 26.0) < 15.0:
+                return false
+    # Frontier Canteen already has a covered terrace at this anchor.
+    if district_id == "SCIENCE" and absf(local.x - 43.0) < 32.0 and absf(local.y + 66.0) < 24.0:
+        return false
+    return true
+
+
+static func _append_instance(kind: String, position: Vector3, basis: Basis, tint: Color,
+        transforms_by_kind: Dictionary, colors_by_kind: Dictionary) -> void:
+    var instances: Array = transforms_by_kind[kind]
+    instances.append(Transform3D(basis, position))
+    var tints: Array = colors_by_kind[kind]
+    tints.append(tint)
 
 
 static func _is_near_any(candidate: Vector2, others: Array[Vector2], minimum_distance: float) -> bool:
@@ -290,27 +424,27 @@ static func _item_offset(index: int) -> Vector2:
 static func _theme_for(district_id: String) -> PackedStringArray:
     match district_id:
         "SPORTS":
-            return PackedStringArray(["ball", "shuttlecock", "bottle", "bag"])
+            return PackedStringArray(["ball", "shuttlecock", "bottle", "bag", "frisbee", "folded_umbrella"])
         "ENGINEERING":
-            return PackedStringArray(["notebook", "paper", "coffee", "bottle", "bag"])
+            return PackedStringArray(["notebook", "paper", "coffee", "bottle", "bag", "phone", "headphones", "cardboard_box"])
         "SCIENCE":
-            return PackedStringArray(["notebook", "paper", "coffee", "bottle", "food"])
+            return PackedStringArray(["notebook", "paper", "coffee", "bottle", "food", "phone", "headphones", "frisbee"])
         "CLB":
-            return PackedStringArray(["notebook", "paper", "coffee", "bottle"])
+            return PackedStringArray(["notebook", "paper", "coffee", "bottle", "phone", "headphones", "cardboard_box"])
         "COM3":
-            return PackedStringArray(["notebook", "paper", "coffee", "bag"])
+            return PackedStringArray(["notebook", "paper", "coffee", "bag", "phone", "headphones", "cardboard_box"])
         "PGP":
-            return PackedStringArray(["bag", "bottle", "coffee", "food"])
+            return PackedStringArray(["bag", "bottle", "coffee", "food", "phone", "folded_umbrella", "cardboard_box"])
         "KR_MRT":
-            return PackedStringArray(["bottle", "coffee", "bag", "paper"])
+            return PackedStringArray(["bottle", "coffee", "bag", "paper", "phone", "folded_umbrella"])
         "MUSEUM":
-            return PackedStringArray(["paper", "notebook", "coffee", "bag"])
+            return PackedStringArray(["paper", "notebook", "coffee", "bag", "phone", "cardboard_box", "frisbee"])
         "YIH":
-            return PackedStringArray(["bag", "bottle", "coffee", "food"])
+            return PackedStringArray(["bag", "bottle", "coffee", "food", "phone", "headphones", "folded_umbrella"])
         "UHC":
-            return PackedStringArray(["bottle", "paper", "bag", "coffee"])
+            return PackedStringArray(["bottle", "paper", "bag", "coffee", "phone", "folded_umbrella"])
         _:
-            return PackedStringArray(["paper", "notebook", "coffee", "bottle"])
+            return PackedStringArray(["paper", "notebook", "coffee", "bottle", "phone", "headphones", "cardboard_box", "frisbee"])
 
 
 static func _make_meshes() -> Dictionary:
@@ -358,6 +492,56 @@ static func _make_meshes() -> Dictionary:
     trash_bin.height = 0.82
     trash_bin.radial_segments = 8
 
+    var phone: BoxMesh = BoxMesh.new()
+    phone.size = Vector3(0.16, 0.025, 0.28)
+
+    var headphones: TorusMesh = TorusMesh.new()
+    headphones.inner_radius = 0.085
+    headphones.outer_radius = 0.135
+    headphones.rings = 12
+    headphones.ring_segments = 6
+
+    var folded_umbrella: CylinderMesh = CylinderMesh.new()
+    folded_umbrella.top_radius = 0.035
+    folded_umbrella.bottom_radius = 0.065
+    folded_umbrella.height = 0.62
+    folded_umbrella.radial_segments = 6
+
+    var cardboard_box: BoxMesh = BoxMesh.new()
+    cardboard_box.size = Vector3(0.42, 0.34, 0.36)
+
+    var frisbee: CylinderMesh = CylinderMesh.new()
+    frisbee.top_radius = 0.20
+    frisbee.bottom_radius = 0.20
+    frisbee.height = 0.035
+    frisbee.radial_segments = 10
+
+    var vending_machine: BoxMesh = BoxMesh.new()
+    vending_machine.size = Vector3(0.92, 2.05, 0.72)
+
+    var vending_display: BoxMesh = BoxMesh.new()
+    vending_display.size = Vector3(0.54, 0.82, 0.035)
+
+    var picnic_table: ArrayMesh = _make_picnic_table_mesh()
+
+    var shade_umbrella: CylinderMesh = CylinderMesh.new()
+    shade_umbrella.top_radius = 0.10
+    shade_umbrella.bottom_radius = 1.28
+    shade_umbrella.height = 0.42
+    shade_umbrella.radial_segments = 10
+
+    var umbrella_pole: CylinderMesh = CylinderMesh.new()
+    umbrella_pole.top_radius = 0.04
+    umbrella_pole.bottom_radius = 0.04
+    umbrella_pole.height = 2.15
+    umbrella_pole.radial_segments = 8
+
+    var water_dispenser: BoxMesh = BoxMesh.new()
+    water_dispenser.size = Vector3(0.88, 1.5, 0.72)
+
+    var water_tap: BoxMesh = BoxMesh.new()
+    water_tap.size = Vector3(0.30, 0.12, 0.04)
+
     return {
         "paper": paper,
         "notebook": notebook,
@@ -368,8 +552,43 @@ static func _make_meshes() -> Dictionary:
         "ball": ball,
         "shuttlecock": shuttlecock,
         "bench": bench,
-        "trash_bin": trash_bin
+        "trash_bin": trash_bin,
+        "phone": phone,
+        "headphones": headphones,
+        "folded_umbrella": folded_umbrella,
+        "cardboard_box": cardboard_box,
+        "frisbee": frisbee,
+        "vending_machine": vending_machine,
+        "vending_display": vending_display,
+        "picnic_table": picnic_table,
+        "shade_umbrella": shade_umbrella,
+        "umbrella_pole": umbrella_pole,
+        "water_dispenser": water_dispenser,
+        "water_tap": water_tap
     }
+
+
+static func _make_picnic_table_mesh() -> ArrayMesh:
+    # One low-poly mesh combines tabletop, legs and two fixed benches.
+    var tool: SurfaceTool = SurfaceTool.new()
+    tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+    var top: BoxMesh = BoxMesh.new()
+    top.size = Vector3(2.45, 0.14, 1.12)
+    tool.append_from(top, 0, Transform3D(Basis.IDENTITY, Vector3(0.0, 0.30, 0.0)))
+    var leg: BoxMesh = BoxMesh.new()
+    leg.size = Vector3(0.14, 0.68, 0.14)
+    for x in [-1.02, 1.02]:
+        for z in [-0.40, 0.40]:
+            tool.append_from(leg, 0, Transform3D(Basis.IDENTITY, Vector3(float(x), -0.05, float(z))))
+    var seat: BoxMesh = BoxMesh.new()
+    seat.size = Vector3(2.15, 0.12, 0.36)
+    var seat_leg: BoxMesh = BoxMesh.new()
+    seat_leg.size = Vector3(0.12, 0.38, 0.28)
+    for side in [-1.0, 1.0]:
+        tool.append_from(seat, 0, Transform3D(Basis.IDENTITY, Vector3(0.0, -0.17, side * 0.94)))
+        for x in [-0.88, 0.88]:
+            tool.append_from(seat_leg, 0, Transform3D(Basis.IDENTITY, Vector3(float(x), -0.34, side * 0.94)))
+    return tool.commit()
 
 
 static func _make_bench_mesh() -> ArrayMesh:
@@ -411,6 +630,26 @@ static func _half_height(kind: String) -> float:
             return 0.60
         "trash_bin":
             return 0.41
+        "phone":
+            return 0.013
+        "headphones":
+            return 0.015
+        "folded_umbrella":
+            return 0.31
+        "cardboard_box":
+            return 0.17
+        "frisbee":
+            return 0.018
+        "vending_machine":
+            return 1.025
+        "picnic_table":
+            return 0.54
+        "shade_umbrella":
+            return 2.1
+        "umbrella_pole":
+            return 1.075
+        "water_dispenser":
+            return 0.75
     return 0.05
 
 
@@ -435,6 +674,22 @@ static func _random_tint(kind: String, rng: RandomNumberGenerator) -> Color:
             palette = PackedStringArray(["#ae8267", "#9b755e", "#c09a78"])
         "trash_bin":
             palette = PackedStringArray(["#71877f", "#788d91", "#879b82"])
+        "phone":
+            palette = PackedStringArray(["#3f4d56", "#667e89", "#b7b9ae"])
+        "headphones":
+            palette = PackedStringArray(["#445d68", "#a77d68", "#6d8778"])
+        "folded_umbrella":
+            palette = PackedStringArray(["#6d8792", "#bd8d76", "#9c9a70"])
+        "cardboard_box":
+            palette = PackedStringArray(["#b7956e", "#c4a47d", "#9d8265"])
+        "frisbee":
+            palette = PackedStringArray(["#d9bb68", "#78a7a0", "#d48d79"])
+        "vending_machine":
+            palette = PackedStringArray(["#dce6df", "#c8d6d4", "#e8dfcc"])
+        "picnic_table":
+            palette = PackedStringArray(["#a77c55", "#b18a62", "#92704f"])
+        "shade_umbrella":
+            palette = PackedStringArray(["#e7d7b6", "#c7d7ce", "#d8b6a3"])
         _:
             palette = PackedStringArray(["#f4efdf", "#d9e4d9", "#e6c18a"])
     return Color.html(palette[rng.randi_range(0, palette.size() - 1)])

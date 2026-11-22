@@ -28,8 +28,8 @@ func _run() -> void:
         _fail("scatter root was not attached")
         return
     var batches: int = scatter.get_child_count()
-    if batches < 10 or batches > 10:
-        _fail("expected 10 bounded object batches (8 small-prop types plus benches and bins), got %d" % batches)
+    if batches < 17 or batches > 22:
+        _fail("expected 17-22 bounded prop and amenity batches, got %d" % batches)
         return
 
     var total_instances: int = 0
@@ -53,8 +53,27 @@ func _run() -> void:
     if not seen_kinds.has("Scattered_paper_MultiMesh") or not seen_kinds.has("Scattered_bottle_MultiMesh"):
         _fail("academic and everyday props were not both generated")
         return
+    var required_amenity_batches: Array[String] = [
+        "Scattered_vending_machine_MultiMesh",
+        "Scattered_vending_display_MultiMesh",
+        "Scattered_picnic_table_MultiMesh",
+        "Scattered_shade_umbrella_MultiMesh",
+        "Scattered_umbrella_pole_MultiMesh",
+        "Scattered_water_dispenser_MultiMesh",
+        "Scattered_water_tap_MultiMesh"
+    ]
+    for required_batch in required_amenity_batches:
+        if not seen_kinds.has(required_batch):
+            _fail("campus amenity batch is missing: " + required_batch)
+            return
     if not seen_kinds.has("Scattered_bench_MultiMesh") or not seen_kinds.has("Scattered_trash_bin_MultiMesh"):
         _fail("outdoor seating and waste bins were not generated")
+        return
+    var vending_batch: MultiMeshInstance3D = scatter.get_node("Scattered_vending_machine_MultiMesh") as MultiMeshInstance3D
+    var picnic_batch: MultiMeshInstance3D = scatter.get_node("Scattered_picnic_table_MultiMesh") as MultiMeshInstance3D
+    var water_batch: MultiMeshInstance3D = scatter.get_node("Scattered_water_dispenser_MultiMesh") as MultiMeshInstance3D
+    if vending_batch.multimesh.instance_count < 4 or picnic_batch.multimesh.instance_count < 4 or water_batch.multimesh.instance_count < 2:
+        _fail("vending, shaded picnic or water refill amenities are below their minimum counts")
         return
     var bench_batch: MultiMeshInstance3D = scatter.get_node("Scattered_bench_MultiMesh") as MultiMeshInstance3D
     var bin_batch: MultiMeshInstance3D = scatter.get_node("Scattered_trash_bin_MultiMesh") as MultiMeshInstance3D
@@ -67,6 +86,6 @@ func _run() -> void:
     if scatter.find_children("*", "CollisionShape3D", true, false).size() > 0:
         _fail("decorative scatter must not add collision geometry")
 
-    print("PASS: M25 campus scatter: %d props across %d GPU batches; %d Kent Ridge benches, %d Kent Ridge bins, %d UTown benches and %d UTown bins" % [total_instances, batches, bench_batch.multimesh.instance_count, bin_batch.multimesh.instance_count, dressing.bench_count, dressing.trash_bin_count])
+    print("PASS: M25 campus dressing: %d instances across %d GPU batches; %d vending machines, %d shaded picnic tables, %d refill stations" % [total_instances, batches, vending_batch.multimesh.instance_count, picnic_batch.multimesh.instance_count, water_batch.multimesh.instance_count])
     game.queue_free()
     quit(0)
