@@ -9,6 +9,7 @@ func _fail(message: String) -> void:
     quit(1)
 
 func _render() -> void:
+    NUS3DServices.ensure_scene_services(self)
     var packed: PackedScene = load("res://scenes/main.tscn") as PackedScene
     if packed == null:
         _fail("main scene could not load")
@@ -16,6 +17,13 @@ func _render() -> void:
     var game: Node3D = packed.instantiate() as Node3D
     root.add_child(game)
     await process_frame
+    NUS3DServices.enter_test_playmode(game)
+    var intro: Node = game.get_node_or_null("Intro")
+    if intro != null:
+        if intro.has_method("finish_intro"):
+            intro.call("finish_intro")
+        intro.set_process(false)
+        intro.set_physics_process(false)
     await process_frame
 
     var life: UTownCampusLife = game.get_node_or_null("CampusLife") as UTownCampusLife
