@@ -26,12 +26,25 @@ func _render() -> void:
         if child is CanvasLayer:
             (child as CanvasLayer).visible = false
 
+    var player: Node3D = game.get_node_or_null("Player") as Node3D
+    if player != null:
+        # The review camera is independent of the avatar; hide the avatar so it
+        # cannot fill the foreground when the camera moves to a distant prop.
+        player.visible = false
+        player.set_process(false)
+        player.set_physics_process(false)
+
     var dressing: Node3D = game.get_node_or_null("MapDressing") as Node3D
     var scatter: Node3D = dressing.get_node_or_null("KentRidgeScatteredEverydayProps_M25") if dressing != null else null
-    var camera: Camera3D = game.get_node_or_null("Player/Head/Camera3D") as Camera3D
-    if scatter == null or camera == null:
-        _fail("campus scatter or player camera is missing")
+    if scatter == null:
+        _fail("campus scatter is missing")
         return
+    var camera: Camera3D = Camera3D.new()
+    camera.name = "M25_IndependentReviewCamera"
+    camera.fov = 68.0
+    camera.far = 1400.0
+    game.add_child(camera)
+    camera.make_current()
 
     var vending: MultiMeshInstance3D = scatter.get_node_or_null("Scattered_vending_machine_MultiMesh") as MultiMeshInstance3D
     var picnic: MultiMeshInstance3D = scatter.get_node_or_null("Scattered_picnic_table_MultiMesh") as MultiMeshInstance3D
