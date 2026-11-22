@@ -255,6 +255,13 @@ func _build_picnic_spots() -> void:
         _box(patch, "StudentNotebook", Vector3(-0.63, 0.055, -0.20), Vector3(0.38, 0.06, 0.48), "#f4edd5")
         _box(patch, "StudyBottle", Vector3(0.75, 0.16, 0.34), Vector3(0.13, 0.31, 0.13), "#66a8a3")
         _box(patch, "Frisbee", Vector3(0.15, 0.06, -0.40), Vector3(0.34, 0.03, 0.34), "#d8c86e")
+        # A low picnic table gives the existing blanket clusters a clear social focal point.
+        _box(patch, "PicnicTableTop", Vector3(0.0, 0.37, -0.05), Vector3(0.98, 0.12, 0.68), "#a77c55")
+        for table_x in [-0.38, 0.38]:
+            for table_z in [-0.25, 0.25]:
+                _box(patch, "PicnicTableLeg", Vector3(table_x, 0.18, table_z - 0.05), Vector3(0.08, 0.36, 0.08), "#59676a")
+        _box(patch, "PicnicSnackBox", Vector3(-0.20, 0.49, -0.08), Vector3(0.18, 0.12, 0.16), "#d7b47e")
+        _box(patch, "PicnicCup", Vector3(0.22, 0.50, -0.08), Vector3(0.10, 0.16, 0.10), "#dce6df")
         picnic_count += 1
 
 func _box_batch(parent_node: Node3D, label: String, points: Array[Vector3], size: Vector3, color: String) -> void:

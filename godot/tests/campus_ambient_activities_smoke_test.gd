@@ -30,6 +30,14 @@ func _run() -> void:
     if activities.spots.size() < 14 or activities.picnic_groups.is_empty():
         _fail("bench, water, vending or picnic activity anchors are missing")
         return
+    var green_dining: Node3D = game.get_node_or_null("GreenDining") as Node3D
+    var picnic_root: Node3D = green_dining.get_node_or_null("TownGreenPicnicPatches_NoCollisions") as Node3D if green_dining != null else null
+    if picnic_root == null or picnic_root.get_child_count() < 1:
+        _fail("Town Green picnic patches are missing")
+        return
+    if (picnic_root.get_child(0) as Node3D).get_node_or_null("PicnicTableTop") == null:
+        _fail("picnic patch is missing its low table")
+        return
 
     var ambient_states: Array[Dictionary] = []
     var story_states: Array[Dictionary] = []
@@ -106,6 +114,9 @@ func _run() -> void:
     for state in chat_pair:
         if str(state.get("activity_mode", "")) != "chat":
             _fail("picnic pair did not enter the shared conversation state")
+            return
+        if absf(float((state["left_leg"] as Node3D).rotation.x) - PI * 0.5) > 0.01:
+            _fail("picnic conversation did not switch to a seated pose")
             return
     activities._finish_group(group_id, Time.get_ticks_msec() / 1000.0)
 

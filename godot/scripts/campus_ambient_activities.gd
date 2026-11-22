@@ -86,8 +86,8 @@ func _build_facility_spots() -> void:
         if not patch is Node3D:
             continue
         var patch_node: Node3D = patch as Node3D
-        var left_position: Vector3 = patch_node.to_global(Vector3(-0.48, 0.0, 0.34))
-        var right_position: Vector3 = patch_node.to_global(Vector3(0.48, 0.0, 0.34))
+        var left_position: Vector3 = patch_node.to_global(Vector3(-0.82, 0.0, 0.52))
+        var right_position: Vector3 = patch_node.to_global(Vector3(0.82, 0.0, 0.52))
         var group_id: String = str(patch_node.name)
         picnic_groups.append({
             "id": group_id,
@@ -357,6 +357,10 @@ func _apply_activity_pose(state: Dictionary, now: float) -> void:
             _face_activity_target(state)
             _attach_hand_prop(state, true)
         "chat":
+            left_leg.rotation.x = PI * 0.5
+            right_leg.rotation.x = PI * 0.5
+            left_arm.rotation.x = 0.45
+            right_arm.rotation.x = 0.45
             _update_activity_pose(state, now, 0.0)
         _:
             return

@@ -121,8 +121,16 @@ func _ambient_state(life: UTownCampusLife, index: int) -> Dictionary:
 
 func _capture_activity(camera: Camera3D, state: Dictionary, output: String, filename: String) -> bool:
     var npc: Node3D = state["node"]
-    camera.global_position = npc.global_position + Vector3(3.2, 2.1, 3.4)
-    camera.look_at(npc.global_position + Vector3.UP * 1.0, Vector3.UP)
+    if str(state.get("activity_kind", "")) == "chat":
+        var partner: Node3D = state.get("activity_partner") as Node3D
+        var centre: Vector3 = npc.global_position if partner == null else (npc.global_position + partner.global_position) * 0.5
+        camera.global_position = centre + Vector3(0.0, 3.0, -4.6)
+        camera.look_at(centre + Vector3.UP * 0.95, Vector3.UP)
+    else:
+        # The existing bench/water/vending fixtures sit behind the NPC (+Z).
+        # Capture from the front (-Z) so the actor and the fixture remain visible.
+        camera.global_position = npc.global_position + Vector3(3.0, 1.9, -3.5)
+        camera.look_at(npc.global_position + Vector3.UP * 1.0, Vector3.UP)
     for _frame in range(3):
         await process_frame
     await RenderingServer.frame_post_draw
