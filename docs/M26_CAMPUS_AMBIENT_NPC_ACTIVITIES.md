@@ -22,4 +22,4 @@ M26 gives a small subset of existing ambient pedestrians short, autonomous routi
 
 ## Validation
 
-The dedicated M26 workflow checks bench, refill, vending and paired picnic routines; verifies that named-character affinity remains unchanged; and renders four genuine Godot viewport captures.
+The dedicated M26 workflow checks A* movement progress to a reserved facility, bench/refill/vending/picnic routines, named-character affinity isolation and collision-free placement; it also renders four genuine Godot viewport captures.

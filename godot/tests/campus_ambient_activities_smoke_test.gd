@@ -61,6 +61,34 @@ func _run() -> void:
     var story_relationships: Node = game.get_node_or_null("Relationships")
     var story_scores_before: Dictionary = (story_relationships.get("scores") as Dictionary).duplicate(true) if story_relationships != null else {}
 
+    # Verify that the existing A* service actually moves an ambient pedestrian
+    # toward a facility before testing the arrival pose in isolation.
+    var route_walker: Dictionary = ambient_states[3]
+    var route_spot: Dictionary = activities._available_spots("sit")[0]
+    if not activities._start_single_activity(route_walker, route_spot):
+        _fail("ambient student could not start a routed walk to a bench")
+        return
+    var route_npc: Node3D = route_walker["node"]
+    var route_start: Vector3 = route_npc.global_position
+    var route_now: float = Time.get_ticks_msec() / 1000.0
+    var first_waypoint: Vector3 = navigation.next_target(
+        str(route_walker.get("nav_key", "")), route_start, route_spot["position"], route_now)
+    if first_waypoint == Vector3.ZERO:
+        _fail("A* did not produce a waypoint to the reserved bench")
+        return
+    for step in range(12):
+        activities._move_to_activity(route_walker, 0.25, route_now + float(step) * 0.25)
+        if str(route_walker.get("activity_mode", "")) != "walk_to":
+            break
+    var walked_distance: float = Vector2(
+        route_npc.global_position.x - route_start.x,
+        route_npc.global_position.z - route_start.z
+    ).length()
+    if walked_distance < 0.20:
+        _fail("ambient NPC did not make measurable progress along the A* route")
+        return
+    activities._finish_single(route_walker, Time.get_ticks_msec() / 1000.0)
+
     var bench_spot: Dictionary = activities._available_spots("sit")[0]
     var sitter: Dictionary = ambient_states[0]
     if not activities._start_single_activity(sitter, bench_spot):
