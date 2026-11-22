@@ -15,6 +15,8 @@ var path_edge_count: int = 0
 var meadow_patch_count: int = 0
 var bush_count: int = 0
 var bench_count: int = 0
+var refill_station_count: int = 0
+var bench_anchors: Array[Dictionary] = []
 var district_tree_count: int = 0
 var plaza_planter_count: int = 0
 var grove_positions: Array[Vector3] = []
@@ -29,6 +31,7 @@ func _ready() -> void:
     _build_meadow_islands()
     _build_verge_shrubs()
     _build_path_benches()
+    _build_path_refill_stations()
     _build_plaza_planters()
     _build_district_groves()
 
@@ -218,6 +221,10 @@ func _build_path_benches() -> void:
             if conflict:
                 continue
             locations.append(at)
+            bench_anchors.append({
+                "position": at,
+                "outward": normal * side
+            })
             var bench: Node3D = Node3D.new()
             bench.name = "CurvedStudyBench_%02d" % bench_count
             bench.position = Vector3(at.x, 0.0, at.y)
@@ -229,6 +236,71 @@ func _build_path_benches() -> void:
             for x in [-1.10, 1.10]:
                 _box(bench, "Frame", Vector3(x, 0.31, 0), Vector3(0.13, 0.62, 0.61), legs)
             bench_count += 1
+
+func _build_path_refill_stations() -> void:
+    if bench_anchors.is_empty():
+        return
+    var root: Node3D = Node3D.new()
+    root.name = "CampusRefillStations_NoCollision"
+    add_child(root)
+    var body: Material = _material("#8CAAA8")
+    var trim: Material = _material("#4E6467")
+    var bottle: Material = _material("#86B8BD")
+    var panel: Material = _material("#DCE8E1")
+    var tray: Material = _material("#9CB8B3")
+    var locations: Array[Vector2] = []
+
+    for index in range(bench_anchors.size()):
+        if refill_station_count >= 4:
+            break
+        # Bench placement already validated the inner clearance. Place refill
+        # equipment farther out into the verge, and only reject nearby trees
+        # or another refill station so a valid bench does not lose its fixture.
+        if index % 2 == 0:
+            continue
+        var anchor: Dictionary = bench_anchors[index]
+        var bench_position: Vector2 = anchor.get("position", Vector2.ZERO)
+        var outward: Vector2 = anchor.get("outward", Vector2.RIGHT).normalized()
+        var candidate: Vector2 = Vector2.ZERO
+        var candidate_found: bool = false
+        for offset_m in [2.8, 3.8, 4.8]:
+            var option: Vector2 = bench_position + outward * float(offset_m)
+            var tree_conflict: bool = false
+            for tree in world.generated_tree_positions:
+                if Vector2(tree.x, tree.z).distance_to(option) < 2.8:
+                    tree_conflict = true
+                    break
+            if tree_conflict:
+                continue
+            var separated: bool = true
+            for previous in locations:
+                if previous.distance_to(option) < 16.0:
+                    separated = false
+                    break
+            if not separated:
+                continue
+            candidate = option
+            candidate_found = true
+            break
+        if not candidate_found:
+            continue
+
+        var station: Node3D = Node3D.new()
+        station.name = "CampusRefillStation_%02d" % refill_station_count
+        station.position = Vector3(candidate.x, 0.0, candidate.y)
+        root.add_child(station)
+        var front: Vector2 = -outward
+        station.look_at(station.global_position + Vector3(front.x, 0.0, front.y), Vector3.UP)
+        _box(station, "DispenserBody", Vector3(0.0, 0.82, 0.0), Vector3(0.88, 1.64, 0.74), body)
+        _box(station, "DispenserBase", Vector3(0.0, 0.13, 0.0), Vector3(0.98, 0.22, 0.82), trim)
+        _box(station, "WaterBottle", Vector3(0.0, 1.82, 0.0), Vector3(0.34, 0.42, 0.34), bottle)
+        _box(station, "RefillPanel", Vector3(0.0, 1.14, -0.39), Vector3(0.46, 0.38, 0.05), panel)
+        _box(station, "WaterTap", Vector3(0.0, 0.91, -0.47), Vector3(0.22, 0.10, 0.14), trim)
+        _box(station, "DripTray", Vector3(0.0, 0.48, -0.49), Vector3(0.50, 0.07, 0.22), tray)
+        locations.append(candidate)
+        refill_station_count += 1
+    print("NUS3D_M26_REFILL: %d stations from %d benches" % [refill_station_count, bench_anchors.size()])
+
 
 func _build_plaza_planters() -> void:
     var plaza: Dictionary = world.layout.get("plaza", {})

@@ -662,6 +662,8 @@ func _process(delta: float) -> void:
             state["distance"] = next_distance
         var sample: Dictionary = _sample_route(route, float(state["distance"]))
         var npc: Node3D = state["node"]
+        if str(state.get("activity_mode", "walk")) != "walk":
+            continue
         var walking: bool = talk_remaining <= 0.0 and idle_remaining <= 0.0
         var gait: float = sin(now * 6.2 + float(state["phase"])) if walking else sin(now * 1.8 + float(state["phase"])) * 0.08
         var bob: float = absf(sin(now * 6.2 + float(state["phase"]))) * 0.035 if walking else sin(now * 1.8 + float(state["phase"])) * 0.012
