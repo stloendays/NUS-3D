@@ -10,6 +10,7 @@ on:
       - "godot/scripts/utown_map_dressing.gd"
       - "godot/tests/campus_scattered_props_smoke_test.gd"
       - "godot/tests/map_facelift_smoke_test.gd"
+      - "godot/tests/render_campus_props_review.gd"
   workflow_dispatch:
 
 permissions:
@@ -33,3 +34,19 @@ jobs:
         run: timeout 65s godot --headless --path godot --script res://tests/campus_scattered_props_smoke_test.gd
       - name: Validate existing UTown and Kent Ridge map dressing budgets
         run: timeout 65s godot --headless --path godot --script res://tests/map_facelift_smoke_test.gd
+      - name: Install virtual display for visual review
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+      - name: Render real Godot campus prop close-ups
+        run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_campus_props_review.gd
+      - name: Upload campus prop visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: nus3d-m25-campus-props-visual-review
+          path: |
+            godot/review_previews/M25_VENDING_MACHINE.png
+            godot/review_previews/M25_SHADED_PICNIC.png
+            godot/review_previews/M25_WATER_REFILL.png
+          if-no-files-found: error
+          retention-days: 30
