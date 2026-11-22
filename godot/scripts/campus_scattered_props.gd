@@ -349,7 +349,7 @@ static func _append_amenities(district: Dictionary, expansion: NUSKentRidgeWorld
     ])
     if district_id in picnic_districts:
         var picnic_site: Dictionary = _find_amenity_site(
-            district, expansion, tree_positions, occupied_positions, rng, 5.0, 14.0, 4.0)
+            district, expansion, tree_positions, occupied_positions, rng, 5.0, 14.0, 4.0, false)
         if bool(picnic_site.get("found", false)):
             var local: Vector2 = picnic_site["local"]
             var yaw: float = rng.randf_range(0.0, TAU)
@@ -373,28 +373,29 @@ static func _append_amenities(district: Dictionary, expansion: NUSKentRidgeWorld
 static func _find_amenity_site(district: Dictionary, expansion: NUSKentRidgeWorld,
         tree_positions: Array[Vector3], occupied_positions: Array[Vector2],
         rng: RandomNumberGenerator, walkway_clearance: float,
-        minimum_separation: float, building_clearance: float) -> Dictionary:
-    # Prefer locations beside an actual building facade instead of the middle of a lawn.
-    for landmark_value in district.get("landmarks", []):
-        var landmark: Dictionary = landmark_value
-        var offset_values: Array = landmark.get("offset", [0, 0])
-        var dimensions: Array = landmark.get("size", [35, 25, 15])
-        var building_center: Vector2 = Vector2(float(offset_values[0]), -float(offset_values[1]))
-        var half_width: float = float(dimensions[0]) * 0.5
-        var half_depth: float = float(dimensions[1]) * 0.5
-        var clearance: float = building_clearance + 1.6
-        var facade_candidates: Array[Vector2] = [
-            Vector2(building_center.x, building_center.y + half_depth + clearance),
-            Vector2(building_center.x + half_width + clearance, building_center.y),
-            Vector2(building_center.x - half_width - clearance, building_center.y),
-            Vector2(building_center.x, building_center.y - half_depth - clearance)
-        ]
-        for facade_candidate in facade_candidates:
-            if _amenity_candidate_is_clear(facade_candidate, district, expansion,
-                    tree_positions, occupied_positions, walkway_clearance,
-                    minimum_separation, building_clearance):
-                return {"found": true, "local": facade_candidate}
-
+        minimum_separation: float, building_clearance: float,
+        prefer_facade: bool = true) -> Dictionary:
+    # Vending/refill equipment prefers building edges; picnic sets prefer open lawns.
+    if prefer_facade:
+        for landmark_value in district.get("landmarks", []):
+            var landmark: Dictionary = landmark_value
+            var offset_values: Array = landmark.get("offset", [0, 0])
+            var dimensions: Array = landmark.get("size", [35, 25, 15])
+            var building_center: Vector2 = Vector2(float(offset_values[0]), -float(offset_values[1]))
+            var half_width: float = float(dimensions[0]) * 0.5
+            var half_depth: float = float(dimensions[1]) * 0.5
+            var clearance: float = building_clearance + 1.6
+            var facade_candidates: Array[Vector2] = [
+                Vector2(building_center.x, building_center.y + half_depth + clearance),
+                Vector2(building_center.x + half_width + clearance, building_center.y),
+                Vector2(building_center.x - half_width - clearance, building_center.y),
+                Vector2(building_center.x, building_center.y - half_depth - clearance)
+            ]
+            for facade_candidate in facade_candidates:
+                if _amenity_candidate_is_clear(facade_candidate, district, expansion,
+                        tree_positions, occupied_positions, walkway_clearance,
+                        minimum_separation, building_clearance):
+                    return {"found": true, "local": facade_candidate}
     # Fall back to seeded district quadrants if all facade edges are blocked.
     var size_values: Array = district.get("size", [150, 140])
     var width_m: float = float(size_values[0])
@@ -578,11 +579,8 @@ static func _make_meshes() -> Dictionary:
     var vending_products: BoxMesh = BoxMesh.new()
     vending_products.size = Vector3(0.10, 0.13, 0.04)
 
-    var vending_buttons: CylinderMesh = CylinderMesh.new()
-    vending_buttons.top_radius = 0.035
-    vending_buttons.bottom_radius = 0.035
-    vending_buttons.height = 0.035
-    vending_buttons.radial_segments = 6
+    var vending_buttons: BoxMesh = BoxMesh.new()
+    vending_buttons.size = Vector3(0.055, 0.055, 0.035)
 
     var picnic_table: ArrayMesh = _make_picnic_table_mesh()
 
@@ -760,7 +758,7 @@ static func _random_tint(kind: String, rng: RandomNumberGenerator) -> Color:
         "frisbee":
             palette = PackedStringArray(["#d9bb68", "#78a7a0", "#d48d79"])
         "vending_machine":
-            palette = PackedStringArray(["#dce6df", "#c8d6d4", "#e8dfcc"])
+            palette = PackedStringArray(["#647f82", "#718b86", "#8b806f"])
         "picnic_table":
             palette = PackedStringArray(["#a77c55", "#b18a62", "#92704f"])
         "shade_umbrella":

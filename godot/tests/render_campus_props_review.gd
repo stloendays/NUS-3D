@@ -78,8 +78,8 @@ func _render() -> void:
 
     var picnic_transform: Transform3D = picnic.global_transform * picnic.multimesh.get_instance_transform(0)
     var picnic_target: Vector3 = picnic_transform.origin + Vector3.UP * 1.2
-    camera.global_position = picnic_transform.origin + picnic_transform.basis * Vector3(4.2, 5.0, 5.6)
-    camera.look_at(picnic_target + Vector3.UP * 0.35, Vector3.UP)
+    camera.global_position = picnic_transform.origin + picnic_transform.basis * Vector3(4.8, 3.5, 5.6)
+    camera.look_at(picnic_target, Vector3.UP)
     if not await _capture(output, "M25_SHADED_PICNIC.png"):
         _fail("could not capture shaded picnic table")
         return
