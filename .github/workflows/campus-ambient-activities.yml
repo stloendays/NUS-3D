@@ -11,6 +11,7 @@ on:
       - "godot/scenes/main.tscn"
       - "godot/tests/campus_ambient_activities_smoke_test.gd"
       - "godot/tests/render_campus_ambient_activities.gd"
+      - "godot/scripts/npc_relationships.gd"
   pull_request:
     paths:
       - ".github/workflows/campus-ambient-activities.yml"
