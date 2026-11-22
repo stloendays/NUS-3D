@@ -1,0 +1,25 @@
+# M26 — Ambient campus NPC routines
+
+## Scope
+
+M26 gives a small subset of existing ambient pedestrians short, autonomous routines around the existing UTown campus furniture. It reuses the 24-person outdoor roster, procedural character model, A* navigation and current map anchors.
+
+## Routines
+
+- Sit briefly on existing outdoor benches.
+- Walk to a refill station, raise a drink and pause.
+- Walk to an existing vending machine, make a purchase gesture and carry a small bag.
+- Meet another ambient pedestrian at a Town Green picnic patch and have a short conversation.
+
+## Integration and safety
+
+- Only the 18 ambient passers-by are eligible. The six named characters retain their current personality, dialogue and relationship logic.
+- Movement to facilities uses the existing cached A* path service, collision sweep and pedestrian separation.
+- A maximum of six ambient NPCs may be in an activity at once; spot reservations prevent multiple actors occupying the same seat or vending position.
+- Player conversation, hostility and interior transitions cancel or pause ambient routines safely.
+- No new collisions, persistent activity saves, rewards, currency changes, quest changes, account changes, input bindings or multiplayer RPCs are introduced.
+- All activity props are small procedural primitives attached only while needed.
+
+## Validation
+
+The dedicated M26 workflow checks bench, refill, vending and paired picnic routines; verifies that named-character affinity remains unchanged; and renders four genuine Godot viewport captures.

@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3]
+[gd_scene load_steps=40 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -38,6 +38,7 @@
 [ext_resource type="Script" path="res://scripts/npc_relationships.gd" id="35"]
 [ext_resource type="Script" path="res://scripts/npc_navigation.gd" id="36"]
 [ext_resource type="Script" path="res://scripts/npc_relations.gd" id="37"]
+[ext_resource type="Script" path="res://scripts/campus_ambient_activities.gd" id="38"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -294,3 +295,6 @@ script = ExtResource("36")
 
 [node name="NPCRelations" type="Node" parent="."]
 script = ExtResource("37")
+
+[node name="CampusAmbientActivities" type="Node" parent="."]
+script = ExtResource("38")

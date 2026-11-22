@@ -1,0 +1,59 @@
+name: M26 campus ambient NPC activities
+
+on:
+  push:
+    branches:
+      - feature/m26-campus-ambient-npc-activities-20261122
+    paths:
+      - ".github/workflows/campus-ambient-activities.yml"
+      - "godot/scripts/campus_ambient_activities.gd"
+      - "godot/scripts/utown_campus_life.gd"
+      - "godot/scenes/main.tscn"
+      - "godot/tests/campus_ambient_activities_smoke_test.gd"
+      - "godot/tests/render_campus_ambient_activities.gd"
+  pull_request:
+    paths:
+      - ".github/workflows/campus-ambient-activities.yml"
+      - "godot/scripts/campus_ambient_activities.gd"
+      - "godot/scripts/utown_campus_life.gd"
+      - "godot/scenes/main.tscn"
+      - "godot/tests/campus_ambient_activities_smoke_test.gd"
+      - "godot/tests/render_campus_ambient_activities.gd"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ambient-activities:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fLsS --retry 4 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install -m 755 /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+      - name: Import project assets and scripts
+        run: godot --headless --path godot --import --quit
+      - name: Validate ambient facility routines and story-state isolation
+        run: timeout 75s godot --headless --path godot --script res://tests/campus_ambient_activities_smoke_test.gd
+      - name: Install virtual display for visual review
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+      - name: Render real Godot NPC facility routines
+        run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_campus_ambient_activities.gd
+      - name: Upload campus ambient activity visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: nus3d-m26-campus-ambient-activities
+          path: |
+            godot/review_previews/M26_BENCH_REST.png
+            godot/review_previews/M26_WATER_BREAK.png
+            godot/review_previews/M26_VENDING_PURCHASE.png
+            godot/review_previews/M26_PICNIC_CHAT.png
+          if-no-files-found: error
+          retention-days: 30
