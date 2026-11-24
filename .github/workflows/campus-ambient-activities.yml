@@ -45,8 +45,9 @@ jobs:
         run: timeout 75s godot --headless --path godot --script res://tests/campus_ambient_activities_smoke_test.gd
       - name: Install virtual display for visual review
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+          if ! command -v xvfb-run >/dev/null 2>&1; then
+            sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+          fi
       - name: Render real Godot NPC facility routines
         run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_campus_ambient_activities.gd
       - name: Upload campus ambient activity visual review

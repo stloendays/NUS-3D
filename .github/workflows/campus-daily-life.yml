@@ -44,8 +44,9 @@ jobs:
         run: timeout 75s godot --headless --path godot --script res://tests/campus_daily_life_smoke_test.gd
       - name: Install virtual display
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+          if ! command -v xvfb-run >/dev/null 2>&1; then
+            sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+          fi
       - name: Render real campus crowd and weather routines
         run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_campus_daily_life.gd
       - name: Upload M27 visual review
