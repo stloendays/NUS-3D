@@ -10,6 +10,7 @@ const UI_FONT_KIT = preload("res://scripts/utown_ui_font.gd")
 @onready var challenge: UTownChallenge = $"../Challenge"
 @onready var weather: UTownWeather = $"../Weather"
 @onready var campus_life: UTownCampusLife = $"../CampusLife"
+@onready var daily_life: NUS3DCampusDailyLife = $"../CampusDailyLife"
 @onready var title_label: Label = $Info/VBox/Title
 @onready var hint_label: Label = $Info/VBox/Hint
 @onready var target_label: Label = $Info/VBox/Target
@@ -328,10 +329,12 @@ func _process(delta: float) -> void:
         challenge_message.text = challenge.feedback_message
     var weather_info: String = language_service.weather_card(weather) if localized else weather.status_text()
     campus_message.text = weather_info.get_slice("\n", 0)
+    if daily_life != null:
+        campus_message.text += "\n" + daily_life.status_text()
     if show_full_help or (campus_life.message_time > 0.0 and not campus_life.message.is_empty()):
         var life_info: String = language_service.game_text(campus_life.status_text()) if localized else campus_life.status_text()
         campus_message.text += "\n" + life_info
-    campus_card.visible = show_full_help or (campus_life.message_time > 0.0 and not campus_life.message.is_empty())
+    campus_card.visible = true
     _update_notices(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
