@@ -73,7 +73,11 @@ func _render() -> void:
         (eater["node"] as Node3D).global_position = eat_spots[index]["position"]
         activities._arrive(eater, Time.get_ticks_msec() / 1000.0)
     activities.update_occupancy_markers(true)
-    if not await _capture_from_anchor(camera, food_root, Vector3(0.0, 13.0, 22.0), Vector3(0.0, 1.0, -6.5), output, "M27_LUNCH_CROWD.png"):
+    var lunch_centre: Vector3 = Vector3.ZERO
+    for index in range(8):
+        lunch_centre += (ambient_states[index] if index < 4 else ambient_states[index])["node"].global_position
+    lunch_centre /= 8.0
+    if not await _capture_world(camera, lunch_centre, Vector3(0.0, 23.0, 13.0), output, "M27_LUNCH_CROWD.png"):
         _fail("lunch crowd capture failed")
         return
 
@@ -111,7 +115,21 @@ func _render() -> void:
     daily.set_game_time(20.0 * 60.0)
     weather.set_mode(0)
     daily.refresh_schedule_context(true)
-    if not await _capture_from_anchor(camera, food_root, Vector3(0.0, 14.0, 24.0), Vector3(0.0, 1.0, -5.0), output, "M27_EVENING_CAMPUS.png"):
+    var green_benches: Array[Dictionary] = []
+    for spot in activities._available_spots("sit"):
+        if str(spot.get("id", "")).begins_with("bench_GREEN"):
+            green_benches.append(spot)
+    if green_benches.size() < 2:
+        _fail("Town Green evening bench anchors are missing")
+        return
+    for index in range(2):
+        var evening_state: Dictionary = ambient_states[8 + index]
+        activities._start_single_activity(evening_state, green_benches[index])
+        (evening_state["node"] as Node3D).global_position = green_benches[index]["position"]
+        activities._arrive(evening_state, Time.get_ticks_msec() / 1000.0)
+    activities.update_occupancy_markers(true)
+    var evening_centre: Vector3 = ((ambient_states[8]["node"] as Node3D).global_position + (ambient_states[9]["node"] as Node3D).global_position) * 0.5
+    if not await _capture_world(camera, evening_centre, Vector3(8.0, 8.5, 11.0), output, "M27_EVENING_CAMPUS.png"):
         _fail("evening lighting capture failed")
         return
 
@@ -127,9 +145,9 @@ func _ambient_states(life: UTownCampusLife) -> Array[Dictionary]:
             result.append(state)
     return result
 
-func _capture_from_anchor(camera: Camera3D, anchor: Node3D, camera_local: Vector3, target_local: Vector3, output: String, filename: String) -> bool:
-    camera.global_position = anchor.to_global(camera_local)
-    camera.look_at(anchor.to_global(target_local), Vector3.UP)
+func _capture_world(camera: Camera3D, centre: Vector3, camera_offset: Vector3, output: String, filename: String) -> bool:
+    camera.global_position = centre + camera_offset
+    camera.look_at(centre, Vector3.UP)
     for _frame in range(4):
         await process_frame
     await RenderingServer.frame_post_draw
