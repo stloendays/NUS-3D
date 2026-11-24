@@ -145,6 +145,17 @@ func _ambient_states(life: UTownCampusLife) -> Array[Dictionary]:
             result.append(state)
     return result
 
+func _capture_from_anchor(camera: Camera3D, anchor: Node3D, camera_local: Vector3, target_local: Vector3, output: String, filename: String) -> bool:
+    camera.global_position = anchor.to_global(camera_local)
+    camera.look_at(anchor.to_global(target_local), Vector3.UP)
+    for _frame in range(4):
+        await process_frame
+    await RenderingServer.frame_post_draw
+    var frame: Image = root.get_texture().get_image()
+    if frame == null or frame.is_empty() or frame.get_width() < 400 or frame.get_height() < 300:
+        return false
+    return frame.save_png(output.path_join(filename)) == OK
+
 func _capture_world(camera: Camera3D, centre: Vector3, camera_offset: Vector3, output: String, filename: String) -> bool:
     camera.global_position = centre + camera_offset
     camera.look_at(centre, Vector3.UP)
