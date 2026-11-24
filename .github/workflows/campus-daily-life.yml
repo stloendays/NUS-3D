@@ -55,6 +55,7 @@ jobs:
           name: nus3d-m27-dynamic-campus-ecology
           path: |
             godot/review_previews/M27_LUNCH_CROWD.png
+            godot/review_previews/M27_LUNCH_QUEUE.png
             godot/review_previews/M27_RAIN_SHELTER.png
             godot/review_previews/M27_EVENING_CAMPUS.png
           if-no-files-found: error

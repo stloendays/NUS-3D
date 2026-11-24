@@ -73,12 +73,19 @@ func _render() -> void:
         (eater["node"] as Node3D).global_position = eat_spots[index]["position"]
         activities._arrive(eater, Time.get_ticks_msec() / 1000.0)
     activities.update_occupancy_markers(true)
-    var lunch_centre: Vector3 = Vector3.ZERO
-    for index in range(8):
-        lunch_centre += (ambient_states[index] if index < 4 else ambient_states[index])["node"].global_position
-    lunch_centre /= 8.0
-    if not await _capture_world(camera, lunch_centre, Vector3(0.0, 23.0, 13.0), output, "M27_LUNCH_CROWD.png"):
-        _fail("lunch crowd capture failed")
+    var dining_centre: Vector3 = Vector3.ZERO
+    for index in range(4, 8):
+        dining_centre += (ambient_states[index]["node"] as Node3D).global_position
+    dining_centre /= 4.0
+    if not await _capture_world(camera, dining_centre, Vector3(8.0, 8.5, 11.0), output, "M27_LUNCH_CROWD.png"):
+        _fail("lunch dining capture failed")
+        return
+    var queue_centre: Vector3 = Vector3.ZERO
+    for index in range(4):
+        queue_centre += (ambient_states[index]["node"] as Node3D).global_position
+    queue_centre /= 4.0
+    if not await _capture_world(camera, queue_centre, Vector3(8.0, 7.0, 10.0), output, "M27_LUNCH_QUEUE.png"):
+        _fail("lunch queue capture failed")
         return
 
     for state in ambient_states:
