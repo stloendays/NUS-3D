@@ -20,6 +20,7 @@ var food_court_crowd: int = 0
 var active_routines: int = 0
 
 func _ready() -> void:
+    life = get_parent().get_node_or_null("CampusLife") as UTownCampusLife
     game_minutes = START_TIME_MINUTES
     last_lighting_mode = world.lighting_mode
     _apply_clock_lighting()
@@ -99,8 +100,13 @@ func refresh_schedule_context(force: bool = false) -> void:
     food_court_crowd = activities.food_court_crowd_count()
 
 func status_text() -> String:
+    var campus_life: UTownCampusLife = life
+    if campus_life == null:
+        campus_life = get_parent().get_node_or_null("CampusLife") as UTownCampusLife
+    if campus_life == null:
+        return "CAMPUS CLOCK"
     var total_ambient: int = 0
-    for state_value in life.pedestrians:
+    for state_value in campus_life.pedestrians:
         if bool(state_value.get("ambient", false)):
             total_ambient += 1
     var hour: int = int(floor(game_minutes / 60.0))

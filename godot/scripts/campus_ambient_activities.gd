@@ -240,7 +240,7 @@ func _build_occupancy_markers() -> void:
     occupancy_visual.multimesh = multi
     occupancy_visual.material_override = material
     occupancy_visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-    scene_root.add_child(occupancy_visual)
+    scene_root.call_deferred("add_child", occupancy_visual)
     occupancy_multimesh = multi
     for index in range(spots.size()):
         var spot: Dictionary = spots[index]

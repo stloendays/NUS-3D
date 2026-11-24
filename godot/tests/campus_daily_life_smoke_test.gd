@@ -89,8 +89,9 @@ func _run() -> void:
     if occupied_index < 0:
         _fail("active lunch routine did not reserve its facility")
         return
-    if activities.occupancy_multimesh.get_instance_color(occupied_index).r < 0.8:
-        _fail("reserved facility still reports the free state")
+    var reserved_spot_id: String = str(foodie.get("activity_spot_id", ""))
+    if not activities.reserved_spots.has(reserved_spot_id):
+        _fail("facility reservation state did not record the lunch occupant")
         return
 
     daily.set_game_time(17.0 * 60.0)
