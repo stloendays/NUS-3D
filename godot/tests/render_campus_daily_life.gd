@@ -73,8 +73,7 @@ func _render() -> void:
         (eater["node"] as Node3D).global_position = eat_spots[index]["position"]
         activities._arrive(eater, Time.get_ticks_msec() / 1000.0)
     activities.update_occupancy_markers(true)
-    var lunch_centre: Vector3 = food_root.to_global(Vector3(0.0, 0.0, -7.5))
-    if not await _capture(camera, lunch_centre, output, "M27_LUNCH_CROWD.png"):
+    if not await _capture_from_anchor(camera, food_root, Vector3(0.0, 13.0, 22.0), Vector3(0.0, 1.0, -6.5), output, "M27_LUNCH_CROWD.png"):
         _fail("lunch crowd capture failed")
         return
 
@@ -85,21 +84,34 @@ func _render() -> void:
     weather.set_mode(3)
     daily.refresh_schedule_context(true)
     var shelters: Array[Dictionary] = activities._available_spots("shelter")
-    for index in range(3):
+    var src_shelter_indices: Array[int] = [2, 3, 4]
+    for index in range(src_shelter_indices.size()):
         var state: Dictionary = ambient_states[index]
-        activities._start_single_activity(state, shelters[index])
-        (state["node"] as Node3D).global_position = shelters[index]["position"]
+        var shelter: Dictionary = shelters[src_shelter_indices[index]]
+        activities._start_single_activity(state, shelter)
+        (state["node"] as Node3D).global_position = shelter["position"]
         activities._arrive(state, Time.get_ticks_msec() / 1000.0)
     activities.update_occupancy_markers(true)
-    var shelter_centre: Vector3 = (shelters[0]["position"] + shelters[1]["position"] + shelters[2]["position"]) / 3.0
-    if not await _capture(camera, shelter_centre, output, "M27_RAIN_SHELTER.png"):
+    var src_record: Dictionary = {}
+    for record in life.world.layout.get("buildings", []):
+        if str(record.get("id", "")) == "SRC":
+            src_record = record
+            break
+    var src_parts: Array = src_record.get("parts", [])
+    var src_facade_x: float = float(src_parts[2].get("dx", 0.0)) + float(src_parts[2].get("w", 0.0)) * 0.5
+    var src_middle_z: float = -float(src_parts[2].get("dn", 0.0))
+    var flavours_root: Node3D = (game.get_node("GreenDining") as UTownGreenDining).dining_areas["flavours"]["root"] as Node3D
+    if not await _capture_from_anchor(camera, flavours_root,
+            Vector3(src_facade_x + 12.0, 8.0, src_middle_z + 13.0),
+            Vector3(src_facade_x + 1.5, 1.0, src_middle_z),
+            output, "M27_RAIN_SHELTER.png"):
         _fail("rain shelter capture failed")
         return
 
     daily.set_game_time(20.0 * 60.0)
     weather.set_mode(0)
     daily.refresh_schedule_context(true)
-    if not await _capture(camera, food_root.global_position + Vector3(0.0, 0.0, -8.0), output, "M27_EVENING_CAMPUS.png"):
+    if not await _capture_from_anchor(camera, food_root, Vector3(0.0, 14.0, 24.0), Vector3(0.0, 1.0, -5.0), output, "M27_EVENING_CAMPUS.png"):
         _fail("evening lighting capture failed")
         return
 
@@ -115,9 +127,9 @@ func _ambient_states(life: UTownCampusLife) -> Array[Dictionary]:
             result.append(state)
     return result
 
-func _capture(camera: Camera3D, centre: Vector3, output: String, filename: String) -> bool:
-    camera.global_position = centre + Vector3(0.0, 10.5, 22.0)
-    camera.look_at(centre + Vector3.UP * 0.9, Vector3.UP)
+func _capture_from_anchor(camera: Camera3D, anchor: Node3D, camera_local: Vector3, target_local: Vector3, output: String, filename: String) -> bool:
+    camera.global_position = anchor.to_global(camera_local)
+    camera.look_at(anchor.to_global(target_local), Vector3.UP)
     for _frame in range(4):
         await process_frame
     await RenderingServer.frame_post_draw
