@@ -104,6 +104,25 @@ func _box(parent: Node3D, name_value: String, position_value: Vector3, size_valu
     return mesh
 
 
+func _rounded_box(parent: Node3D, name_value: String, position_value: Vector3, size_value: Vector3, color_hex: String, solid: bool = false) -> MeshInstance3D:
+    var mesh: MeshInstance3D = MeshInstance3D.new()
+    mesh.name = name_value
+    mesh.position = position_value
+    mesh.mesh = SOFT_ARCHITECTURE.rounded_prism(size_value, 0.72)
+    mesh.material_override = _material(color_hex)
+    parent.add_child(mesh)
+    if solid:
+        var static_body: StaticBody3D = StaticBody3D.new()
+        static_body.name = "SchematicCollision"
+        mesh.add_child(static_body)
+        var collider: CollisionShape3D = CollisionShape3D.new()
+        var collider_box: BoxShape3D = BoxShape3D.new()
+        collider_box.size = size_value
+        collider.shape = collider_box
+        static_body.add_child(collider)
+    return mesh
+
+
 func _label(parent: Node3D, label_text: String, position_value: Vector3, color_hex: String, font_size_value: int = 28) -> Label3D:
     var label: Label3D = Label3D.new()
     label.text = label_text
@@ -256,7 +275,7 @@ func _build_districts() -> void:
             building.name = str(info["name"]).replace(" ", "_").replace("/", "_")
             building.position = Vector3(at.x, 0.0, at.z)
             root.add_child(building)
-            _box(building, "OriginalMass", Vector3(0.0, height_value * 0.5, 0.0), Vector3(width_value, height_value, depth_value), str(district["accent"]), true)
+            _rounded_box(building, "OriginalMass", Vector3(0.0, height_value * 0.5, 0.0), Vector3(width_value, height_value, depth_value), str(district["accent"]), true)
             _box(building, "Roof", Vector3(0.0, height_value + 0.22, 0.0), Vector3(width_value + 1.4, 0.45, depth_value + 1.4), "#d4dad6")
             _box(building, "Entrance", Vector3(0.0, 2.4, depth_value * 0.5 + 0.07), Vector3(minf(width_value * 0.42, 14.0), 4.6, 0.16), "#466678")
             for level in range(mini(int(height_value / 4.6), 6)):

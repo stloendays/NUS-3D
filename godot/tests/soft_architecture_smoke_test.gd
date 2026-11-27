@@ -95,6 +95,15 @@ func _run() -> void:
         if not (model.mesh is ArrayMesh):
             _fail("Kent Ridge original mass remained a hard box")
             return
+        var ridge_collider: CollisionShape3D = model.get_node_or_null(
+            "SchematicCollision/CollisionShape3D") as CollisionShape3D
+        if ridge_collider == null or not (ridge_collider.shape is BoxShape3D):
+            _fail("Kent Ridge rounded mass lost its original box collider")
+            return
+        var original_size: Vector3 = (ridge_collider.shape as BoxShape3D).size
+        if (model.mesh.get_aabb().size - original_size).length() > 0.04:
+            _fail("Kent Ridge rounded mesh changed the original collision footprint")
+            return
     print("PASS: cached original rounded mesh, bounds, %d UTown shells, %d ridge masses, low-spec MSAA and atmospheric falloff" % [
         source_count, ridge_masses.size()
     ])
