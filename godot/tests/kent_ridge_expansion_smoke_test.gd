@@ -35,8 +35,10 @@ func _run() -> void:
     if world == null or extension == null or bus == null or player == null or minimap == null or hud == null:
         _fail("Existing world or new travel scene nodes are absent")
         return
-    if extension.districts.size() != 11 or extension.stops.size() != 12:
-        _fail("Expected 11 extended districts and 12 travel/walking anchors")
+    # The existing UTown world is the base area; the expansion JSON contains
+    # ten additional districts and eleven travel anchors including the UTown transfer stop.
+    if extension.districts.size() != 10 or extension.stops.size() != 11:
+        _fail("Expected ten Kent Ridge expansion districts and eleven travel anchors including UTown")
         return
     if extension.shelter_count != 11 or extension.building_count < 24:
         _fail("Shelters and low-poly campus building geometry are missing")

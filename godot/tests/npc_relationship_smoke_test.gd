@@ -22,8 +22,14 @@ func _run() -> void:
     if relation.affinity("Maya") != 4:
         _fail("conversation cooldown did not prevent repeated farming")
         return
-    if relation.contextual_line("Maya", true).is_empty():
-        _fail("relationship dialogue unlock missing")
+    var tier_probe: NUS3DRelationships = NUS3DRelationships.new()
+    tier_probe.scores["Maya"] = 9
+    if not tier_probe.contextual_line("Maya", true).is_empty():
+        _fail("Friendship dialogue must remain locked below the 10-point threshold")
+        return
+    tier_probe.scores["Maya"] = 10
+    if tier_probe.contextual_line("Maya", true).is_empty():
+        _fail("Friendship dialogue must unlock at the 10-point threshold")
         return
     relation.conversation("Ethan", true)
     if relation.affinity("Ethan") != 2:

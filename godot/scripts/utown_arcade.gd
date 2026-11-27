@@ -454,12 +454,19 @@ func _layout_status_card() -> void:
     var top: float = STATUS_CARD_MIN_TOP
     var campus_card: Control = hud.get_node_or_null("CampusCard") as Control
     if campus_card != null and campus_card.visible:
-        var weather_height: float = maxf(campus_card.size.y, campus_card.get_combined_minimum_size().y)
-        top = maxf(top, campus_card.position.y + weather_height + 10.0)
-    # The district postcard starts at y=354 and the key rail is bottom-fixed.
-    # Hide this optional summary when either takes priority on a small window.
+        # CampusCard lives in a different CanvasLayer. Use its actual viewport
+        # rectangle rather than its local position, which can omit anchor offsets.
+        var campus_rect: Rect2 = campus_card.get_global_rect()
+        top = maxf(top, campus_rect.end.y + 10.0)
+
+    # Keep the optional Arcade summary above the live district postcard and
+    # the fixed bottom action rail. All bounds are measured in viewport space.
     var limit: float = minf(STATUS_CARD_MAX_BOTTOM,
-        float(get_viewport().get_visible_rect().size.y) - 66.0)
+        get_viewport().get_visible_rect().end.y - 66.0)
+    var guide: UTownExperienceGuide = get_parent().get_node_or_null("ExperienceGuide") as UTownExperienceGuide
+    if guide != null and guide.zone_card != null and guide.zone_card.visible:
+        limit = minf(limit, guide.zone_card.get_global_rect().position.y - 10.0)
+
     if top + STATUS_CARD_HEIGHT > limit:
         status_card.hide()
         return

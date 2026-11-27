@@ -182,7 +182,7 @@ func challenge_save_path() -> String:
 
 func feature_save_path(feature: String) -> String:
     # Keep profile-owned game saves separate from shared language and sound settings.
-    if not is_logged_in() or not ["arcade", "coursework", "coins", "activities", "ddl_story", "leisure", "relationships"].has(feature):
+    if not is_logged_in() or not ["arcade", "coursework", "coins", "activities", "ddl_story", "leisure", "horror", "relationships"].has(feature):
         return ""
     var record: Dictionary = accounts.get(active_username, {})
     var path: String = storage_root.path_join("features").path_join(

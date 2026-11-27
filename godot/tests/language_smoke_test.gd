@@ -130,10 +130,16 @@ func _run() -> void:
         return
 
     var life: UTownCampusLife = shell.game.get_node("CampusLife") as UTownCampusLife
-    if life == null or life.pedestrians.size() != 6:
-        _fail("Existing six NPCs disappeared after localization")
+    var story_pedestrians: Array[Dictionary] = []
+    if life != null:
+        for state_value in life.pedestrians:
+            var state: Dictionary = state_value
+            if not bool(state.get("ambient", false)):
+                story_pedestrians.append(state)
+    if life == null or story_pedestrians.size() != 6:
+        _fail("Six named NPCs disappeared after localization")
         return
-    var npc: Node3D = life.pedestrians[0]["node"]
+    var npc: Node3D = story_pedestrians[0]["node"]
     var player: UTownPlayer = shell.game.get_node("Player") as UTownPlayer
     player.global_position = npc.global_position + Vector3(0.0, 0.18, 0.0)
     dialogue_service.reset_session()
