@@ -27,6 +27,10 @@ func _run() -> void:
     if leisure.chess_board.size() != 81 or menu.cells.size() != 81 or leisure.CARD_ROUNDS != 5:
         _fail("Gomoku board, AI or five-round cards are missing")
         return
+    # Isolate both saves before checking the locked state; earlier smoke
+    # processes must not leave completed coursework in the shared user:// path.
+    course.save_path = "user://leisure-coursework-%d.cfg" % Time.get_ticks_usec()
+    course._load_progress()
     leisure.save_path = "user://leisure-integration-%d.cfg" % Time.get_ticks_usec()
     leisure._load_stats()
     if leisure.unlocked() or menu.open_lounge():
@@ -34,8 +38,6 @@ func _run() -> void:
         return
     # Select a real faculty first: _store_active_state intentionally ignores
     # progress until current_faculty_id has been established.
-    course.save_path = "user://leisure-coursework-%d.cfg" % Time.get_ticks_usec()
-    course._load_progress()
     if course.faculty_options.is_empty():
         _fail("coursework faculty catalogue is empty")
         return
