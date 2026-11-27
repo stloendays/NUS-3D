@@ -44,13 +44,20 @@ func _smoke() -> void:
     if weather_card == null or arcade_card == null or guide == null or guide.zone_card == null:
         _fail("HUD clearance card references missing")
         return
-    var starting_weather_minimum: Vector2 = weather_card.custom_minimum_size
-    weather_card.custom_minimum_size = Vector2(starting_weather_minimum.x, 125.0)
+    # HUD._process owns CampusCard visibility. Keep its real display condition
+    # active so the expanded-panel test exercises an actually visible card.
+    var starting_help: bool = bool(hud.get("show_full_help"))
     var starting_weather_visible: bool = weather_card.visible
-    weather_card.show()
+    var starting_weather_minimum: Vector2 = weather_card.custom_minimum_size
+    hud.set("show_full_help", true)
+    weather_card.custom_minimum_size = Vector2(starting_weather_minimum.x, 125.0)
+    hud.call("_process", 0.0)
     await process_frame
     arcade._refresh_status()
     await process_frame
+    if not weather_card.visible:
+        _fail("expanded weather panel was not visible during HUD clearance test")
+        return
     if arcade_card.visible and arcade_card.get_global_rect().intersects(weather_card.get_global_rect()):
         _fail("Arcade status overlaps expanded indoor/weather panel")
         return
@@ -61,6 +68,8 @@ func _smoke() -> void:
         _fail("Arcade summary was not compacted to one readable line")
         return
     weather_card.custom_minimum_size = starting_weather_minimum
+    hud.set("show_full_help", starting_help)
+    hud.call("_process", 0.0)
     weather_card.visible = starting_weather_visible
     await process_frame
     arcade._refresh_status()
