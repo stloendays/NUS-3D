@@ -207,9 +207,8 @@ func _event_announcement() -> String:
 
 
 func _progress_message() -> String:
-    return _t("校园活动：%s · 已交谈 %d/%d 位不同同学。",
-        "CAMPUS EVENT: %s · %d/%d different students spoken to.") % [
-        _event_title(), event_progress, TARGET_TALKERS
+    return _t("已交谈 %d/%d 位不同同学。", "Talked to %d/%d different students.") % [
+        event_progress, TARGET_TALKERS
     ]
 
 

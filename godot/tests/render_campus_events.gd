@@ -82,16 +82,22 @@ func _render() -> void:
     events.refresh_event(true)
     player.global_position = food_root.global_position
     _talk_to(life, player, ambient_states[0])
-    if not await _save_capture(camera, food_root.global_position, Vector3(22.0, 17.0, 24.0), output, "M28_LUNCH_EVENT.png"):
+    if not await _save_capture(camera, food_root.global_position, Vector3(0.0, 58.0, 76.0), output, "M28_LUNCH_EVENT.png"):
         _fail("Lunch Rush event capture failed")
         return
 
     var shelter_position: Vector3 = Vector3.ZERO
     for spot_value in activities.spots:
         var spot: Dictionary = spot_value
-        if str(spot.get("kind", "")) == "shelter":
+        if str(spot.get("kind", "")) == "shelter" and str(spot.get("area", "")) == "flavours":
             shelter_position = spot.get("position", Vector3.ZERO)
             break
+    if shelter_position == Vector3.ZERO:
+        for spot_value in activities.spots:
+            var spot: Dictionary = spot_value
+            if str(spot.get("kind", "")) == "shelter":
+                shelter_position = spot.get("position", Vector3.ZERO)
+                break
     if shelter_position == Vector3.ZERO:
         _fail("rain shelter anchor is missing")
         return
@@ -101,7 +107,7 @@ func _render() -> void:
     events.refresh_event(true)
     player.global_position = shelter_position
     _talk_to(life, player, ambient_states[1])
-    if not await _save_capture(camera, shelter_position, Vector3(17.0, 12.0, 20.0), output, "M28_RAIN_EVENT.png"):
+    if not await _save_capture(camera, shelter_position, Vector3(0.0, 38.0, 52.0), output, "M28_RAIN_EVENT.png"):
         _fail("Rain Shelter event capture failed")
         return
 
