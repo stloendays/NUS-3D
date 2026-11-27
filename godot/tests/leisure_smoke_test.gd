@@ -32,8 +32,26 @@ func _run() -> void:
     if leisure.unlocked() or menu.open_lounge():
         _fail("club opened before Coursework completion")
         return
-    course.active_quest_index = 3
+    # Select a real faculty first: _store_active_state intentionally ignores
+    # progress until current_faculty_id has been established.
+    course.save_path = "user://leisure-coursework-%d.cfg" % Time.get_ticks_usec()
+    course._load_progress()
+    if course.faculty_options.is_empty():
+        _fail("coursework faculty catalogue is empty")
+        return
+    var faculty_id: String = str(course.faculty_options[0].get("id", ""))
+    if not course.select_faculty(faculty_id):
+        _fail("could not select a faculty for the club unlock test")
+        return
+    var chapter_count: int = course.faculty_by_id[faculty_id]["quests"].size()
+    if chapter_count != 3:
+        _fail("the selected faculty must contain exactly three coursework chapters")
+        return
+    course.active_quest_index = chapter_count
     course._store_active_state()
+    if not course._save_progress():
+        _fail("coursework completion state did not persist to the isolated test save")
+        return
     if not leisure.unlocked() or not menu.open_lounge():
         _fail("club did not unlock after three chapters")
         return
@@ -77,4 +95,5 @@ func _run() -> void:
         return
     print("PASS: Post-Course Club isolation, Gomoku, cards, social actions, travel guard and save")
     game.queue_free()
+    await process_frame
     quit(0)
