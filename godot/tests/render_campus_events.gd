@@ -49,9 +49,12 @@ func _render() -> void:
             (child as CanvasLayer).visible = false
     if coins.interface != null:
         coins.interface.visible = false
-    var ddl_story: Node3D = game.get_node_or_null("DDLStory") as Node3D
+    var ddl_story: Node = game.get_node_or_null("DDLStory")
     if ddl_story != null:
-        ddl_story.visible = false
+        ddl_story.set_process(false)
+        var mission_layer: CanvasLayer = ddl_story.get("display_layer") as CanvasLayer
+        if mission_layer != null:
+            mission_layer.visible = false
     coins.save_path = "user://nus3d-m28-render-%d.cfg" % Time.get_ticks_usec()
     coins.load_progress()
 
@@ -104,13 +107,13 @@ func _render() -> void:
         (eater["node"] as Node3D).global_position = eat_spots[index]["position"]
         activities._arrive(eater, now)
     activities.update_occupancy_markers(true)
-    var dining_centre: Vector3 = Vector3.ZERO
+    var queue_centre: Vector3 = Vector3.ZERO
     for index in range(3):
-        dining_centre += eat_spots[index]["position"]
-    dining_centre /= 3.0
-    player.global_position = eat_spots[0]["position"] + Vector3(0.0, 0.0, 1.5)
+        queue_centre += queue_spots[index]["position"]
+    queue_centre /= 3.0
+    player.global_position = queue_spots[0]["position"] + Vector3(0.0, 0.0, 1.5)
     life.talk_to_nearest()
-    if not await _save_capture(camera, dining_centre, Vector3(8.0, 8.5, 11.0), output, "M28_LUNCH_EVENT.png"):
+    if not await _save_capture(camera, queue_centre, Vector3(8.0, 7.0, 10.0), output, "M28_LUNCH_EVENT.png"):
         _fail("Lunch Rush event capture failed")
         return
 
