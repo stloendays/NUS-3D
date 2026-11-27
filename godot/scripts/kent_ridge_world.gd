@@ -171,8 +171,7 @@ func _graded_strip(parent: Node3D, name_value: String, start: Vector3, finish: V
 const PATH_SAMPLE_STEP: float = 18.0
 const PATH_MAX_SEGMENTS: int = 64
 
-const PATH_SAMPLE_STEP: float = 18.0
-const PATH_MAX_SEGMENTS: int = 64
+
 
 func _terrain_following_strip(parent: Node3D, name_value: String, start: Vector3, finish: Vector3, lateral_offset: float, width_value: float, color: String, clearance: float) -> void:
     var flat_delta: Vector3 = Vector3(finish.x - start.x, 0.0, finish.z - start.z)

@@ -277,8 +277,9 @@ func reset_runtime_session() -> void:
         state["break_seconds"] = 0.0
         var actor: Node3D = state["node"]
         actor.scale = Vector3.ONE
-        if i < campus_life.pedestrians.size():
-            campus_life.pedestrians[i]["talk_remaining"] = 0.0
+        var campus_index: int = int(state.get("campus_index", i))
+        if campus_index < campus_life.pedestrians.size():
+            campus_life.pedestrians[campus_index]["talk_remaining"] = 0.0
         _refresh_student_label(i)
     for projectile in projectiles:
         projectile["active"] = false
@@ -506,8 +507,10 @@ func _process(delta: float) -> void:
             state["focus"] = STUDENT_FOCUS
             var actor: Node3D = state["node"]
             actor.scale = Vector3.ONE
-        elif float(campus_life.pedestrians[i]["talk_remaining"]) < remaining:
-            campus_life.pedestrians[i]["talk_remaining"] = remaining
+        else:
+            var campus_index: int = int(state.get("campus_index", i))
+            if campus_index < campus_life.pedestrians.size() and float(campus_life.pedestrians[campus_index]["talk_remaining"]) < remaining:
+                campus_life.pedestrians[campus_index]["talk_remaining"] = remaining
         if ceili(remaining) != previous_sec:
             _refresh_student_label(i)
     for state in projectiles:
