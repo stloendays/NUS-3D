@@ -41,7 +41,7 @@ var projectiles: Array[Dictionary] = []
 var next_projectile: int = 0
 var mesh_cache: Dictionary = {}
 var material_cache: Dictionary = {}
-var status_layer: CanvasLayer
+var status_layer: Control
 var status_card: PanelContainer
 var status_label: Label
 var held_toy: Node3D
@@ -163,10 +163,14 @@ func _spawn_professors() -> void:
         professors.append({"node": teacher, "name": names[i], "line": jokes[i], "label": plate})
 
 func _build_status_panel() -> void:
-    status_layer = CanvasLayer.new()
+    # Share the HUD CanvasLayer so viewport-space layout comparisons use one
+    # coordinate system. Separate CanvasLayers have independent canvas transforms.
+    status_layer = Control.new()
     status_layer.name = "ArcadeOverlay"
-    status_layer.layer = 2
-    add_child(status_layer)
+    status_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    status_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    status_layer.z_index = 10
+    hud.add_child(status_layer)
     var card := PanelContainer.new()
     card.name = "ArcadeCard"
     # Compact one-line summary: never cover expanding indoor/weather information.

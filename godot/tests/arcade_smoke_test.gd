@@ -27,6 +27,9 @@ func _smoke() -> void:
     if arcade.students.size() != 6 or arcade.professors.size() != 2:
         _fail("six reused students and two fictional professors required")
         return
+    if arcade.status_layer.get_parent() != hud:
+        _fail("Arcade overlay must share the HUD canvas for consistent viewport layout")
+        return
     if arcade.students[0]["node"] != campus.pedestrians[0]["node"]:
         _fail("student reuse is broken")
         return
