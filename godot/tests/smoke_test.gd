@@ -194,8 +194,8 @@ func _smoke() -> void:
         push_error("invalid lighting preset was accepted")
         quit(1)
         return
-    if world.navigation_labels.size() < 10 or world.route_marker_root == null:
-        push_error("Missing navigational world labels for clean photo mode")
+    if world.route_marker_root == null:
+        push_error("Missing route marker visibility controller for clean photo mode")
         quit(1)
         return
     world.set_navigation_markers_visible(false)
@@ -209,8 +209,8 @@ func _smoke() -> void:
         quit(1)
         return
     world.set_navigation_markers_visible(true)
-    if not world.route_marker_root.visible:
-        push_error("F7 photo mode did not restore navigation markers")
+    if world.route_marker_root.visible:
+        push_error("Removed sky-high route labels reappeared after F7 photo mode")
         quit(1)
         return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
@@ -383,8 +383,20 @@ func _smoke() -> void:
         push_error("wet surfaces did not dry and restore original materials")
         quit(1)
         return
-    if campus_life == null or campus_life.pedestrians.size() != 6:
-        push_error("six procedural campus pedestrians did not spawn")
+    if campus_life == null:
+        push_error("campus life controller did not load")
+        quit(1)
+        return
+    var story_npc_count: int = 0
+    var ambient_npc_count: int = 0
+    for state_value in campus_life.pedestrians:
+        var state: Dictionary = state_value
+        if bool(state.get("ambient", false)):
+            ambient_npc_count += 1
+        else:
+            story_npc_count += 1
+    if story_npc_count != campus_life.npc_names.size() or ambient_npc_count != campus_life.AMBIENT_COUNT:
+        push_error("named story NPCs or ambient campus pedestrians did not spawn")
         quit(1)
         return
     var first_npc: Node3D = campus_life.pedestrians[0]["node"]
@@ -394,8 +406,8 @@ func _smoke() -> void:
         return
         quit(1)
         return
-    if campus_life.interiors.size() != 2 or campus_life.shuttle == null:
-        push_error("ERC/SRC interior concepts or campus shuttle did not load")
+    if not campus_life.interiors.has("ERC") or not campus_life.interiors.has("SRC") or campus_life.shuttle == null:
+        push_error("ERC/SRC core interior concepts or campus shuttle did not load")
         quit(1)
         return
     for interior_id in ["ERC", "SRC"]:
@@ -739,12 +751,12 @@ func _smoke() -> void:
         quit(1)
         return
     campus_life.interior_floor = 0
-    var press_p := InputEventKey.new()
-    press_p.keycode = KEY_P
-    press_p.pressed = true
-    leisure_ui._input(press_p)
+    var press_tab := InputEventKey.new()
+    press_tab.keycode = KEY_TAB
+    press_tab.pressed = true
+    leisure_ui._input(press_tab)
     if leisure.nearest_station() != "chess" or not leisure_ui.is_open or leisure_ui.active_tab != "chess":
-        push_error("P-key near the Gomoku table did not open the matching game")
+        push_error("Tab-key near the Gomoku table did not open the matching game")
         quit(1)
         return
     if not coursework.modal_open or not player.movement_locked:

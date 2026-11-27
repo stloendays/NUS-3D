@@ -44,6 +44,10 @@ func _run() -> void:
     if extension.bus_states.size() != 2:
         _fail("Visual D1/D2 route buses did not initialize")
         return
+    var terrain_root: Node3D = extension.get_node_or_null("KentRidgeContinuousTerrain_Visual") as Node3D
+    if terrain_root == null or terrain_root.get_node_or_null("TerrainSurface") == null:
+        _fail("Continuous schematic terrain mesh exceeded its bounded generation budget")
+        return
     for faculty_id in ["ENGINEERING", "CLB", "COM3", "BIZ2", "MUSEUM", "YIH", "UHC", "PGP", "KR_MRT"]:
         var amenity_root: Node3D = extension.get_node_or_null("KentRidgeDistricts_Schematic/%s/FacultyAmenities" % faculty_id) as Node3D
         if amenity_root == null or amenity_root.get_child_count() < 3:

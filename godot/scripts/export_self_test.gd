@@ -17,6 +17,39 @@ const REQUIRED_SOURCE_FILES: Array[String] = [
     "res://data/campus_links.json",
 ]
 
+func _pedestrian_counts(campus_life: UTownCampusLife) -> Dictionary:
+    var story_count: int = 0
+    var ambient_count: int = 0
+    if campus_life != null:
+        for state_value in campus_life.pedestrians:
+            var state: Dictionary = state_value
+            if bool(state.get("ambient", false)):
+                ambient_count += 1
+            else:
+                story_count += 1
+    return {"story": story_count, "ambient": ambient_count}
+
+
+func _core_interior_count(campus_life: UTownCampusLife) -> int:
+    if campus_life == null:
+        return 0
+    var count: int = 0
+    for id in ["ERC", "SRC"]:
+        if campus_life.interiors.has(id):
+            count += 1
+    return count
+
+
+func _core_interior_activity_count(campus_life: UTownCampusLife) -> int:
+    if campus_life == null:
+        return 0
+    var count: int = 0
+    for id in ["ERC", "SRC"]:
+        if campus_life.activity_spots.has(id):
+            count += campus_life.activity_spots[id].size()
+    return count
+
+
 func _ready() -> void:
     if OS.get_cmdline_user_args().has(TEST_FLAG):
         call_deferred("_run_export_test")
@@ -81,8 +114,19 @@ func collect_issues() -> Array[String]:
         issues.append("Campus Sprint did not resolve the four-stop loop and return")
     if weather == null or weather.mode_count() != 5 or weather.rain == null or weather.puddle_nodes.size() < 4 or weather.rain_streaks == null or weather.rain_multimesh.instance_count != 220:
         issues.append("Five-mode weather controller, rain particles, rain streaks or puddles did not load")
-    if campus_life == null or campus_life.pedestrians.size() != 6 or campus_life.interiors.size() != 2 or campus_life.shuttle == null:
-        issues.append("Campus NPCs, two interior concepts or shuttle did not load")
+    if campus_life == null:
+        issues.append("Campus life controller missing")
+    else:
+        var npc_counts: Dictionary = _pedestrian_counts(campus_life)
+        var story_count: int = int(npc_counts["story"])
+        var ambient_count: int = int(npc_counts["ambient"])
+        if story_count != campus_life.npc_names.size() or ambient_count != campus_life.AMBIENT_COUNT:
+            issues.append("Expected %d named NPCs and %d ambient pedestrians; found %d and %d" % [
+                campus_life.npc_names.size(), campus_life.AMBIENT_COUNT, story_count, ambient_count])
+        if not campus_life.interiors.has("ERC") or not campus_life.interiors.has("SRC"):
+            issues.append("Core ERC/SRC interior concepts did not load")
+        if campus_life.shuttle == null:
+            issues.append("Campus shuttle did not load")
     if campus_life != null and (campus_life.bicycle_wheels.size() != 2 or campus_life.shuttle_wheels.size() != 4 or campus_life.shuttle_passengers.size() != 3):
         issues.append("Bicycle or shuttle visual components are incomplete")
     if indoor_npcs == null or indoor_npcs.indoor_count != 6:
@@ -155,6 +199,10 @@ func _run_export_test() -> void:
     if coursework != null:
         for faculty in coursework.faculty_options:
             quests_total += faculty["quests"].size()
+    var npc_counts: Dictionary = _pedestrian_counts(campus_life)
+    var core_interior_count: int = _core_interior_count(campus_life)
+    var core_interior_activity_count: int = _core_interior_activity_count(campus_life)
+    var total_interior_count: int = campus_life.interiors.size() if campus_life != null else 0
     var results: Dictionary = {
         "schema_version": 1,
         "result": "pass" if issues.is_empty() else "fail",
@@ -169,11 +217,15 @@ func _run_export_test() -> void:
         "sprint_waypoints": challenge.sprint_route.size() if challenge != null else 0,
         "weather_modes": weather.mode_count() if weather != null else 0,
         "npc_count": campus_life.pedestrians.size() if campus_life != null else 0,
-        "interior_count": campus_life.interiors.size() if campus_life != null else 0,
+        "story_npc_count": int(npc_counts["story"]),
+        "ambient_npc_count": int(npc_counts["ambient"]),
+        "interior_count": total_interior_count,
+        "core_interior_count": core_interior_count,
+        "extended_interior_count": maxi(0, total_interior_count - core_interior_count),
         "shuttle_loaded": campus_life.shuttle != null if campus_life != null else false,
         "puddle_count": weather.puddle_nodes.size() if weather != null else 0,
         "wet_surface_count": world.weather_reactive_materials.size() if world != null else 0,
-        "interior_activity_count": 6 if campus_life != null and campus_life.activity_spots.size() == 2 else 0,
+        "interior_activity_count": core_interior_activity_count,
         "rain_streak_count": weather.rain_multimesh.instance_count if weather != null and weather.rain_multimesh != null else 0,
         "bicycle_wheels": campus_life.bicycle_wheels.size() if campus_life != null else 0,
         "shuttle_passengers": campus_life.shuttle_passengers.size() if campus_life != null else 0,

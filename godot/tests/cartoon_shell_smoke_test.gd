@@ -25,8 +25,8 @@ func _run() -> void:
     if not paused or shell.login_cover == null or not shell.login_cover.visible:
         _fail("startup must open on the paused login UI")
         return
-    var illustration: NUS3DCampusLoginArt = shell.login_cover.get_node_or_null("CampusCartoon") as NUS3DCampusLoginArt
-    if illustration == null or illustration.mouse_filter != Control.MOUSE_FILTER_IGNORE:
+    var illustration: NUS3DCampusLoginArt = shell.login_cover.get_node_or_null("CampusCartoonBackdrop") as NUS3DCampusLoginArt
+    if illustration == null or illustration != shell.login_art or illustration.mouse_filter != Control.MOUSE_FILTER_IGNORE:
         _fail("static hand-drawn campus illustration is absent or intercepting input")
         return
     if shell.login_name == null or shell.login_password == null or shell.login_submit == null:

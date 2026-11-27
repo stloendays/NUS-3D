@@ -15,6 +15,14 @@ func _run() -> void:
         _fail("Alice registration failed")
         return
     var alice_path: String = account.challenge_save_path()
+    var alice_horror_path: String = account.feature_save_path("horror")
+    var alice_exam_path: String = account.feature_save_path("english_exams")
+    if alice_horror_path.is_empty() or alice_exam_path.is_empty():
+        _fail("Account-scoped horror or English-exam save path is missing")
+        return
+    if not account.set_ui_locale("zh") or account.preferred_ui_locale() != "zh":
+        _fail("Account UI locale preference did not persist")
+        return
     if not account.is_logged_in() or account.get_username() != "alice_3d":
         _fail("Register must open its own profile")
         return
@@ -38,6 +46,17 @@ func _run() -> void:
 
     if account.register("bob_3d", "another-pass-456") != "":
         _fail("Bob registration failed")
+        return
+    var bob_horror_path: String = account.feature_save_path("horror")
+    var bob_exam_path: String = account.feature_save_path("english_exams")
+    if bob_horror_path.is_empty() or bob_horror_path == alice_horror_path:
+        _fail("Horror saves must be enabled and isolated per account")
+        return
+    if bob_exam_path.is_empty() or bob_exam_path == alice_exam_path:
+        _fail("English-exam saves must be enabled and isolated per account")
+        return
+    if account.preferred_ui_locale() != "":
+        _fail("UI locale preference leaked across local accounts")
         return
     if account.challenge_save_path() == alice_path or account.level_progress()["total"] != 0:
         _fail("Separate accounts must not share challenge saves or XP")

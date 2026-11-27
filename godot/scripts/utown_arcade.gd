@@ -9,6 +9,7 @@ const BREAK_DURATION: float = 16.0
 const PROJECTILE_CAPACITY: int = 8
 # A single-line arcade summary fits between the weather card and area postcard.
 const STATUS_CARD_HEIGHT: float = 42.0
+const STATUS_CARD_WIDTH: float = 412.0
 const STATUS_CARD_MIN_TOP: float = 194.0
 const STATUS_CARD_MAX_BOTTOM: float = 344.0
 const WEAPONS = [
@@ -40,7 +41,7 @@ var projectiles: Array[Dictionary] = []
 var next_projectile: int = 0
 var mesh_cache: Dictionary = {}
 var material_cache: Dictionary = {}
-var status_layer: CanvasLayer
+var status_layer: Control
 var status_card: PanelContainer
 var status_label: Label
 var held_toy: Node3D
@@ -116,6 +117,10 @@ func _nameplate(value: String, color: Color) -> Label3D:
 func _register_students() -> void:
     for i in range(campus_life.pedestrians.size()):
         var pedestrian: Dictionary = campus_life.pedestrians[i]
+        # Arcade study focus belongs to the six named story students, not the
+        # eighteen ambient walkers introduced by the campus-life expansion.
+        if bool(pedestrian.get("ambient", false)):
+            continue
         var actor: Node3D = pedestrian["node"]
         var label := _nameplate(str(pedestrian["name"]), Color.html("#e7f7ff"))
         label.name = "ArcadeNameplate"
@@ -123,9 +128,9 @@ func _register_students() -> void:
         actor.add_child(label)
         students.append({
             "node": actor, "name": str(pedestrian["name"]), "label": label,
-            "focus": STUDENT_FOCUS, "break_seconds": 0.0
+            "campus_index": i, "focus": STUDENT_FOCUS, "break_seconds": 0.0
         })
-        _refresh_student_label(i)
+        _refresh_student_label(students.size() - 1)
 
 func _spawn_professors() -> void:
     var names: PackedStringArray = PackedStringArray(["Prof. Deadline", "Dr. Plot Twist"])
@@ -158,10 +163,14 @@ func _spawn_professors() -> void:
         professors.append({"node": teacher, "name": names[i], "line": jokes[i], "label": plate})
 
 func _build_status_panel() -> void:
-    status_layer = CanvasLayer.new()
+    # Share the HUD CanvasLayer so viewport-space layout comparisons use one
+    # coordinate system. Separate CanvasLayers have independent canvas transforms.
+    status_layer = Control.new()
     status_layer.name = "ArcadeOverlay"
-    status_layer.layer = 2
-    add_child(status_layer)
+    status_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    status_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    status_layer.z_index = 10
+    hud.add_child(status_layer)
     var card := PanelContainer.new()
     card.name = "ArcadeCard"
     # Compact one-line summary: never cover expanding indoor/weather information.
@@ -273,8 +282,9 @@ func reset_runtime_session() -> void:
         state["break_seconds"] = 0.0
         var actor: Node3D = state["node"]
         actor.scale = Vector3.ONE
-        if i < campus_life.pedestrians.size():
-            campus_life.pedestrians[i]["talk_remaining"] = 0.0
+        var campus_index: int = int(state.get("campus_index", i))
+        if campus_index < campus_life.pedestrians.size():
+            campus_life.pedestrians[campus_index]["talk_remaining"] = 0.0
         _refresh_student_label(i)
     for projectile in projectiles:
         projectile["active"] = false
@@ -320,7 +330,7 @@ func hit_student(index: int, amount: int = 1) -> bool:
     state["break_seconds"] = BREAK_DURATION
     var actor: Node3D = state["node"]
     actor.scale = Vector3.ONE * 0.86
-    campus_life.pedestrians[index]["talk_remaining"] = BREAK_DURATION
+    campus_life.pedestrians[int(state.get("campus_index", index))]["talk_remaining"] = BREAK_DURATION
     student_wins += 1
     _award_xp(30)
     _refresh_student_label(index)
@@ -451,18 +461,39 @@ func _announce(value: String, duration: float) -> void:
 func _layout_status_card() -> void:
     if status_card == null:
         return
-    var top: float = STATUS_CARD_MIN_TOP
+    # Use the horizontal lane between the left weather card and right minimap.
+    # A vertical-only offset is insufficient when the weather card expands.
+    var viewport: Rect2 = get_viewport().get_visible_rect()
+    var left_limit: float = 18.0
+    var right_limit: float = viewport.size.x - 18.0
     var campus_card: Control = hud.get_node_or_null("CampusCard") as Control
     if campus_card != null and campus_card.visible:
-        var weather_height: float = maxf(campus_card.size.y, campus_card.get_combined_minimum_size().y)
-        top = maxf(top, campus_card.position.y + weather_height + 10.0)
-    # The district postcard starts at y=354 and the key rail is bottom-fixed.
-    # Hide this optional summary when either takes priority on a small window.
-    var limit: float = minf(STATUS_CARD_MAX_BOTTOM,
-        float(get_viewport().get_visible_rect().size.y) - 66.0)
-    if top + STATUS_CARD_HEIGHT > limit:
+        left_limit = maxf(left_limit, campus_card.get_global_rect().end.x + 12.0)
+    var minimap: Control = hud.get_node_or_null("Minimap") as Control
+    if minimap != null and minimap.visible:
+        right_limit = minf(right_limit, minimap.get_global_rect().position.x - 12.0)
+    var gis_card: Control = hud.get_node_or_null("GISCard") as Control
+    if gis_card != null and gis_card.visible:
+        right_limit = minf(right_limit, gis_card.get_global_rect().position.x - 12.0)
+
+    var available_width: float = right_limit - left_limit
+    if available_width < 340.0:
         status_card.hide()
         return
+    var card_width: float = minf(STATUS_CARD_WIDTH, available_width)
+    var left: float = left_limit + (available_width - card_width) * 0.5
+    var top: float = STATUS_CARD_MIN_TOP
+    var bottom_limit: float = minf(STATUS_CARD_MAX_BOTTOM, viewport.end.y - 66.0)
+    if top + STATUS_CARD_HEIGHT > bottom_limit:
+        status_card.hide()
+        return
+
+    status_card.anchor_left = 0.0
+    status_card.anchor_right = 0.0
+    status_card.anchor_top = 0.0
+    status_card.anchor_bottom = 0.0
+    status_card.offset_left = left
+    status_card.offset_right = left + card_width
     status_card.offset_top = top
     status_card.offset_bottom = top + STATUS_CARD_HEIGHT
     status_card.show()
@@ -495,8 +526,10 @@ func _process(delta: float) -> void:
             state["focus"] = STUDENT_FOCUS
             var actor: Node3D = state["node"]
             actor.scale = Vector3.ONE
-        elif float(campus_life.pedestrians[i]["talk_remaining"]) < remaining:
-            campus_life.pedestrians[i]["talk_remaining"] = remaining
+        else:
+            var campus_index: int = int(state.get("campus_index", i))
+            if campus_index < campus_life.pedestrians.size() and float(campus_life.pedestrians[campus_index]["talk_remaining"]) < remaining:
+                campus_life.pedestrians[campus_index]["talk_remaining"] = remaining
         if ceili(remaining) != previous_sec:
             _refresh_student_label(i)
     for state in projectiles:

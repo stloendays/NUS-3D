@@ -1,6 +1,6 @@
 # M18 — Campus elevation foundation
 
-Adds **illustrative**, non-surveyed terrace elevations to all ten Kent Ridge expansion districts, with solid terrace pads and sloped pedestrian ramps. Science / MD1 and the other Kent Ridge landmark buildings inherit their district elevation. The existing UTown area stays at its original level (0) to avoid invalidating player spawn, campus props, NPC paths, vehicle routes and saved coordinates.
+Adds **illustrative**, non-surveyed terrace elevations to the eleven Kent Ridge expansion districts, with solid terrace pads and sloped pedestrian ramps. The schematic SPORTS field is explicitly ground-level (`elevation_m: 0`); Science / MD1 and the other elevated campus districts inherit their illustrative district elevation. The existing UTown area stays at its original level (0) to avoid invalidating player spawn, campus props, NPC paths, vehicle routes and saved coordinates.
 
 This is a **first stage** of whole-map relief, not a surveyed terrain mesh. District height values are artistic placeholders and are not actual NUS altitudes. The existing straight bus/road links remain at their old heights and do not yet follow terrain; buses do not use the new pedestrian ramps. Ramp ends and paths must be inspected for gaps/overlap, and players must be tested walking up/down in the Godot scene.
 

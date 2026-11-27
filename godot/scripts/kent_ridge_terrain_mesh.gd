@@ -2,7 +2,7 @@ extends RefCounted
 class_name KentRidgeTerrainMesh
 ## Schematic continuous surface. Heights are game-design estimates, not survey data.
 ## Mesh is visual-only until road/terrace overlap and spawn points are audited.
-const GRID_STEP: float = 24.0
+const GRID_STEP: float = 32.0
 const INFLUENCE_RADIUS: float = 165.0
 const MAX_CELLS: int = 3000
 

@@ -22,9 +22,18 @@ func _run() -> void:
     if relation.affinity("Maya") != 4:
         _fail("conversation cooldown did not prevent repeated farming")
         return
-    if relation.contextual_line("Maya", true).is_empty():
-        _fail("relationship dialogue unlock missing")
+    # Probe the threshold on the existing test node; do not allocate an
+    # unparented Node that survives until SceneTree shutdown.
+    var maya_affinity_before_probe: int = relation.affinity("Maya")
+    relation.scores["Maya"] = 9
+    if not relation.contextual_line("Maya", true).is_empty():
+        _fail("Friendship dialogue must remain locked below the 10-point threshold")
         return
+    relation.scores["Maya"] = 10
+    if relation.contextual_line("Maya", true).is_empty():
+        _fail("Friendship dialogue must unlock at the 10-point threshold")
+        return
+    relation.scores["Maya"] = maya_affinity_before_probe
     relation.conversation("Ethan", true)
     if relation.affinity("Ethan") != 2:
         _fail("reserved personality should gain affinity more slowly")

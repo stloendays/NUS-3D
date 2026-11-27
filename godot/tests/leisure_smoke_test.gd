@@ -27,17 +27,48 @@ func _run() -> void:
     if leisure.chess_board.size() != 81 or menu.cells.size() != 81 or leisure.CARD_ROUNDS != 5:
         _fail("Gomoku board, AI or five-round cards are missing")
         return
+    # Isolate both saves before checking the locked state; earlier smoke
+    # processes must not leave completed coursework in the shared user:// path.
+    course.save_path = "user://leisure-coursework-%d.cfg" % Time.get_ticks_usec()
+    course._load_progress()
     leisure.save_path = "user://leisure-integration-%d.cfg" % Time.get_ticks_usec()
     leisure._load_stats()
     if leisure.unlocked() or menu.open_lounge():
         _fail("club opened before Coursework completion")
         return
-    course.active_quest_index = 3
+    # Select a real faculty first: _store_active_state intentionally ignores
+    # progress until current_faculty_id has been established.
+    if course.faculty_options.is_empty():
+        _fail("coursework faculty catalogue is empty")
+        return
+    var faculty_id: String = str(course.faculty_options[0].get("id", ""))
+    if not course.select_faculty(faculty_id):
+        _fail("could not select a faculty for the club unlock test")
+        return
+    var chapter_count: int = course.faculty_by_id[faculty_id]["quests"].size()
+    if chapter_count != 3:
+        _fail("the selected faculty must contain exactly three coursework chapters")
+        return
+    course.active_quest_index = chapter_count
     course._store_active_state()
-    if not leisure.unlocked() or not menu.open_lounge():
+    if not course._save_progress():
+        _fail("coursework completion state did not persist to the isolated test save")
+        return
+    if not leisure.unlocked():
         _fail("club did not unlock after three chapters")
         return
-    if not menu.is_open or not course.modal_open or not game.get_node("Player").movement_locked:
+    var player: UTownPlayer = game.get_node("Player") as UTownPlayer
+    if not life.enter_interior("SRC"):
+        _fail("could not enter the SRC ground-floor club room")
+        return
+    player.global_position = leisure.station_global_position("chess")
+    if leisure.nearest_station() != "chess":
+        _fail("test player was not positioned beside the chess station")
+        return
+    if not menu.open_lounge():
+        _fail("club station did not open after coursework completion")
+        return
+    if not menu.is_open or not course.modal_open or not player.movement_locked:
         _fail("minigame overlay did not lock game input")
         return
     menu.close_lounge()
@@ -77,4 +108,5 @@ func _run() -> void:
         return
     print("PASS: Post-Course Club isolation, Gomoku, cards, social actions, travel guard and save")
     game.queue_free()
+    await process_frame
     quit(0)
