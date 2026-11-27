@@ -43,13 +43,11 @@ func _smoke() -> void:
         return
     var starting_weather_minimum: Vector2 = weather_card.custom_minimum_size
     weather_card.custom_minimum_size = Vector2(starting_weather_minimum.x, 125.0)
+    var starting_weather_visible: bool = weather_card.visible
+    weather_card.show()
     await process_frame
     arcade._refresh_status()
-    var minimap_debug: Control = hud.get_node_or_null("Minimap") as Control
-    print("ARCADE_LAYOUT_DEBUG campus=", weather_card.get_global_rect(),
-        " arcade=", arcade_card.get_global_rect(),
-        " offsets=", arcade_card.offset_left, ",", arcade_card.offset_top, ",", arcade_card.offset_right, ",", arcade_card.offset_bottom,
-        " minimap=", minimap_debug.get_global_rect() if minimap_debug != null else Rect2())
+    await process_frame
     if arcade_card.visible and arcade_card.get_global_rect().intersects(weather_card.get_global_rect()):
         _fail("Arcade status overlaps expanded indoor/weather panel")
         return
@@ -60,6 +58,7 @@ func _smoke() -> void:
         _fail("Arcade summary was not compacted to one readable line")
         return
     weather_card.custom_minimum_size = starting_weather_minimum
+    weather_card.visible = starting_weather_visible
     await process_frame
     arcade._refresh_status()
     if not arcade_card.visible:
