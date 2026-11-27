@@ -751,12 +751,12 @@ func _smoke() -> void:
         quit(1)
         return
     campus_life.interior_floor = 0
-    var press_p := InputEventKey.new()
-    press_p.keycode = KEY_P
-    press_p.pressed = true
-    leisure_ui._input(press_p)
+    var press_tab := InputEventKey.new()
+    press_tab.keycode = KEY_TAB
+    press_tab.pressed = true
+    leisure_ui._input(press_tab)
     if leisure.nearest_station() != "chess" or not leisure_ui.is_open or leisure_ui.active_tab != "chess":
-        push_error("P-key near the Gomoku table did not open the matching game")
+        push_error("Tab-key near the Gomoku table did not open the matching game")
         quit(1)
         return
     if not coursework.modal_open or not player.movement_locked:
