@@ -116,6 +116,10 @@ func _nameplate(value: String, color: Color) -> Label3D:
 func _register_students() -> void:
     for i in range(campus_life.pedestrians.size()):
         var pedestrian: Dictionary = campus_life.pedestrians[i]
+        # Arcade study focus belongs to the six named story students, not the
+        # eighteen ambient walkers introduced by the campus-life expansion.
+        if bool(pedestrian.get("ambient", false)):
+            continue
         var actor: Node3D = pedestrian["node"]
         var label := _nameplate(str(pedestrian["name"]), Color.html("#e7f7ff"))
         label.name = "ArcadeNameplate"
@@ -123,9 +127,9 @@ func _register_students() -> void:
         actor.add_child(label)
         students.append({
             "node": actor, "name": str(pedestrian["name"]), "label": label,
-            "focus": STUDENT_FOCUS, "break_seconds": 0.0
+            "campus_index": i, "focus": STUDENT_FOCUS, "break_seconds": 0.0
         })
-        _refresh_student_label(i)
+        _refresh_student_label(students.size() - 1)
 
 func _spawn_professors() -> void:
     var names: PackedStringArray = PackedStringArray(["Prof. Deadline", "Dr. Plot Twist"])
@@ -320,7 +324,7 @@ func hit_student(index: int, amount: int = 1) -> bool:
     state["break_seconds"] = BREAK_DURATION
     var actor: Node3D = state["node"]
     actor.scale = Vector3.ONE * 0.86
-    campus_life.pedestrians[index]["talk_remaining"] = BREAK_DURATION
+    campus_life.pedestrians[int(state.get("campus_index", index))]["talk_remaining"] = BREAK_DURATION
     student_wins += 1
     _award_xp(30)
     _refresh_student_label(index)

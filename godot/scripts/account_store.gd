@@ -173,6 +173,20 @@ func get_username() -> String:
     return active_username
 
 
+func set_ui_locale(locale_code: String) -> bool:
+    # Profile metadata only: language never changes XP, faculty, saves or mail.
+    # An explicit choice on the login screen wins over an older preference.
+    if not is_logged_in() or locale_code not in ["en", "zh"]:
+        return false
+    profile["ui_locale"] = locale_code
+    return _save_profile()
+
+
+func preferred_ui_locale() -> String:
+    var code: String = str(profile.get("ui_locale", ""))
+    return code if code in ["en", "zh"] else ""
+
+
 func challenge_save_path() -> String:
     if not is_logged_in():
         return LEGACY_CHALLENGE_SAVE
@@ -182,7 +196,7 @@ func challenge_save_path() -> String:
 
 func feature_save_path(feature: String) -> String:
     # Keep profile-owned game saves separate from shared language and sound settings.
-    if not is_logged_in() or not ["arcade", "coursework", "coins", "activities", "ddl_story", "leisure", "horror", "relationships"].has(feature):
+    if not is_logged_in() or not ["arcade", "coursework", "coins", "activities", "ddl_story", "leisure", "english_exams", "horror", "relationships"].has(feature):
         return ""
     var record: Dictionary = accounts.get(active_username, {})
     var path: String = storage_root.path_join("features").path_join(

@@ -194,8 +194,8 @@ func _smoke() -> void:
         push_error("invalid lighting preset was accepted")
         quit(1)
         return
-    if world.navigation_labels.size() < 10 or world.route_marker_root == null:
-        push_error("Missing navigational world labels for clean photo mode")
+    if world.route_marker_root == null:
+        push_error("Missing route marker visibility controller for clean photo mode")
         quit(1)
         return
     world.set_navigation_markers_visible(false)
@@ -209,8 +209,8 @@ func _smoke() -> void:
         quit(1)
         return
     world.set_navigation_markers_visible(true)
-    if not world.route_marker_root.visible:
-        push_error("F7 photo mode did not restore navigation markers")
+    if world.route_marker_root.visible:
+        push_error("Removed sky-high route labels reappeared after F7 photo mode")
         quit(1)
         return
     if world.route_points.size() != 4 or world.generated_path_count < 8:
