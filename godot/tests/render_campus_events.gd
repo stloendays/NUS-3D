@@ -49,6 +49,9 @@ func _render() -> void:
             (child as CanvasLayer).visible = false
     if coins.interface != null:
         coins.interface.visible = false
+    var ddl_story: Node3D = game.get_node_or_null("DDLStory") as Node3D
+    if ddl_story != null:
+        ddl_story.visible = false
     coins.save_path = "user://nus3d-m28-render-%d.cfg" % Time.get_ticks_usec()
     coins.load_progress()
 
@@ -76,38 +79,73 @@ func _render() -> void:
     if food_root == null:
         _fail("Fine Food root is missing")
         return
+    var eat_spots: Array[Dictionary] = activities._available_spots("eat")
+    var queue_spots: Array[Dictionary] = activities._available_spots("queue")
+    if eat_spots.size() < 3 or queue_spots.size() < 3:
+        _fail("Fine Food dining and queue anchors are missing")
+        return
     daily.set_game_time(12.0 * 60.0)
     weather.set_mode(0)
     daily.refresh_schedule_context(true)
     events.refresh_event(true)
-    player.global_position = food_root.global_position
-    _talk_to(life, player, ambient_states[0])
-    if not await _save_capture(camera, food_root.global_position, Vector3(0.0, 58.0, 76.0), output, "M28_LUNCH_EVENT.png"):
+    for index in range(life.pedestrians.size()):
+        var state: Dictionary = life.pedestrians[index]
+        var actor: Node3D = state.get("node") as Node3D
+        if actor != null:
+            actor.global_position = food_root.global_position + Vector3(100.0 + float(index) * 4.0, 0.0, 100.0)
+    var now: float = Time.get_ticks_msec() / 1000.0
+    for index in range(3):
+        var queue_state: Dictionary = ambient_states[index]
+        activities._start_single_activity(queue_state, queue_spots[index])
+        (queue_state["node"] as Node3D).global_position = queue_spots[index]["position"]
+        activities._arrive(queue_state, now)
+        var eater: Dictionary = ambient_states[index + 3]
+        activities._start_single_activity(eater, eat_spots[index])
+        (eater["node"] as Node3D).global_position = eat_spots[index]["position"]
+        activities._arrive(eater, now)
+    activities.update_occupancy_markers(true)
+    var dining_centre: Vector3 = Vector3.ZERO
+    for index in range(3):
+        dining_centre += eat_spots[index]["position"]
+    dining_centre /= 3.0
+    player.global_position = eat_spots[0]["position"] + Vector3(0.0, 0.0, 1.5)
+    life.talk_to_nearest()
+    if not await _save_capture(camera, dining_centre, Vector3(8.0, 8.5, 11.0), output, "M28_LUNCH_EVENT.png"):
         _fail("Lunch Rush event capture failed")
         return
 
-    var shelter_position: Vector3 = Vector3.ZERO
+    var shelter_spots: Array[Dictionary] = []
     for spot_value in activities.spots:
         var spot: Dictionary = spot_value
         if str(spot.get("kind", "")) == "shelter" and str(spot.get("area", "")) == "flavours":
-            shelter_position = spot.get("position", Vector3.ZERO)
-            break
-    if shelter_position == Vector3.ZERO:
+            shelter_spots.append(spot)
+    if shelter_spots.is_empty():
         for spot_value in activities.spots:
             var spot: Dictionary = spot_value
             if str(spot.get("kind", "")) == "shelter":
-                shelter_position = spot.get("position", Vector3.ZERO)
-                break
-    if shelter_position == Vector3.ZERO:
+                shelter_spots.append(spot)
+    if shelter_spots.is_empty():
         _fail("rain shelter anchor is missing")
         return
     daily.set_game_time(15.0 * 60.0)
     weather.set_mode(3)
     daily.refresh_schedule_context(true)
     events.refresh_event(true)
-    player.global_position = shelter_position
-    _talk_to(life, player, ambient_states[1])
-    if not await _save_capture(camera, shelter_position, Vector3(0.0, 38.0, 52.0), output, "M28_RAIN_EVENT.png"):
+    var shelter_position: Vector3 = shelter_spots[0]["position"]
+    for index in range(life.pedestrians.size()):
+        var state: Dictionary = life.pedestrians[index]
+        var actor: Node3D = state.get("node") as Node3D
+        if actor != null:
+            actor.global_position = shelter_position + Vector3(100.0 + float(index) * 4.0, 0.0, 100.0)
+    for index in range(mini(3, shelter_spots.size())):
+        var shelter_state: Dictionary = ambient_states[index]
+        activities._start_single_activity(shelter_state, shelter_spots[index])
+        (shelter_state["node"] as Node3D).global_position = shelter_spots[index]["position"]
+        activities._arrive(shelter_state, Time.get_ticks_msec() / 1000.0)
+    activities.update_occupancy_markers(true)
+    player.global_position = shelter_position + Vector3(0.0, 0.0, 1.5)
+    life.talk_to_nearest()
+    if not await _save_capture(camera, shelter_position, Vector3(8.0, 8.5, 11.0), output, "M28_RAIN_EVENT.png"):
         _fail("Rain Shelter event capture failed")
         return
 
@@ -124,8 +162,15 @@ func _render() -> void:
     weather.set_mode(0)
     daily.refresh_schedule_context(true)
     events.refresh_event(true)
-    player.global_position = picnic_position
-    _talk_to(life, player, ambient_states[2])
+    for index in range(life.pedestrians.size()):
+        var state: Dictionary = life.pedestrians[index]
+        var actor: Node3D = state.get("node") as Node3D
+        if actor != null:
+            actor.global_position = picnic_position + Vector3(100.0 + float(index) * 4.0, 0.0, 100.0)
+    for index in range(mini(2, positions.size())):
+        (ambient_states[index]["node"] as Node3D).global_position = positions[index]
+    player.global_position = picnic_position + Vector3(0.0, 0.0, 1.5)
+    life.talk_to_nearest()
     if not await _save_capture(camera, picnic_position, Vector3(18.0, 13.0, 20.0), output, "M28_EVENING_EVENT.png"):
         _fail("Evening Picnic event capture failed")
         return
