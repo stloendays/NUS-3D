@@ -95,8 +95,11 @@ func _run() -> void:
         if not (model.mesh is ArrayMesh):
             _fail("Kent Ridge original mass remained a hard box")
             return
-        var ridge_collider: CollisionShape3D = model.get_node_or_null(
-            "SchematicCollision/CollisionShape3D") as CollisionShape3D
+        var ridge_body: StaticBody3D = model.get_node_or_null("SchematicCollision") as StaticBody3D
+        if ridge_body == null or ridge_body.get_child_count() == 0:
+            _fail("Kent Ridge rounded mass lost its original collision body")
+            return
+        var ridge_collider: CollisionShape3D = ridge_body.get_child(0) as CollisionShape3D
         if ridge_collider == null or not (ridge_collider.shape is BoxShape3D):
             _fail("Kent Ridge rounded mass lost its original box collider")
             return
