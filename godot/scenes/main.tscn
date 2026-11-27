@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3]
+[gd_scene load_steps=42 format=3]
 
 [ext_resource type="Script" path="res://scripts/utown_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player_controller.gd" id="2"]
@@ -40,6 +40,7 @@
 [ext_resource type="Script" path="res://scripts/npc_relations.gd" id="37"]
 [ext_resource type="Script" path="res://scripts/campus_ambient_activities.gd" id="38"]
 [ext_resource type="Script" path="res://scripts/campus_daily_life.gd" id="39"]
+[ext_resource type="Script" path="res://scripts/campus_event_director.gd" id="40"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.34
@@ -302,3 +303,6 @@ script = ExtResource("38")
 
 [node name="CampusDailyLife" type="Node" parent="."]
 script = ExtResource("39")
+
+[node name="CampusEvents" type="Node" parent="."]
+script = ExtResource("40")

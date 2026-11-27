@@ -100,7 +100,10 @@ func _reason(reason: String) -> String:
         "Campus Sprint silver": "校园竞速银牌",
         "Campus Sprint gold": "校园竞速金牌",
         "Cartoon student duel": "卡通对战胜利",
-        "Lunch Express delivered": "送餐成功"
+        "Lunch Express delivered": "送餐成功",
+        "Campus Event: Lunch Rush": "午餐高峰活动",
+        "Campus Event: Rain Shelter": "雨天互助活动",
+        "Campus Event: Evening Picnic": "傍晚野餐活动"
     }
     return _t(str(names.get(reason, reason)), reason)
 
