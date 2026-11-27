@@ -194,5 +194,7 @@ func _run() -> void:
         return
     shell._logout()
     paused = false
+    shell.queue_free()
+    await process_frame
     print("NUS3D_STORY_SMOKE_OK")
     quit(0)
