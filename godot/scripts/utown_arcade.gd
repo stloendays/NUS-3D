@@ -9,6 +9,7 @@ const BREAK_DURATION: float = 16.0
 const PROJECTILE_CAPACITY: int = 8
 # A single-line arcade summary fits between the weather card and area postcard.
 const STATUS_CARD_HEIGHT: float = 42.0
+const STATUS_CARD_WIDTH: float = 412.0
 const STATUS_CARD_MIN_TOP: float = 194.0
 const STATUS_CARD_MAX_BOTTOM: float = 344.0
 const WEAPONS = [
@@ -456,25 +457,39 @@ func _announce(value: String, duration: float) -> void:
 func _layout_status_card() -> void:
     if status_card == null:
         return
-    var top: float = STATUS_CARD_MIN_TOP
+    # Use the horizontal lane between the left weather card and right minimap.
+    # A vertical-only offset is insufficient when the weather card expands.
+    var viewport: Rect2 = get_viewport().get_visible_rect()
+    var left_limit: float = 18.0
+    var right_limit: float = viewport.size.x - 18.0
     var campus_card: Control = hud.get_node_or_null("CampusCard") as Control
     if campus_card != null and campus_card.visible:
-        # CampusCard lives in a different CanvasLayer. Use its actual viewport
-        # rectangle rather than its local position, which can omit anchor offsets.
-        var campus_rect: Rect2 = campus_card.get_global_rect()
-        top = maxf(top, campus_rect.end.y + 10.0)
+        left_limit = maxf(left_limit, campus_card.get_global_rect().end.x + 12.0)
+    var minimap: Control = hud.get_node_or_null("Minimap") as Control
+    if minimap != null and minimap.visible:
+        right_limit = minf(right_limit, minimap.get_global_rect().position.x - 12.0)
+    var gis_card: Control = hud.get_node_or_null("GISCard") as Control
+    if gis_card != null and gis_card.visible:
+        right_limit = minf(right_limit, gis_card.get_global_rect().position.x - 12.0)
 
-    # Keep the optional Arcade summary above the live district postcard and
-    # the fixed bottom action rail. All bounds are measured in viewport space.
-    var limit: float = minf(STATUS_CARD_MAX_BOTTOM,
-        get_viewport().get_visible_rect().end.y - 66.0)
-    var guide: UTownExperienceGuide = get_parent().get_node_or_null("ExperienceGuide") as UTownExperienceGuide
-    if guide != null and guide.zone_card != null and guide.zone_card.visible:
-        limit = minf(limit, guide.zone_card.get_global_rect().position.y - 10.0)
-
-    if top + STATUS_CARD_HEIGHT > limit:
+    var available_width: float = right_limit - left_limit
+    if available_width < 340.0:
         status_card.hide()
         return
+    var card_width: float = minf(STATUS_CARD_WIDTH, available_width)
+    var left: float = left_limit + (available_width - card_width) * 0.5
+    var top: float = STATUS_CARD_MIN_TOP
+    var bottom_limit: float = minf(STATUS_CARD_MAX_BOTTOM, viewport.end.y - 66.0)
+    if top + STATUS_CARD_HEIGHT > bottom_limit:
+        status_card.hide()
+        return
+
+    status_card.anchor_left = 0.0
+    status_card.anchor_right = 0.0
+    status_card.anchor_top = 0.0
+    status_card.anchor_bottom = 0.0
+    status_card.offset_left = left
+    status_card.offset_right = left + card_width
     status_card.offset_top = top
     status_card.offset_bottom = top + STATUS_CARD_HEIGHT
     status_card.show()

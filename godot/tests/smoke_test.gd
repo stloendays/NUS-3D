@@ -383,8 +383,20 @@ func _smoke() -> void:
         push_error("wet surfaces did not dry and restore original materials")
         quit(1)
         return
-    if campus_life == null or campus_life.pedestrians.size() != 6:
-        push_error("six procedural campus pedestrians did not spawn")
+    if campus_life == null:
+        push_error("campus life controller did not load")
+        quit(1)
+        return
+    var story_npc_count: int = 0
+    var ambient_npc_count: int = 0
+    for state_value in campus_life.pedestrians:
+        var state: Dictionary = state_value
+        if bool(state.get("ambient", false)):
+            ambient_npc_count += 1
+        else:
+            story_npc_count += 1
+    if story_npc_count != campus_life.npc_names.size() or ambient_npc_count != campus_life.AMBIENT_COUNT:
+        push_error("named story NPCs or ambient campus pedestrians did not spawn")
         quit(1)
         return
     var first_npc: Node3D = campus_life.pedestrians[0]["node"]
@@ -394,8 +406,8 @@ func _smoke() -> void:
         return
         quit(1)
         return
-    if campus_life.interiors.size() != 2 or campus_life.shuttle == null:
-        push_error("ERC/SRC interior concepts or campus shuttle did not load")
+    if not campus_life.interiors.has("ERC") or not campus_life.interiors.has("SRC") or campus_life.shuttle == null:
+        push_error("ERC/SRC core interior concepts or campus shuttle did not load")
         quit(1)
         return
     for interior_id in ["ERC", "SRC"]:
