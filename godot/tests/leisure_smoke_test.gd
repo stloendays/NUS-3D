@@ -54,10 +54,21 @@ func _run() -> void:
     if not course._save_progress():
         _fail("coursework completion state did not persist to the isolated test save")
         return
-    if not leisure.unlocked() or not menu.open_lounge():
+    if not leisure.unlocked():
         _fail("club did not unlock after three chapters")
         return
-    if not menu.is_open or not course.modal_open or not game.get_node("Player").movement_locked:
+    var player: UTownPlayer = game.get_node("Player") as UTownPlayer
+    if not life.enter_interior("SRC"):
+        _fail("could not enter the SRC ground-floor club room")
+        return
+    player.global_position = leisure.station_global_position("chess")
+    if leisure.nearest_station() != "chess":
+        _fail("test player was not positioned beside the chess station")
+        return
+    if not menu.open_lounge():
+        _fail("club station did not open after coursework completion")
+        return
+    if not menu.is_open or not course.modal_open or not player.movement_locked:
         _fail("minigame overlay did not lock game input")
         return
     menu.close_lounge()
