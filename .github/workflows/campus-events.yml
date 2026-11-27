@@ -50,7 +50,7 @@ jobs:
             sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
           fi
       - name: Render actual campus event HUD states
-        run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --rendering-driver opengl3 --script res://tests/render_campus_events.gd
+        run: xvfb-run -a -s "-screen 0 1280x720x24" env LIBGL_ALWAYS_SOFTWARE=1 godot --path godot --audio-driver Dummy --rendering-driver opengl3 --script res://tests/render_campus_events.gd
       - name: Upload M28 visual review
         uses: actions/upload-artifact@v4
         with:
