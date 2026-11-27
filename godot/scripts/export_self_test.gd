@@ -30,6 +30,16 @@ func _pedestrian_counts(campus_life: UTownCampusLife) -> Dictionary:
     return {"story": story_count, "ambient": ambient_count}
 
 
+func _core_interior_count(campus_life: UTownCampusLife) -> int:
+    if campus_life == null:
+        return 0
+    var count: int = 0
+    for id in ["ERC", "SRC"]:
+        if campus_life.interiors.has(id):
+            count += 1
+    return count
+
+
 func _core_interior_activity_count(campus_life: UTownCampusLife) -> int:
     if campus_life == null:
         return 0
@@ -190,7 +200,9 @@ func _run_export_test() -> void:
         for faculty in coursework.faculty_options:
             quests_total += faculty["quests"].size()
     var npc_counts: Dictionary = _pedestrian_counts(campus_life)
+    var core_interior_count: int = _core_interior_count(campus_life)
     var core_interior_activity_count: int = _core_interior_activity_count(campus_life)
+    var total_interior_count: int = campus_life.interiors.size() if campus_life != null else 0
     var results: Dictionary = {
         "schema_version": 1,
         "result": "pass" if issues.is_empty() else "fail",
@@ -207,7 +219,9 @@ func _run_export_test() -> void:
         "npc_count": campus_life.pedestrians.size() if campus_life != null else 0,
         "story_npc_count": int(npc_counts["story"]),
         "ambient_npc_count": int(npc_counts["ambient"]),
-        "interior_count": campus_life.interiors.size() if campus_life != null else 0,
+        "interior_count": total_interior_count,
+        "core_interior_count": core_interior_count,
+        "extended_interior_count": maxi(0, total_interior_count - core_interior_count),
         "shuttle_loaded": campus_life.shuttle != null if campus_life != null else false,
         "puddle_count": weather.puddle_nodes.size() if weather != null else 0,
         "wet_surface_count": world.weather_reactive_materials.size() if world != null else 0,
